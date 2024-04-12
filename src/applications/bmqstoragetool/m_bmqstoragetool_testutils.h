@@ -140,7 +140,7 @@ class JournalFile {
     const FileHeader& fileHeader() const;
 
     /// Return value of timestamp incrementation.
-    const bsls::Types::Uint64 timestampIncrement() const;
+    bsls::Types::Uint64 timestampIncrement() const;
 
     // MANIPULATORS
 
@@ -259,7 +259,7 @@ inline const FileHeader& JournalFile::fileHeader() const
     return d_fileHeader;
 }
 
-inline const bsls::Types::Uint64 JournalFile::timestampIncrement() const
+inline bsls::Types::Uint64 JournalFile::timestampIncrement() const
 {
     return d_timestampIncrement;
 }
