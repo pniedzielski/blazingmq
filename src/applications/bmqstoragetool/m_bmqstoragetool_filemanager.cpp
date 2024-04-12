@@ -68,7 +68,7 @@ FileManager::~FileManager()
 }
 
 // =====================
-// class FileManagerReal
+// class FileManagerImpl
 // =====================
 
 // CREATORS
