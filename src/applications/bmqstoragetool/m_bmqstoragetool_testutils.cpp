@@ -16,6 +16,9 @@
 // bmqstoragetool
 #include <m_bmqstoragetool_testutils.h>
 
+// BDE
+#include <bsla_maybeunused.h>
+
 namespace BloombergLP {
 
 namespace m_bmqstoragetool {
@@ -681,14 +684,14 @@ void outputGuidString(bsl::ostream&            ostream,
 // class FileManagerMock
 // =====================
 
-FileManagerMock::FileManagerMock(bslma::Allocator* allocator)
+FileManagerMock::FileManagerMock(BSLA_MAYBE_UNUSED bslma::Allocator* allocator)
 {
     EXPECT_CALL(*this, dataFileIterator())
         .WillRepeatedly(Return(bsl::nullptr_t()));
 }
 
 FileManagerMock::FileManagerMock(const JournalFile& journalFile,
-                                 bslma::Allocator*  allocator)
+                                 BSLA_MAYBE_UNUSED bslma::Allocator* allocator)
 : d_journalFileIt(&journalFile.mappedFileDescriptor(),
                   journalFile.fileHeader(),
                   false)
