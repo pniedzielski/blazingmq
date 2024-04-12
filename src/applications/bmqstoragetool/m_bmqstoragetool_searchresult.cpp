@@ -179,6 +179,19 @@ void outputFooter(bsl::ostream& ostream, bsl::size_t foundMessagesCount)
 
 }  // close unnamed namespace
 
+// ==================
+// class SearchResult
+// ==================
+
+SearchResult::~SearchResult()
+{
+}
+
+bool SearchResult::hasCache() const
+{
+    return false;
+}
+
 // ===========================
 // class SearchResultDecorator
 // ===========================

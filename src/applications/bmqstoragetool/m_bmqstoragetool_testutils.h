@@ -231,30 +231,16 @@ class FileManagerMock : public FileManager {
     // CREATORS
 
     /// Constructor using the specified `allocator`.
-    explicit FileManagerMock(bslma::Allocator* allocator = 0)
-    {
-        EXPECT_CALL(*this, dataFileIterator())
-            .WillRepeatedly(Return(bsl::nullptr_t()));
-    }
+    explicit FileManagerMock(bslma::Allocator* allocator = 0);
 
     /// Constructor using the specified `journalFile` and `allocator`.
     explicit FileManagerMock(const JournalFile& journalFile,
-                             bslma::Allocator*  allocator = 0)
-    : d_journalFileIt(&journalFile.mappedFileDescriptor(),
-                      journalFile.fileHeader(),
-                      false)
-    {
-        EXPECT_CALL(*this, dataFileIterator())
-            .WillRepeatedly(Return(bsl::nullptr_t()));
-    }
+                             bslma::Allocator*  allocator = 0);
 
     // MANIPULATORS
 
     /// Return pointer to modifiable journal file iterator.
-    mqbs::JournalFileIterator* journalFileIterator() BSLS_KEYWORD_OVERRIDE
-    {
-        return &d_journalFileIt;
-    };
+    mqbs::JournalFileIterator* journalFileIterator() BSLS_KEYWORD_OVERRIDE;
 
     MOCK_METHOD0(dataFileIterator, mqbs::DataFileIterator*());
 };

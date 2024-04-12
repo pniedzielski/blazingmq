@@ -677,6 +677,33 @@ void outputGuidString(bsl::ostream&            ostream,
         ostream << bsl::endl;
 }
 
+// =====================
+// class FileManagerMock
+// =====================
+
+FileManagerMock::FileManagerMock(bslma::Allocator* allocator)
+{
+    EXPECT_CALL(*this, dataFileIterator())
+        .WillRepeatedly(Return(bsl::nullptr_t()));
+}
+
+FileManagerMock::FileManagerMock(const JournalFile& journalFile,
+                                 bslma::Allocator*  allocator)
+: d_journalFileIt(&journalFile.mappedFileDescriptor(),
+                  journalFile.fileHeader(),
+                  false)
+{
+    EXPECT_CALL(*this, dataFileIterator())
+        .WillRepeatedly(Return(bsl::nullptr_t()));
+}
+
+// MANIPULATORS
+
+mqbs::JournalFileIterator* FileManagerMock::journalFileIterator()
+{
+    return &d_journalFileIt;
+}
+
 }  // close TestUtils namespace
 
 }  // close package namespace

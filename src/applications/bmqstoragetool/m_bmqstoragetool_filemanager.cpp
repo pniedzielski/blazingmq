@@ -59,6 +59,14 @@ void closeLedger(mqbsl::Ledger* ledger)
 
 }  // close unnamed namespace
 
+// =================
+// class FileManager
+// =================
+
+FileManager::~FileManager()
+{
+}
+
 // =====================
 // class FileManagerReal
 // =====================

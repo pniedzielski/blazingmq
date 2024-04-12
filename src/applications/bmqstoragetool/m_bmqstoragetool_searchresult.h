@@ -77,7 +77,7 @@ class SearchResult {
         GuidsMap;
     // Hash map of message guids to iterators of GuidsList.
 
-    virtual bool hasCache() const { return false; }
+    virtual bool hasCache() const;
     // Return `false` if all required data is processed, e.g. all given GUIDs
     // are output and search could be stopped. Return `true` to indicate that
     // there is incomplete data.
@@ -86,7 +86,7 @@ class SearchResult {
     // CREATORS
 
     /// Destructor
-    virtual ~SearchResult() {}
+    virtual ~SearchResult();
 
     // MANIPULATORS
 

@@ -13,23 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef INCLUDED_M_BMQSTORAGETOOL_COMMANDPROCESSOR
-#define INCLUDED_M_BMQSTORAGETOOL_COMMANDPROCESSOR
-
-//@PURPOSE: Provide a command processor interface to process commands.
-//
-//@CLASSES:
-//  m_bmqstoragetool::CommandProcessor: command processor interface.
-//
-//@DESCRIPTION: 'CommandProcessor' provides interface
-// to process commands.
-
-// bmqstoragetool
-#include <m_bmqstoragetool_filemanager.h>
-#include <m_bmqstoragetool_parameters.h>
-
-// BDE
-#include <bsl_ostream.h>
+#include "m_bmqstoragetool_commandprocessor.h"
 
 namespace BloombergLP {
 namespace m_bmqstoragetool {
@@ -38,22 +22,13 @@ namespace m_bmqstoragetool {
 // class CommandProcessor
 // ======================
 
-class CommandProcessor {
-  public:
-    // CREATORS
+CommandProcessor::CommandProcessor()
+{
+}
 
-    /// Default constructor.
-    CommandProcessor();
-
-    virtual ~CommandProcessor();
-
-    // MANIPULATORS
-
-    /// Process command.
-    virtual void process() = 0;
-};
+CommandProcessor::~CommandProcessor()
+{
+}
 
 }  // close package namespace
 }  // close enterprise namespace
-
-#endif
