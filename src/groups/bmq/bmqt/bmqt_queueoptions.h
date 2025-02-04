@@ -104,8 +104,6 @@ class QueueOptions {
     typedef bsl::pair<SubscriptionHandle, Subscription> HandleAndSubscription;
 
     /// `loadSubscriptions` return types
-    ///
-    /// EXPERIMENTAL.  Do not use until this feature is announced.
     typedef bsl::vector<HandleAndSubscription> SubscriptionsSnapshot;
 
   public:
@@ -159,20 +157,14 @@ class QueueOptions {
     /// error.  Note that `errorDescription` may be null if the caller does
     /// not care about getting error messages, but users are strongly
     /// encouraged to log error string if this API returns failure.
-    ///
-    /// EXPERIMENTAL.  Do not use until this feature is announced.
     bool addOrUpdateSubscription(bsl::string*              errorDescription,
                                  const SubscriptionHandle& handle,
                                  const Subscription&       subscription);
 
     /// Return false if subscription does not exist.
-    ///
-    /// EXPERIMENTAL.  Do not use until this feature is announced.
     bool removeSubscription(const SubscriptionHandle& handle);
 
     /// Remove all subscriptions.
-    ///
-    /// EXPERIMENTAL.  Do not use until this feature is announced.
     void removeAllSubscriptions();
 
     // ACCESSORS
@@ -208,14 +200,10 @@ class QueueOptions {
     bool hasSuspendsOnBadHostHealth() const;
 
     /// Return false if subscription does not exist.
-    ///
-    /// EXPERIMENTAL.  Do not use until this feature is announced.
     bool loadSubscription(Subscription*             subscription,
                           const SubscriptionHandle& handle) const;
 
     /// Load all handles and subscriptions into the specified `snapshot`.
-    ///
-    /// EXPERIMENTAL.  Do not use until this feature is announced.
     void loadSubscriptions(SubscriptionsSnapshot* snapshot) const;
 
     /// Format this object to the specified output `stream` at the (absolute
