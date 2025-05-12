@@ -32,6 +32,7 @@
 // BDE
 #include <bdls_filesystemutil.h>
 #include <bdls_pathutil.h>
+#include <bsla_annotations.h>
 
 namespace BloombergLP {
 namespace m_bmqstoragetool {
