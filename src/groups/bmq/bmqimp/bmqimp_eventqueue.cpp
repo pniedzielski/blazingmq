@@ -42,6 +42,7 @@
 #include <bsls_assert.h>
 #include <bsls_performancehint.h>
 #include <bsls_timeutil.h>
+#include <bsla_annotations.h>
 
 namespace BloombergLP {
 namespace bmqimp {
@@ -544,9 +545,8 @@ bsl::shared_ptr<Event> EventQueue::popFront()
 
     // Look in the queue
     QueueItem item;
-    const int rc = d_queue.popFront(&item);
+    BSLA_MAYBE_UNUSED const int rc = d_queue.popFront(&item);
     BSLS_ASSERT_SAFE(rc == 0);
-    (void)rc;
     event = item.d_event_sp;
     afterEventPopped(item);
     return event;

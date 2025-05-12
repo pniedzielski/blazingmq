@@ -36,6 +36,7 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmf_nil.h>
+#include <bsla_annotations.h>
 
 namespace BloombergLP {
 
@@ -327,9 +328,8 @@ class BasicTableInfoProvider : public bmqst::TableInfoProvider {
 // ACCESSORS
 template <typename TYPE>
 int BasicTableInfoProvider_ValueSizeVisitor::operator()(
-    const TYPE& value) const
+    BSLA_UNUSED const TYPE& value) const
 {
-    (void)value;  // compiler warning unused parameter 'value'
     return 1;
 }
 

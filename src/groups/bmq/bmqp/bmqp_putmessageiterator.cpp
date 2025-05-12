@@ -32,6 +32,7 @@
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_iostream.h>
 #include <bsls_performancehint.h>
+#include <bsla_annotations.h>
 
 namespace BloombergLP {
 namespace bmqp {
@@ -70,9 +71,8 @@ void PutMessageIterator::initCachedOptionsView() const
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_optionsView.isNull())) {
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         // Load options iterator
-        int rc = loadOptionsView(&d_optionsView.makeValue());
+        BSLA_MAYBE_UNUSED int rc = loadOptionsView(&d_optionsView.makeValue());
         BSLS_ASSERT_SAFE(rc == 0);
-        (void)rc;  // compiler happiness
     }
 
     // POSTCONDITIONS
