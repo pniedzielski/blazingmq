@@ -78,7 +78,7 @@ void doFail()
 }
 
 void executeOnClosedChannelFunc(bmqio::NtcChannel* channel,
-                                const Status&      status)
+                                BSLA_UNUSED const Status& status)
 {
     // PRECONDITIONS
     BMQTST_ASSERT(channel);
@@ -251,8 +251,8 @@ void Tester::onAcceptConnection(
     d_semaphore.post();
 }
 
-void Tester::onChannelResult(ChannelFactoryEvent::Enum       event,
-                             const Status&                   status,
+void Tester::onChannelResult(BSLA_UNUSED ChannelFactoryEvent::Enum       event,
+                             BSLA_UNUSED const Status&                   status,
                              const bsl::shared_ptr<Channel>& channel)
 {
     d_connectChannels.push_back(channel);
