@@ -1275,12 +1275,13 @@ void ClientSession::processDisconnectAllQueuesDone(
 
 void ClientSession::processDisconnect(
     const bmqp_ctrlmsg::ControlMessage&             controlMessage,
-    const bsl::shared_ptr<bmqsys::OperationLogger>& opLogger)
+    BSLA_UNUSED const bsl::shared_ptr<bmqsys::OperationLogger>& opLogger)
 {
     // executed by the *CLIENT* dispatcher thread
 
     // Want to keep `opLogger` until the end of this scope to log the current
-    // operation execution time.
+    // operation execution time, but we don't use it directly, so it's marked
+    // as `BSLA_UNUSED`.
 
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(dispatcher()->inDispatcherThread(this));
@@ -1364,12 +1365,13 @@ void ClientSession::openQueueCb(
     BSLA_UNUSED mqbi::QueueHandle*                  handle,
     const bmqp_ctrlmsg::OpenQueueResponse&          openQueueResponse,
     const bmqp_ctrlmsg::ControlMessage&             handleParamsCtrlMsg,
-    const bsl::shared_ptr<bmqsys::OperationLogger>& opLogger)
+    BSLA_UNUSED const bsl::shared_ptr<bmqsys::OperationLogger>& opLogger)
 {
     // executed by the *CLIENT* dispatcher thread
 
     // Want to keep `opLogger` until the end of this scope to log the current
-    // operation execution time.
+    // operation execution time, but we don't use it directly, so it's marked
+    // as `BSLA_UNUSED`.
 
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(dispatcher()->inDispatcherThread(this));
@@ -1444,12 +1446,13 @@ void ClientSession::processCloseQueue(
 void ClientSession::closeQueueCb(
     const bsl::shared_ptr<mqbi::QueueHandle>&       handle,
     const bmqp_ctrlmsg::ControlMessage&             handleParamsCtrlMsg,
-    const bsl::shared_ptr<bmqsys::OperationLogger>& opLogger)
+    BSLA_UNUSED const bsl::shared_ptr<bmqsys::OperationLogger>& opLogger)
 {
     // executed by the *CLIENT* dispatcher thread
 
     // Want to keep `opLogger` until the end of this scope to log the current
-    // operation execution time.
+    // operation execution time, but we don't use it directly, so it's marked
+    // as `BSLA_UNUSED`.
 
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(dispatcher()->inDispatcherThread(this));

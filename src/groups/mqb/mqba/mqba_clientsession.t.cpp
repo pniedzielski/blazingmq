@@ -2147,7 +2147,7 @@ static void test11_initiateShutdown()
         mqbi::StorageMessageAttributes d_messageAttributes;
 
         // CREATORS
-        MockStorageIterator(bslma::Allocator* allocator = 0)
+        MockStorageIterator(BSLA_UNUSED bslma::Allocator* allocator = 0)
         : d_guid(bmqp::MessageGUIDGenerator::testGUID())
         , d_appMessage(bmqp::RdaInfo())
         , d_appData()
@@ -2187,13 +2187,13 @@ static void test11_initiateShutdown()
         }
 
         const mqbi::AppMessage&
-        appMessageView(unsigned int appOrdinal) const BSLS_KEYWORD_OVERRIDE
+        appMessageView(BSLA_UNUSED unsigned int appOrdinal) const BSLS_KEYWORD_OVERRIDE
         {
             return d_appMessage;
         }
 
         mqbi::AppMessage&
-        appMessageState(unsigned int appOrdinal) BSLS_KEYWORD_OVERRIDE
+        appMessageState(BSLA_UNUSED unsigned int appOrdinal) BSLS_KEYWORD_OVERRIDE
         {
             return d_appMessage;
         }
