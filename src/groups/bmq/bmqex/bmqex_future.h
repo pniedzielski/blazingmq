@@ -150,7 +150,7 @@
 #if BSLS_COMPILERFEATURES_SIMULATE_CPP11_FEATURES
 // clang-format off
 // Include version that can be compiled with C++03
-// Generated on Wed Apr  2 14:55:18 2025
+// Generated on Thu Jun 12 17:51:39 2025
 // Command line: sim_cpp11_features.pl bmqex_future.h
 
 # define COMPILING_BMQEX_FUTURE_H
@@ -955,7 +955,7 @@ class FutureSharedState {
     /// the C++ standard.
     void setValue(bslmf::MovableRef<R> value);
 
-#if !BSLS_COMPILERFEATURES_SIMULATE_CPP11_FEATURES  // $var-args=9
+#if !BSLS_COMPILERFEATURES_SIMULATE_CPP11_FEATURES // $var-args=9
 
     /// Atomically initialize the stored value as if by direct-non-list-
     /// initializing an object of type `R` with 'bsl::forward<ARGS>(
@@ -1648,6 +1648,10 @@ inline FutureSharedState<R>::~FutureSharedState()
         reinterpret_cast<Buffer*>(&d_result)->object().~ExceptionObjType();
         break;  // BREAK
     }
+    default: {
+        // Unreachable code, but makes the compiler happy.
+        BSLS_ASSERT(false);
+    }
     }
 }
 
@@ -1664,7 +1668,7 @@ inline void FutureSharedState<R>::setValue(bslmf::MovableRef<R> value)
     emplaceValue(bslmf::MovableRefUtil::move(value));
 }
 
-#if !BSLS_COMPILERFEATURES_SIMULATE_CPP11_FEATURES  // $var-args=9
+#if !BSLS_COMPILERFEATURES_SIMULATE_CPP11_FEATURES // $var-args=9
 template <class R>
 template <class... ARGS>
 inline void FutureSharedState<R>::emplaceValue(ARGS&&... args)
@@ -1821,11 +1825,12 @@ inline R& FutureSharedState<R>::get()
         typedef bsls::ObjectBuffer<ExceptionObjType> Buffer;
         reinterpret_cast<Buffer*>(&d_result)->object().emit();  // THROW
     }
+    default: {
+        // Unreachable code, but makes the compiler happy.
+        BSLS_ASSERT(false);
+        BSLS_ASSERT_INVOKE_NORETURN("");
     }
-
-    // Unreachable code, but makes the compiler happy.
-    BSLS_ASSERT(false);
-    return *reinterpret_cast<R*>(0x42);
+    }
 }
 
 template <class R>
@@ -1901,6 +1906,6 @@ inline void bmqex::swap(FutureResult<R>& lhs,
 
 }  // close enterprise namespace
 
-#endif  // End C++11 code
+#endif // End C++11 code
 
 #endif

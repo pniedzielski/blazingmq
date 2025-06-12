@@ -722,6 +722,10 @@ void TCPSessionFactory::channelStateCallback(
                             context->d_resultState_p,
                             bmqio::Channel::ReadCallback());
     } break;
+    default: {
+        BSLS_ASSERT(false && "Unexpected ChannelFactorEvent; unreachable by design.");
+        BSLA_UNREACHABLE;
+    }
     }
 }
 
