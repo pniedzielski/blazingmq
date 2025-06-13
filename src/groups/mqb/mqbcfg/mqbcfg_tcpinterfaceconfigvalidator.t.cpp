@@ -26,10 +26,25 @@
 #include <bsl_cstdlib.h>
 #include <bsl_iostream.h>
 #include <bsls_asserttest.h>
+#include <bsla_annotations.h>
 
 using namespace BloombergLP;
 
-struct TcpInterfaceConfigValidatorTest : bmqtst::Test {};
+struct TcpInterfaceConfigValidatorTest : bmqtst::Test {
+    // CREATORS
+    TcpInterfaceConfigValidatorTest();
+    ~TcpInterfaceConfigValidatorTest() BSLS_KEYWORD_OVERRIDE;
+};
+
+TcpInterfaceConfigValidatorTest::TcpInterfaceConfigValidatorTest()
+{
+    // NOTHING
+}
+
+TcpInterfaceConfigValidatorTest::~TcpInterfaceConfigValidatorTest()
+{
+    // NOTHING
+}
 
 BMQTST_TEST_F(TcpInterfaceConfigValidatorTest, breathingTest)
 {
