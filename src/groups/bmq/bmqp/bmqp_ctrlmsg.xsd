@@ -1522,8 +1522,8 @@
     </sequence>
   </complexType>
 
-  <simpleType name='DumpMsgType' bdem:preserveEnumOrder='1'>
-    <restriction base='string'>
+  <simpleType name='DumpMsgType'>
+    <restriction base='string' bdem:preserveEnumOrder='1'>
       <enumeration value='E_INCOMING'/>
       <enumeration value='E_OUTGOING'/>
       <enumeration value='E_PUSH'/>
@@ -1533,8 +1533,8 @@
     </restriction>
   </simpleType>
 
-  <simpleType name='DumpActionType' bdem:preserveEnumOrder='1'>
-    <restriction base='string'>
+  <simpleType name='DumpActionType'>
+    <restriction base='string' bdem:preserveEnumOrder='1'>
       <enumeration value='E_ON'/>
       <enumeration value='E_OFF'/>
       <enumeration value='E_MESSAGE_COUNT'/>
