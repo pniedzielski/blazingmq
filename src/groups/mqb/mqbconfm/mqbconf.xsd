@@ -67,7 +67,7 @@
       </documentation>
     </annotation>
     <sequence>
-      <element name='code'    type='int'/>
+      <element name='code' type='int' />
       <element name='message' type='string' default=''/>
     </sequence>
   </complexType>
@@ -94,22 +94,43 @@
       <documentation>
         Represent the various limitations to apply to either a 'domain' or an
         individual 'queue'.
-
-        messages...............: maximum number of messages
-        messagesWatermarkRatio.: threshold ratio to the maximum number of
-                                 messages for which a high watermark alarm
-                                 will trigger
-        bytes..................: maximum cumulated number of bytes
-        bytesWatermarkRatio....: threshold ratio to the maximum cumulated
-                                 number of bytes for which a high watermark
-                                 alarm will trigger
       </documentation>
     </annotation>
+
     <sequence>
-      <element name='messages'               type ='long'/>
-      <element name='messagesWatermarkRatio' type ='decimal' default='0.8'/>
-      <element name='bytes'                  type ='long'/>
-      <element name='bytesWatermarkRatio'    type ='decimal' default='0.8'/>
+      <element name='messages' type ='long'>
+        <annotation>
+          <documentation>
+            Maximum number of messages.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='messagesWatermarkRatio' type ='decimal' default='0.8'>
+        <annotation>
+          <documentation>
+            Threshold ratio of the maximum number of messages for which a high
+            watermark alarm will trigger.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='bytes' type ='long'>
+        <annotation>
+          <documentation>
+            Maximum accumulated number of bytes.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='bytesWatermarkRatio' type ='decimal' default='0.8'>
+        <annotation>
+          <documentation>
+            Threshold ratio to the maximum accumulated number of bytes for
+            which a high watermark alarm will trigger.
+          </documentation>
+        </annotation>
+      </element>
     </sequence>
   </complexType>
 
@@ -169,53 +190,125 @@
     <annotation>
       <documentation>
         Configuration for a Domain using the custom Bloomberg Domain.
-
-        name................: name of this domain
-        mode................: mode of the queues in this domain
-        storage.............: storage to use by queues in this domain
-        maxConsumers........: will reject if more than this number of consumers
-                              tries to connect. 0 (the default) means unlimited
-        maxProducers........: will reject if more than this number of producers
-                              tries to connect. 0 (the default) means unlimited
-        maxQueues...........: will reject creating more than this number of
-                              queues. 0 (the default) means unlimited
-        msgGroupIdConfig....: optional configuration for Group Id routing
-                              features
-        maxIdleTime.........: (seconds) time queue can be inactive before
-                              alarming. 0 (the default) means no monitoring and
-                              alarming
-        messageTtl..........: (seconds) minimum time before which a message can
-                              be discarded (i.e., it's not guaranteed that the
-                              message will be discarded exactly after
-                              'ttlSeconds' time, but it is guaranteed that it
-                              will not be discarded before at least
-                              'ttlSeconds' time
-        maxDeliveryAttempts.: maximum number of times BlazingMQ framework will
-                              attempt to deliver a message to consumers before
-                              purging it from the queue.  Zero (the default)
-                              means unlimited
-        deduplicationTimeMs.: timeout, in milliseconds, to keep GUID of PUT
-                              message for the purpose of detecting duplicate
-                              PUTs.
-        consistency.........: optional consistency mode.
-        subscriptions.......: optional application subscriptions
       </documentation>
     </annotation>
+
     <sequence>
-      <element name='name'                type='string'/>
-      <element name='mode'                type='mqbconfm:QueueMode'/>
-      <element name='storage'             type='mqbconfm:StorageDefinition'/>
-      <element name='maxConsumers'        type='int' default='0'/>
-      <element name='maxProducers'        type='int' default='0'/>
-      <element name='maxQueues'           type='int' default='0'/>
-      <element name='msgGroupIdConfig'    type='mqbconfm:MsgGroupIdConfig'
-                                                  minOccurs='0' maxOccurs='1'/>
-      <element name='maxIdleTime'         type='int' default='0'/>
-      <element name='messageTtl'          type='long'/>
-      <element name='maxDeliveryAttempts' type='int' default='0'/>
-      <element name='deduplicationTimeMs' type='int' default='300000'/>   <!-- 5 minutes -->
-      <element name='consistency'         type='mqbconfm:Consistency'/>
-      <element name='subscriptions'       type='mqbconfm:Subscription' maxOccurs='unbounded'/>
+      <element name='name' type='string'>
+        <annotation>
+          <documentation>
+            Name of this domain.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='mode' type='mqbconfm:QueueMode'>
+        <annotation>
+          <documentation>
+            Mode of the queues in this domain.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='storage' type='mqbconfm:StorageDefinition'>
+        <annotation>
+          <documentation>
+            Storage to use by queues in this domain.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='maxConsumers' type='int' default='0'>
+        <annotation>
+          <documentation>
+            Will reject is more than this number of consumers tries to connect.
+            0 (the default) means unlimited.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='maxProducers' type='int' default='0'>
+        <annotation>
+          <documentation>
+            Will reject is more than this number of producers tries to connect.
+            0 (the default) means unlimited.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='maxQueues' type='int' default='0'>
+        <annotation>
+          <documentation>
+            Will reject creating more than this number of queues.  0 (the
+            default) means unlimited.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='msgGroupIdConfig' type='mqbconfm:MsgGroupIdConfig'
+                                       minOccurs='0' maxOccurs='1'>
+        <annotation>
+          <documentation>
+            Optional configuration for Group Id routing features.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='maxIdleTime' type='int' default='0'>
+        <annotation>
+          <documentation>
+            Time, in seconds, a queue can be inactive before alarming.  0 (the
+            default) means no monitoring and alarming.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='messageTtl' type='long'>
+        <annotation>
+          <documentation>
+            Minimum time, in seconds, before which a message can be discarded
+            (i.e., it's not guaranteed that the message will be discarded
+            exactly after `messageTtl` seconds, but it is guaranteed that it
+            will not be discarded before at least `messageTtl` seconds).
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='maxDeliveryAttempts' type='int' default='0'>
+        <annotation>
+          <documentation>
+            Maximum number of times the BlazingMQ framework will attempt to
+            deliver a message to consumers before purging it from the queue.
+            0 (the default) means unlimited.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='deduplicationTimeMs' type='int' default='300000'>
+        <annotation>
+          <documentation>
+            Timeout, in milliseconds, to keep the GUID of a PUT message for the
+            purpose of detecting duplicate PUTs.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='consistency' type='mqbconfm:Consistency'>
+        <annotation>
+          <documentation>
+            Optional consistency mode.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='subscriptions' type='mqbconfm:Subscription'
+                                    maxOccurs='unbounded'>
+        <annotation>
+          <documentation>
+            Optional application subscriptions.
+          </documentation>
+        </annotation>
+      </element>
     </sequence>
   </complexType>
 
@@ -251,17 +344,34 @@
     <annotation>
       <documentation>
         Choice of all the various modes a queue can be configured in.
-
-        fanout.........: multiple consumers are each getting all messages
-        priority.......: consumers with highest priority are sharing load in
-                         round robin way
-        broadcast......: send to all available consumers on a best-effort basis
       </documentation>
     </annotation>
+
     <choice>
-      <element name='fanout'    type='mqbconfm:QueueModeFanout'/>
-      <element name='priority'  type='mqbconfm:QueueModePriority'/>
-      <element name='broadcast' type='mqbconfm:QueueModeBroadcast'/>
+      <element name='fanout' type='mqbconfm:QueueModeFanout'>
+        <annotation>
+          <documentation>
+            Multiple consumers are each getting all messages.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='priority' type='mqbconfm:QueueModePriority'>
+        <annotation>
+          <documentation>
+            Consumers with highest priority are sharing load in round robin
+            way.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='broadcast' type='mqbconfm:QueueModeBroadcast'>
+        <annotation>
+          <documentation>
+            Send to all available consumers on a best-effort basis.
+          </documentation>
+        </annotation>
+      </element>
     </choice>
   </complexType>
 
@@ -269,15 +379,25 @@
     <annotation>
       <documentation>
         Configuration for a fanout queue.
-
-        appIDs.............: List of appIDs authorized to consume from the
-                             queue.
-        publishAppIdMetrics: Whether to publish appId metrics.
       </documentation>
     </annotation>
+
     <sequence>
-      <element name='appIDs'              type='string' maxOccurs='unbounded'/>
-      <element name='publishAppIdMetrics' type='boolean' default='false'/>
+      <element name='appIDs' type='string' maxOccurs='unbounded'>
+        <annotation>
+          <documentation>
+            List of appIDs authorized to consume from the queue.
+          </documentation>
+        </annotation>
+      </element>
+
+      <element name='publishAppIdMetrics' type='boolean' default='false'>
+        <annotation>
+          <documentation>
+            Whether to publish appId metrics.
+          </documentation>
+        </annotation>
+      </element>
     </sequence>
   </complexType>
 
