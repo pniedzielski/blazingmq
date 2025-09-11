@@ -257,19 +257,18 @@ void createQueueStatsDatum(bmqst::StatContext* statContext,
     datum->adopt(builder.commit());
 }
 
-bmqp_ctrlmsg::ClientIdentity* extractClientIdentity(
+const bmqp_ctrlmsg::ClientIdentity* extractClientIdentity(
     const bmqp_ctrlmsg::NegotiationMessage& negotiationMessage)
 // Based on the client type, return the pointer to the correct identity field
 // of the specified 'negotiationMesage'.
 {
     switch (negotiationMessage.selectionId()) {
     case bmqp_ctrlmsg::NegotiationMessage::SELECTION_INDEX_CLIENT_IDENTITY: {
-        return const_cast<bmqp_ctrlmsg::ClientIdentity*>(
-            &negotiationMessage.clientIdentity());  // RETURN
+        return &negotiationMessage.clientIdentity();                  // RETURN
     }
     case bmqp_ctrlmsg::NegotiationMessage::SELECTION_INDEX_BROKER_RESPONSE: {
-        return const_cast<bmqp_ctrlmsg::ClientIdentity*>(
-            &negotiationMessage.brokerResponse().brokerIdentity());  // RETURN
+        return &negotiationMessage.brokerResponse().brokerIdentity();
+                                                                      // RETURN
     }
     default: {
         BSLS_ASSERT_OPT(false && "Invalid negotiation message");

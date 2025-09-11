@@ -321,7 +321,7 @@ class ClientSession : public mqbnet::Session,
 
     /// Raw pointer to the right field in `d_negotiationMessage` (dpending on
     /// whether it's a "client" or a "broker").
-    bmqp_ctrlmsg::ClientIdentity* d_clientIdentity_p;
+    const bmqp_ctrlmsg::ClientIdentity* d_clientIdentity_p;
 
     /// Set to true when the client identity `guidInfo` struct contains
     /// non-empty `clientId` field.  If this broker the first hop, then the
