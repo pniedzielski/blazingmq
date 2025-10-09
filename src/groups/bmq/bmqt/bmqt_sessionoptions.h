@@ -438,7 +438,7 @@ SessionOptions::setStatsDumpInterval(const bsls::TimeInterval& value)
                     "value must be a multiple of 30s");
     BSLS_ASSERT_OPT(value.seconds() <
                         bdlt::TimeUnitRatio::k_SECONDS_PER_HOUR &&
-                    "value must be < 10 min");
+                    "value must be < 60 min");
 
     d_statsDumpInterval = value;
     return *this;
