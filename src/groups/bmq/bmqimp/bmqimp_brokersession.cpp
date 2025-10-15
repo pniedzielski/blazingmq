@@ -1455,14 +1455,14 @@ BrokerSession::QueueFsm::QueueFsm(BrokerSession& session)
         {S::e_CLOSING_CFG, E::e_RESP_OK, S::e_CLOSING_CLS},
         {S::e_CLOSING_CFG, E::e_REQ_NOT_SENT, S::e_CLOSING_CFG_EXPIRED},
         {S::e_CLOSING_CFG, E::e_RESP_BAD, S::e_CLOSING_CLS},
-        {S::e_CLOSING_CFG, E::e_RESP_TIMEOUT, S::e_CLOSING_CFG_EXPIRED},
+        {S::e_CLOSING_CFG, E::e_RESP_TIMEOUT, S::e_CLOSING_CFG},
         {S::e_CLOSING_CFG, E::e_REQ_CANCELED, S::e_CLOSED},
         {S::e_CLOSING_CFG, E::e_SESSION_DOWN, S::e_CLOSED},
         //
         {S::e_CLOSING_CLS, E::e_RESP_OK, S::e_CLOSED},
         {S::e_CLOSING_CLS, E::e_REQ_NOT_SENT, S::e_CLOSING_CLS_EXPIRED},
         {S::e_CLOSING_CLS, E::e_RESP_BAD, S::e_CLOSED},
-        {S::e_CLOSING_CLS, E::e_RESP_TIMEOUT, S::e_CLOSING_CLS_EXPIRED},
+        {S::e_CLOSING_CLS, E::e_RESP_TIMEOUT, S::e_CLOSING_CLS},
         {S::e_CLOSING_CLS, E::e_REQ_CANCELED, S::e_CLOSED},
         {S::e_CLOSING_CLS, E::e_SESSION_DOWN, S::e_CLOSED},
         //
@@ -2469,25 +2469,37 @@ void BrokerSession::QueueFsm::handleResponseTimeout(
         BSLS_ASSERT_SAFE(context->request().choice().isCloseQueueValue());
         BSLS_ASSERT_SAFE(bmqt::QueueFlagsUtil::isReader(queue->flags()));
 
-        // Set EXPIRED state
-        setQueueState(queue, QueueState::e_CLOSING_CFG_EXPIRED, event);
+        // If we timeout while closing a queue, we don't know what state the
+        // primary thinks the queue is in.  The primary could have not yet
+        // processed our 'CloseQueue' request, could do so at some point in the
+        // future, or could never.  The safest thing to do is kill the
+        // connection.
 
-        logOperationTime(queue->uri().asString(), "Close queue");
+        // Keep the state and do not notify about response's timeout.  By
+        // killing the connection, a CHANNEL_DOWN signal will follow and the
+        // queue will be closed.
+        setQueueState(queue, QueueState::e_CLOSING_CFG, event);
 
-        // Notify about close result
-        context->signal();
+        // Close the channel
+        d_session.d_channel_sp->close();
     } break;
     case QueueState::e_CLOSING_CLS: {
         // Expect 'CloseQueue' request and 'Status' response.
         BSLS_ASSERT_SAFE(context->request().choice().isCloseQueueValue());
 
-        // Set EXPIRED state
-        setQueueState(queue, QueueState::e_CLOSING_CLS_EXPIRED, event);
+        // If we timeout while closing a queue, we don't know what state the
+        // primary thinks the queue is in.  The primary could have not yet
+        // processed our 'CloseQueue' request, could do so at some point in the
+        // future, or could never.  The safest thing to do is kill the
+        // connection.
 
-        logOperationTime(queue->uri().asString(), "Close queue");
+        // Keep the state and do not notify about response's timeout.  By
+        // killing the connection, a CHANNEL_DOWN signal will follow and the
+        // queue will be closed.
+        setQueueState(queue, QueueState::e_CLOSING_CLS, event);
 
-        // Notify about close result
-        context->signal();
+        // Close the channel
+        d_session.d_channel_sp->close();
     } break;
     case QueueState::e_PENDING: {
         BSLS_ASSERT_SAFE(isConfigure(context->request()));
