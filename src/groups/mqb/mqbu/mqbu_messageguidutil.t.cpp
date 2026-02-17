@@ -1337,7 +1337,12 @@ int main(int argc, char* argv[])
     case 3: test3_print(); break;
     case 2: test2_multithread(); break;
     case 1: test1_breathingTest(); break;
-    case -1: testN1_decode(); break;
+    case -1:
+        BMQTST_BENCHMARK_WITH_ARGS(testN1_decode,
+                                   RangeMultiplier(10)
+                                       ->Range(10, 10000000)
+                                       ->Unit(benchmark::kMillisecond));
+        break;
     case -2:
         BMQTST_BENCHMARK_WITH_ARGS(testN2_bdlbPerformance,
                                    RangeMultiplier(10)
