@@ -214,7 +214,7 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     // this data structure present only if
     // queue is in fanout mode.
 
-    bsls::Types::Int64 d_ttlSeconds;
+    bsls::Types::Uint64 d_ttlSeconds;
 
     bsls::AtomicInt d_isEmpty;
     // Flag indicating if storage is empty.
@@ -271,7 +271,7 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     /// atomically reconfigure that storage with the new configuration.
     void configure(const mqbconfm::Storage& config,
                    const mqbconfm::Limits&  limits,
-                   bsls::Types::Int64       messageTtl,
+                   bsls::Types::Uint64      messageTtl,
                    int maxDeliveryAttempts) BSLS_KEYWORD_OVERRIDE;
 
     /// Set the consistency level associated to this storage to the specified

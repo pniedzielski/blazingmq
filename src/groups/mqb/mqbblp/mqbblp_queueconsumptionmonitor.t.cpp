@@ -58,7 +58,7 @@ static mqbconfm::Domain getDomainConfig()
 {
     mqbconfm::Domain domainCfg;
     domainCfg.deduplicationTimeMs() = 0;  // No history
-    domainCfg.messageTtl() = bsl::numeric_limits<bsls::Types::Int64>::max();
+    domainCfg.messageTtl() = bsl::numeric_limits<bsls::Types::Uint64>::max();
     return domainCfg;
 }
 

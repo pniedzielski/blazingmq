@@ -233,7 +233,7 @@ bool FileBackedStorage::hasReceipt(const bmqt::MessageGUID& msgGUID) const
 
 void FileBackedStorage::configure(const mqbconfm::Storage& config,
                                   const mqbconfm::Limits&  limits,
-                                  bsls::Types::Int64       messageTtl,
+                                  bsls::Types::Uint64      messageTtl,
                                   int                      maxDeliveryAttempts)
 {
     d_config = config;
@@ -805,8 +805,7 @@ int FileBackedStorage::gcExpiredMessages(const bdlt::Datetime& currentTimeUtc,
         DeletionRecordFlag::Enum     deletionFlag = DeletionRecordFlag::e_NONE;
 
         latestMsgTimestampEpoch = handle.timestamp();
-        if ((secondsFromEpoch - handle.timestamp()) <=
-            static_cast<bsls::Types::Uint64>(d_ttlSeconds)) {
+        if ((secondsFromEpoch - handle.timestamp()) <= d_ttlSeconds) {
             // Current message hasn't expired and subsequent messages are only
             // "younger" (have a larger timestamp), so we can check if the SC
             // waiting for Receipts has exceeded the deduplicationTimeNs.

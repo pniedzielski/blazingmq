@@ -93,7 +93,7 @@ const int k_MAX_UNCONFIRMED_BYTES_DEFAULT_INITIAILIZER = 32 * 1024 * 1024;
 /// messages, it specifies (TTL + N + 1) as the elapsed seconds argument.
 /// The TTL must be greater than total number of messages the tester can
 /// post.
-const size_t k_MAX_MESSAGES = 64000;
+const bsls::Types::Uint64 k_MAX_MESSAGES = 64000;
 
 // STATIC HELPER FUNCTIONS
 

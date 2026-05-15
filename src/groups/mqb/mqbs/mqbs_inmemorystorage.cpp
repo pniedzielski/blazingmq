@@ -83,8 +83,6 @@ InMemoryStorage::InMemoryStorage(DataStore*              dataStore_p,
 , d_currentlyAutoConfirming()
 , d_autoConfirms(d_allocator_p)
 {
-    BSLS_ASSERT_SAFE(0 <= d_ttlSeconds);  // Broadcast queues can use 0 for TTL
-
     d_virtualStorageCatalog.stats()->initialize(d_uri, domain);
     d_virtualStorageCatalog.setDefaultRda(config.maxDeliveryAttempts());
 
@@ -102,7 +100,7 @@ InMemoryStorage::~InMemoryStorage()
 //   (virtual mqbi::Storage)
 void InMemoryStorage::configure(const mqbconfm::Storage& config,
                                 const mqbconfm::Limits&  limits,
-                                bsls::Types::Int64       messageTtl,
+                                bsls::Types::Uint64      messageTtl,
                                 int                      maxDeliveryAttempts)
 {
     d_config = config;
@@ -459,8 +457,7 @@ int InMemoryStorage::gcExpiredMessages(const bdlt::Datetime& currentTimeUtc,
             cit->second.attributes();
 
         latestMsgTimestampEpoch = attribs.arrivalTimestamp();
-        if ((secondsFromEpoch - attribs.arrivalTimestamp()) <=
-            static_cast<bsls::Types::Uint64>(d_ttlSeconds)) {
+        if ((secondsFromEpoch - attribs.arrivalTimestamp()) <= d_ttlSeconds) {
             break;  // BREAK
         }
 

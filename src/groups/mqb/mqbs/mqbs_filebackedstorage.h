@@ -175,7 +175,7 @@ class FileBackedStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
 
     VirtualStorageCatalog d_virtualStorageCatalog;
 
-    bsls::Types::Int64 d_ttlSeconds;
+    bsls::Types::Uint64 d_ttlSeconds;
 
     mqbu::CapacityMeter d_capacityMeter;
 
@@ -387,7 +387,7 @@ class FileBackedStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     /// atomically reconfigure that storage with the new configuration.
     void configure(const mqbconfm::Storage& config,
                    const mqbconfm::Limits&  limits,
-                   bsls::Types::Int64       messageTtl,
+                   bsls::Types::Uint64      messageTtl,
                    int maxDeliveryAttempts) BSLS_KEYWORD_OVERRIDE;
 
     /// Set the consistency level associated to this storage to the specified

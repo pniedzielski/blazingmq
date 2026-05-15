@@ -84,7 +84,7 @@
       <element name='msgGroupIdConfig'    type='mqbconfm:MsgGroupIdConfig'
                                                   minOccurs='0' maxOccurs='1'/>
       <element name='maxIdleTime'         type='int' default='0'/>
-      <element name='messageTtl'          type='long'/>
+      <element name='messageTtl'          type='unsignedLong'/>
       <element name='maxDeliveryAttempts' type='int' default='0'/>
       <element name='deduplicationTimeMs' type='int' default='300000'/>   <!-- 5 minutes -->
       <element name='consistency'         type='mqbconfm:Consistency'/>

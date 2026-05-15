@@ -127,6 +127,8 @@ const mqbu::StorageKey k_APP_KEY3(mqbu::StorageKey::HexRepresentation(),
 const bsls::Types::Int64 k_INT64_ZERO = 0;
 const bsls::Types::Int64 k_INT64_MAX =
     bsl::numeric_limits<bsls::Types::Int64>::max();
+const bsls::Types::Uint64 k_UINT64_MAX =
+    bsl::numeric_limits<bsls::Types::Uint64>::max();
 const mqbu::StorageKey k_NULL_KEY = mqbu::StorageKey::k_NULL_KEY;
 
 // FUNCTIONS
@@ -571,7 +573,7 @@ struct Tester {
 
         mqbconfm::Domain domainCfg(d_allocator_p);
         domainCfg.deduplicationTimeMs() = 0;  // No history
-        domainCfg.messageTtl()          = k_INT64_MAX;
+        domainCfg.messageTtl()          = k_UINT64_MAX;
 
         bmqu::MemOutStream errDescription(d_allocator_p);
         d_mockDomain.configure(errDescription, domainCfg);
@@ -601,7 +603,7 @@ struct Tester {
                    bsls::Types::Int64 byteCapacity = k_DEFAULT_BYTES,
                    double msgWatermarkRatio        = k_MSG_WATERMARK_RATIO,
                    double byteWatermarkRatio       = k_BYTE_WATERMARK_RATIO,
-                   bsls::Types::Int64 messageTtl   = k_INT64_MAX)
+                   bsls::Types::Uint64 messageTtl  = k_UINT64_MAX)
     {
         // PRECONDITIONS
         BSLS_ASSERT_OPT(d_replicatedStorage_mp && "Storage was not created");

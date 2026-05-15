@@ -1518,7 +1518,7 @@ int StorageManager::configureStorage(
     const bmqt::Uri&                   uri,
     const mqbu::StorageKey&            queueKey,
     int                                partitionId,
-    const bsls::Types::Int64           messageTtl,
+    const bsls::Types::Uint64          messageTtl,
     const int                          maxDeliveryAttempts,
     const mqbconfm::StorageDefinition& storageDef)
 {
