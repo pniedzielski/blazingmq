@@ -176,8 +176,7 @@ class SessionOptions {
     /// Function type used to obtain authentication credentials (mechanism and
     /// data) for authenticating with the broker.  The function should return
     /// an `AuthnCredential` object on success, or `bsl::nullopt` if an error
-    /// occurs. Any error details should be written to the provided `error`
-    /// stream.
+    /// occurs.
     typedef bsl::function<bsl::optional<AuthnCredential>()> AuthnCredentialCb;
 
     // CONSTANTS
