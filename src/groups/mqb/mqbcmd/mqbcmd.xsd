@@ -277,7 +277,7 @@
     <choice>
       <element name="theNull"     type="tns:Void"/>
       <element name="theBool"     type="xs:boolean"/>
-      <element name="theInteger"  type="xs:integer"/>
+      <element name="theInteger"  type="xs:long"/>
       <element name="theDouble"   type="xs:double"/>
       <element name="theDate"     type="xs:date"/>
       <element name="theTime"     type="xs:time"/>
@@ -968,7 +968,7 @@
     <sequence>
       <element name="clientDescription"        type="xs:string"/>
       <element name="msgGroupId"               type="xs:string"/>
-      <element name="lastSeenDeltaNanoseconds" type="xs:integer"/>
+      <element name="lastSeenDeltaNanoseconds" type="xs:long"/>
     </sequence>
   </complexType>
 
@@ -1007,7 +1007,7 @@
   <complexType name="Message">
     <sequence>
       <element name="guid"             type="xs:string"/>
-      <element name="sizeBytes"        type="xs:integer"/>
+      <element name="sizeBytes"        type="xs:long"/>
       <element name="arrivalTimestamp" type="xs:dateTime"/>
     </sequence>
   </complexType>
