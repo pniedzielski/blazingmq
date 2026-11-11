@@ -37,37 +37,6 @@ using namespace BloombergLP;
 // ----------------------------------------------------------------------------
 namespace {
 
-// ========================
-// struct AsyncTestCallback
-// ========================
-
-/// Provides a functor to be invoked asynchronously.
-struct AsyncTestCallback {
-    void operator()(bslmt::Semaphore*      waitSem,
-                    int*                   incIndex,
-                    bslmt::ThreadUtil::Id* threadId,
-                    bslmt::Semaphore*      postSem) const
-    {
-        waitSem->wait();  // wait permission to continue
-        ++(*incIndex);
-        *threadId = bslmt::ThreadUtil::selfId();
-        postSem->post();  // notify we are done
-    }
-};
-
-// ==========================
-// struct InPlaceTestCallback
-// ==========================
-
-/// Provides a functor to be invoked in-place.
-struct InPlaceTestCallback {
-    void operator()(int* incIndex, bslmt::ThreadUtil::Id* threadId) const
-    {
-        ++(*incIndex);
-        *threadId = bslmt::ThreadUtil::selfId();
-    }
-};
-
 // UTILITY FUNCTIONS
 void onThreadExit(void* threadsCompleted)
 {
@@ -203,7 +172,10 @@ static void test3_executor_post()
     for (int i = 0; i < k_NUM_JOBS; ++i) {
         // schedule function object execution
         ex.post([&sem1, &jobNo, &threadId, &sem2]() {
-            AsyncTestCallback()(&sem1, &jobNo, &threadId, &sem2);
+            sem1.wait();  // wait permission to continue
+            ++jobNo;
+            threadId = bslmt::ThreadUtil::selfId();
+            sem2.post();  // notify we are done
         });
 
         // function object not executed yet
@@ -246,7 +218,8 @@ static void test4_executor_dispatch()
     for (int i = 0; i < k_NUM_JOBS; ++i) {
         // execute function object
         ex.dispatch([&jobNo, &threadId]() {
-            InPlaceTestCallback()(&jobNo, &threadId);
+            ++jobNo;
+            threadId = bslmt::ThreadUtil::selfId();
         });
 
         // function object executed in this thread
