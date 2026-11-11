@@ -221,7 +221,7 @@ Policy_Permission& Policy_Permission::operator=(const Policy_Permission& other)
 }
 
 Policy_Permission::Policy_Permission(
-    bslmf::MovableRef<Policy_Permission> other) BSLS_KEYWORD_NOEXCEPT
+    bslmf::MovableRef<Policy_Permission> other) noexcept
 : MOVE_INIT(other, d_id),
   MOVE_INIT(other, d_connectClient),
   MOVE_INIT(other, d_connectProxy),
@@ -464,7 +464,7 @@ Policy& Policy::operator=(const Policy& other)
     return *this;
 }
 
-Policy::Policy(bslmf::MovableRef<Policy> other) BSLS_KEYWORD_NOEXCEPT
+Policy::Policy(bslmf::MovableRef<Policy> other) noexcept
 : MOVE_INIT(other, d_rolePermissions)
 {
     // NOTHING
@@ -494,7 +494,7 @@ Policy& Policy::operator=(bslmf::MovableRef<Policy> other)
     return *this;
 }
 
-Policy::~Policy() BSLS_KEYWORD_NOEXCEPT
+Policy::~Policy() noexcept
 {
     // NOTHING
 }

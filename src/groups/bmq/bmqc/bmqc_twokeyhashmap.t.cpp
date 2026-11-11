@@ -70,16 +70,16 @@ class TestHasher {
 
   public:
     // CREATORS
-    explicit TestHasher(int id = 0) BSLS_KEYWORD_NOEXCEPT : d_id(id) {}
+    explicit TestHasher(int id = 0) noexcept : d_id(id) {}
 
   public:
     // MANIPULATORS
-    size_t operator()(const T& value) const BSLS_KEYWORD_NOEXCEPT
+    size_t operator()(const T& value) const noexcept
     {
         return bsl::hash<T>()(value);
     }
 
-    int id() const BSLS_KEYWORD_NOEXCEPT { return d_id; }
+    int id() const noexcept { return d_id; }
 };
 
 /// An "Integer" that may throw on copy, or equality comparison.  A
@@ -103,7 +103,7 @@ class ThrowingInteger {
     // CREATORS
     ThrowingInteger(int  value             = 0,
                     bool throwOnCopy       = false,
-                    bool throwOnComparison = false) BSLS_KEYWORD_NOEXCEPT
+                    bool throwOnComparison = false) noexcept
     // IMPLICIT
     : d_value(value),
       d_throwOnCopy(throwOnCopy),
@@ -136,11 +136,11 @@ class ThrowingInteger {
 
   public:
     // MANIPULATORS
-    int& value() BSLS_KEYWORD_NOEXCEPT { return d_value; }
+    int& value() noexcept { return d_value; }
 
   public:
     // ACCESSORS
-    int value() const BSLS_KEYWORD_NOEXCEPT { return d_value; }
+    int value() const noexcept { return d_value; }
 
     friend bool operator==(const ThrowingInteger& lhs,
                            const ThrowingInteger& rhs)
@@ -160,7 +160,7 @@ namespace bsl {
 template <>
 struct hash<ThrowingInteger> {
     // MANIPULATORS
-    size_t operator()(const ThrowingInteger& value) const BSLS_KEYWORD_NOEXCEPT
+    size_t operator()(const ThrowingInteger& value) const noexcept
     {
         return bsl::hash<int>()(value.value());
     }

@@ -239,8 +239,7 @@ class Policy_Permission {
 
     Policy_Permission& operator=(const Policy_Permission& other);
 
-    Policy_Permission(bslmf::MovableRef<Policy_Permission> other)
-        BSLS_KEYWORD_NOEXCEPT;
+    Policy_Permission(bslmf::MovableRef<Policy_Permission> other) noexcept;
 
     Policy_Permission(bslmf::MovableRef<Policy_Permission> other,
                       const allocator_type&                allocator);
@@ -307,13 +306,13 @@ class Policy {
 
     Policy& operator=(const Policy& other);
 
-    Policy(bslmf::MovableRef<Policy> other) BSLS_KEYWORD_NOEXCEPT;
+    Policy(bslmf::MovableRef<Policy> other) noexcept;
 
     Policy(bslmf::MovableRef<Policy> other, const allocator_type& allocator);
 
     Policy& operator=(bslmf::MovableRef<Policy> other);
 
-    ~Policy() BSLS_KEYWORD_NOEXCEPT;
+    ~Policy() noexcept;
 
     static int parse(Policy*                 result,
                      const mqbpoly::Policy&  policy,

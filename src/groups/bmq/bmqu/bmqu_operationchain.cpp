@@ -39,8 +39,7 @@ OperationChain_Job::TargetBase::~TargetBase()
 // --------------------
 
 // PRIVATE MANIPULATORS
-void OperationChain::onOperationCompleted(JobHandle handle)
-    BSLS_KEYWORD_NOEXCEPT
+void OperationChain::onOperationCompleted(JobHandle handle) noexcept
 {
     LockGuard lock(&d_mutex);  // LOCK
 
@@ -67,7 +66,7 @@ void OperationChain::onOperationCompleted(JobHandle handle)
     d_condition.broadcast();
 }
 
-void OperationChain::run(LockGuard* lock) BSLS_KEYWORD_NOEXCEPT
+void OperationChain::run(LockGuard* lock) noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(lock);
@@ -160,7 +159,7 @@ void OperationChain::start()
     run(&lock);  // UNLOCK
 }
 
-void OperationChain::stop() BSLS_KEYWORD_NOEXCEPT
+void OperationChain::stop() noexcept
 {
     LockGuard lock(&d_mutex);  // LOCK
 
@@ -168,7 +167,7 @@ void OperationChain::stop() BSLS_KEYWORD_NOEXCEPT
     d_isStarted = false;
 }
 
-void OperationChain::join() BSLS_KEYWORD_NOEXCEPT
+void OperationChain::join() noexcept
 {
     LockGuard lock(&d_mutex);  // LOCK
     for (; d_numJobsRunning != 0; d_condition.wait(&d_mutex))
@@ -213,7 +212,7 @@ void OperationChain::append(Link* const* links, size_t count)
     }
 }
 
-int OperationChain::popBack() BSLS_KEYWORD_NOEXCEPT
+int OperationChain::popBack() noexcept
 {
     LockGuard lock(&d_mutex);  // LOCK
 
@@ -242,7 +241,7 @@ int OperationChain::popBack() BSLS_KEYWORD_NOEXCEPT
     return 0;
 }
 
-int OperationChain::popBack(Link* link) BSLS_KEYWORD_NOEXCEPT
+int OperationChain::popBack(Link* link) noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(link);
@@ -281,7 +280,7 @@ int OperationChain::popBack(Link* link) BSLS_KEYWORD_NOEXCEPT
     return 0;
 }
 
-size_t OperationChain::removeAll() BSLS_KEYWORD_NOEXCEPT
+size_t OperationChain::removeAll() noexcept
 {
     LockGuard lock(&d_mutex);  // LOCK
 
@@ -304,43 +303,43 @@ size_t OperationChain::removeAll() BSLS_KEYWORD_NOEXCEPT
 }
 
 // ACCESSORS
-bool OperationChain::isStarted() const BSLS_KEYWORD_NOEXCEPT
+bool OperationChain::isStarted() const noexcept
 {
     LockGuard lock(&d_mutex);  // LOCK
     return d_isStarted;
 }
 
-bool OperationChain::isRunning() const BSLS_KEYWORD_NOEXCEPT
+bool OperationChain::isRunning() const noexcept
 {
     LockGuard lock(&d_mutex);  // LOCK
     return d_numJobsRunning != 0;
 }
 
-size_t OperationChain::numLinks() const BSLS_KEYWORD_NOEXCEPT
+size_t OperationChain::numLinks() const noexcept
 {
     LockGuard lock(&d_mutex);  // LOCK
     return d_numLinks;
 }
 
-size_t OperationChain::numOperations() const BSLS_KEYWORD_NOEXCEPT
+size_t OperationChain::numOperations() const noexcept
 {
     LockGuard lock(&d_mutex);  // LOCK
     return d_jobList.size();
 }
 
-size_t OperationChain::numOperationsPending() const BSLS_KEYWORD_NOEXCEPT
+size_t OperationChain::numOperationsPending() const noexcept
 {
     LockGuard lock(&d_mutex);  // LOCK
     return d_jobList.size() - d_numJobsRunning;
 }
 
-size_t OperationChain::numOperationsExecuting() const BSLS_KEYWORD_NOEXCEPT
+size_t OperationChain::numOperationsExecuting() const noexcept
 {
     LockGuard lock(&d_mutex);  // LOCK
     return d_numJobsRunning;
 }
 
-bslma::Allocator* OperationChain::allocator() const BSLS_KEYWORD_NOEXCEPT
+bslma::Allocator* OperationChain::allocator() const noexcept
 {
     return d_jobList.get_allocator().mechanism();
 }
@@ -368,7 +367,7 @@ OperationChainLink::OperationChainLink(
 
 // MANIPULATORS
 OperationChainLink& OperationChainLink::operator=(
-    bslmf::MovableRef<OperationChainLink> rhs) BSLS_KEYWORD_NOEXCEPT
+    bslmf::MovableRef<OperationChainLink> rhs) noexcept
 {
     // l-value reference to the link object
     OperationChainLink& rhsRef = bslmf::MovableRefUtil::access(rhs);
@@ -388,7 +387,7 @@ OperationChainLink& OperationChainLink::operator=(
     return *this;
 }
 
-size_t OperationChainLink::removeAll() BSLS_KEYWORD_NOEXCEPT
+size_t OperationChainLink::removeAll() noexcept
 {
     size_t count = d_jobList.size();
     d_jobList.clear();
@@ -396,7 +395,7 @@ size_t OperationChainLink::removeAll() BSLS_KEYWORD_NOEXCEPT
     return count;
 }
 
-void OperationChainLink::swap(OperationChainLink& other) BSLS_KEYWORD_NOEXCEPT
+void OperationChainLink::swap(OperationChainLink& other) noexcept
 {
     // NOTE: This method is implemented this way because 'swap' does not work
     //       on 'JobList' - the code does not compile due to 'Job' not being a
@@ -423,12 +422,12 @@ void OperationChainLink::swap(OperationChainLink& other) BSLS_KEYWORD_NOEXCEPT
 }
 
 // ACCESSORS
-size_t OperationChainLink::numOperations() const BSLS_KEYWORD_NOEXCEPT
+size_t OperationChainLink::numOperations() const noexcept
 {
     return d_jobList.size();
 }
 
-bslma::Allocator* OperationChainLink::allocator() const BSLS_KEYWORD_NOEXCEPT
+bslma::Allocator* OperationChainLink::allocator() const noexcept
 {
     return d_jobList.get_allocator().mechanism();
 }

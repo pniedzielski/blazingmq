@@ -178,7 +178,7 @@ class TestExecutionContext {
 
       private:
         // PRIVATE CREATORS
-        ExecutorType(TestExecutionContext* context) BSLS_KEYWORD_NOEXCEPT
+        ExecutorType(TestExecutionContext* context) noexcept
         // IMPLICIT
         // Create a 'ExecutorType' object having the specified 'context' as
         // its associated execution context.
@@ -227,7 +227,7 @@ class TestExecutionContext {
 
   private:
     // PRIVATE MANIPULATORS
-    void doInvoke(const Job& f) BSLS_KEYWORD_NOEXCEPT
+    void doInvoke(const Job& f) noexcept
     {
         try {
             f();
@@ -287,16 +287,13 @@ class TestExecutionContext {
 
     /// Return an executor that may be used for submitting function objects
     /// to this execution context.
-    ExecutorType executor() const BSLS_KEYWORD_NOEXCEPT
+    ExecutorType executor() const noexcept
     {
         return const_cast<TestExecutionContext*>(this);
     }
 
     /// Return collected statistics.
-    const Statistics& statistics() const BSLS_KEYWORD_NOEXCEPT
-    {
-        return d_statistics;
-    }
+    const Statistics& statistics() const noexcept { return d_statistics; }
 };
 
 }  // close unnamed namespace

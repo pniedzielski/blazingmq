@@ -302,7 +302,7 @@ class TestExecutionContext {
 
       private:
         // PRIVATE CREATORS
-        ExecutorType(TestExecutionContext* context) BSLS_KEYWORD_NOEXCEPT
+        ExecutorType(TestExecutionContext* context) noexcept
         // IMPLICIT
         // Create a 'ExecutorType' object having the specified 'context' as
         // its associated execution context.
@@ -375,7 +375,7 @@ class TestExecutionContext {
 
     /// Return an executor that may be used for submitting function objects
     /// to this execution context.
-    ExecutorType executor() const BSLS_KEYWORD_NOEXCEPT
+    ExecutorType executor() const noexcept
     {
         return const_cast<TestExecutionContext*>(this);
     }

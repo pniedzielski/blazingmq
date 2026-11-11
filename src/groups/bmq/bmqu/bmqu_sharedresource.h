@@ -238,8 +238,7 @@ class SharedResource_Deleter : public bdlma::Deleter<void> {
 
     /// Create a `SharedResource_Deleter` object holding a copy of the
     /// specified `deleter`.
-    explicit SharedResource_Deleter(const DELETER& deleter)
-        BSLS_KEYWORD_NOEXCEPT;
+    explicit SharedResource_Deleter(const DELETER& deleter) noexcept;
 
   public:
     // MANIPULATORS
@@ -248,11 +247,11 @@ class SharedResource_Deleter : public bdlma::Deleter<void> {
     ///
     /// `DELETER` must satisfy the requirements of noexcept-CopyAssignable
     /// specified in the C++ standard.
-    void assign(const DELETER& deleter) BSLS_KEYWORD_NOEXCEPT;
+    void assign(const DELETER& deleter) noexcept;
 
     /// Delete the specified `resource` by applying the stored `deleter`, as
     /// `deleter(static_cast<RESOURCE*>(resource))`.
-    void deleteObject(void* resource) BSLS_KEYWORD_NOEXCEPT override;
+    void deleteObject(void* resource) noexcept override;
 };
 
 // ==========================
@@ -296,8 +295,7 @@ struct SharedResource_Base {
     /// object is destroyed, and all shared/weak pointers obtained from this
     /// object release ownership.
     explicit SharedResource_Base(bdlma::Deleter<void>* deleter,
-                                 bslma::Allocator*     allocator)
-        BSLS_KEYWORD_NOEXCEPT;
+                                 bslma::Allocator*     allocator) noexcept;
 
     /// Create a `SharedResource_Base` object managing the specified
     /// `resource`.  Specify a `deleter` used to free the resource upon
@@ -325,7 +323,7 @@ struct SharedResource_Base {
     /// possible to obtain a valid shared pointer until `invalidate`
     /// returns, i.e. until all shared pointer obtained from this object
     /// release ownership.
-    bsl::shared_ptr<void> acquire() BSLS_KEYWORD_NOEXCEPT;
+    bsl::shared_ptr<void> acquire() noexcept;
 
     /// Invalidate the managed resource and block the calling thread until
     /// all shared pointers obtained from this object release ownership.
@@ -333,14 +331,14 @@ struct SharedResource_Base {
     /// if this object manages no resource.
     ///
     /// Note that this function shall not be invoked concurrently.
-    void invalidate() BSLS_KEYWORD_NOEXCEPT;
+    void invalidate() noexcept;
 
     /// Reset this object leaving it managing no resource.  If prior to this
     /// call this object was managing a resource, the resource is released
     /// via a call to `invalidate`.
     ///
     /// Note that this function is not thread-safe.
-    void reset() BSLS_KEYWORD_NOEXCEPT;
+    void reset() noexcept;
 
     /// Reset this object leaving it managing the specified `resource`.  In
     /// case of exception, the resource is freed using the supplied deleter
@@ -354,7 +352,7 @@ struct SharedResource_Base {
 
     /// Return `true` if this object manages a resource, and `false`
     /// otherwise.
-    bool isValid() const BSLS_KEYWORD_NOEXCEPT;
+    bool isValid() const noexcept;
 };
 
 // ====================
@@ -387,8 +385,7 @@ class SharedResource {
 
   public:
     // CREATORS
-    explicit SharedResource(bslma::Allocator* basicAllocator = 0)
-        BSLS_KEYWORD_NOEXCEPT;
+    explicit SharedResource(bslma::Allocator* basicAllocator = 0) noexcept;
 
     /// IMPLICIT
     /// Create a `SharedResource` object managing no resource.  Optionally
@@ -408,7 +405,7 @@ class SharedResource {
     /// `DELETER` must be noexcept-DefaultConstructible as specified in the
     ///  C++ standard.
     SharedResource(bsl::nullptr_t,
-                   bslma::Allocator* basicAllocator = 0) BSLS_KEYWORD_NOEXCEPT;
+                   bslma::Allocator* basicAllocator = 0) noexcept;
 
     /// Create a `SharedResource` object managing the specified `resource`.
     /// Optionally specify a `deleter` used to free the resource upon
@@ -441,11 +438,11 @@ class SharedResource {
     /// possible to obtain a valid shared pointer until `invalidate`
     /// returns, i.e. until all shared pointer obtained from this object
     /// release ownership.
-    bsl::shared_ptr<RESOURCE> acquire() BSLS_KEYWORD_NOEXCEPT;
+    bsl::shared_ptr<RESOURCE> acquire() noexcept;
 
     /// Return a weak pointer to the managed resource, as if by
     /// `return bsl::weak_ptr<RESOURCE>(acquire())`.
-    bsl::weak_ptr<RESOURCE> acquireWeak() BSLS_KEYWORD_NOEXCEPT;
+    bsl::weak_ptr<RESOURCE> acquireWeak() noexcept;
 
     /// Invalidate the managed resource and block the calling thread until
     /// all shared pointers obtained from this object release ownership.
@@ -453,14 +450,14 @@ class SharedResource {
     /// if this object manages no resource.
     ///
     /// Note that this function shall not be invoked concurrently.
-    void invalidate() BSLS_KEYWORD_NOEXCEPT;
+    void invalidate() noexcept;
 
     /// Reset this object leaving it managing no resource.  If prior to this
     /// call this object was managing a resource, the resource is released
     /// via a call to `invalidate`.
     ///
     /// Note that this function is not thread-safe.
-    void reset() BSLS_KEYWORD_NOEXCEPT;
+    void reset() noexcept;
 
     /// Reset this object leaving it managing the specified `resource`.
     /// Optionally specify a `deleter` used to free the resource upon
@@ -482,7 +479,7 @@ class SharedResource {
 
     /// Return `true` if this object manages a resource, and `false`
     /// otherwise.
-    bool isValid() const BSLS_KEYWORD_NOEXCEPT;
+    bool isValid() const noexcept;
 
   public:
     // TRAITS
@@ -509,15 +506,14 @@ class SharedResourceFactoryDeleter {
 
     /// Create a `SharedResourceBdlmaDeleterDeleter` object wrapping the
     /// specified `factory` pointer.
-    explicit SharedResourceFactoryDeleter(FACTORY* factory)
-        BSLS_KEYWORD_NOEXCEPT;
+    explicit SharedResourceFactoryDeleter(FACTORY* factory) noexcept;
 
   public:
     // ACCESSORS
 
     /// Delete the specified `resource` by applying the stored `factory`,
     /// as `factory->deleteObject(resource)`.
-    void operator()(RESOURCE* resource) const BSLS_KEYWORD_NOEXCEPT;
+    void operator()(RESOURCE* resource) const noexcept;
 };
 
 // ===============================
@@ -531,7 +527,7 @@ class SharedResourceNoOpDeleter {
     // ACCESSORS
 
     /// Do nothing.
-    void operator()(RESOURCE*) const BSLS_KEYWORD_NOEXCEPT;
+    void operator()(RESOURCE*) const noexcept;
 };
 
 // ============================================================================
@@ -545,7 +541,7 @@ class SharedResourceNoOpDeleter {
 // CREATORS
 template <class RESOURCE, class DELETER>
 inline SharedResource_Deleter<RESOURCE, DELETER>::SharedResource_Deleter(
-    const DELETER& deleter) BSLS_KEYWORD_NOEXCEPT : d_deleter(deleter)
+    const DELETER& deleter) noexcept : d_deleter(deleter)
 {
     // NOTHING
 }
@@ -553,14 +549,14 @@ inline SharedResource_Deleter<RESOURCE, DELETER>::SharedResource_Deleter(
 // MANIPULATORS
 template <class RESOURCE, class DELETER>
 inline void SharedResource_Deleter<RESOURCE, DELETER>::assign(
-    const DELETER& deleter) BSLS_KEYWORD_NOEXCEPT
+    const DELETER& deleter) noexcept
 {
     d_deleter = deleter;
 }
 
 template <class RESOURCE, class DELETER>
 inline void SharedResource_Deleter<RESOURCE, DELETER>::deleteObject(
-    void* resource) BSLS_KEYWORD_NOEXCEPT
+    void* resource) noexcept
 {
     d_deleter(static_cast<RESOURCE*>(resource));
 }
@@ -572,7 +568,7 @@ inline void SharedResource_Deleter<RESOURCE, DELETER>::deleteObject(
 // CREATORS
 template <class RESOURCE, class DELETER>
 inline SharedResource<RESOURCE, DELETER>::SharedResource(
-    bslma::Allocator* basicAllocator) BSLS_KEYWORD_NOEXCEPT
+    bslma::Allocator* basicAllocator) noexcept
 : d_deleter(DELETER()),
   d_base(&d_deleter, bslma::Default::allocator(basicAllocator))
 {
@@ -582,7 +578,7 @@ inline SharedResource<RESOURCE, DELETER>::SharedResource(
 template <class RESOURCE, class DELETER>
 inline SharedResource<RESOURCE, DELETER>::SharedResource(
     bsl::nullptr_t,
-    bslma::Allocator* basicAllocator) BSLS_KEYWORD_NOEXCEPT
+    bslma::Allocator* basicAllocator) noexcept
 : d_deleter(DELETER()),
   d_base(&d_deleter, bslma::Default::allocator(basicAllocator))
 {
@@ -613,27 +609,26 @@ inline SharedResource<RESOURCE, DELETER>::SharedResource(
 // MANIPULATORS
 template <class RESOURCE, class DELETER>
 inline bsl::shared_ptr<RESOURCE>
-SharedResource<RESOURCE, DELETER>::acquire() BSLS_KEYWORD_NOEXCEPT
+SharedResource<RESOURCE, DELETER>::acquire() noexcept
 {
     return bsl::static_pointer_cast<RESOURCE>(d_base.acquire());
 }
 
 template <class RESOURCE, class DELETER>
 inline bsl::weak_ptr<RESOURCE>
-SharedResource<RESOURCE, DELETER>::acquireWeak() BSLS_KEYWORD_NOEXCEPT
+SharedResource<RESOURCE, DELETER>::acquireWeak() noexcept
 {
     return bsl::weak_ptr<RESOURCE>(acquire());
 }
 
 template <class RESOURCE, class DELETER>
-inline void
-SharedResource<RESOURCE, DELETER>::invalidate() BSLS_KEYWORD_NOEXCEPT
+inline void SharedResource<RESOURCE, DELETER>::invalidate() noexcept
 {
     d_base.invalidate();
 }
 
 template <class RESOURCE, class DELETER>
-inline void SharedResource<RESOURCE, DELETER>::reset() BSLS_KEYWORD_NOEXCEPT
+inline void SharedResource<RESOURCE, DELETER>::reset() noexcept
 {
     d_base.reset();
 }
@@ -661,8 +656,7 @@ inline void SharedResource<RESOURCE, DELETER>::reset(RESOURCE*      resource,
 
 // ACCESSORS
 template <class RESOURCE, class DELETER>
-inline bool
-SharedResource<RESOURCE, DELETER>::isValid() const BSLS_KEYWORD_NOEXCEPT
+inline bool SharedResource<RESOURCE, DELETER>::isValid() const noexcept
 {
     return d_base.isValid();
 }
@@ -674,7 +668,7 @@ SharedResource<RESOURCE, DELETER>::isValid() const BSLS_KEYWORD_NOEXCEPT
 // CREATORS
 template <class RESOURCE, class FACTORY>
 inline SharedResourceFactoryDeleter<RESOURCE, FACTORY>::
-    SharedResourceFactoryDeleter(FACTORY* factory) BSLS_KEYWORD_NOEXCEPT
+    SharedResourceFactoryDeleter(FACTORY* factory) noexcept
 : d_factory_p(factory)
 {
     // PRECONDITIONS
@@ -684,7 +678,7 @@ inline SharedResourceFactoryDeleter<RESOURCE, FACTORY>::
 // ACCESSORS
 template <class RESOURCE, class FACTORY>
 inline void SharedResourceFactoryDeleter<RESOURCE, FACTORY>::operator()(
-    RESOURCE* resource) const BSLS_KEYWORD_NOEXCEPT
+    RESOURCE* resource) const noexcept
 {
     d_factory_p->deleteObject(resource);
 }
@@ -695,8 +689,8 @@ inline void SharedResourceFactoryDeleter<RESOURCE, FACTORY>::operator()(
 
 // ACCESSORS
 template <class RESOURCE>
-inline void SharedResourceNoOpDeleter<RESOURCE>::operator()(RESOURCE*) const
-    BSLS_KEYWORD_NOEXCEPT
+inline void
+SharedResourceNoOpDeleter<RESOURCE>::operator()(RESOURCE*) const noexcept
 {
     // NOTHING
 }

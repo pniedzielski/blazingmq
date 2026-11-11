@@ -175,7 +175,7 @@ class SystemExecutor_Context {
     /// This function is executed when a spawned thread starts. All it does
     /// is a call to `onThreadRun` on the associated execution context.
     template <class THREAD_DATA>
-    static void* threadRunHandler(void* threadData) BSLS_KEYWORD_NOEXCEPT;
+    static void* threadRunHandler(void* threadData) noexcept;
 
   private:
     // PRIVATE MANIPULATORS
@@ -186,8 +186,7 @@ class SystemExecutor_Context {
 
     /// This function is called by a spawned thread before completion to
     /// establish necessary postconditions.
-    void finalizeThread(const bslmt::ThreadUtil::Handle& thread)
-        BSLS_KEYWORD_NOEXCEPT;
+    void finalizeThread(const bslmt::ThreadUtil::Handle& thread) noexcept;
 
   private:
     // NOT IMPLEMENTED
@@ -247,7 +246,7 @@ class SystemExecutor_Context {
 
     /// Return the allocator used by this execution context to supply
     /// memory.
-    bslma::Allocator* allocator() const BSLS_KEYWORD_NOEXCEPT;
+    bslma::Allocator* allocator() const noexcept;
 };
 
 // ====================
@@ -354,8 +353,8 @@ inline SystemExecutor_ThreadData<FUNCTION>::SystemExecutor_ThreadData(
 
 // PRIVATE CLASS METHODS
 template <class THREAD_DATA>
-inline void* SystemExecutor_Context::threadRunHandler(void* threadData)
-    BSLS_KEYWORD_NOEXCEPT
+inline void*
+SystemExecutor_Context::threadRunHandler(void* threadData) noexcept
 {
     THREAD_DATA* typedThreadData = reinterpret_cast<THREAD_DATA*>(threadData);
 

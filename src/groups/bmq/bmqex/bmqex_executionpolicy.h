@@ -193,13 +193,13 @@ class ExecutionPolicy {
     ExecutionPolicy useAllocator(bslma::Allocator* allocator) const;
 
     /// Return the associated blocking property.
-    ExecutionProperty::Blocking blocking() const BSLS_KEYWORD_NOEXCEPT;
+    ExecutionProperty::Blocking blocking() const noexcept;
 
     /// Return the associated executor.
-    const EXECUTOR& executor() const BSLS_KEYWORD_NOEXCEPT;
+    const EXECUTOR& executor() const noexcept;
 
     /// Return the associated allocator.
-    bslma::Allocator* allocator() const BSLS_KEYWORD_NOEXCEPT;
+    bslma::Allocator* allocator() const noexcept;
 };
 
 // ==========================
@@ -323,21 +323,19 @@ ExecutionPolicy<EXECUTOR>::useAllocator(bslma::Allocator* allocator) const
 
 template <class EXECUTOR>
 inline ExecutionProperty::Blocking
-ExecutionPolicy<EXECUTOR>::blocking() const BSLS_KEYWORD_NOEXCEPT
+ExecutionPolicy<EXECUTOR>::blocking() const noexcept
 {
     return d_blocking;
 }
 
 template <class EXECUTOR>
-inline const EXECUTOR&
-ExecutionPolicy<EXECUTOR>::executor() const BSLS_KEYWORD_NOEXCEPT
+inline const EXECUTOR& ExecutionPolicy<EXECUTOR>::executor() const noexcept
 {
     return d_executor;
 }
 
 template <class EXECUTOR>
-inline bslma::Allocator*
-ExecutionPolicy<EXECUTOR>::allocator() const BSLS_KEYWORD_NOEXCEPT
+inline bslma::Allocator* ExecutionPolicy<EXECUTOR>::allocator() const noexcept
 {
     return d_allocator_p;
 }

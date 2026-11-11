@@ -120,7 +120,7 @@ struct SequentialContext_ThreadUtil {
 
     /// Return an unsigned 64-bit integer representing a thread id that is
     /// guaranteed never to be a valid thread id.
-    static bsls::Types::Uint64 invalidThreadId() BSLS_KEYWORD_NOEXCEPT;
+    static bsls::Types::Uint64 invalidThreadId() noexcept;
 };
 
 // =======================
@@ -218,7 +218,7 @@ class SequentialContext {
     /// currently executing a function object, the thread will exit only
     /// after completion of that function object. Invocation of `stop`
     /// returns without waiting for the thread to complete.
-    void stop() BSLS_KEYWORD_NOEXCEPT;
+    void stop() noexcept;
 
     /// If not already stopped, signal the working thread to complete once
     /// `outstandingJobs()` is 0. Blocks the calling thread until the
@@ -227,12 +227,12 @@ class SequentialContext {
     /// function is invoked from the thread owned by `*this`.
     ///
     /// Note that subsequent invocations of `join` complete immediately.
-    void join() BSLS_KEYWORD_NOEXCEPT;
+    void join() noexcept;
 
     /// Remove all functions objects but the one that is currently being
     /// invoked (if any) from this execution context. Return the number of
     /// removed function objects.
-    size_t dropPendingJobs() BSLS_KEYWORD_NOEXCEPT;
+    size_t dropPendingJobs() noexcept;
 
   public:
     // ACCESSORS
@@ -242,15 +242,15 @@ class SequentialContext {
     /// added to the context via its associated executor, but not yet
     /// invoked, plus the number of function objects that are currently
     /// being invoked within the context, which is either 0 or 1.
-    size_t outstandingJobs() const BSLS_KEYWORD_NOEXCEPT;
+    size_t outstandingJobs() const noexcept;
 
     /// Return an executor that may be used for submitting function
     /// objects to this execution context.
-    ExecutorType executor() const BSLS_KEYWORD_NOEXCEPT;
+    ExecutorType executor() const noexcept;
 
     /// Return the allocator used by this execution context to supply
     /// memory.
-    bslma::Allocator* allocator() const BSLS_KEYWORD_NOEXCEPT;
+    bslma::Allocator* allocator() const noexcept;
 
   public:
     // TRAITS
@@ -278,7 +278,7 @@ class SequentialContextExecutor {
 
   private:
     // PRIVATE CREATORS
-    SequentialContextExecutor(ContextType* context) BSLS_KEYWORD_NOEXCEPT;
+    SequentialContextExecutor(ContextType* context) noexcept;
     // IMPLICIT
     // Create a 'SequentialContextExecutor' object having the specified
     // 'context' as its associated execution context.
@@ -317,7 +317,7 @@ class SequentialContextExecutor {
     void dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const;
 
     /// Swap the contents of `*this` and `other`.
-    void swap(SequentialContextExecutor& other) BSLS_KEYWORD_NOEXCEPT;
+    void swap(SequentialContextExecutor& other) noexcept;
 
   public:
     // ACCESSORS
@@ -325,10 +325,10 @@ class SequentialContextExecutor {
     /// If the current thread of execution is the thread owned by the
     /// associated `SequentialContext` object, return `true`. Otherwise,
     /// return `false`.
-    bool runningInThisThread() const BSLS_KEYWORD_NOEXCEPT;
+    bool runningInThisThread() const noexcept;
 
     /// Return a reference to the associated `SequentialContext` object.
-    ContextType& context() const BSLS_KEYWORD_NOEXCEPT;
+    ContextType& context() const noexcept;
 
   public:
     // TRAITS
@@ -340,15 +340,15 @@ class SequentialContextExecutor {
 
 /// Return `&lhs.context() == &rhs.context()`.
 bool operator==(const SequentialContextExecutor& lhs,
-                const SequentialContextExecutor& rhs) BSLS_KEYWORD_NOEXCEPT;
+                const SequentialContextExecutor& rhs) noexcept;
 
 /// Return `!(lhs == rhs)`.
 bool operator!=(const SequentialContextExecutor& lhs,
-                const SequentialContextExecutor& rhs) BSLS_KEYWORD_NOEXCEPT;
+                const SequentialContextExecutor& rhs) noexcept;
 
 /// Swap the contents of `lhs` and `rhs`.
 void swap(SequentialContextExecutor& lhs,
-          SequentialContextExecutor& rhs) BSLS_KEYWORD_NOEXCEPT;
+          SequentialContextExecutor& rhs) noexcept;
 
 // ============================================================================
 //                           INLINE DEFINITIONS
@@ -399,22 +399,20 @@ SequentialContextExecutor::dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION)
 }  // close package namespace
 
 // FREE OPERATORS
-inline bool
-bmqex::operator==(const SequentialContextExecutor& lhs,
-                  const SequentialContextExecutor& rhs) BSLS_KEYWORD_NOEXCEPT
+inline bool bmqex::operator==(const SequentialContextExecutor& lhs,
+                              const SequentialContextExecutor& rhs) noexcept
 {
     return &lhs.context() == &rhs.context();
 }
 
-inline bool
-bmqex::operator!=(const SequentialContextExecutor& lhs,
-                  const SequentialContextExecutor& rhs) BSLS_KEYWORD_NOEXCEPT
+inline bool bmqex::operator!=(const SequentialContextExecutor& lhs,
+                              const SequentialContextExecutor& rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
 inline void bmqex::swap(SequentialContextExecutor& lhs,
-                        SequentialContextExecutor& rhs) BSLS_KEYWORD_NOEXCEPT
+                        SequentialContextExecutor& rhs) noexcept
 {
     lhs.swap(rhs);
 }

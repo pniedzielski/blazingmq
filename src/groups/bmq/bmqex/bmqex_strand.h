@@ -107,7 +107,7 @@ struct Strand_ThreadUtil {
 
     /// Return an unsigned 64-bit integer representing a thread id that is
     /// guaranteed never to be a valid thread id.
-    static bsls::Types::Uint64 invalidThreadId() BSLS_KEYWORD_NOEXCEPT;
+    static bsls::Types::Uint64 invalidThreadId() noexcept;
 };
 
 // ============
@@ -203,18 +203,18 @@ class Strand {
     /// Stop executing functors on this execution context. Invocation of
     /// `stop` returns without waiting for the currently executing functor
     /// (if any) to complete.
-    void stop() BSLS_KEYWORD_NOEXCEPT;
+    void stop() noexcept;
 
     /// Block the calling thread pending completion of the currently
     /// executing functor. Then, continue to block the calling thread until
     /// either `outstandingJobs()` is 0, or the execution context is stopped
     /// (if not already). The behavior is undefined if this function is
     /// invoked from a functor executed on this strand.
-    void join() BSLS_KEYWORD_NOEXCEPT;
+    void join() noexcept;
 
     /// Remove all functors but the one that is currently being invoked (if
     /// any) from this strand. Return the number of removed functors.
-    size_t dropPendingJobs() BSLS_KEYWORD_NOEXCEPT;
+    size_t dropPendingJobs() noexcept;
 
   public:
     // ACCESSORS
@@ -224,18 +224,18 @@ class Strand {
     /// the strand via its associated executor, but not yet invoked, plus
     /// the number of functors that are currently being invoked within
     /// the strand, which is either 0 or 1.
-    size_t outstandingJobs() const BSLS_KEYWORD_NOEXCEPT;
+    size_t outstandingJobs() const noexcept;
 
     /// Return an executor that may be used for submitting functors to this
     /// execution context.
-    ExecutorType executor() const BSLS_KEYWORD_NOEXCEPT;
+    ExecutorType executor() const noexcept;
 
     /// Return the underlying executor.
-    InnerExecutorType innerExecutor() const BSLS_KEYWORD_NOEXCEPT;
+    InnerExecutorType innerExecutor() const noexcept;
 
     /// Return the allocator used by this execution context to supply
     /// memory.
-    bslma::Allocator* allocator() const BSLS_KEYWORD_NOEXCEPT;
+    bslma::Allocator* allocator() const noexcept;
 
   public:
     // TRAITS
@@ -272,7 +272,7 @@ class StrandExecutor {
     ///
     /// Note that this is a private constructor reserved to be used by the
     /// `Strand`.
-    StrandExecutor(ContextType* context) BSLS_KEYWORD_NOEXCEPT;  // IMPLICIT
+    StrandExecutor(ContextType* context) noexcept;  // IMPLICIT
 
   public:
     // MANIPULATORS
@@ -306,7 +306,7 @@ class StrandExecutor {
     void dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const;
 
     /// Swap the contents of `*this` and `other`.
-    void swap(StrandExecutor& other) BSLS_KEYWORD_NOEXCEPT;
+    void swap(StrandExecutor& other) noexcept;
 
   public:
     // ACCESSORS
@@ -317,10 +317,10 @@ class StrandExecutor {
     ///
     /// Note that is, the current thread of execution's call chain includes
     /// a function that was submitted to the associated `Strand`.
-    bool runningInThisThread() const BSLS_KEYWORD_NOEXCEPT;
+    bool runningInThisThread() const noexcept;
 
     /// Return a reference to the associated `Strand` object.
-    ContextType& context() const BSLS_KEYWORD_NOEXCEPT;
+    ContextType& context() const noexcept;
 
   public:
     // TRAITS
@@ -332,17 +332,17 @@ class StrandExecutor {
 /// Return `&lhs.context() == &rhs.context()`.
 template <class EXECUTOR>
 bool operator==(const StrandExecutor<EXECUTOR>& lhs,
-                const StrandExecutor<EXECUTOR>& rhs) BSLS_KEYWORD_NOEXCEPT;
+                const StrandExecutor<EXECUTOR>& rhs) noexcept;
 
 /// Return `!(lhs == rhs)`.
 template <class EXECUTOR>
 bool operator!=(const StrandExecutor<EXECUTOR>& lhs,
-                const StrandExecutor<EXECUTOR>& rhs) BSLS_KEYWORD_NOEXCEPT;
+                const StrandExecutor<EXECUTOR>& rhs) noexcept;
 
 /// Swap the contents of `lhs` and `rhs`.
 template <class EXECUTOR>
 void swap(StrandExecutor<EXECUTOR>& lhs,
-          StrandExecutor<EXECUTOR>& rhs) BSLS_KEYWORD_NOEXCEPT;
+          StrandExecutor<EXECUTOR>& rhs) noexcept;
 
 // ============================================================================
 //                           INLINE DEFINITIONS
@@ -446,7 +446,7 @@ inline void Strand<EXECUTOR>::start()
 }
 
 template <class EXECUTOR>
-inline void Strand<EXECUTOR>::stop() BSLS_KEYWORD_NOEXCEPT
+inline void Strand<EXECUTOR>::stop() noexcept
 {
     bslmt::LockGuard<bslmt::Mutex> lock(&d_mutex);  // LOCK
 
@@ -454,7 +454,7 @@ inline void Strand<EXECUTOR>::stop() BSLS_KEYWORD_NOEXCEPT
 }
 
 template <class EXECUTOR>
-inline void Strand<EXECUTOR>::join() BSLS_KEYWORD_NOEXCEPT
+inline void Strand<EXECUTOR>::join() noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(d_workingThreadId.loadAcquire() !=
@@ -468,7 +468,7 @@ inline void Strand<EXECUTOR>::join() BSLS_KEYWORD_NOEXCEPT
 }
 
 template <class EXECUTOR>
-inline size_t Strand<EXECUTOR>::dropPendingJobs() BSLS_KEYWORD_NOEXCEPT
+inline size_t Strand<EXECUTOR>::dropPendingJobs() noexcept
 {
     bslmt::LockGuard<bslmt::Mutex> lock(&d_mutex);  // LOCK
 
@@ -500,7 +500,7 @@ inline size_t Strand<EXECUTOR>::dropPendingJobs() BSLS_KEYWORD_NOEXCEPT
 
 // ACCESSORS
 template <class EXECUTOR>
-inline size_t Strand<EXECUTOR>::outstandingJobs() const BSLS_KEYWORD_NOEXCEPT
+inline size_t Strand<EXECUTOR>::outstandingJobs() const noexcept
 {
     bslmt::LockGuard<bslmt::Mutex> lock(&d_mutex);  // LOCK
 
@@ -509,21 +509,20 @@ inline size_t Strand<EXECUTOR>::outstandingJobs() const BSLS_KEYWORD_NOEXCEPT
 
 template <class EXECUTOR>
 inline typename Strand<EXECUTOR>::ExecutorType
-Strand<EXECUTOR>::executor() const BSLS_KEYWORD_NOEXCEPT
+Strand<EXECUTOR>::executor() const noexcept
 {
     return const_cast<Strand*>(this);
 }
 
 template <class EXECUTOR>
 inline typename Strand<EXECUTOR>::InnerExecutorType
-Strand<EXECUTOR>::innerExecutor() const BSLS_KEYWORD_NOEXCEPT
+Strand<EXECUTOR>::innerExecutor() const noexcept
 {
     return d_innerExecutor;
 }
 
 template <class EXECUTOR>
-inline bslma::Allocator*
-Strand<EXECUTOR>::allocator() const BSLS_KEYWORD_NOEXCEPT
+inline bslma::Allocator* Strand<EXECUTOR>::allocator() const noexcept
 {
     return d_jobQueue.get_allocator().mechanism();
 }
@@ -534,8 +533,8 @@ Strand<EXECUTOR>::allocator() const BSLS_KEYWORD_NOEXCEPT
 
 // PRIVATE CREATORS
 template <class EXECUTOR>
-inline StrandExecutor<EXECUTOR>::StrandExecutor(ContextType* context)
-    BSLS_KEYWORD_NOEXCEPT : d_context_p(context)
+inline StrandExecutor<EXECUTOR>::StrandExecutor(ContextType* context) noexcept
+: d_context_p(context)
 {
     // PRECONDITIONS
     BSLS_ASSERT(context);
@@ -593,24 +592,21 @@ StrandExecutor<EXECUTOR>::dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION)
 }
 
 template <class EXECUTOR>
-inline void
-StrandExecutor<EXECUTOR>::swap(StrandExecutor& other) BSLS_KEYWORD_NOEXCEPT
+inline void StrandExecutor<EXECUTOR>::swap(StrandExecutor& other) noexcept
 {
     bsl::swap(d_context_p, other.d_context_p);
 }
 
 // ACCESSORS
 template <class EXECUTOR>
-inline bool
-StrandExecutor<EXECUTOR>::runningInThisThread() const BSLS_KEYWORD_NOEXCEPT
+inline bool StrandExecutor<EXECUTOR>::runningInThisThread() const noexcept
 {
     return d_context_p->d_workingThreadId.loadAcquire() ==
            bslmt::ThreadUtil::selfIdAsUint64();
 }
 
 template <class EXECUTOR>
-inline Strand<EXECUTOR>&
-StrandExecutor<EXECUTOR>::context() const BSLS_KEYWORD_NOEXCEPT
+inline Strand<EXECUTOR>& StrandExecutor<EXECUTOR>::context() const noexcept
 {
     return *d_context_p;
 }
@@ -619,24 +615,22 @@ StrandExecutor<EXECUTOR>::context() const BSLS_KEYWORD_NOEXCEPT
 
 // FREE OPERATORS
 template <class EXECUTOR>
-inline bool
-bmqex::operator==(const StrandExecutor<EXECUTOR>& lhs,
-                  const StrandExecutor<EXECUTOR>& rhs) BSLS_KEYWORD_NOEXCEPT
+inline bool bmqex::operator==(const StrandExecutor<EXECUTOR>& lhs,
+                              const StrandExecutor<EXECUTOR>& rhs) noexcept
 {
     return &lhs.context() == &rhs.context();
 }
 
 template <class EXECUTOR>
-inline bool
-bmqex::operator!=(const StrandExecutor<EXECUTOR>& lhs,
-                  const StrandExecutor<EXECUTOR>& rhs) BSLS_KEYWORD_NOEXCEPT
+inline bool bmqex::operator!=(const StrandExecutor<EXECUTOR>& lhs,
+                              const StrandExecutor<EXECUTOR>& rhs) noexcept
 {
     return !(lhs == rhs);
 }
 
 template <class EXECUTOR>
 inline void bmqex::swap(StrandExecutor<EXECUTOR>& lhs,
-                        StrandExecutor<EXECUTOR>& rhs) BSLS_KEYWORD_NOEXCEPT
+                        StrandExecutor<EXECUTOR>& rhs) noexcept
 {
     lhs.swap(rhs);
 }

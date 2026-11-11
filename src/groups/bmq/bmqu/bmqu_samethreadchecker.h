@@ -182,7 +182,7 @@ class SameThreadChecker {
     // CREATORS
 
     /// Create a `SameThreadChecker` object.
-    SameThreadChecker() BSLS_KEYWORD_NOEXCEPT;
+    SameThreadChecker() noexcept;
 
   public:
     // MANIPULATORS
@@ -191,10 +191,10 @@ class SameThreadChecker {
     /// the calling thread and return `true`.  Otherwise, return `true` if
     /// the id of the calling thread matches the previously stored id, and
     /// `false` otherwise.
-    bool inSameThread() BSLS_KEYWORD_NOEXCEPT;
+    bool inSameThread() noexcept;
 
     /// Reset this object to a default-constructed state.
-    void reset() BSLS_KEYWORD_NOEXCEPT;
+    void reset() noexcept;
 };
 
 }  // close package namespace

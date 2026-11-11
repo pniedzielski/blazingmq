@@ -31,8 +31,7 @@ namespace bmqex {
 // -----------------------------------
 
 // CLASS METHODS
-bsls::Types::Uint64
-SequentialContext_ThreadUtil::invalidThreadId() BSLS_KEYWORD_NOEXCEPT
+bsls::Types::Uint64 SequentialContext_ThreadUtil::invalidThreadId() noexcept
 {
     return bslmt::ThreadUtil::idAsUint64(
         bslmt::ThreadUtil::handleToId(bslmt::ThreadUtil::invalidHandle()));
@@ -148,7 +147,7 @@ int SequentialContext::start(const bslmt::ThreadAttributes& threadAttributes)
     return 0;
 }
 
-void SequentialContext::stop() BSLS_KEYWORD_NOEXCEPT
+void SequentialContext::stop() noexcept
 {
     {
         bslmt::LockGuard<bslmt::Mutex> lock(&d_mutex);  // LOCK
@@ -161,7 +160,7 @@ void SequentialContext::stop() BSLS_KEYWORD_NOEXCEPT
     d_condition.signal();
 }
 
-void SequentialContext::join() BSLS_KEYWORD_NOEXCEPT
+void SequentialContext::join() noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(d_workingThreadId.loadAcquire() !=
@@ -193,7 +192,7 @@ void SequentialContext::join() BSLS_KEYWORD_NOEXCEPT
     bslmt::ThreadUtil::join(workingThread);
 }
 
-size_t SequentialContext::dropPendingJobs() BSLS_KEYWORD_NOEXCEPT
+size_t SequentialContext::dropPendingJobs() noexcept
 {
     bslmt::LockGuard<bslmt::Mutex> lock(&d_mutex);  // LOCK
 
@@ -211,20 +210,19 @@ size_t SequentialContext::dropPendingJobs() BSLS_KEYWORD_NOEXCEPT
 }
 
 // ACCESSORS
-size_t SequentialContext::outstandingJobs() const BSLS_KEYWORD_NOEXCEPT
+size_t SequentialContext::outstandingJobs() const noexcept
 {
     bslmt::LockGuard<bslmt::Mutex> lock(&d_mutex);  // LOCK
 
     return d_jobQueue.size();
 }
 
-SequentialContext::ExecutorType
-SequentialContext::executor() const BSLS_KEYWORD_NOEXCEPT
+SequentialContext::ExecutorType SequentialContext::executor() const noexcept
 {
     return ExecutorType(const_cast<SequentialContext*>(this));
 }
 
-bslma::Allocator* SequentialContext::allocator() const BSLS_KEYWORD_NOEXCEPT
+bslma::Allocator* SequentialContext::allocator() const noexcept
 {
     return d_jobQueue.get_allocator().mechanism();
 }
@@ -234,30 +232,28 @@ bslma::Allocator* SequentialContext::allocator() const BSLS_KEYWORD_NOEXCEPT
 // -------------------------------
 
 // PRIVATE CREATORS
-SequentialContextExecutor::SequentialContextExecutor(ContextType* context)
-    BSLS_KEYWORD_NOEXCEPT : d_context_p(context)
+SequentialContextExecutor::SequentialContextExecutor(
+    ContextType* context) noexcept : d_context_p(context)
 {
     // PRECONDITIONS
     BSLS_ASSERT(context);
 }
 
 // MANIPULATORS
-void SequentialContextExecutor::swap(SequentialContextExecutor& other)
-    BSLS_KEYWORD_NOEXCEPT
+void SequentialContextExecutor::swap(SequentialContextExecutor& other) noexcept
 {
     bsl::swap(d_context_p, other.d_context_p);
 }
 
 // ACCESSORS
-bool SequentialContextExecutor::runningInThisThread() const
-    BSLS_KEYWORD_NOEXCEPT
+bool SequentialContextExecutor::runningInThisThread() const noexcept
 {
     return d_context_p->d_workingThreadId.loadAcquire() ==
            bslmt::ThreadUtil::selfIdAsUint64();
 }
 
 SequentialContextExecutor::ContextType&
-SequentialContextExecutor::context() const BSLS_KEYWORD_NOEXCEPT
+SequentialContextExecutor::context() const noexcept
 {
     return *d_context_p;
 }

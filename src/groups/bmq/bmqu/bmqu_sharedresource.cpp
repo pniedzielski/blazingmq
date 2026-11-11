@@ -28,7 +28,7 @@ namespace {
 /// Provides a deleter for the shared state.
 struct NotifyingDeleter {
     // ACCESSORS
-    void operator()(void* sharedResource) const BSLS_KEYWORD_NOEXCEPT
+    void operator()(void* sharedResource) const noexcept
     {
         SharedResource_Base* sharedResourcePtr =
             static_cast<SharedResource_Base*>(sharedResource);
@@ -54,7 +54,7 @@ struct ResetGuard {
     SharedResource_Base* d_sharedResource_p;
 
     // CREATORS
-    ResetGuard(SharedResource_Base* sharedResource) BSLS_KEYWORD_NOEXCEPT
+    ResetGuard(SharedResource_Base* sharedResource) noexcept
     : d_sharedResource_p(sharedResource)
     {
         // PRECONDITIONS
@@ -72,7 +72,7 @@ struct ResetGuard {
     }
 
     // MANIPULATORS
-    void release() BSLS_KEYWORD_NOEXCEPT { d_sharedResource_p = 0; }
+    void release() noexcept { d_sharedResource_p = 0; }
 };
 
 }  // close unnamed namespace
@@ -83,12 +83,12 @@ struct ResetGuard {
 
 // CREATORS
 SharedResource_Base::SharedResource_Base(bdlma::Deleter<void>* deleter,
-                                         bslma::Allocator*     allocator)
-    BSLS_KEYWORD_NOEXCEPT : d_semaphore(),
-                            d_resource_p(0),
-                            d_deleter_p(deleter),
-                            d_sharedPtrRep_p(0),
-                            d_allocator_p(allocator)
+                                         bslma::Allocator* allocator) noexcept
+: d_semaphore(),
+  d_resource_p(0),
+  d_deleter_p(deleter),
+  d_sharedPtrRep_p(0),
+  d_allocator_p(allocator)
 {
     // PRECONDITIONS
     BSLS_ASSERT(deleter);
@@ -120,7 +120,7 @@ SharedResource_Base::~SharedResource_Base()
 }
 
 // MANIPULATORS
-bsl::shared_ptr<void> SharedResource_Base::acquire() BSLS_KEYWORD_NOEXCEPT
+bsl::shared_ptr<void> SharedResource_Base::acquire() noexcept
 {
     // try acquire a strong reference
     if (!d_sharedPtrRep_p || !d_sharedPtrRep_p->tryAcquireRef()) {
@@ -131,7 +131,7 @@ bsl::shared_ptr<void> SharedResource_Base::acquire() BSLS_KEYWORD_NOEXCEPT
     return bsl::shared_ptr<void>(d_resource_p, d_sharedPtrRep_p);
 }
 
-void SharedResource_Base::invalidate() BSLS_KEYWORD_NOEXCEPT
+void SharedResource_Base::invalidate() noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(isValid());
@@ -142,7 +142,7 @@ void SharedResource_Base::invalidate() BSLS_KEYWORD_NOEXCEPT
     d_semaphore.wait();
 }
 
-void SharedResource_Base::reset() BSLS_KEYWORD_NOEXCEPT
+void SharedResource_Base::reset() noexcept
 {
     if (!d_sharedPtrRep_p) {
         return;  // RETURN
@@ -193,7 +193,7 @@ void SharedResource_Base::reset(void* resource)
 }
 
 // ACCESSORS
-bool SharedResource_Base::isValid() const BSLS_KEYWORD_NOEXCEPT
+bool SharedResource_Base::isValid() const noexcept
 {
     return d_sharedPtrRep_p && d_sharedPtrRep_p->numReferences();
 }

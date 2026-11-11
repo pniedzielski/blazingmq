@@ -63,7 +63,7 @@ class ChannelFactoryPipeline : public bmqio::ChannelFactory {
         // Create a pipeline builder based on `baseFactory`
         explicit Config(const ChannelFactorySP& baseFactory,
                         const allocator_type&   allocator = allocator_type());
-        Config(bslmf::MovableRef<Config> other) BSLS_KEYWORD_NOEXCEPT;
+        Config(bslmf::MovableRef<Config> other) noexcept;
         Config(bslmf::MovableRef<Config> other,
                const allocator_type&     allocator);
 
@@ -104,8 +104,8 @@ class ChannelFactoryPipeline : public bmqio::ChannelFactory {
 
   public:
     // CONSTRUCTORS
-    ChannelFactoryPipeline(bslmf::MovableRef<ChannelFactoryPipeline> other)
-        BSLS_KEYWORD_NOEXCEPT;
+    ChannelFactoryPipeline(
+        bslmf::MovableRef<ChannelFactoryPipeline> other) noexcept;
 
     ChannelFactoryPipeline(bslmf::MovableRef<ChannelFactoryPipeline> other,
                            const allocator_type& allocator);
@@ -113,7 +113,7 @@ class ChannelFactoryPipeline : public bmqio::ChannelFactory {
     ChannelFactoryPipeline(bslmf::MovableRef<Config> builder,
                            const allocator_type& allocator = allocator_type());
 
-    ~ChannelFactoryPipeline() BSLS_KEYWORD_NOEXCEPT override;
+    ~ChannelFactoryPipeline() noexcept override;
 
   private:
     // PRIVATE CONSTRUCTORS
@@ -160,7 +160,7 @@ class ChannelFactoryPipeline : public bmqio::ChannelFactory {
     T* get();
 };
 
-inline ChannelFactoryPipeline::~ChannelFactoryPipeline() BSLS_KEYWORD_NOEXCEPT
+inline ChannelFactoryPipeline::~ChannelFactoryPipeline() noexcept
 {
     this->stop();
 }

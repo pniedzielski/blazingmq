@@ -156,20 +156,20 @@ class Executor_TargetBase {
     virtual void dispatch(const bsl::function<void()>& f) const = 0;
 
     /// Move-construct `*this` into the specified `dst` address.
-    virtual void move(void* dst) BSLS_KEYWORD_NOEXCEPT = 0;
+    virtual void move(void* dst) noexcept = 0;
 
   public:
     // ACCESSORS
 
     /// Return a pointer to the contained executor target.
-    virtual void*       target() BSLS_KEYWORD_NOEXCEPT       = 0;
-    virtual const void* target() const BSLS_KEYWORD_NOEXCEPT = 0;
+    virtual void*       target() noexcept       = 0;
+    virtual const void* target() const noexcept = 0;
 
     /// Return `typeid(e)`, where `e` is the contained executor target.
-    virtual const bsl::type_info& targetType() const BSLS_KEYWORD_NOEXCEPT = 0;
+    virtual const bsl::type_info& targetType() const noexcept = 0;
 
     /// Copy-construct `*this` into the specified `dst` address.
-    virtual void copy(void* dst) const BSLS_KEYWORD_NOEXCEPT = 0;
+    virtual void copy(void* dst) const noexcept = 0;
 };
 
 // =====================
@@ -202,7 +202,7 @@ class Executor_Target : public Executor_TargetBase {
     /// `bsl::decay_t<EXECUTOR_PARM>` shall be the same type as `EXECUTOR`.
     template <class EXECUTOR_PARAM>
     Executor_Target(BSLS_COMPILERFEATURES_FORWARD_REF(EXECUTOR_PARAM)
-                        executor) BSLS_KEYWORD_NOEXCEPT;
+                        executor) noexcept;
 
   public:
     // MANIPULATORS
@@ -214,20 +214,20 @@ class Executor_Target : public Executor_TargetBase {
     void dispatch(const bsl::function<void()>&) const override;
 
     /// Implements `Executor_TargetBase::move()`.
-    void move(void* dst) BSLS_KEYWORD_NOEXCEPT override;
+    void move(void* dst) noexcept override;
 
   public:
     // ACCESSORS
-    void* target() BSLS_KEYWORD_NOEXCEPT override;
+    void* target() noexcept override;
 
     /// Implements `Executor_TargetBase::target()`.
-    const void* target() const BSLS_KEYWORD_NOEXCEPT override;
+    const void* target() const noexcept override;
 
-    const bsl::type_info& targetType() const BSLS_KEYWORD_NOEXCEPT override;
+    const bsl::type_info& targetType() const noexcept override;
     // Implements 'Executor_TargetBase::targetType'.
 
     /// Implements `Executor_TargetBase::copy`.
-    void copy(void* dst) const BSLS_KEYWORD_NOEXCEPT override;
+    void copy(void* dst) const noexcept override;
 };
 
 // =========================
@@ -258,14 +258,14 @@ class Executor_Box_DefImp {
     // MANIPULATORS
 
     /// Swap the contents of `*this` and `other`.
-    void swap(Executor_Box_DefImp& other) BSLS_KEYWORD_NOEXCEPT;
+    void swap(Executor_Box_DefImp& other) noexcept;
 
   public:
     // ACCESSORS
-    Executor_TargetBase* target() BSLS_KEYWORD_NOEXCEPT;
+    Executor_TargetBase* target() noexcept;
 
     /// Return a pointer to the contained `Executor_TargetBase` object.
-    const Executor_TargetBase* target() const BSLS_KEYWORD_NOEXCEPT;
+    const Executor_TargetBase* target() const noexcept;
 };
 
 // =========================
@@ -309,37 +309,35 @@ class Executor_Box_SboImp {
     /// documentation).
     template <class EXECUTOR>
     Executor_Box_SboImp(EXECUTOR          executor,
-                        bslma::Allocator* allocator = 0) BSLS_KEYWORD_NOEXCEPT;
+                        bslma::Allocator* allocator = 0) noexcept;
 
-    Executor_Box_SboImp(const Executor_Box_SboImp& original)
-        BSLS_KEYWORD_NOEXCEPT;
+    Executor_Box_SboImp(const Executor_Box_SboImp& original) noexcept;
 
     /// Create a `Executor_Box_SboImp` object containing a copy of the
     /// specified `original` object's target.
-    Executor_Box_SboImp(bslmf::MovableRef<Executor_Box_SboImp> original)
-        BSLS_KEYWORD_NOEXCEPT;
+    Executor_Box_SboImp(
+        bslmf::MovableRef<Executor_Box_SboImp> original) noexcept;
 
     /// Destroy this object and the contained target with it.
     ~Executor_Box_SboImp();
 
   public:
     // MANIPULATORS
-    Executor_Box_SboImp&
-    operator=(const Executor_Box_SboImp& rhs) BSLS_KEYWORD_NOEXCEPT;
+    Executor_Box_SboImp& operator=(const Executor_Box_SboImp& rhs) noexcept;
 
     /// Assign the contents of `rhs` to `*this`. Return `*this`.
-    Executor_Box_SboImp& operator=(bslmf::MovableRef<Executor_Box_SboImp> rhs)
-        BSLS_KEYWORD_NOEXCEPT;
+    Executor_Box_SboImp&
+    operator=(bslmf::MovableRef<Executor_Box_SboImp> rhs) noexcept;
 
     /// Swap the contents of `*this` and `other`.
-    void swap(Executor_Box_SboImp& other) BSLS_KEYWORD_NOEXCEPT;
+    void swap(Executor_Box_SboImp& other) noexcept;
 
   public:
     // ACCESSORS
-    Executor_TargetBase* target() BSLS_KEYWORD_NOEXCEPT;
+    Executor_TargetBase* target() noexcept;
 
     /// Return a pointer to the contained `Executor_TargetBase` object.
-    const Executor_TargetBase* target() const BSLS_KEYWORD_NOEXCEPT;
+    const Executor_TargetBase* target() const noexcept;
 };
 
 /// Provides a metafunction to determine whether an `Executor_Box_SboImp`
@@ -365,7 +363,7 @@ class Executor_Box {
     // CREATORS
 
     /// Create a `Executor_Box` object containing no target.
-    Executor_Box() BSLS_KEYWORD_NOEXCEPT;
+    Executor_Box() noexcept;
 
     /// Create a `Executor_Box` object containing an object of type
     /// `Executor_Target<EXECUTOR>` direct-non-list-initialized by
@@ -381,14 +379,14 @@ class Executor_Box {
     // MANIPULATORS
 
     /// Swap the contents of `*this` and `other`.
-    void swap(Executor_Box& other) BSLS_KEYWORD_NOEXCEPT;
+    void swap(Executor_Box& other) noexcept;
 
   public:
     // ACCESSORS
-    Executor_TargetBase* target() BSLS_KEYWORD_NOEXCEPT;
+    Executor_TargetBase* target() noexcept;
 
     /// Return a pointer to the contained `Executor_TargetBase` object.
-    const Executor_TargetBase* target() const BSLS_KEYWORD_NOEXCEPT;
+    const Executor_TargetBase* target() const noexcept;
 };
 
 // ==============
@@ -405,7 +403,7 @@ class Executor {
     // CREATORS
 
     /// Create a `Executor` object having no target.
-    Executor() BSLS_KEYWORD_NOEXCEPT;
+    Executor() noexcept;
 
     /// Create a `Executor` object containing an executor target of type
     /// `EXECUTOR` direct-non-list-initialized by `bsl::move(executor)`.
@@ -426,7 +424,7 @@ class Executor {
     /// provided so this constructor overload would be selected against the
     /// template one.
     Executor(const Executor&   original,
-             bslma::Allocator* dummyAllocator = 0) BSLS_KEYWORD_NOEXCEPT;
+             bslma::Allocator* dummyAllocator = 0) noexcept;
 
     /// Create a `Executor` object sharing a target with the specified
     /// `original` object, or a containing a copy of that target, leaving
@@ -436,7 +434,7 @@ class Executor {
     /// provided so this constructor overload would be selected against the
     /// template one.
     Executor(bslmf::MovableRef<Executor> original,
-             bslma::Allocator* dummyAllocator = 0) BSLS_KEYWORD_NOEXCEPT;
+             bslma::Allocator*           dummyAllocator = 0) noexcept;
 
   public:
     // MANIPULATORS
@@ -453,12 +451,12 @@ class Executor {
 
     /// Make `*this` share a target with the specified `rhs` object, or
     /// contain a copy of that target.  Return `*this`.
-    Executor& operator=(const Executor& rhs) BSLS_KEYWORD_NOEXCEPT;
+    Executor& operator=(const Executor& rhs) noexcept;
 
     /// Make `*this` share a target with the specified `rhs` object, or
     /// contain a copy of that target, leaving `rhs` in an unspecified
     /// state.  Return `*this`.
-    Executor& operator=(bslmf::MovableRef<Executor> rhs) BSLS_KEYWORD_NOEXCEPT;
+    Executor& operator=(bslmf::MovableRef<Executor> rhs) noexcept;
 
     /// If `*this` has a target, release the shared ownership, or destroy
     /// it.  Then direct-non-list-initialize a new executor target of type
@@ -496,32 +494,32 @@ class Executor {
     void dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const;
 
     /// Swap the contents of `*this` and `other`.
-    void swap(Executor& other) BSLS_KEYWORD_NOEXCEPT;
+    void swap(Executor& other) noexcept;
 
   public:
     // ACCESSORS
 
     /// If `*this` has a target, return `true`.  Otherwise, return `false`.
     BSLS_KEYWORD_EXPLICIT
-    operator bool() const BSLS_KEYWORD_NOEXCEPT;
+    operator bool() const noexcept;
 
     template <class T>
-    T* target() BSLS_KEYWORD_NOEXCEPT;
+    T* target() noexcept;
 
     /// If `targetType() == typeid(T)`, return a pointer to the contained
     /// executor target.  Otherwise, return a null pointer value.
     template <class T>
-    const T* target() const BSLS_KEYWORD_NOEXCEPT;
+    const T* target() const noexcept;
 
     /// If `*this` has a target of type `T`, return `typeid(T)`.  Otherwise,
     /// return `typeid(void)`.
-    const bsl::type_info& targetType() const BSLS_KEYWORD_NOEXCEPT;
+    const bsl::type_info& targetType() const noexcept;
 };
 
 // FREE OPERATORS
 
 /// Swap the contents of `lhs` and `rhs`.
-void swap(Executor& lhs, Executor& rhs) BSLS_KEYWORD_NOEXCEPT;
+void swap(Executor& lhs, Executor& rhs) noexcept;
 
 // ============================================================================
 //                           INLINE DEFINITIONS
@@ -535,8 +533,7 @@ void swap(Executor& lhs, Executor& rhs) BSLS_KEYWORD_NOEXCEPT;
 template <class EXECUTOR>
 template <class EXECUTOR_PARAM>
 inline Executor_Target<EXECUTOR>::Executor_Target(
-    BSLS_COMPILERFEATURES_FORWARD_REF(EXECUTOR_PARAM)
-        executor) BSLS_KEYWORD_NOEXCEPT
+    BSLS_COMPILERFEATURES_FORWARD_REF(EXECUTOR_PARAM) executor) noexcept
 : d_executor(BSLS_COMPILERFEATURES_FORWARD(EXECUTOR_PARAM, executor))
 {
     // NOTHING
@@ -558,7 +555,7 @@ Executor_Target<EXECUTOR>::dispatch(const bsl::function<void()>& f) const
 }
 
 template <class EXECUTOR>
-inline void Executor_Target<EXECUTOR>::move(void* dst) BSLS_KEYWORD_NOEXCEPT
+inline void Executor_Target<EXECUTOR>::move(void* dst) noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(dst);
@@ -571,28 +568,26 @@ inline void Executor_Target<EXECUTOR>::move(void* dst) BSLS_KEYWORD_NOEXCEPT
 
 // ACCESSORS
 template <class EXECUTOR>
-inline void* Executor_Target<EXECUTOR>::target() BSLS_KEYWORD_NOEXCEPT
+inline void* Executor_Target<EXECUTOR>::target() noexcept
 {
     return static_cast<void*>(&d_executor);
 }
 
 template <class EXECUTOR>
-inline const void*
-Executor_Target<EXECUTOR>::target() const BSLS_KEYWORD_NOEXCEPT
+inline const void* Executor_Target<EXECUTOR>::target() const noexcept
 {
     return static_cast<const void*>(&d_executor);
 }
 
 template <class EXECUTOR>
 inline const bsl::type_info&
-Executor_Target<EXECUTOR>::targetType() const BSLS_KEYWORD_NOEXCEPT
+Executor_Target<EXECUTOR>::targetType() const noexcept
 {
     return typeid(EXECUTOR);
 }
 
 template <class EXECUTOR>
-inline void
-Executor_Target<EXECUTOR>::copy(void* dst) const BSLS_KEYWORD_NOEXCEPT
+inline void Executor_Target<EXECUTOR>::copy(void* dst) const noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(dst);
@@ -625,9 +620,9 @@ inline Executor_Box_DefImp::Executor_Box_DefImp(EXECUTOR          executor,
 
 // CREATORS
 template <class EXECUTOR>
-inline Executor_Box_SboImp::Executor_Box_SboImp(EXECUTOR          executor,
-                                                bslma::Allocator* allocator)
-    BSLS_KEYWORD_NOEXCEPT : d_buffer()
+inline Executor_Box_SboImp::Executor_Box_SboImp(
+    EXECUTOR          executor,
+    bslma::Allocator* allocator) noexcept : d_buffer()
 {
     // PRECONDITIONS
     BSLMF_ASSERT(Executor_Box_SboImpCanHold<EXECUTOR>::value);
@@ -710,14 +705,14 @@ inline void Executor::dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION)
 
 // ACCESSORS
 template <class T>
-inline T* Executor::target() BSLS_KEYWORD_NOEXCEPT
+inline T* Executor::target() noexcept
 {
     const bool match = targetType() == typeid(T);
     return match ? static_cast<T*>(d_box.target()->target()) : 0;
 }
 
 template <class T>
-inline const T* Executor::target() const BSLS_KEYWORD_NOEXCEPT
+inline const T* Executor::target() const noexcept
 {
     const bool match = targetType() == typeid(T);
     return match ? static_cast<const T*>(d_box.target()->target()) : 0;
@@ -726,7 +721,7 @@ inline const T* Executor::target() const BSLS_KEYWORD_NOEXCEPT
 }  // close package namespace
 
 // FREE OPERATORS
-inline void bmqex::swap(Executor& lhs, Executor& rhs) BSLS_KEYWORD_NOEXCEPT
+inline void bmqex::swap(Executor& lhs, Executor& rhs) noexcept
 {
     lhs.swap(rhs);
 }

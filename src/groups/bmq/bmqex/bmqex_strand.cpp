@@ -24,7 +24,7 @@ namespace bmqex {
 // ------------------------
 
 // CLASS METHODS
-bsls::Types::Uint64 Strand_ThreadUtil::invalidThreadId() BSLS_KEYWORD_NOEXCEPT
+bsls::Types::Uint64 Strand_ThreadUtil::invalidThreadId() noexcept
 {
     return bslmt::ThreadUtil::idAsUint64(
         bslmt::ThreadUtil::handleToId(bslmt::ThreadUtil::invalidHandle()));

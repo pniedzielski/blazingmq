@@ -154,8 +154,7 @@ class ExecutionUtil_FunctionRef {
     /// Create a `ExecutionUtil_FunctionRef` containing the specified
     /// `function` pointer.
     explicit BSLS_KEYWORD_CONSTEXPR_CPP14 ExecutionUtil_FunctionRef(
-        typename bsl::remove_reference<F>::type* function)
-        BSLS_KEYWORD_NOEXCEPT;
+        typename bsl::remove_reference<F>::type* function) noexcept;
 
   public:
     // ACCESSORS
@@ -210,8 +209,8 @@ class ExecutionUtil_OneOffFunction {
 
         /// Create a `DestroyFunctionOnScopeExit` referring to the specified
         /// `functionValue`.
-        explicit BSLS_KEYWORD_CONSTEXPR_CPP14 DestroyFunctionOnScopeExit(
-            FunctionValueType* functionValue) BSLS_KEYWORD_NOEXCEPT;
+        explicit BSLS_KEYWORD_CONSTEXPR_CPP14
+        DestroyFunctionOnScopeExit(FunctionValueType* functionValue) noexcept;
 
         /// Destroy the referred to function object.
         ~DestroyFunctionOnScopeExit();
@@ -331,7 +330,7 @@ class ExecutionUtil_UniqueTask {
 
     /// Block the calling thread pending completion of the contained
     /// function object invocation.
-    void wait() const BSLS_KEYWORD_NOEXCEPT;
+    void wait() const noexcept;
 };
 
 // ====================
@@ -427,7 +426,7 @@ inline R ExecutionUtil_FunctionRef<R, F>::invoke(
 template <class R, class F>
 inline BSLS_KEYWORD_CONSTEXPR_CPP14
 ExecutionUtil_FunctionRef<R, F>::ExecutionUtil_FunctionRef(
-    typename bsl::remove_reference<F>::type* function) BSLS_KEYWORD_NOEXCEPT
+    typename bsl::remove_reference<F>::type* function) noexcept
 : d_function_p(function)
 {
     // PRECONDITIONS
@@ -490,9 +489,9 @@ inline R ExecutionUtil_OneOffFunction<R, F>::operator()()
 
 // CREATORS
 template <class R, class F>
-inline BSLS_KEYWORD_CONSTEXPR_CPP14 ExecutionUtil_OneOffFunction<R, F>::
-    DestroyFunctionOnScopeExit ::DestroyFunctionOnScopeExit(
-        FunctionValueType* functionValue) BSLS_KEYWORD_NOEXCEPT
+inline BSLS_KEYWORD_CONSTEXPR_CPP14
+ExecutionUtil_OneOffFunction<R, F>::DestroyFunctionOnScopeExit::
+    DestroyFunctionOnScopeExit(FunctionValueType* functionValue) noexcept
 : d_functionValue_p(functionValue)
 {
     // PRECONDITIONS
@@ -548,7 +547,7 @@ inline void ExecutionUtil_UniqueTask<F>::operator()()
 
 // ACCESSORS
 template <class F>
-inline void ExecutionUtil_UniqueTask<F>::wait() const BSLS_KEYWORD_NOEXCEPT
+inline void ExecutionUtil_UniqueTask<F>::wait() const noexcept
 {
     d_latch.wait();
 }

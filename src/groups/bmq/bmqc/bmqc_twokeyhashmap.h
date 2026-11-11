@@ -301,9 +301,7 @@ class TwoKeyHashMap {
         // PRIVATE CREATORS
 
         /// Internal constructor.
-        iterator(KeyIndex       keyIndex,
-                 TwoKeyHashMap* map,
-                 Node*          node) BSLS_KEYWORD_NOEXCEPT;
+        iterator(KeyIndex keyIndex, TwoKeyHashMap* map, Node* node) noexcept;
 
       public:
         // CREATORS
@@ -312,7 +310,7 @@ class TwoKeyHashMap {
         /// iterator of some unspecified empty container.  Two default-
         /// constructed iterators always compares equal.  The value of
         /// `keyIndex()` is unspecified.
-        iterator() BSLS_KEYWORD_NOEXCEPT;
+        iterator() noexcept;
 
       public:
         // MANIPULATORS
@@ -328,7 +326,7 @@ class TwoKeyHashMap {
         iterator operator++(int);
 
         /// Swap the contents of `lhs` and `rhs`.
-        friend void swap(iterator& lhs, iterator& rhs) BSLS_KEYWORD_NOEXCEPT
+        friend void swap(iterator& lhs, iterator& rhs) noexcept
         {
             // NOTE: This function had to be defined inline.  For reasons I
             //       don't completely understand the code does not compile
@@ -355,7 +353,7 @@ class TwoKeyHashMap {
         pointer operator->() const;
 
         /// Return the index of the key this iterator is currently bound to.
-        KeyIndex keyIndex() const BSLS_KEYWORD_NOEXCEPT;
+        KeyIndex keyIndex() const noexcept;
 
         /// Return `true` if the specified iterators `lhs` and `rhs` refer
         /// to the same object, and `false` otherwise.  The behavior is
@@ -416,7 +414,7 @@ class TwoKeyHashMap {
         /// Internal constructor.
         const_iterator(KeyIndex             keyIndex,
                        const TwoKeyHashMap* map,
-                       const Node*          node) BSLS_KEYWORD_NOEXCEPT;
+                       const Node*          node) noexcept;
 
       public:
         // CREATORS
@@ -425,11 +423,11 @@ class TwoKeyHashMap {
         /// end iterator of some unspecified empty container.  Two default-
         /// constructed iterators always compares equal.  The value of
         /// `keyIndex()` is unspecified.
-        const_iterator() BSLS_KEYWORD_NOEXCEPT;
+        const_iterator() noexcept;
 
         /// Create a `const_iterator` object that refers to the same element
         /// as the specified iterator `it`, if any.
-        const_iterator(iterator it) BSLS_KEYWORD_NOEXCEPT;  // IMPLICIT
+        const_iterator(iterator it) noexcept;  // IMPLICIT
 
       public:
         // MANIPULATORS
@@ -445,8 +443,7 @@ class TwoKeyHashMap {
         const_iterator operator++(int);
 
         /// Swap the contents of `lhs` and `rhs`.
-        friend void swap(const_iterator& lhs,
-                         const_iterator& rhs) BSLS_KEYWORD_NOEXCEPT
+        friend void swap(const_iterator& lhs, const_iterator& rhs) noexcept
         {
             // NOTE: This function had to be defined inline.  For reasons I
             //       don't completely understand the code does not compile
@@ -473,7 +470,7 @@ class TwoKeyHashMap {
         pointer operator->() const;
 
         /// Return the index of the key this iterator is currently bound to.
-        KeyIndex keyIndex() const BSLS_KEYWORD_NOEXCEPT;
+        KeyIndex keyIndex() const noexcept;
 
         /// Return `true` if the specified iterators `lhs` and `rhs` refer
         /// to the same object, and `false` otherwise.  The behavior is
@@ -644,34 +641,30 @@ class TwoKeyHashMap {
     /// Remove all elements from the container.  Invalidate any references,
     /// pointers, or iterators referring to contained elements.  Invalidate
     /// past-the-end iterators.
-    void clear() BSLS_KEYWORD_NOEXCEPT;
+    void clear() noexcept;
 
     /// Swap the contents of `*this` and `other`.  Note that iterators
     /// referring to elements contained in `*this` and `other`, as well as
     /// past-the-end iterators for these two containers, are invalidated.
     /// Pointers and references to contained elements are not affected.
-    void swap(TwoKeyHashMap& other) BSLS_KEYWORD_NOEXCEPT;
+    void swap(TwoKeyHashMap& other) noexcept;
 
   public:
     // ACCESSORS
-    iterator begin(KeyIndex keyIndex = e_FIRST_KEY) BSLS_KEYWORD_NOEXCEPT;
-    const_iterator
-    begin(KeyIndex keyIndex = e_FIRST_KEY) const BSLS_KEYWORD_NOEXCEPT;
+    iterator       begin(KeyIndex keyIndex = e_FIRST_KEY) noexcept;
+    const_iterator begin(KeyIndex keyIndex = e_FIRST_KEY) const noexcept;
 
     /// Return an iterator to the first element in the container as indexed
     /// by the specified `keyIndex`.  If the container is empty, return
     /// `end(keyIndex)`.
-    const_iterator
-    cbegin(KeyIndex keyIndex = e_FIRST_KEY) const BSLS_KEYWORD_NOEXCEPT;
+    const_iterator cbegin(KeyIndex keyIndex = e_FIRST_KEY) const noexcept;
 
-    iterator end(KeyIndex keyIndex = e_FIRST_KEY) BSLS_KEYWORD_NOEXCEPT;
-    const_iterator
-    end(KeyIndex keyIndex = e_FIRST_KEY) const BSLS_KEYWORD_NOEXCEPT;
+    iterator       end(KeyIndex keyIndex = e_FIRST_KEY) noexcept;
+    const_iterator end(KeyIndex keyIndex = e_FIRST_KEY) const noexcept;
 
     /// Returns an iterator to the element following the last element of the
     /// container as indexed by the specified `keyIndex`.
-    const_iterator
-    cend(KeyIndex keyIndex = e_FIRST_KEY) const BSLS_KEYWORD_NOEXCEPT;
+    const_iterator cend(KeyIndex keyIndex = e_FIRST_KEY) const noexcept;
 
     iterator       findByKey1(const first_key_type& k1);
     const_iterator findByKey1(const first_key_type& k1) const;
@@ -684,13 +677,13 @@ class TwoKeyHashMap {
 
     /// Return `true` if the container contains no elements, and `false`
     /// otherwise.
-    bool empty() const BSLS_KEYWORD_NOEXCEPT;
+    bool empty() const noexcept;
 
     /// Return the current number of elements in the container.
-    size_type size() const BSLS_KEYWORD_NOEXCEPT;
+    size_type size() const noexcept;
 
     /// Return the maximum possible number of elements in the container.
-    size_type max_size() const BSLS_KEYWORD_NOEXCEPT;
+    size_type max_size() const noexcept;
 
     /// Returns the function used to hash the first key.
     first_hasher hash1() const;
@@ -734,22 +727,22 @@ class TwoKeyHashMapValue : private TwoKeyHashMap_Node<MAP> {
 
     /// Return a modifiable reference to the mapped value associated with
     /// this `TwoKeyHashMapValue`.
-    typename MAP::mapped_type& value() BSLS_KEYWORD_NOEXCEPT;
+    typename MAP::mapped_type& value() noexcept;
 
   public:
     // ACCESSORS
 
     /// Return a const reference to the first key associated with this
     /// `TwoKeyHashMapValue`.
-    const typename MAP::first_key_type& key1() const BSLS_KEYWORD_NOEXCEPT;
+    const typename MAP::first_key_type& key1() const noexcept;
 
     /// Return a const reference to the second key associated with this
     /// `TwoKeyHashMapValue`.
-    const typename MAP::second_key_type& key2() const BSLS_KEYWORD_NOEXCEPT;
+    const typename MAP::second_key_type& key2() const noexcept;
 
     /// Return a const reference to the mapped value associated with this
     /// `TwoKeyHashMapValue`.
-    const typename MAP::mapped_type& value() const BSLS_KEYWORD_NOEXCEPT;
+    const typename MAP::mapped_type& value() const noexcept;
 };
 
 // FREE OPERATORS
@@ -757,7 +750,7 @@ class TwoKeyHashMapValue : private TwoKeyHashMap_Node<MAP> {
 /// Swap the contents of `lhs` and `rhs` via a call to `lhs.swap(rhs)`.
 template <class K1, class K2, class VALUE, class H1, class H2>
 void swap(TwoKeyHashMap<K1, K2, VALUE, H1, H2>& lhs,
-          TwoKeyHashMap<K1, K2, VALUE, H1, H2>& rhs) BSLS_KEYWORD_NOEXCEPT;
+          TwoKeyHashMap<K1, K2, VALUE, H1, H2>& rhs) noexcept;
 
 /// Compare the contents of the specified `lhs` with those of the specified
 /// `rhs`.  Return `true` if they are equal and `false` otherwise.
@@ -839,9 +832,9 @@ template <class K1, class K2, class VALUE, class H1, class H2>
 inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::iterator::iterator(
     KeyIndex       keyIndex,
     TwoKeyHashMap* map,
-    Node*          node) BSLS_KEYWORD_NOEXCEPT : d_keyIndex(keyIndex),
-                                        d_map_p(map),
-                                        d_node_p(node)
+    Node*          node) noexcept : d_keyIndex(keyIndex),
+                           d_map_p(map),
+                           d_node_p(node)
 {
     // PRECONDITIONS
     BSLS_ASSERT(keyIndex == e_FIRST_KEY || keyIndex == e_SECOND_KEY);
@@ -850,10 +843,10 @@ inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::iterator::iterator(
 
 // CREATORS
 template <class K1, class K2, class VALUE, class H1, class H2>
-inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::iterator::iterator()
-    BSLS_KEYWORD_NOEXCEPT : d_keyIndex(e_FIRST_KEY),
-                            d_map_p(0),
-                            d_node_p(0)
+inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::iterator::iterator() noexcept
+: d_keyIndex(e_FIRST_KEY),
+  d_map_p(0),
+  d_node_p(0)
 {
     // NOTHING
 }
@@ -915,8 +908,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::iterator::operator->() const
 
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::KeyIndex
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::iterator::keyIndex() const
-    BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::iterator::keyIndex() const noexcept
 {
     return d_keyIndex;
 }
@@ -930,9 +922,9 @@ template <class K1, class K2, class VALUE, class H1, class H2>
 inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator::const_iterator(
     KeyIndex             keyIndex,
     const TwoKeyHashMap* map,
-    const Node*          node) BSLS_KEYWORD_NOEXCEPT : d_keyIndex(keyIndex),
-                                              d_map_p(map),
-                                              d_node_p(node)
+    const Node*          node) noexcept : d_keyIndex(keyIndex),
+                                 d_map_p(map),
+                                 d_node_p(node)
 {
     // PRECONDITIONS
     BSLS_ASSERT(keyIndex == e_FIRST_KEY || keyIndex == e_SECOND_KEY);
@@ -942,18 +934,18 @@ inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator::const_iterator(
 // CREATORS
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator::const_iterator()
-    BSLS_KEYWORD_NOEXCEPT : d_keyIndex(e_FIRST_KEY),
-                            d_map_p(0),
-                            d_node_p(0)
+    noexcept : d_keyIndex(e_FIRST_KEY),
+               d_map_p(0),
+               d_node_p(0)
 {
     // NOTHING
 }
 
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator::const_iterator(
-    iterator it) BSLS_KEYWORD_NOEXCEPT : d_keyIndex(it.d_keyIndex),
-                                         d_map_p(it.d_map_p),
-                                         d_node_p(it.d_node_p)
+    iterator it) noexcept : d_keyIndex(it.d_keyIndex),
+                            d_map_p(it.d_map_p),
+                            d_node_p(it.d_node_p)
 {
     // NOTHING
 }
@@ -1015,8 +1007,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator::operator->() const
 
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::KeyIndex
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator::keyIndex() const
-    BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator::keyIndex() const noexcept
 {
     return d_keyIndex;
 }
@@ -1364,7 +1355,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::eraseByKey2(const second_key_type& k2)
 }
 
 template <class K1, class K2, class VALUE, class H1, class H2>
-inline void TwoKeyHashMap<K1, K2, VALUE, H1, H2>::clear() BSLS_KEYWORD_NOEXCEPT
+inline void TwoKeyHashMap<K1, K2, VALUE, H1, H2>::clear() noexcept
 {
 #ifdef BSLS_ASSERT_SAFE_IS_ACTIVE
     // POSTCONDITIONS
@@ -1384,8 +1375,8 @@ inline void TwoKeyHashMap<K1, K2, VALUE, H1, H2>::clear() BSLS_KEYWORD_NOEXCEPT
 }
 
 template <class K1, class K2, class VALUE, class H1, class H2>
-inline void TwoKeyHashMap<K1, K2, VALUE, H1, H2>::swap(TwoKeyHashMap& other)
-    BSLS_KEYWORD_NOEXCEPT
+inline void
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::swap(TwoKeyHashMap& other) noexcept
 {
     using bsl::swap;
 
@@ -1397,8 +1388,7 @@ inline void TwoKeyHashMap<K1, K2, VALUE, H1, H2>::swap(TwoKeyHashMap& other)
 // ACCESSORS
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::iterator
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::begin(KeyIndex keyIndex)
-    BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::begin(KeyIndex keyIndex) noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(keyIndex == e_FIRST_KEY || keyIndex == e_SECOND_KEY);
@@ -1415,8 +1405,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::begin(KeyIndex keyIndex)
 
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::begin(KeyIndex keyIndex) const
-    BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::begin(KeyIndex keyIndex) const noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(keyIndex == e_FIRST_KEY || keyIndex == e_SECOND_KEY);
@@ -1433,8 +1422,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::begin(KeyIndex keyIndex) const
 
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::cbegin(KeyIndex keyIndex) const
-    BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::cbegin(KeyIndex keyIndex) const noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(keyIndex == e_FIRST_KEY || keyIndex == e_SECOND_KEY);
@@ -1444,8 +1432,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::cbegin(KeyIndex keyIndex) const
 
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::iterator
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::end(KeyIndex keyIndex)
-    BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::end(KeyIndex keyIndex) noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(keyIndex == e_FIRST_KEY || keyIndex == e_SECOND_KEY);
@@ -1455,8 +1442,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::end(KeyIndex keyIndex)
 
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::end(KeyIndex keyIndex) const
-    BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::end(KeyIndex keyIndex) const noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(keyIndex == e_FIRST_KEY || keyIndex == e_SECOND_KEY);
@@ -1466,8 +1452,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::end(KeyIndex keyIndex) const
 
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::cend(KeyIndex keyIndex) const
-    BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::cend(KeyIndex keyIndex) const noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(keyIndex == e_FIRST_KEY || keyIndex == e_SECOND_KEY);
@@ -1516,22 +1501,21 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::findByKey2(
 }
 
 template <class K1, class K2, class VALUE, class H1, class H2>
-inline bool
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::empty() const BSLS_KEYWORD_NOEXCEPT
+inline bool TwoKeyHashMap<K1, K2, VALUE, H1, H2>::empty() const noexcept
 {
     return d_k1Map.empty();
 }
 
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::size_type
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::size() const BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::size() const noexcept
 {
     return d_k1Map.size();
 }
 
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::size_type
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::max_size() const BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::max_size() const noexcept
 {
     return bsl::min(d_k1Map.max_size(), d_k2Map.max_size());
 }
@@ -1587,8 +1571,7 @@ inline bool TwoKeyHashMap<K1, K2, VALUE, H1, H2>::assertInvariants() const
 
 // MANIPULATORS
 template <class MAP>
-inline typename MAP::mapped_type&
-TwoKeyHashMapValue<MAP>::value() BSLS_KEYWORD_NOEXCEPT
+inline typename MAP::mapped_type& TwoKeyHashMapValue<MAP>::value() noexcept
 {
     return this->d_value.object();
 }
@@ -1596,21 +1579,21 @@ TwoKeyHashMapValue<MAP>::value() BSLS_KEYWORD_NOEXCEPT
 // ACCESSORS
 template <class MAP>
 inline const typename MAP::first_key_type&
-TwoKeyHashMapValue<MAP>::key1() const BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMapValue<MAP>::key1() const noexcept
 {
     return this->d_k1MapIter->first;
 }
 
 template <class MAP>
 inline const typename MAP::second_key_type&
-TwoKeyHashMapValue<MAP>::key2() const BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMapValue<MAP>::key2() const noexcept
 {
     return this->d_k2MapIter->first;
 }
 
 template <class MAP>
 inline const typename MAP::mapped_type&
-TwoKeyHashMapValue<MAP>::value() const BSLS_KEYWORD_NOEXCEPT
+TwoKeyHashMapValue<MAP>::value() const noexcept
 {
     return this->d_value.object();
 }
@@ -1619,9 +1602,8 @@ TwoKeyHashMapValue<MAP>::value() const BSLS_KEYWORD_NOEXCEPT
 
 // FREE OPERATORS
 template <class K1, class K2, class VALUE, class H1, class H2>
-inline void
-bmqc::swap(TwoKeyHashMap<K1, K2, VALUE, H1, H2>& lhs,
-           TwoKeyHashMap<K1, K2, VALUE, H1, H2>& rhs) BSLS_KEYWORD_NOEXCEPT
+inline void bmqc::swap(TwoKeyHashMap<K1, K2, VALUE, H1, H2>& lhs,
+                       TwoKeyHashMap<K1, K2, VALUE, H1, H2>& rhs) noexcept
 {
     lhs.swap(rhs);
 }

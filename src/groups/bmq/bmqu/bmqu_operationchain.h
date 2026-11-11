@@ -284,8 +284,7 @@ class OperationChain_CompletionCallbackWrapper {
     /// completion callback.
     OperationChain_CompletionCallbackWrapper(OperationChain* chain,
                                              JobHandle       jobHandle,
-                                             CO_CALLBACK*    coCallback)
-        BSLS_KEYWORD_NOEXCEPT;
+                                             CO_CALLBACK* coCallback) noexcept;
 
   public:
     // ACCESSORS
@@ -423,7 +422,7 @@ class OperationChain_Job {
     // ACCESSORS
 
     /// Return the ID of this job.
-    unsigned id() const BSLS_KEYWORD_NOEXCEPT;
+    unsigned id() const noexcept;
 
   public:
     // TRAITS
@@ -481,12 +480,12 @@ class OperationChain {
 
     /// Callback invoked to notify this operation chain an async
     /// operation identified by the specified `handle` has completed.
-    void onOperationCompleted(JobHandle handle) BSLS_KEYWORD_NOEXCEPT;
+    void onOperationCompleted(JobHandle handle) noexcept;
 
     /// Execute all operations in the first link of this operation chain.
     /// Unlock the mutex associated with the specified 'lock' guard and
     /// release the guard.
-    void run(LockGuard* lock) BSLS_KEYWORD_NOEXCEPT;
+    void run(LockGuard* lock) noexcept;
 
   private:
     // NOT IMPLEMENTED
@@ -524,12 +523,12 @@ class OperationChain {
     /// the calling thread pending completion of any currently executing
     /// operation. If the chain is already stopped, this function has no
     /// effect.
-    void stop() BSLS_KEYWORD_NOEXCEPT;
+    void stop() noexcept;
 
     /// Block the calling thread until there is no operations executing
     /// in this operation chain. If there is no operations currently
     /// executing, return immediately.
-    void join() BSLS_KEYWORD_NOEXCEPT;
+    void join() noexcept;
 
     /// Append the specified `link` to this operation chain. If the chain is
     /// started and the appended `link` is the first one in the chain,
@@ -599,7 +598,7 @@ class OperationChain {
                        BSLS_COMPILERFEATURES_FORWARD_REF(CO_CALLBACK)
                            coCallback);
 
-    int popBack() BSLS_KEYWORD_NOEXCEPT;
+    int popBack() noexcept;
 
     /// Extract and remove the last link from this operation chain and load
     /// it into the optionally specified `link`. Return 0 on success, and a
@@ -608,13 +607,13 @@ class OperationChain {
     /// currently executing. On failure, this function has no effect and the
     /// contents of `link` are unmodified. The behavior is undefined unless
     /// `link` uses that same allocator as this object.
-    int popBack(Link* link) BSLS_KEYWORD_NOEXCEPT;
+    int popBack(Link* link) noexcept;
 
     /// Remove all links from this operation chain. If operations in this
     /// chain are currently executing, do not remove the first link. Return
     /// the number of operations removed. If this chain is empty, this
     /// function has no effect and 0 is returned.
-    size_t removeAll() BSLS_KEYWORD_NOEXCEPT;
+    size_t removeAll() noexcept;
 
   public:
     // ACCESSORS
@@ -622,31 +621,31 @@ class OperationChain {
     /// Return `true` if this operation chain is started, and `false`
     /// otherwise. Note that a stopped chain can still be executing
     /// operations.
-    bool isStarted() const BSLS_KEYWORD_NOEXCEPT;
+    bool isStarted() const noexcept;
 
     /// Return `true` if this operation chain is currently executing at
     /// least one operation, and `false` otherwise.
-    bool isRunning() const BSLS_KEYWORD_NOEXCEPT;
+    bool isRunning() const noexcept;
 
     /// Return the number of links in this operation chain. A value of 0
     /// means the chain is empty.
-    size_t numLinks() const BSLS_KEYWORD_NOEXCEPT;
+    size_t numLinks() const noexcept;
 
     /// Return the number of operations in this operation chain, including
     /// those that are currently executing (if any). A value of 0 means the
     /// chain is empty.
-    size_t numOperations() const BSLS_KEYWORD_NOEXCEPT;
+    size_t numOperations() const noexcept;
 
     /// Return the number of operations in this operation chain that are not
     /// currently executing.
-    size_t numOperationsPending() const BSLS_KEYWORD_NOEXCEPT;
+    size_t numOperationsPending() const noexcept;
 
     /// Return the number of operations in this operation chain that are
     /// currently executing.
-    size_t numOperationsExecuting() const BSLS_KEYWORD_NOEXCEPT;
+    size_t numOperationsExecuting() const noexcept;
 
     /// Return the allocator used by this operation chain to supply memory.
-    bslma::Allocator* allocator() const BSLS_KEYWORD_NOEXCEPT;
+    bslma::Allocator* allocator() const noexcept;
 
   public:
     // TRAITS
@@ -703,7 +702,7 @@ class OperationChainLink {
     /// behavior is undefined unless `rhs` uses that same allocator as this
     /// object.
     OperationChainLink&
-    operator=(bslmf::MovableRef<OperationChainLink> rhs) BSLS_KEYWORD_NOEXCEPT;
+    operator=(bslmf::MovableRef<OperationChainLink> rhs) noexcept;
 
     /// Insert an operation into this link. Specify a `opCallback` operation
     /// callback initiating the operation. Optionally specify a `coCallback`
@@ -727,22 +726,22 @@ class OperationChainLink {
 
     /// Remove all operations in this link, if any. Return the number of
     /// operations removed.
-    size_t removeAll() BSLS_KEYWORD_NOEXCEPT;
+    size_t removeAll() noexcept;
 
     /// Swap the contents of this object and the specified `other` object.
     /// The behavior is undefined unless `other` uses that same allocator
     /// as this object.
-    void swap(OperationChainLink& other) BSLS_KEYWORD_NOEXCEPT;
+    void swap(OperationChainLink& other) noexcept;
 
   public:
     // ACCESSORS
 
     /// Return the number of operations in this link. A value of 0 means the
     /// link is empty.
-    size_t numOperations() const BSLS_KEYWORD_NOEXCEPT;
+    size_t numOperations() const noexcept;
 
     /// Return the allocator used by this link to supply memory.
-    bslma::Allocator* allocator() const BSLS_KEYWORD_NOEXCEPT;
+    bslma::Allocator* allocator() const noexcept;
 
   public:
     // TRAITS
@@ -754,8 +753,7 @@ class OperationChainLink {
 
 /// Swap the contents of `lhs` and `rhs`. The behavior is undefined unless
 /// `lhs` and `rhs` use the same allocator.
-void swap(OperationChainLink& lhs,
-          OperationChainLink& rhs) BSLS_KEYWORD_NOEXCEPT;
+void swap(OperationChainLink& lhs, OperationChainLink& rhs) noexcept;
 
 // ============================================================================
 //                            INLINE DEFINITIONS
@@ -770,10 +768,10 @@ template <class CO_CALLBACK>
 inline OperationChain_CompletionCallbackWrapper<CO_CALLBACK>::
     OperationChain_CompletionCallbackWrapper(OperationChain* chain,
                                              JobHandle       jobHandle,
-                                             CO_CALLBACK*    coCallback)
-        BSLS_KEYWORD_NOEXCEPT : d_chain_p(chain),
-                                d_jobHandle(jobHandle),
-                                d_coCallback_p(coCallback)
+                                             CO_CALLBACK* coCallback) noexcept
+: d_chain_p(chain),
+  d_jobHandle(jobHandle),
+  d_coCallback_p(coCallback)
 {
     // PRECONDITIONS
     BSLS_ASSERT(chain);
@@ -843,7 +841,7 @@ inline void OperationChain_Job::execute(OperationChain* chain,
 }
 
 // ACCESSORS
-inline unsigned OperationChain_Job::id() const BSLS_KEYWORD_NOEXCEPT
+inline unsigned OperationChain_Job::id() const noexcept
 {
     return d_id;
 }
@@ -982,7 +980,7 @@ inline void OperationChainLink::insert(
 
 // FREE OPERATORS
 inline void bmqu::swap(OperationChainLink& lhs,
-                       OperationChainLink& rhs) BSLS_KEYWORD_NOEXCEPT
+                       OperationChainLink& rhs) noexcept
 {
     lhs.swap(rhs);
 }

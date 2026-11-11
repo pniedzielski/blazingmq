@@ -28,9 +28,8 @@ ChannelFactoryPipeline::Config::Config(const ChannelFactorySP& baseFactory,
 }
 
 ChannelFactoryPipeline::Config::Config(bslmf::MovableRef<Config> other)
-    BSLS_KEYWORD_NOEXCEPT
-: d_pipeline(MoveUtil::move(MoveUtil::access(other).d_pipeline),
-             MoveUtil::access(other).d_pipeline.get_allocator())
+    noexcept : d_pipeline(MoveUtil::move(MoveUtil::access(other).d_pipeline),
+                          MoveUtil::access(other).d_pipeline.get_allocator())
 {
 }
 
@@ -75,7 +74,7 @@ size_t ChannelFactoryPipeline::Config::size() const
 }
 
 ChannelFactoryPipeline::ChannelFactoryPipeline(
-    bslmf::MovableRef<ChannelFactoryPipeline> other) BSLS_KEYWORD_NOEXCEPT
+    bslmf::MovableRef<ChannelFactoryPipeline> other) noexcept
 : d_pipeline(MoveUtil::move(MoveUtil::access(other).d_pipeline),
              MoveUtil::access(other).get_allocator())
 {

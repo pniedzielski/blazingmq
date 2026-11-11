@@ -851,7 +851,7 @@ class WeakMemFn
 
     /// Create a `WeakMemFn` object holding the address of the specified
     /// `memFn` member function.
-    WeakMemFn(PROT memFn) BSLS_KEYWORD_NOEXCEPT;  // IMPLICIT
+    WeakMemFn(PROT memFn) noexcept;  // IMPLICIT
 };
 
 // =======================
@@ -901,8 +901,7 @@ class WeakMemFnInstance
     /// specified `memFn` member function and the specified `obj` object
     /// weak pointer.
     template <class OBJ>
-    WeakMemFnInstance(PROT                      memFn,
-                      const bsl::weak_ptr<OBJ>& obj) BSLS_KEYWORD_NOEXCEPT;
+    WeakMemFnInstance(PROT memFn, const bsl::weak_ptr<OBJ>& obj) noexcept;
 };
 
 // =====================
@@ -930,8 +929,7 @@ class WeakMemFnResult {
     /// contained value if `VALUE` declares the `bslma::UsesBslmaAllocator`
     /// trait.  If `basicAllocator` is 0, the default memory allocator is
     /// used.
-    explicit WeakMemFnResult(bslma::Allocator* basicAllocator = 0)
-        BSLS_KEYWORD_NOEXCEPT;
+    explicit WeakMemFnResult(bslma::Allocator* basicAllocator = 0) noexcept;
 
     /// Create a `WeakMemFnResult` object containing the specified `value`
     /// by direct-non-list initializing an object of type `VALUE` with
@@ -979,14 +977,14 @@ class WeakMemFnResult {
 
   public:
     // ACCESSORS
-    VALUE& value() BSLS_KEYWORD_NOEXCEPT;
+    VALUE& value() noexcept;
 
     /// Return a reference to the contained value.  The behavior is
     /// undefined unless `isNull()` is `false`.
-    const VALUE& value() const BSLS_KEYWORD_NOEXCEPT;
+    const VALUE& value() const noexcept;
 
     /// Return `true` if this object is null, and `false` otherwise.
-    bool isNull() const BSLS_KEYWORD_NOEXCEPT;
+    bool isNull() const noexcept;
 
   public:
     // TRAITS
@@ -1005,8 +1003,7 @@ class WeakMemFnResult<void> {
 
     /// Create a `WeakMemFnResult` object having the null value.  The
     /// specified `basicAllocator` is ignored.
-    explicit WeakMemFnResult(bslma::Allocator* basicAllocator = 0)
-        BSLS_KEYWORD_NOEXCEPT;
+    explicit WeakMemFnResult(bslma::Allocator* basicAllocator = 0) noexcept;
 
     /// Create a `WeakMemFnResult` object having a not null value.
     ///
@@ -1028,10 +1025,10 @@ class WeakMemFnResult<void> {
     /// Does nothing.  The behavior is undefined unless `isNull()` is
     /// `false`.  Note that this function is provided to simplify template
     /// metaprogramming.
-    void value() const BSLS_KEYWORD_NOEXCEPT;
+    void value() const noexcept;
 
     /// Return `true` if this object is null, and `false` otherwise.
-    bool isNull() const BSLS_KEYWORD_NOEXCEPT;
+    bool isNull() const noexcept;
 
   public:
     // TRAITS
@@ -1055,8 +1052,7 @@ class WeakMemFnResult<VALUE&> {
 
     /// Create a `WeakMemFnResult` object having the null value.  The
     /// specified `basicAllocator` is ignored.
-    explicit WeakMemFnResult(bslma::Allocator* basicAllocator = 0)
-        BSLS_KEYWORD_NOEXCEPT;
+    explicit WeakMemFnResult(bslma::Allocator* basicAllocator = 0) noexcept;
 
     /// Create a `WeakMemFnResult` object containing the specified `value`
     /// reference.
@@ -1078,10 +1074,10 @@ class WeakMemFnResult<VALUE&> {
 
     /// Return the contained reference.  The behavior is undefined unless
     /// `isNull()` is `false`.
-    VALUE& value() const BSLS_KEYWORD_NOEXCEPT;
+    VALUE& value() const noexcept;
 
     /// Return `true` if this object is null, and `false` otherwise.
-    bool isNull() const BSLS_KEYWORD_NOEXCEPT;
+    bool isNull() const noexcept;
 
   public:
     // TRAITS
@@ -1099,18 +1095,17 @@ struct WeakMemFnUtil {
 
     /// Return `WeakMemFn<PROT>(memFn)`.
     template <class PROT>
-    static WeakMemFn<PROT> weakMemFn(PROT memFn) BSLS_KEYWORD_NOEXCEPT;
+    static WeakMemFn<PROT> weakMemFn(PROT memFn) noexcept;
 
     /// Return `WeakMemFnInstance<PROT>(memFn, obj)`.
     template <class PROT, class OBJ>
     static WeakMemFnInstance<PROT>
-    weakMemFn(PROT memFn, const bsl::weak_ptr<OBJ>& obj) BSLS_KEYWORD_NOEXCEPT;
+    weakMemFn(PROT memFn, const bsl::weak_ptr<OBJ>& obj) noexcept;
 
     /// Return `WeakMemFnInstance<PROT>(memFn, bsl::weak_ptr<OBJ>(obj))`.
     template <class PROT, class OBJ>
     static WeakMemFnInstance<PROT>
-    weakMemFn(PROT                        memFn,
-              const bsl::shared_ptr<OBJ>& obj) BSLS_KEYWORD_NOEXCEPT;
+    weakMemFn(PROT memFn, const bsl::shared_ptr<OBJ>& obj) noexcept;
 };
 
 // ============================================================================
@@ -1947,8 +1942,7 @@ operator()(typename bslmf::ForwardingType<ARG1>::Type arg1,
 
 // CREATORS
 template <class PROT>
-inline WeakMemFn<PROT>::WeakMemFn(PROT memFn) BSLS_KEYWORD_NOEXCEPT
-: d_memFn(memFn)
+inline WeakMemFn<PROT>::WeakMemFn(PROT memFn) noexcept : d_memFn(memFn)
 {
     // PRECONDITIONS
     BSLS_ASSERT(memFn);
@@ -1963,8 +1957,8 @@ template <class PROT>
 template <class OBJ>
 inline WeakMemFnInstance<PROT>::WeakMemFnInstance(
     PROT                      memFn,
-    const bsl::weak_ptr<OBJ>& obj) BSLS_KEYWORD_NOEXCEPT : d_memFn(memFn),
-                                                           d_obj(obj)
+    const bsl::weak_ptr<OBJ>& obj) noexcept : d_memFn(memFn),
+                                              d_obj(obj)
 {
     // PRECONDITIONS
     BSLS_ASSERT(memFn);
@@ -1977,8 +1971,7 @@ inline WeakMemFnInstance<PROT>::WeakMemFnInstance(
 // CREATORS
 template <class VALUE>
 inline WeakMemFnResult<VALUE>::WeakMemFnResult(
-    bslma::Allocator* basicAllocator) BSLS_KEYWORD_NOEXCEPT
-: d_value(basicAllocator)
+    bslma::Allocator* basicAllocator) noexcept : d_value(basicAllocator)
 {
     // NOTHING
 }
@@ -2034,7 +2027,7 @@ WeakMemFnResult<VALUE>::operator=(bslmf::MovableRef<WeakMemFnResult> original)
 
 // ACCESSORS
 template <class VALUE>
-inline VALUE& WeakMemFnResult<VALUE>::value() BSLS_KEYWORD_NOEXCEPT
+inline VALUE& WeakMemFnResult<VALUE>::value() noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(!isNull());
@@ -2043,7 +2036,7 @@ inline VALUE& WeakMemFnResult<VALUE>::value() BSLS_KEYWORD_NOEXCEPT
 }
 
 template <class VALUE>
-inline const VALUE& WeakMemFnResult<VALUE>::value() const BSLS_KEYWORD_NOEXCEPT
+inline const VALUE& WeakMemFnResult<VALUE>::value() const noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(!isNull());
@@ -2052,14 +2045,14 @@ inline const VALUE& WeakMemFnResult<VALUE>::value() const BSLS_KEYWORD_NOEXCEPT
 }
 
 template <class VALUE>
-inline bool WeakMemFnResult<VALUE>::isNull() const BSLS_KEYWORD_NOEXCEPT
+inline bool WeakMemFnResult<VALUE>::isNull() const noexcept
 {
     return d_value.object().isNull();
 }
 
 // CREATORS
-inline WeakMemFnResult<void>::WeakMemFnResult(bslma::Allocator*)
-    BSLS_KEYWORD_NOEXCEPT : d_isNull(true)
+inline WeakMemFnResult<void>::WeakMemFnResult(bslma::Allocator*) noexcept
+: d_isNull(true)
 {
     // NOTHING
 }
@@ -2078,21 +2071,21 @@ inline WeakMemFnResult<void>::WeakMemFnResult(const WeakMemFnResult& original,
 }
 
 // ACCESSORS
-inline void WeakMemFnResult<void>::value() const BSLS_KEYWORD_NOEXCEPT
+inline void WeakMemFnResult<void>::value() const noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(!isNull());
 }
 
-inline bool WeakMemFnResult<void>::isNull() const BSLS_KEYWORD_NOEXCEPT
+inline bool WeakMemFnResult<void>::isNull() const noexcept
 {
     return d_isNull;
 }
 
 // CREATORS
 template <class VALUE>
-inline WeakMemFnResult<VALUE&>::WeakMemFnResult(bslma::Allocator*)
-    BSLS_KEYWORD_NOEXCEPT : d_value()
+inline WeakMemFnResult<VALUE&>::WeakMemFnResult(bslma::Allocator*) noexcept
+: d_value()
 {
     // NOTHING
 }
@@ -2116,7 +2109,7 @@ inline WeakMemFnResult<VALUE&>::WeakMemFnResult(
 
 // ACCESSORS
 template <class VALUE>
-inline VALUE& WeakMemFnResult<VALUE&>::value() const BSLS_KEYWORD_NOEXCEPT
+inline VALUE& WeakMemFnResult<VALUE&>::value() const noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(!isNull());
@@ -2125,7 +2118,7 @@ inline VALUE& WeakMemFnResult<VALUE&>::value() const BSLS_KEYWORD_NOEXCEPT
 }
 
 template <class VALUE>
-inline bool WeakMemFnResult<VALUE&>::isNull() const BSLS_KEYWORD_NOEXCEPT
+inline bool WeakMemFnResult<VALUE&>::isNull() const noexcept
 {
     return d_value.isNull();
 }
@@ -2136,24 +2129,21 @@ inline bool WeakMemFnResult<VALUE&>::isNull() const BSLS_KEYWORD_NOEXCEPT
 
 // CLASS METHODS
 template <class PROT>
-inline WeakMemFn<PROT>
-WeakMemFnUtil::weakMemFn(PROT memFn) BSLS_KEYWORD_NOEXCEPT
+inline WeakMemFn<PROT> WeakMemFnUtil::weakMemFn(PROT memFn) noexcept
 {
     return WeakMemFn<PROT>(memFn);
 }
 
 template <class PROT, class OBJ>
 inline WeakMemFnInstance<PROT>
-WeakMemFnUtil::weakMemFn(PROT                      memFn,
-                         const bsl::weak_ptr<OBJ>& obj) BSLS_KEYWORD_NOEXCEPT
+WeakMemFnUtil::weakMemFn(PROT memFn, const bsl::weak_ptr<OBJ>& obj) noexcept
 {
     return WeakMemFnInstance<PROT>(memFn, obj);
 }
 
 template <class PROT, class OBJ>
 inline WeakMemFnInstance<PROT>
-WeakMemFnUtil::weakMemFn(PROT                        memFn,
-                         const bsl::shared_ptr<OBJ>& obj) BSLS_KEYWORD_NOEXCEPT
+WeakMemFnUtil::weakMemFn(PROT memFn, const bsl::shared_ptr<OBJ>& obj) noexcept
 {
     return WeakMemFnInstance<PROT>(memFn, bsl::weak_ptr<OBJ>(obj));
 }

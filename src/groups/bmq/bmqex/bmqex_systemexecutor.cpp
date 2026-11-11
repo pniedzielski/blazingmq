@@ -31,7 +31,7 @@ namespace bmqex {
 
 // PRIVATE MANIPULATORS
 void SystemExecutor_Context::finalizeThread(
-    const bslmt::ThreadUtil::Handle& thread) BSLS_KEYWORD_NOEXCEPT
+    const bslmt::ThreadUtil::Handle& thread) noexcept
 {
     // PRECONDITIONS
     BSLS_ASSERT(
@@ -103,8 +103,7 @@ SystemExecutor_Context::~SystemExecutor_Context()
 }
 
 // ACCESSORS
-bslma::Allocator*
-SystemExecutor_Context::allocator() const BSLS_KEYWORD_NOEXCEPT
+bslma::Allocator* SystemExecutor_Context::allocator() const noexcept
 {
     return d_allocator_p;
 }

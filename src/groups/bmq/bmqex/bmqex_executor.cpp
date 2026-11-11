@@ -33,19 +33,17 @@ Executor_TargetBase::~Executor_TargetBase()
 // -------------------------
 
 // MANIPULATORS
-void Executor_Box_DefImp::swap(Executor_Box_DefImp& other)
-    BSLS_KEYWORD_NOEXCEPT
+void Executor_Box_DefImp::swap(Executor_Box_DefImp& other) noexcept
 {
     d_target.swap(other.d_target);
 }
 
-Executor_TargetBase* Executor_Box_DefImp::target() BSLS_KEYWORD_NOEXCEPT
+Executor_TargetBase* Executor_Box_DefImp::target() noexcept
 {
     return d_target.get();
 }
 
-const Executor_TargetBase*
-Executor_Box_DefImp::target() const BSLS_KEYWORD_NOEXCEPT
+const Executor_TargetBase* Executor_Box_DefImp::target() const noexcept
 {
     return d_target.get();
 }
@@ -55,14 +53,14 @@ Executor_Box_DefImp::target() const BSLS_KEYWORD_NOEXCEPT
 // -------------------------
 
 // CREATORS
-Executor_Box_SboImp::Executor_Box_SboImp(const Executor_Box_SboImp& original)
-    BSLS_KEYWORD_NOEXCEPT
+Executor_Box_SboImp::Executor_Box_SboImp(
+    const Executor_Box_SboImp& original) noexcept
 {
     original.target()->copy(this);
 }
 
 Executor_Box_SboImp::Executor_Box_SboImp(
-    bslmf::MovableRef<Executor_Box_SboImp> original) BSLS_KEYWORD_NOEXCEPT
+    bslmf::MovableRef<Executor_Box_SboImp> original) noexcept
 {
     bslmf::MovableRefUtil::access(original).target()->move(this);
 }
@@ -73,8 +71,8 @@ Executor_Box_SboImp::~Executor_Box_SboImp()
 }
 
 // MANIPULATORS
-Executor_Box_SboImp& Executor_Box_SboImp::operator=(
-    const Executor_Box_SboImp& rhs) BSLS_KEYWORD_NOEXCEPT
+Executor_Box_SboImp&
+Executor_Box_SboImp::operator=(const Executor_Box_SboImp& rhs) noexcept
 {
     target()->~Executor_TargetBase();
     rhs.target()->copy(this);
@@ -83,7 +81,7 @@ Executor_Box_SboImp& Executor_Box_SboImp::operator=(
 }
 
 Executor_Box_SboImp& Executor_Box_SboImp::operator=(
-    bslmf::MovableRef<Executor_Box_SboImp> rhs) BSLS_KEYWORD_NOEXCEPT
+    bslmf::MovableRef<Executor_Box_SboImp> rhs) noexcept
 {
     target()->~Executor_TargetBase();
     bslmf::MovableRefUtil::access(rhs).target()->move(this);
@@ -91,8 +89,7 @@ Executor_Box_SboImp& Executor_Box_SboImp::operator=(
     return *this;
 }
 
-void Executor_Box_SboImp::swap(Executor_Box_SboImp& other)
-    BSLS_KEYWORD_NOEXCEPT
+void Executor_Box_SboImp::swap(Executor_Box_SboImp& other) noexcept
 {
     Executor_Box_SboImp tmp(bslmf::MovableRefUtil::move(other));
 
@@ -101,13 +98,12 @@ void Executor_Box_SboImp::swap(Executor_Box_SboImp& other)
 }
 
 // ACCESSORS
-Executor_TargetBase* Executor_Box_SboImp::target() BSLS_KEYWORD_NOEXCEPT
+Executor_TargetBase* Executor_Box_SboImp::target() noexcept
 {
     return reinterpret_cast<Executor_TargetBase*>(this);
 }
 
-const Executor_TargetBase*
-Executor_Box_SboImp::target() const BSLS_KEYWORD_NOEXCEPT
+const Executor_TargetBase* Executor_Box_SboImp::target() const noexcept
 {
     return reinterpret_cast<const Executor_TargetBase*>(this);
 }
@@ -117,19 +113,19 @@ Executor_Box_SboImp::target() const BSLS_KEYWORD_NOEXCEPT
 // ------------------
 
 // CREATORS
-Executor_Box::Executor_Box() BSLS_KEYWORD_NOEXCEPT : d_imp()
+Executor_Box::Executor_Box() noexcept : d_imp()
 {
     // NOTHING
 }
 
 // MANIPULATORS
-void Executor_Box::swap(Executor_Box& other) BSLS_KEYWORD_NOEXCEPT
+void Executor_Box::swap(Executor_Box& other) noexcept
 {
     d_imp.swap(other.d_imp);
 }
 
 // ACCESSORS
-Executor_TargetBase* Executor_Box::target() BSLS_KEYWORD_NOEXCEPT
+Executor_TargetBase* Executor_Box::target() noexcept
 {
     if (d_imp.isUnset()) {
         return 0;  // RETURN
@@ -140,7 +136,7 @@ Executor_TargetBase* Executor_Box::target() BSLS_KEYWORD_NOEXCEPT
                : d_imp.the<Executor_Box_SboImp>().target();
 }
 
-const Executor_TargetBase* Executor_Box::target() const BSLS_KEYWORD_NOEXCEPT
+const Executor_TargetBase* Executor_Box::target() const noexcept
 {
     return const_cast<Executor_Box*>(this)->target();
 }
@@ -150,20 +146,19 @@ const Executor_TargetBase* Executor_Box::target() const BSLS_KEYWORD_NOEXCEPT
 // --------------
 
 // CREATORS
-Executor::Executor() BSLS_KEYWORD_NOEXCEPT : d_box()
+Executor::Executor() noexcept : d_box()
 {
     // NOTHING
 }
 
-Executor::Executor(const Executor& original,
-                   bslma::Allocator*) BSLS_KEYWORD_NOEXCEPT
+Executor::Executor(const Executor& original, bslma::Allocator*) noexcept
 : d_box(original.d_box)
 {
     // NOTHING
 }
 
 Executor::Executor(bslmf::MovableRef<Executor> original,
-                   bslma::Allocator*) BSLS_KEYWORD_NOEXCEPT
+                   bslma::Allocator*) noexcept
 : d_box(bslmf::MovableRefUtil::move(
       bslmf::MovableRefUtil::access(original).d_box))
 {
@@ -171,32 +166,31 @@ Executor::Executor(bslmf::MovableRef<Executor> original,
 }
 
 // MANIPULATORS
-Executor& Executor::operator=(const Executor& rhs) BSLS_KEYWORD_NOEXCEPT
+Executor& Executor::operator=(const Executor& rhs) noexcept
 {
     d_box = rhs.d_box;
     return *this;
 }
 
-Executor&
-Executor::operator=(bslmf::MovableRef<Executor> rhs) BSLS_KEYWORD_NOEXCEPT
+Executor& Executor::operator=(bslmf::MovableRef<Executor> rhs) noexcept
 {
     d_box = bslmf::MovableRefUtil::move(
         bslmf::MovableRefUtil::access(rhs).d_box);
     return *this;
 }
 
-void Executor::swap(Executor& other) BSLS_KEYWORD_NOEXCEPT
+void Executor::swap(Executor& other) noexcept
 {
     d_box.swap(other.d_box);
 }
 
 // ACCESSORS
-Executor::operator bool() const BSLS_KEYWORD_NOEXCEPT
+Executor::operator bool() const noexcept
 {
     return static_cast<bool>(d_box.target());
 }
 
-const bsl::type_info& Executor::targetType() const BSLS_KEYWORD_NOEXCEPT
+const bsl::type_info& Executor::targetType() const noexcept
 {
     return d_box.target() ? d_box.target()->targetType() : typeid(void);
 }

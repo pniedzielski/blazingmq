@@ -36,14 +36,14 @@ const bsls::Types::Uint64 k_INVALID_THREAD_ID = bslmt::ThreadUtil::idAsUint64(
 // -----------------------
 
 // CREATORS
-SameThreadChecker::SameThreadChecker() BSLS_KEYWORD_NOEXCEPT
+SameThreadChecker::SameThreadChecker() noexcept
 : d_threadId(k_INVALID_THREAD_ID)
 {
     // NOTHING
 }
 
 // MANIPULATORS
-bool SameThreadChecker::inSameThread() BSLS_KEYWORD_NOEXCEPT
+bool SameThreadChecker::inSameThread() noexcept
 {
     const bsls::Types::Uint64 selfThreadId =
         bslmt::ThreadUtil::selfIdAsUint64();
@@ -54,7 +54,7 @@ bool SameThreadChecker::inSameThread() BSLS_KEYWORD_NOEXCEPT
     return threadId == selfThreadId || threadId == k_INVALID_THREAD_ID;
 }
 
-void SameThreadChecker::reset() BSLS_KEYWORD_NOEXCEPT
+void SameThreadChecker::reset() noexcept
 {
     d_threadId.storeRelease(k_INVALID_THREAD_ID);
 }
