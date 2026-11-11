@@ -49,15 +49,6 @@ typedef bsl::unordered_map<BloombergLP::mqbpoly::Identity,
                            BloombergLP::mqbauthz::Policy_Permission>
     RoleMap;
 
-struct ContainsRole {
-    bsl::string_view d_role;
-
-    bool operator()(const RoleMap::value_type& entry)
-    {
-        return entry.first.name() == d_role;
-    }
-};
-
 struct Policy_UriResource_Matcher {
     const bmqt::Uri* d_uri;
 
@@ -535,10 +526,12 @@ int Policy::parse(Policy*                 result,
 bsl::optional<const Policy::Permission*> Policy::get(bsl::string_view role)
 {
     bsl::optional<const Permission*> result;
-    ContainsRole                     containsRole = {role};
-    RoleMap::const_iterator permIt = bsl::find_if(d_rolePermissions.cbegin(),
-                                                  d_rolePermissions.cend(),
-                                                  containsRole);
+    RoleMap::const_iterator          permIt = bsl::find_if(
+        d_rolePermissions.cbegin(),
+        d_rolePermissions.cend(),
+        [role](const RoleMap::value_type& entry) {
+            return entry.first.name() == role;
+        });
     if (permIt != d_rolePermissions.cend()) {
         result = &permIt->second;
     }
