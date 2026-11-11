@@ -80,8 +80,8 @@ class PluginManager final {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    PluginManager(const PluginManager&);             // = delete;
-    PluginManager& operator=(const PluginManager&);  // = delete;
+    PluginManager(const PluginManager&)            = delete;
+    PluginManager& operator=(const PluginManager&) = delete;
 
   private:
     // PRIVATE METHODS
