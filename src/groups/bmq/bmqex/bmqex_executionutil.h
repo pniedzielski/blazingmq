@@ -89,8 +89,6 @@
 #include <bslmf_util.h>
 #include <bslmt_latch.h>
 #include <bsls_assert.h>
-#include <bsls_compilerfeatures.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 
@@ -399,22 +397,14 @@ template <class R, class F>
 inline void ExecutionUtil_FunctionRef<R, F>::invoke(
     BSLA_MAYBE_UNUSED bsl::true_type voidResultTag) const
 {
-#ifdef BSLS_COMPILERFEATURES_SUPPORT_RVALUE_REFERENCES
     bsl::forward<F> (*d_function_p)();
-#else
-    (*d_function_p)();
-#endif
 }
 
 template <class R, class F>
 inline R ExecutionUtil_FunctionRef<R, F>::invoke(
     BSLA_MAYBE_UNUSED bsl::false_type voidResultTag) const
 {
-#ifdef BSLS_COMPILERFEATURES_SUPPORT_RVALUE_REFERENCES
     return bsl::forward<F>(*d_function_p)();
-#else
-    return (*d_function_p)();
-#endif
 }
 
 // CREATORS

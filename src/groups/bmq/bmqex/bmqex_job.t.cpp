@@ -23,7 +23,6 @@
 #include <bsl_ostream.h>
 #include <bslma_testallocator.h>
 #include <bsls_assert.h>
-#include <bsls_compilerfeatures.h>
 
 // CONVENIENCE
 using namespace BloombergLP;
@@ -54,11 +53,7 @@ class NullaryFunctor {
 
   public:
     // MANIPULATORS
-#if defined(BSLS_COMPILERFEATURES_SUPPORT_RVALUE_REFERENCES)
     void operator()() &&
-#else
-    void operator()()
-#endif
     {
         *d_invoked = true;
     }

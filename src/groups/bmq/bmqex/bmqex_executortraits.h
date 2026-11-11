@@ -34,24 +34,10 @@
 #include <bslmf_integralconstant.h>
 #include <bslmf_util.h>
 #include <bslmf_voidtype.h>
-#include <bsls_compilerfeatures.h>
-
-// BDE (C++03)
-#if !defined(BSLS_COMPILERFEATURES_SUPPORT_DECLTYPE) ||                       \
-    !defined(BSLS_COMPILERFEATURES_SUPPORT_VARIADIC_TEMPLATES) ||             \
-    !defined(BSLS_COMPILERFEATURES_SUPPORT_DEFAULT_TEMPLATE_ARGS)
-#include <bsl_functional.h>
-#endif
 #include <bsl_type_traits.h>
 
 namespace BloombergLP {
 namespace bmqex {
-
-#if defined(BSLS_COMPILERFEATURES_SUPPORT_DECLTYPE) &&                        \
-    defined(BSLS_COMPILERFEATURES_SUPPORT_VARIADIC_TEMPLATES) &&              \
-    defined(BSLS_COMPILERFEATURES_SUPPORT_DEFAULT_TEMPLATE_ARGS)
-// NOTE: We assume that if the compiler supports 'decltype', variadic templates
-//       and default template arguments, it also supports expression SFINAE.
 
 // =================================
 // struct ExecutorTraits_CanDispatch
@@ -68,55 +54,6 @@ struct ExecutorTraits_CanDispatch<
     FUNCTION,
     bsl::void_t<decltype(bsl::declval<const EXECUTOR&>().dispatch(
         bsl::declval<FUNCTION>()))> > : bsl::true_type {};
-#else
-
-template <class EXECUTOR, class FUNCTION>
-struct ExecutorTraits_CanDispatch {
-    // Provides a metafunction to detect if an executor has a proper 'dispatch'
-    // member function in C++03.
-    //
-    // Note that due to the lack of expression SFINAE in C++03, this
-    // metafunction tries to detect the presence of a 'dispatch' member
-    // function on the 'EXECUTOR' class having 'void(EXECUTOR::*)(F) const'
-    // signature, 'F' being any of 'F1', 'const F1&', 'F1&&',
-    // and 'F1' being 'bsl::function<void()>'.
-
-    // TYPES
-    typedef bsl::function<void()>                     Job;
-    typedef bsl::function<void()>&&                   JobRef;
-
-    template <class U, void (U::*)(Job) const>
-    struct Test1 {};
-    template <class U, void (U::*)(const Job&) const>
-    struct Test2 {};
-    template <class U, void (U::*)(JobRef) const>
-    struct Test3 {};
-
-    // CLASS METHODS
-    template <class U>
-    static char test1(Test1<U, &U::dispatch>*);
-    template <class U>
-    static int test1(...);
-
-    template <class U>
-    static char test2(Test2<U, &U::dispatch>*);
-    template <class U>
-    static int test2(...);
-
-    template <class U>
-    static char test3(Test3<U, &U::dispatch>*);
-    template <class U>
-    static int test3(...);
-
-    // CLASS DATA
-    static const bool value = sizeof(test1<EXECUTOR>(0)) == sizeof(char) ||
-                              sizeof(test2<EXECUTOR>(0)) == sizeof(char) ||
-                              sizeof(test3<EXECUTOR>(0)) == sizeof(char);
-};
-
-#endif  //    defined(BSLS_COMPILERFEATURES_SUPPORT_DECLTYPE)
-        // && defined(BSLS_COMPILERFEATURES_SUPPORT_VARIADIC_TEMPLATES)
-        // && defined(BSLS_COMPILERFEATURES_SUPPORT_DEFAULT_TEMPLATE_ARGS)
 
 // =========================
 // struct ExecutorTraits_Imp
