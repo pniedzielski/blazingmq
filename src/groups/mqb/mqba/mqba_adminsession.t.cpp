@@ -40,7 +40,6 @@
 #include <bdlbb_pooledblobbufferfactory.h>
 #include <bdlcc_objectpool.h>
 #include <bdlcc_sharedobjectpool.h>
-#include <bdlf_bind.h>
 #include <bdlmt_threadpool.h>
 #include <bsl_memory.h>
 #include <bsl_string.h>
@@ -140,12 +139,12 @@ class TestBench {
               const mqbnet::Session::AdminCommandEnqueueCb& adminEnqueueCb,
               bslma::Allocator*                             allocator)
     : d_bufferFactory(256, allocator)
-    , d_blobSpPool(bdlf::BindUtil::bind(&createBlob,
-                                        &d_bufferFactory,
-                                        bdlf::PlaceHolders::_1,   // arena
-                                        bdlf::PlaceHolders::_2),  // alloc
-                   1024,  // blob pool growth strategy
-                   allocator)
+    , d_blobSpPool(
+          [this](void* arena, bslma::Allocator* alloc) {
+              createBlob(&d_bufferFactory, arena, alloc);
+          },
+          1024,  // blob pool growth strategy
+          allocator)
     , d_channel_sp(new bmqio::TestChannel(allocator))
     , d_mockDispatcher(allocator)
     , d_authorizer_sp(bsl::allocate_shared<TestAuthorizer>(allocator))
@@ -208,9 +207,9 @@ class QueueProcessor {
     /// Spawn the processor thread.
     void start()
     {
-        int rc = bslmt::ThreadUtil::create(
-            &d_handle,
-            bdlf::BindUtil::bind(&QueueProcessor::run, this));
+        int rc = bslmt::ThreadUtil::create(&d_handle, [this]() {
+            run();
+        });
         BMQTST_ASSERT_EQ(rc, 0);
     }
 
@@ -264,9 +263,9 @@ class AsyncAdminExecutor {
         // PRECONDITIONS
         BSLS_ASSERT_OPT(onProcessedCb);
 
-        d_pool_p->enqueueJob(bdlf::BindUtil::bind(&AsyncAdminExecutor::invoke,
-                                                  onProcessedCb,
-                                                  cmd));
+        d_pool_p->enqueueJob([onProcessedCb, cmd]() {
+            invoke(onProcessedCb, cmd);
+        });
     }
 
   private:
@@ -312,11 +311,13 @@ static void test1_watermark()
     TestAdminRetranslator retranslator;
     TestBench             tb(
         client(),
-        bdlf::BindUtil::bind(&TestAdminRetranslator::enqueueCommand,
-                             &retranslator,
-                             bdlf::PlaceHolders::_1,  // source
-                             bdlf::PlaceHolders::_2,  // cmd
-                             bdlf::PlaceHolders::_3),  // onProcessedCb
+        [&retranslator](
+            const bsl::string&                              source,
+            const bsl::string&                              cmd,
+            const mqbnet::Session::AdminCommandProcessedCb& onProcessedCb,
+            bool /* fromReroute */) {
+            retranslator.enqueueCommand(source, cmd, onProcessedCb);
+        },
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare sample admin command control message event
@@ -414,12 +415,12 @@ static void test2_safeConcurrentTeardown()
 
     // Shared blob infrastructure.
     bdlbb::PooledBlobBufferFactory bufferFactory(256, alloc);
-    BlobSpPool                     blobSpPool(bdlf::BindUtil::bind(&createBlob,
-                                               &bufferFactory,
-                                               bdlf::PlaceHolders::_1,
-                                               bdlf::PlaceHolders::_2),
-                          1024,
-                          alloc);
+    BlobSpPool                     blobSpPool(
+        [&bufferFactory](void* arena, bslma::Allocator* allocator) {
+            createBlob(&bufferFactory, arena, allocator);
+        },
+        1024,
+        alloc);
 
     // Dispatcher driven by a dedicated processor thread.
     mqbmock::Dispatcher dispatcher(alloc);
@@ -437,12 +438,14 @@ static void test2_safeConcurrentTeardown()
     BMQTST_ASSERT_EQ(rc, 0);
 
     AsyncAdminExecutor                     executor(&pool);
-    mqbnet::Session::AdminCommandEnqueueCb adminCb = bdlf::BindUtil::bind(
-        &AsyncAdminExecutor::enqueueCommand,
-        &executor,
-        bdlf::PlaceHolders::_1,   // source
-        bdlf::PlaceHolders::_2,   // cmd
-        bdlf::PlaceHolders::_3);  // onProcessedCb
+    mqbnet::Session::AdminCommandEnqueueCb adminCb =
+        [&executor](
+            const bsl::string&                              source,
+            const bsl::string&                              cmd,
+            const mqbnet::Session::AdminCommandProcessedCb& onProcessedCb,
+            bool /* fromReroute */) {
+            executor.enqueueCommand(source, cmd, onProcessedCb);
+        };
 
     // Build a single admin command event, reused across iterations.  The
     // builder is kept alive for the whole loop so that `adminEvent`'s

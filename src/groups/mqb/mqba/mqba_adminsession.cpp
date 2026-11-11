@@ -146,9 +146,9 @@ void AdminSession::sendPacket()
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(inDispatcherThread());
 
-    bdlb::ScopeExitAny resetBlobScopeGuard(
-        bdlf::BindUtil::bind(&bmqp::SchemaEventBuilder::reset,
-                             &d_state.d_schemaEventBuilder));
+    bdlb::ScopeExitAny resetBlobScopeGuard([this]() {
+        d_state.d_schemaEventBuilder.reset();
+    });
     const bdlbb::Blob& blob = *d_state.d_schemaEventBuilder.blob();
 
     // This method is the centralized *single* place where we should try to
@@ -247,10 +247,9 @@ void AdminSession::onProcessedAdminCommand(
 {
     // executed by the *ANY* thread
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&AdminSession::finalizeAdminCommand,
-                             this,
-                             adminCommandCtrlMsg,
-                             commandExecResults),
+        [this, adminCommandCtrlMsg, commandExecResults]() {
+            finalizeAdminCommand(adminCommandCtrlMsg, commandExecResults);
+        },
         this,
         mqbi::DispatcherEventType::e_DISPATCHER);
 }
@@ -387,9 +386,9 @@ void AdminSession::processEvent(const bmqp::Event&                    event,
 
     // Dispatch the event to be processed in dispatcher thread.
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&AdminSession::enqueueAdminCommand,
-                             this,
-                             controlMessage),
+        [this, controlMessage]() {
+            enqueueAdminCommand(controlMessage);
+        },
         this);
 }
 
@@ -415,9 +414,12 @@ void AdminSession::tearDownImpl(bslmt::Semaphore*            semaphore,
     // NOTE: We use the e_DISPATCHER type because this Client is dying, and the
     //       process of this event by the dispatcher should not add it to the
     //       flush list.
-    dispatcher()->execute(bdlf::BindUtil::bind(&sessionHolderDummy, session),
-                          this,
-                          mqbi::DispatcherEventType::e_DISPATCHER);
+    dispatcher()->execute(
+        [session]() {
+            sessionHolderDummy(session);
+        },
+        this,
+        mqbi::DispatcherEventType::e_DISPATCHER);
 
     // We can now wake up the IO thread, and let the channel be destroyed
     semaphore->post();
@@ -438,12 +440,12 @@ void AdminSession::tearDown(const bsl::shared_ptr<void>& session,
     // NOTE: We use the e_DISPATCHER type because this Client is dying, and the
     //       process of this event by the dispatcher should not add it to the
     //       flush list.
-    dispatcher()->execute(bdlf::BindUtil::bind(&AdminSession::tearDownImpl,
-                                               this,
-                                               &semaphore,
-                                               session),
-                          this,
-                          mqbi::DispatcherEventType::e_DISPATCHER);
+    dispatcher()->execute(
+        [this, &semaphore, session]() {
+            tearDownImpl(&semaphore, session);
+        },
+        this,
+        mqbi::DispatcherEventType::e_DISPATCHER);
     semaphore.wait();
 
     // At this point, we are sure the client dispatcher thread has no pending
@@ -458,9 +460,9 @@ void AdminSession::initiateShutdown(const ShutdownCb& callback)
     // executed by the *ANY* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&AdminSession::initiateShutdownDispatched,
-                             this,
-                             callback),
+        [this, callback]() {
+            initiateShutdownDispatched(callback);
+        },
         this);
 }
 
