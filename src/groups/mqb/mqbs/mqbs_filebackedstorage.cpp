@@ -75,12 +75,9 @@ void FileBackedStorage::purgeCommon(const mqbu::StorageKey& appKey,
         d_virtualStorageCatalog.removeAll();
         // Remove all records from the physical storage as well.
 
-        for (RecordHandleMapConstIter it = d_handles.begin();
-             it != d_handles.end();
-             ++it) {
-            const RecordHandlesArray& array = it->second->d_array;
-            for (unsigned int i = 0; i < array.size(); ++i) {
-                d_store_p->removeRecordRaw(array[i]);
+        for (const auto& [guid, item] : d_handles) {
+            for (const DataStoreRecordHandle& recordHandle : item->d_array) {
+                d_store_p->removeRecordRaw(recordHandle);
             }
         }
 
@@ -544,8 +541,8 @@ FileBackedStorage::releaseRef(const bmqt::MessageGUID& guid, bool asPrimary)
             // refCount is zero).  So we just delete records associated with
             // the guid from the underlying (this) storage.
 
-            for (unsigned int i = 0; i < handles.size(); ++i) {
-                d_store_p->removeRecordRaw(handles[i]);
+            for (const DataStoreRecordHandle& recordHandle : handles) {
+                d_store_p->removeRecordRaw(recordHandle);
             }
 
             d_capacityMeter.remove(1, msgLen);
@@ -589,8 +586,8 @@ FileBackedStorage::remove(const bmqt::MessageGUID& msgGUID, int* msgSize)
     }
 
     // Delete all items pointed by all handles for this GUID.
-    for (unsigned int i = 0; i < handles.size(); ++i) {
-        d_store_p->removeRecordRaw(handles[i]);
+    for (const DataStoreRecordHandle& recordHandle : handles) {
+        d_store_p->removeRecordRaw(recordHandle);
     }
 
     // Erase entry from 'd_handles' now that all records for the GUID have been
@@ -859,8 +856,8 @@ int FileBackedStorage::gcExpiredMessages(const bdlt::Datetime& currentTimeUtc,
         // Delete all items pointed by all handles for this GUID (i.e., delete
         // message from the underlying storage).
 
-        for (unsigned int i = 0; i < handles.size(); ++i) {
-            d_store_p->removeRecordRaw(handles[i]);
+        for (const DataStoreRecordHandle& recordHandle : handles) {
+            d_store_p->removeRecordRaw(recordHandle);
         }
 
         d_capacityMeter.remove(1, msgLen);
@@ -948,15 +945,13 @@ void FileBackedStorage::processMessageRecord(
                     d_virtualStorageCatalog.setup(dataStreamMessage.get());
 
                     // Move auto confirms to the data record
-                    for (AutoConfirmHandles::const_iterator cit =
-                             d_autoConfirmHandles.begin();
-                         cit != d_autoConfirmHandles.end();
-                         ++cit) {
+                    for (const AutoConfirm& autoConfirm :
+                         d_autoConfirmHandles) {
                         irc.first->second->d_array.push_back(
-                            cit->d_confirmRecordHandle);
+                            autoConfirm.d_confirmRecordHandle);
                         d_virtualStorageCatalog.autoConfirm(
                             dataStreamMessage.get(),
-                            cit->d_appKey);
+                            autoConfirm.d_appKey);
                     }
                 }
                 else {
@@ -1101,8 +1096,8 @@ void FileBackedStorage::processDeletionRecord(const bmqt::MessageGUID& guid)
 
     // Delete all existing handles.
 
-    for (unsigned int i = 0; i < handles.size(); ++i) {
-        d_store_p->removeRecordRaw(handles[i]);
+    for (const DataStoreRecordHandle& recordHandle : handles) {
+        d_store_p->removeRecordRaw(recordHandle);
     }
 
     // Finally erase entry from 'd_handles' now that all records for the GUID
@@ -1189,10 +1184,8 @@ void FileBackedStorage::calibrate()
 
 void FileBackedStorage::removeAutoConfirmHandles()
 {
-    for (AutoConfirmHandles::const_iterator it = d_autoConfirmHandles.begin();
-         it != d_autoConfirmHandles.end();
-         ++it) {
-        d_store_p->removeRecordRaw(it->d_confirmRecordHandle);
+    for (const AutoConfirm& autoConfirm : d_autoConfirmHandles) {
+        d_store_p->removeRecordRaw(autoConfirm.d_confirmRecordHandle);
     }
     d_autoConfirmHandles.clear();
 
@@ -1206,10 +1199,8 @@ FileBackedStorage::logAppsSubscriptionInfoCb(bsl::ostream& stream) const
         mqbi::Storage::AppInfos appInfos(d_allocator_p);
         loadVirtualStorageDetails(&appInfos);
 
-        for (mqbi::Storage::AppInfos::const_iterator cit = appInfos.begin();
-             cit != appInfos.end();
-             ++cit) {
-            queue()->queueEngine()->logAppSubscriptionInfo(stream, cit->first);
+        for (const auto& [appId, appKey] : appInfos) {
+            queue()->queueEngine()->logAppSubscriptionInfo(stream, appId);
         }
     }
 
