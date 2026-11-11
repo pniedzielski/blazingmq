@@ -544,10 +544,8 @@ static void updateHistFile(const TaskEnvironment* taskEnv)
             << "This is not fatal." << BMQTSK_ALARMLOG_END;
     }
     else {
-        for (bsl::list<bsl::string>::const_iterator it = entries.begin();
-             it != entries.end();
-             ++it) {
-            output << *it << "\n";
+        for (const bsl::string& entry : entries) {
+            output << entry << "\n";
         }
     }
     output.close();
