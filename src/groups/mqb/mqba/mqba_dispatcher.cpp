@@ -499,9 +499,9 @@ void Dispatcher::dispatchEvent(mqbi::Dispatcher::DispatcherEventRvRef event,
                                mqbi::DispatcherClient* destination)
 {
     BALL_LOG_TRACE << "Enqueuing Event to '" << destination->description()
-                   << "': " << *bslmf::MovableRefUtil::access(event);
+                   << "': " << *event;
 
-    bslmf::MovableRefUtil::access(event)->setDestination(destination);
+    event->setDestination(destination);
 
     dispatchEvent(bsl::move(event),
                   destination->dispatcherClientData().clientType(),
@@ -516,7 +516,7 @@ void Dispatcher::dispatchEvent(mqbi::Dispatcher::DispatcherEventRvRef event,
     BSLS_ASSERT_SAFE(handle != mqbi::Dispatcher::k_INVALID_PROCESSOR_HANDLE);
 
     BALL_LOG_TRACE << "Enqueuing Event to processor " << handle << " of "
-                   << type << ": " << *bslmf::MovableRefUtil::access(event);
+                   << type << ": " << *event;
 
     switch (type) {
     case mqbi::DispatcherClientType::e_SESSION:
@@ -526,8 +526,7 @@ void Dispatcher::dispatchEvent(mqbi::Dispatcher::DispatcherEventRvRef event,
 
         BSLS_ASSERT_SAFE(dispatcherContext->d_processorPool_mp);
 
-        bslmf::MovableRefUtil::access(event)->setEnqueueTime(
-            bmqu::Time::highResolutionTimer());
+        event->setEnqueueTime(bmqu::Time::highResolutionTimer());
 
         dispatcherContext->d_processorPool_mp->enqueueEvent(bsl::move(event),
                                                             handle);

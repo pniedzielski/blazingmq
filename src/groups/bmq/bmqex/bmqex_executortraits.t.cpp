@@ -72,7 +72,7 @@ struct PostExecutor {
     template <class FUNCTION>
     void post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
     {
-        bslmf::MovableRefUtil::access(f)();
+        f();
         ++d_postCallCount;
     }
 };
@@ -104,14 +104,14 @@ struct PostDispatchExecutor {
     template <class FUNCTION>
     void post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
     {
-        bslmf::MovableRefUtil::access(f)();
+        f();
         ++d_postCallCount;
     }
 
     template <class FUNCTION>
     void dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
     {
-        bslmf::MovableRefUtil::access(f)();
+        f();
         ++d_dispatchCallCount;
     }
 };

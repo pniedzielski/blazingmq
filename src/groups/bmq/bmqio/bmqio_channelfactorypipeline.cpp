@@ -28,14 +28,14 @@ ChannelFactoryPipeline::Config::Config(const ChannelFactorySP& baseFactory,
 }
 
 ChannelFactoryPipeline::Config::Config(bslmf::MovableRef<Config> other)
-    noexcept : d_pipeline(MoveUtil::move(MoveUtil::access(other).d_pipeline),
-                          MoveUtil::access(other).d_pipeline.get_allocator())
+    noexcept : d_pipeline(MoveUtil::move(other.d_pipeline),
+                          other.d_pipeline.get_allocator())
 {
 }
 
 ChannelFactoryPipeline::Config::Config(bslmf::MovableRef<Config> other,
                                        const allocator_type&     allocator)
-: d_pipeline(MoveUtil::move(MoveUtil::access(other).d_pipeline), allocator)
+: d_pipeline(MoveUtil::move(other.d_pipeline), allocator)
 {
 }
 
@@ -75,8 +75,7 @@ size_t ChannelFactoryPipeline::Config::size() const
 
 ChannelFactoryPipeline::ChannelFactoryPipeline(
     bslmf::MovableRef<ChannelFactoryPipeline> other) noexcept
-: d_pipeline(MoveUtil::move(MoveUtil::access(other).d_pipeline),
-             MoveUtil::access(other).get_allocator())
+: d_pipeline(MoveUtil::move(other.d_pipeline), other.get_allocator())
 {
     BSLS_ASSERT(!d_pipeline.empty());
 }
@@ -84,7 +83,7 @@ ChannelFactoryPipeline::ChannelFactoryPipeline(
 ChannelFactoryPipeline::ChannelFactoryPipeline(
     bslmf::MovableRef<ChannelFactoryPipeline> other,
     const allocator_type&                     allocator)
-: d_pipeline(MoveUtil::move(MoveUtil::access(other).d_pipeline), allocator)
+: d_pipeline(MoveUtil::move(other.d_pipeline), allocator)
 {
     BSLS_ASSERT(!d_pipeline.empty());
 }
@@ -92,7 +91,7 @@ ChannelFactoryPipeline::ChannelFactoryPipeline(
 ChannelFactoryPipeline::ChannelFactoryPipeline(
     bslmf::MovableRef<Config> builder,
     const allocator_type&     allocator)
-: d_pipeline(MoveUtil::move(MoveUtil::access(builder).d_pipeline), allocator)
+: d_pipeline(MoveUtil::move(builder.d_pipeline), allocator)
 {
     BSLS_ASSERT(!d_pipeline.empty());
 }

@@ -63,7 +63,7 @@ Executor_Box_SboImp::Executor_Box_SboImp(
 Executor_Box_SboImp::Executor_Box_SboImp(
     bslmf::MovableRef<Executor_Box_SboImp> original) noexcept
 {
-    bslmf::MovableRefUtil::access(original).target()->move(this);
+    original.target()->move(this);
 }
 
 Executor_Box_SboImp::~Executor_Box_SboImp()
@@ -85,7 +85,7 @@ Executor_Box_SboImp& Executor_Box_SboImp::operator=(
     bslmf::MovableRef<Executor_Box_SboImp> rhs) noexcept
 {
     target()->~Executor_TargetBase();
-    bslmf::MovableRefUtil::access(rhs).target()->move(this);
+    rhs.target()->move(this);
 
     return *this;
 }
@@ -160,7 +160,7 @@ Executor::Executor(const Executor& original, bslma::Allocator*) noexcept
 
 Executor::Executor(bslmf::MovableRef<Executor> original,
                    bslma::Allocator*) noexcept
-: d_box(bsl::move(bslmf::MovableRefUtil::access(original).d_box))
+: d_box(bsl::move(original.d_box))
 {
     // NOTHING
 }
@@ -174,7 +174,7 @@ Executor& Executor::operator=(const Executor& rhs) noexcept
 
 Executor& Executor::operator=(bslmf::MovableRef<Executor> rhs) noexcept
 {
-    d_box = bsl::move(bslmf::MovableRefUtil::access(rhs).d_box);
+    d_box = bsl::move(rhs.d_box);
     return *this;
 }
 

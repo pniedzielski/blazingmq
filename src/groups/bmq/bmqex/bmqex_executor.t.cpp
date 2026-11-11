@@ -117,7 +117,7 @@ class StatExecutor {
     void post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
     {
         ++d_statistics_p->d_postCallCount;
-        bslmf::MovableRefUtil::access(f)();
+        f();
     }
 
     /// Perform `++statistics()->d_dispatchCallCount` followed by `f()`.
@@ -125,7 +125,7 @@ class StatExecutor {
     void dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
     {
         ++d_statistics_p->d_dispatchCallCount;
-        bslmf::MovableRefUtil::access(f)();
+        f();
     }
 
   public:

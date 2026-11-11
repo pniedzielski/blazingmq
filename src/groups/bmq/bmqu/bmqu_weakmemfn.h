@@ -2001,8 +2001,7 @@ template <class VALUE>
 inline WeakMemFnResult<VALUE>::WeakMemFnResult(
     bslmf::MovableRef<WeakMemFnResult> original,
     bslma::Allocator*                  basicAllocator)
-: d_value(bsl::move(bslmf::MovableRefUtil::access(original).d_value.object()),
-          basicAllocator)
+: d_value(bsl::move(original.d_value.object()), basicAllocator)
 {
     // NOTHING
 }
@@ -2020,8 +2019,7 @@ template <class VALUE>
 inline WeakMemFnResult<VALUE>&
 WeakMemFnResult<VALUE>::operator=(bslmf::MovableRef<WeakMemFnResult> original)
 {
-    d_value.object() = bsl::move(
-        bslmf::MovableRefUtil::access(original).d_value.object());
+    d_value.object() = bsl::move(original.d_value.object());
     return *this;
 }
 

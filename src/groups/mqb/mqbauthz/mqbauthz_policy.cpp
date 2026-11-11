@@ -39,8 +39,7 @@
 // Helpers for writing AA-aware move constructors
 #define COPY_INIT(OBJ, FIELD) FIELD(OBJ.FIELD)
 #define COPY_INIT_ALLOC(OBJ, FIELD, ALLOC) FIELD(OBJ.FIELD, ALLOC)
-#define MOVE_FIELD(OBJ, FIELD)                                                \
-    bsl::move(bslmf::MovableRefUtil::access(OBJ).FIELD)
+#define MOVE_FIELD(OBJ, FIELD) bsl::move(OBJ.FIELD)
 #define MOVE_INIT(OBJ, FIELD) FIELD(MOVE_FIELD(OBJ, FIELD))
 #define MOVE_INIT_ALLOC(OBJ, FIELD, ALLOC) FIELD(MOVE_FIELD(OBJ, FIELD), ALLOC)
 

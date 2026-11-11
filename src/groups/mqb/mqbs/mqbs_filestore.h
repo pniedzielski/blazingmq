@@ -889,8 +889,7 @@ class FileStore final : public DataStore {
     template <class EVENT_TYPE>
     void dispatchEvent(bslmf::MovableRef<bsl::shared_ptr<EVENT_TYPE> > event)
     {
-        mqbi::Dispatcher::DispatcherEventSp base(
-            bslmf::MovableRefUtil::access(event));
+        mqbi::Dispatcher::DispatcherEventSp base(event);
         dispatchEvent(bsl::move(base));
     }
 #endif

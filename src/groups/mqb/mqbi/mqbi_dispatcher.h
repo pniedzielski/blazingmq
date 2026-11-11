@@ -393,7 +393,7 @@ class Dispatcher {
     void dispatchEvent(bslmf::MovableRef<bsl::shared_ptr<EVENT_TYPE> > event,
                        DispatcherClient* destination)
     {
-        DispatcherEventSp base(bslmf::MovableRefUtil::access(event));
+        DispatcherEventSp base(event);
         dispatchEvent(bsl::move(base), destination);
     }
 
@@ -402,7 +402,7 @@ class Dispatcher {
                        DispatcherClientType::Enum                      type,
                        ProcessorHandle                                 handle)
     {
-        DispatcherEventSp base(bslmf::MovableRefUtil::access(event));
+        DispatcherEventSp base(event);
         dispatchEvent(bsl::move(base), type, handle);
     }
 #endif

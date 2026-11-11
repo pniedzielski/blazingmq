@@ -895,7 +895,7 @@ inline void OperationChain::append(Link* link)
 
 inline void OperationChain::append(bslmf::MovableRef<Link> link)
 {
-    Link* link_p = &bslmf::MovableRefUtil::access(link);
+    Link* link_p = &link;
     append(&link_p, 1);
 }
 

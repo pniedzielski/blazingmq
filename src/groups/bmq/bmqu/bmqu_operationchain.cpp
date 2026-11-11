@@ -359,7 +359,7 @@ OperationChainLink::OperationChainLink(bslma::Allocator* basicAllocator)
 
 OperationChainLink::OperationChainLink(
     bslmf::MovableRef<OperationChainLink> original)
-: d_jobList(bsl::move(bslmf::MovableRefUtil::access(original).d_jobList))
+: d_jobList(bsl::move(original.d_jobList))
 {
     // NOTE: This constructor is *not* noexcept because the move constructor of
     //       'bsl::list' is allowed to throw.
@@ -370,7 +370,7 @@ OperationChainLink& OperationChainLink::operator=(
     bslmf::MovableRef<OperationChainLink> rhs) noexcept
 {
     // l-value reference to the link object
-    OperationChainLink& rhsRef = bslmf::MovableRefUtil::access(rhs);
+    OperationChainLink& rhsRef = rhs;
 
     // PRECONDITIONS
     BSLS_ASSERT(rhsRef.allocator() == allocator());

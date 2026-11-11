@@ -1121,20 +1121,18 @@ inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::TwoKeyHashMap(
 , d_nodeAllocator(new(*allocator()) bdlma::Pool(sizeof(Node), allocator()),
                   allocator())
 {
-    if (allocator() == bslmf::MovableRefUtil::access(original).allocator()) {
+    if (allocator() == original.allocator()) {
         // '*this' and 'original' use the same allocator. Move the contents.
-        bslmf::MovableRefUtil::access(original).swap(*this);
+        original.swap(*this);
     }
     else {
         // '*this' and 'original' use different allocators. Fallback to copy.
-        TwoKeyHashMap(bslmf::MovableRefUtil::access(original), basicAllocator)
-            .swap(*this);
+        TwoKeyHashMap(original, basicAllocator).swap(*this);
     }
 
     // POSTCONDITIONS
     BSLS_ASSERT_SAFE(assertInvariants());
-    BSLS_ASSERT_SAFE(
-        bslmf::MovableRefUtil::access(original).assertInvariants());
+    BSLS_ASSERT_SAFE(original.assertInvariants());
 }
 
 template <class K1, class K2, class VALUE, class H1, class H2>
@@ -1176,12 +1174,11 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::operator=(
 
     BDLB_SCOPEEXIT_PROCTOR(
         invariantsGuard2,
-        bdlf::MemFnUtil::memFn(&TwoKeyHashMap::assertInvariants,
-                               &bslmf::MovableRefUtil::access(rhs)));
+        bdlf::MemFnUtil::memFn(&TwoKeyHashMap::assertInvariants, &rhs));
 #endif
 
-    if (&bslmf::MovableRefUtil::access(rhs) != this) {
-        if (allocator() == bslmf::MovableRefUtil::access(rhs).allocator()) {
+    if (&rhs != this) {
+        if (allocator() == rhs.allocator()) {
             // '*this' and 'rhs' use the same allocator. Move the contents.
             clear();  // release resources
             TwoKeyHashMap(bsl::move(rhs),
@@ -1190,7 +1187,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::operator=(
         }
         else {
             // '*this' and 'rhs' use different allocators. Fallback to copy.
-            *this = bslmf::MovableRefUtil::access(rhs);
+            *this = rhs;
         }
     }
 

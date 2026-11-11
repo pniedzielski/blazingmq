@@ -79,7 +79,7 @@ void Dispatcher::unregisterClient(
 void Dispatcher::dispatchEvent(mqbi::Dispatcher::DispatcherEventRvRef event,
                                mqbi::DispatcherClient* destination)
 {
-    destination->onDispatcherEvent(*bslmf::MovableRefUtil::access(event));
+    destination->onDispatcherEvent(*event);
 }
 
 void Dispatcher::dispatchEvent(
