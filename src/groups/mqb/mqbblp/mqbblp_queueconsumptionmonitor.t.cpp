@@ -267,17 +267,18 @@ Test::Test()
                &d_domain,
                d_cluster._resources(),
                d_allocator_p)
-, d_monitor(&d_queueState,
-            bdlf::BindUtil::bind(&Test::haveUndeliveredCb,
-                                 this,
-                                 bdlf::PlaceHolders::_1,   // alarmTime_p
-                                 bdlf::PlaceHolders::_2,   // appId
-                                 bdlf::PlaceHolders::_3),  // now
-            bdlf::BindUtil::bind(&Test::loggingCb,
-                                 this,
-                                 bdlf::PlaceHolders::_1,   // appId
-                                 bdlf::PlaceHolders::_2),  // oldestMsgIt
-            d_allocator_p)
+, d_monitor(
+      &d_queueState,
+      [this](bsls::TimeInterval*       alarmTime_p,
+             const bsl::string&        appId,
+             const bsls::TimeInterval& now) {
+          return haveUndeliveredCb(alarmTime_p, appId, now);
+      },
+      [this](const bsl::string&                              appId,
+             const bslma::ManagedPtr<mqbi::StorageIterator>& oldestMsgIt) {
+          loggingCb(appId, oldestMsgIt);
+      },
+      d_allocator_p)
 , d_storage(0,  // No FileStore
             d_queue.uri(),
             mqbu::StorageKey::k_NULL_KEY,

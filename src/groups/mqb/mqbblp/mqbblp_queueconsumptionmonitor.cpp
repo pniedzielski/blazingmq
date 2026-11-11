@@ -329,9 +329,9 @@ void QueueConsumptionMonitor::scheduleAlarmEvent(
     d_queueState_p->scheduler()->scheduleEvent(
         &d_alarmEventHandle,
         d_scheduledAlarmTime,
-        bdlf::BindUtil::bind(
-            &QueueConsumptionMonitor::executeAlarmInQueueDispatcher,
-            this));
+        [this]() {
+            executeAlarmInQueueDispatcher();
+        });
 }
 
 void QueueConsumptionMonitor::scheduleOrRescheduleAlarmEventIfNeeded(
@@ -372,10 +372,9 @@ void QueueConsumptionMonitor::scheduleIdleEvent(SubStreamInfo* subStreamInfo,
     d_queueState_p->scheduler()->scheduleEvent(
         &subStreamInfo->d_idleEventHandle,
         idleTime,
-        bdlf::BindUtil::bind(
-            &QueueConsumptionMonitor::executeIdleInQueueDispatcher,
-            this,
-            appId));
+        [this, appId]() {
+            executeIdleInQueueDispatcher(appId);
+        });
 }
 
 void QueueConsumptionMonitor::executeAlarmInQueueDispatcher()
@@ -387,8 +386,9 @@ void QueueConsumptionMonitor::executeAlarmInQueueDispatcher()
 
     // Forward event to the queue dispatcher thread
     d_queueState_p->queue()->dispatcher()->execute(
-        bdlf::BindUtil::bind(&QueueConsumptionMonitor::alarmEventDispatched,
-                             this),
+        [this]() {
+            alarmEventDispatched();
+        },
         d_queueState_p->queue());
 }
 
@@ -402,9 +402,9 @@ void QueueConsumptionMonitor::executeIdleInQueueDispatcher(
 
     // Forward event to the queue dispatcher thread
     d_queueState_p->queue()->dispatcher()->execute(
-        bdlf::BindUtil::bind(&QueueConsumptionMonitor::idleEventDispatched,
-                             this,
-                             appId),
+        [this, appId]() {
+            idleEventDispatched(appId);
+        },
         d_queueState_p->queue());
 }
 
