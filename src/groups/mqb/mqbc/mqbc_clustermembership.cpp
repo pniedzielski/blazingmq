@@ -80,10 +80,8 @@ ClusterMembership::setSelfNodeStatus(bmqp_ctrlmsg::NodeStatus::Value value)
 
     selfSession->setNodeStatus(value, value);
 
-    for (ClusterNodeSessionMapConstIter cit = clusterNodeSessionMap().begin();
-         cit != clusterNodeSessionMap().end();
-         ++cit) {
-        mqbc::ClusterNodeSession* session = cit->second.get();
+    for (const auto& nodeSessionEntry : clusterNodeSessionMap()) {
+        mqbc::ClusterNodeSession* session = nodeSessionEntry.second.get();
         if (session != selfSession) {
             session->setNodeStatus(session->nodeStatus(), value);
         }
@@ -94,10 +92,8 @@ ClusterMembership::setSelfNodeStatus(bmqp_ctrlmsg::NodeStatus::Value value)
     }
 
     // Self status changed; notify observers.
-    for (ObserversSet::iterator it = d_observers.begin();
-         it != d_observers.end();
-         ++it) {
-        (*it)->onSelfNodeStatus(value);
+    for (const auto& observer : d_observers) {
+        observer->onSelfNodeStatus(value);
     }
 
     return *this;
