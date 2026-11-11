@@ -46,8 +46,6 @@
 #include <bdlb_string.h>
 #include <bdlbb_blob.h>
 #include <bdlbb_blobutil.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bsl_algorithm.h>
 #include <bsl_ios.h>
 #include <bsl_iostream.h>
