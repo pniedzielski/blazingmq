@@ -569,14 +569,12 @@ void StorageInspector::processCommand(
     // Qlist file has been read
     BALL_LOG_INFO << "Total number of queue instances: " << d_queues.size();
 
-    QueuesMap::const_iterator cit  = d_queues.begin();
-    unsigned int              qnum = 0;
-    for (; cit != d_queues.end(); ++cit) {
+    unsigned int qnum = 0;
+    for (const auto& [uri, qr] : d_queues) {
         ++qnum;
         BALL_LOG_INFO_BLOCK
         {
             BALL_LOG_OUTPUT_STREAM << "Queue #" << qnum << "\n";
-            const QueueRecord& qr = cit->second;
 
             bsl::vector<bsl::string> fields;
             fields.push_back("Queue URI");
@@ -584,7 +582,7 @@ void StorageInspector::processCommand(
             fields.push_back("Number of AppIds");
 
             bmqu::AlignedPrinter printer(BALL_LOG_OUTPUT_STREAM, fields);
-            printer << cit->first << qr.d_queueKey << qr.d_appIds.size();
+            printer << uri << qr.d_queueKey << qr.d_appIds.size();
 
             // 'printer' not to be used beyond this point
 
@@ -973,9 +971,7 @@ void StorageInspector::readQueuesIfNeeded()
                     bsl::vector<bsl::string>      newAppIds;
                     bsl::vector<mqbu::StorageKey> newAppKeys;
 
-                    for (size_t n = 0; n < appIdsRec.size(); ++n) {
-                        const AppIdRecord& ar = appIdsRec[n];
-
+                    for (const AppIdRecord& ar : appIdsRec) {
                         for (size_t nn = 0; nn < appIdLenPairs.size(); ++nn) {
                             const bsl::string newAppId(
                                 appIdLenPairs[nn].first,
