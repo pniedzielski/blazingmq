@@ -304,11 +304,8 @@ Flattener::EventBuilderResult Flattener::importOptions()
         OptionType::k_HIGHEST_SUPPORTED_TYPE);
 
     EventBuilderResult result = k_SUCCESS;
-    for (OptionsView::const_iterator i = d_optionsView.begin();
-         i != d_optionsView.end();
-         ++i) {
-        const OptionType::Enum type = *i;
-        const int              intI = static_cast<int>(*i);
+    for (const OptionType::Enum type : d_optionsView) {
+        const int intI = static_cast<int>(type);
 
         if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
                 !(lowI <= intI && intI <= highI))) {
