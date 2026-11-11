@@ -540,7 +540,7 @@ QueueManager::incrementMessageCount(bmqt::CorrelationId corrId,
 
     bsls::SpinLockGuard guard(&d_queuesLock);  // LOCKED
 
-    QueuesMap::const_iterator iter = d_queues.find(corrId);
+    auto iter = d_queues.find(corrId);
     if (iter == d_queues.end()) {
         return -1;  // RETURN
     }
@@ -558,8 +558,8 @@ QueueManager::incrementMessageCount(bmqt::CorrelationId corrId,
 bsls::Types::Int64
 QueueManager::getMessageCount(const bmqt::CorrelationId& corrId) const
 {
-    bsls::SpinLockGuard       guard(&d_queuesLock);  // LOCKED
-    QueuesMap::const_iterator citer = d_queues.find(corrId);
+    bsls::SpinLockGuard guard(&d_queuesLock);  // LOCKED
+    auto                citer = d_queues.find(corrId);
     if (citer == d_queues.end()) {
         return -1;  // RETURN
     }

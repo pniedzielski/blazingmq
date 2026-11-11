@@ -408,7 +408,7 @@ bool QueueManager::insertQueue(const bmqa::QueueId& queueId)
 {
     bsls::SpinLockGuard guard(&d_queuesLock);  // LOCKED
 
-    QueuesMap::iterator iter = d_queues.find(queueId.correlationId());
+    auto iter = d_queues.find(queueId.correlationId());
     if (iter == d_queues.end()) {
         d_queues.insert(
             bsl::make_pair(queueId.correlationId(), QueueContext()));
@@ -421,7 +421,7 @@ void QueueManager::removeQueue(const bmqa::QueueId& queueId)
 {
     bsls::SpinLockGuard guard(&d_queuesLock);  // LOCKED
 
-    QueuesMap::iterator iter = d_queues.find(queueId.correlationId());
+    auto iter = d_queues.find(queueId.correlationId());
     BSLS_ASSERT_SAFE(iter != d_queues.end());
     d_queues.erase(iter);
 }
@@ -435,7 +435,7 @@ bool QueueManager::trackMessage(
 
     bsls::SpinLockGuard guard(&d_queuesLock);  // LOCKED
 
-    QueuesMap::iterator iter = d_queues.find(corrId);
+    auto iter = d_queues.find(corrId);
     if (iter == d_queues.end()) {
         BALL_LOG_ERROR << "Unable to insert a message with correlationId '"
                        << messageCorrelationId << "'. Reason: "
@@ -444,9 +444,8 @@ bool QueueManager::trackMessage(
     }
 
     // Check if message with the same correlationId exists
-    MessagesMap&                messagesPosted = iter->second.d_messagesPosted;
-    MessagesMap::const_iterator cmiter         = messagesPosted.find(
-        messageCorrelationId);
+    MessagesMap& messagesPosted = iter->second.d_messagesPosted;
+    auto         cmiter         = messagesPosted.find(messageCorrelationId);
     if (cmiter != messagesPosted.end()) {
         BALL_LOG_ERROR << "Unable to insert message with correlation ID '"
                        << messageCorrelationId
@@ -468,7 +467,7 @@ bool QueueManager::untrackMessage(
 
     bsls::SpinLockGuard guard(&d_queuesLock);  // LOCKED
 
-    QueuesMap::iterator iter = d_queues.find(corrId);
+    auto iter = d_queues.find(corrId);
     if (iter == d_queues.end()) {
         BALL_LOG_ERROR << "Unable to remove a message with correlationId '"
                        << messageCorrelationId << "'. Reason: "
@@ -477,9 +476,8 @@ bool QueueManager::untrackMessage(
     }
 
     // find the message with the same correlationId
-    MessagesMap&                messagesPosted = iter->second.d_messagesPosted;
-    MessagesMap::const_iterator cmiter         = messagesPosted.find(
-        messageCorrelationId);
+    MessagesMap& messagesPosted = iter->second.d_messagesPosted;
+    auto         cmiter         = messagesPosted.find(messageCorrelationId);
     if (cmiter == messagesPosted.end()) {
         BALL_LOG_ERROR << "Unable to remove message with correlation ID '"
                        << messageCorrelationId
@@ -499,7 +497,7 @@ int QueueManager::onAckMessage(const bmqa::Message& message)
 
     bsls::SpinLockGuard guard(&d_queuesLock);  // LOCKED
 
-    QueuesMap::iterator iter = d_queues.find(corrId);
+    auto iter = d_queues.find(corrId);
     if (iter == d_queues.end()) {
         BALL_LOG_ERROR << "Got Ack/NAck message from the broker with "
                        << "correlation ID '" << message.correlationId()
@@ -512,7 +510,7 @@ int QueueManager::onAckMessage(const bmqa::Message& message)
     // Check if message with the given correlationId exists
     const bmqt::CorrelationId& messageCorrelationId = message.correlationId();
     MessagesMap&               messagesPosted = iter->second.d_messagesPosted;
-    MessagesMap::iterator miter = messagesPosted.find(messageCorrelationId);
+    auto miter = messagesPosted.find(messageCorrelationId);
     if (miter == messagesPosted.end()) {
         // Unknown correlation Id is an error condition in two cases:
         // o If this is successful ACK message (i.e., ack status is zero).
@@ -591,7 +589,7 @@ QueueManager::numMessagesPosted(const bmqa::QueueId& queueId) const
 {
     bsls::SpinLockGuard guard(&d_queuesLock);  // LOCKED
 
-    QueuesMap::const_iterator citer = d_queues.find(queueId.correlationId());
+    auto citer = d_queues.find(queueId.correlationId());
     if (citer == d_queues.end()) {
         return rc_UNKNOWN_QUEUE;  // RETURN
     }
@@ -603,7 +601,7 @@ QueueManager::numMessagesAcked(const bmqa::QueueId& queueId) const
 {
     bsls::SpinLockGuard guard(&d_queuesLock);  // LOCKED
 
-    QueuesMap::const_iterator citer = d_queues.find(queueId.correlationId());
+    auto citer = d_queues.find(queueId.correlationId());
     if (citer == d_queues.end()) {
         return rc_UNKNOWN_QUEUE;  // RETURN
     }
@@ -615,7 +613,7 @@ QueueManager::numMessagesNAcked(const bmqa::QueueId& queueId) const
 {
     bsls::SpinLockGuard guard(&d_queuesLock);  // LOCKED
 
-    QueuesMap::const_iterator citer = d_queues.find(queueId.correlationId());
+    auto citer = d_queues.find(queueId.correlationId());
     if (citer == d_queues.end()) {
         return rc_UNKNOWN_QUEUE;  // RETURN
     }
