@@ -31,8 +31,6 @@
 
 // BDE
 #include <bdlb_print.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bsl_iostream.h>
 #include <bsl_string.h>
 #include <bsl_vector.h>
@@ -177,9 +175,9 @@ mqbi::QueueHandle* QueueHandleCatalog::createHandle(
 
     bsl::shared_ptr<mqbi::QueueHandle> queueHandleSp(
         handle,
-        bdlf::BindUtil::bind(&QueueHandleCatalog::queueHandleDeleter,
-                             this,
-                             bdlf::PlaceHolders::_1),  // handle
+        [this](mqbi::QueueHandle* queueHandle) {
+            queueHandleDeleter(queueHandle);
+        },
         d_allocator_p);
 
     // Insert handle into map
