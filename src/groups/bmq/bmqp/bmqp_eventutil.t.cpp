@@ -184,9 +184,7 @@ static void appendMessages(bmqp::PushEventBuilder*  pushEventBuilder,
 
     bmqt::EventBuilderResult::Enum rc;
 
-    for (bsl::vector<Data>::size_type i = 0; i < data.size(); ++i) {
-        const Data& D = data[i];
-
+    for (const Data& D : data) {
         // Add SubQueueInfos
         rc = pushEventBuilder->addSubQueueInfosOption(D.d_subQueueInfos,
                                                       D.d_isSubQueueInfo);
@@ -335,9 +333,7 @@ static void test1_breathingTest()
                                           bmqtst::TestHelperUtil::allocator());
     flattenedEvent.loadPushMessageIterator(&msgIterator, true);
 
-    for (bsl::vector<Data>::size_type i = 0; i < data.size(); ++i) {
-        const Data& D = data[i];
-
+    for (const Data& D : data) {
         // Check matching SubQueueInfos and payload
         BSLS_ASSERT_OPT(msgIterator.isValid());
 

@@ -282,8 +282,7 @@ static void appendMessages1(bmqp::EventHeader*                 eh,
                             reinterpret_cast<const char*>(eh),
                             eh->headerWords() * bmqp::Protocol::k_WORD_SIZE);
 
-    for (bsl::vector<Data1>::size_type i = 0; i < data.size(); ++i) {
-        const Data1& D               = data[i];
+    for (const Data1& D : data) {
         int          subQueueWords   = 0;
         const bool   hasSubQueueInfo = D.d_subQueueInfos.size() == 1;
         const bool   isPackedOptions = hasSubQueueInfo &&

@@ -577,10 +577,9 @@ static void test4_sendRequestTest()
             requests.emplace_back(request);
         }
 
-        for (bsl::size_t i = 0; i < num_requests; ++i) {
+        for (const ReqSp& request : requests) {
             // checking, that RequestManager has really sent all the requests
             // to testChannel
-            const ReqSp& request        = requests[i];
             Mes          controlMessage = context.getNextRequest();
             BMQTST_ASSERT_EQ(request->request().rId(), controlMessage.rId());
             BMQTST_ASSERT_EQ(request->request(), controlMessage);
@@ -928,8 +927,7 @@ static void test6_cancelAllRequestsTest()
         Mes reason = context.createResponseCancel();
         context.manager().cancelAllRequests(reason);
 
-        for (bsl::size_t i = 0; i < numRequests; ++i) {
-            ReqSp request = requests[i];
+        for (const ReqSp& request : requests) {
             BMQTST_ASSERT_EQ(request->result(),
                              bmqt::GenericResult::e_CANCELED);
             BMQTST_ASSERT_EQ(request->response().choice().status(),
@@ -957,8 +955,7 @@ static void test6_cancelAllRequestsTest()
         Mes reason = context.createResponseCancel();
         context.manager().cancelGroupRequests(reason, 1);
 
-        for (bsl::size_t i = 0; i < numRequests; ++i) {
-            ReqSp request = requests[i];
+        for (const ReqSp& request : requests) {
             if (request->groupId() == 1) {
                 BMQTST_ASSERT_EQ(request->result(),
                                  bmqt::GenericResult::e_CANCELED);
@@ -1001,8 +998,7 @@ static void test6_cancelAllRequestsTest()
             reason,
             bmqp::RequestManagerComponentId::k_CLUSTER_FSM);
 
-        for (bsl::size_t i = 0; i < numRequests; ++i) {
-            ReqSp request = requests[i];
+        for (const ReqSp& request : requests) {
             if (request->componentId() ==
                 bmqp::RequestManagerComponentId::k_CLUSTER_FSM) {
                 BMQTST_ASSERT_EQ(request->result(),
