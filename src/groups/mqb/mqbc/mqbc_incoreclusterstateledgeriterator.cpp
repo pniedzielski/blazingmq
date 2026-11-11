@@ -24,7 +24,6 @@
 
 // BDE
 #include <bdlb_scopeexit.h>
-#include <bdlf_bind.h>
 #include <bsl_ostream.h>
 #include <bslim_printer.h>
 #include <bsls_assert.h>
@@ -98,7 +97,9 @@ int IncoreClusterStateLedgerIterator::next()
         rc_INVALID_RECORD_SIZE = -5
     };
 
-    bdlb::ScopeExitAny guard(bdlf::BindUtil::bind(onInvalidNext, &d_isValid));
+    bdlb::ScopeExitAny guard([isValid = &d_isValid]() {
+        onInvalidNext(isValid);
+    });
 
     // 1. Advance pass the previous record
     if (d_firstInvocation) {
