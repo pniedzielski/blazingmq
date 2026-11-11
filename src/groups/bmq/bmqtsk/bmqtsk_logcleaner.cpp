@@ -19,8 +19,6 @@
 
 // BDE
 #include <ball_log.h>
-#include <bdlf_bind.h>
-#include <bdlf_memfn.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdls_filesystemutil.h>
 #include <bdlt_currenttime.h>
@@ -158,23 +156,14 @@ int LogCleaner::start(bslstl::StringRef         pattern,
 
     // schedule a logs cleanup immediately and then once every 'cleanupPeriod'
     // interval
-    typedef bmqex::Strand<bmqex::SystemExecutor> StrandType;
-
-    struct Local {
-        static void post(StrandType*                  strand,
-                         const bsl::function<void()>& callback)
-        {
-            strand->executor().post(callback);
-        }
-    };
-
     d_scheduler_p->scheduleRecurringEvent(
         &d_logsCleaningEvent,
         cleanupPeriod,
-        bdlf::BindUtil::bind(&Local::post,
-                             &d_logsCleaningContext,
-                             bdlf::MemFnUtil::memFn(&LogCleaner::cleanLogs,
-                                                    this)),
+        [this]() {
+            d_logsCleaningContext.executor().post([this]() {
+                cleanLogs();
+            });
+        },
         bsls::SystemTime::now(d_scheduler_p->clockType()));
 
     return 0;
