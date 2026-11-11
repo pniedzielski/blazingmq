@@ -28,8 +28,6 @@
 #include <ball_loggermanagerconfiguration.h>
 #include <bdlb_string.h>
 #include <bdld_datum.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlmt_eventscheduler.h>
 #include <bdls_filesystemutil.h>
 #include <bdls_pathutil.h>
@@ -59,21 +57,21 @@ namespace {
 
 BALL_LOG_SET_NAMESPACE_CATEGORY("BMQTSK.LOGCONTROLLER");
 
-void printCategoryWithDelimiter(const bsl::shared_ptr<bsl::ostream>& os,
-                                ball::Category*                      category,
-                                char                                 delim)
+void printCategoryWithDelimiter(bsl::ostream&   os,
+                                ball::Category* category,
+                                char            delim)
 {
     ball::Severity::Level level = static_cast<ball::Severity::Level>(
         category->passLevel());
 
-    *os << "    [" << level << "]" << delim << " ";
+    os << "    [" << level << "]" << delim << " ";
     if (bsl::strlen(category->categoryName()) == 0) {
-        *os << "*";
+        os << "*";
     }
     else {
-        *os << category->categoryName();
+        os << category->categoryName();
     }
-    *os << "\n";
+    os << "\n";
 }
 
 static void bslsLogHandler(bsls::LogSeverity::Enum severity,
@@ -308,11 +306,10 @@ int LogController::processInfoCommand([[maybe_unused]] bsl::istream& cmd,
        << "  Categories:\n";
 
     // Iterate over each category to print it's current verbosity
-    ball::LoggerManager::singleton().visitCategories(bdlf::BindUtil::bind(
-        &printCategoryWithDelimiter,
-        bsl::shared_ptr<bsl::ostream>(&os, bslstl::SharedPtrNilDeleter()),
-        bdlf::PlaceHolders::_1,  // category
-        ':'));
+    ball::LoggerManager::singleton().visitCategories(
+        [&os](ball::Category* category) {
+            printCategoryWithDelimiter(os, category, ':');
+        });
 
     return 0;
 }
@@ -489,14 +486,19 @@ int LogController::initialize(bsl::ostream&              errorDescription,
     // LoggerManager
     ball::LoggerManagerConfiguration lmc;
     lmc.setLogOrder(ball::LoggerManagerConfiguration::FIFO);
-    lmc.setDefaultThresholdLevelsCallback(bdlf::BindUtil::bind(
-        &ball::LoggerFunctorPayloads::loadParentCategoryThresholdValues,
-        bdlf::PlaceHolders::_1,
-        bdlf::PlaceHolders::_2,
-        bdlf::PlaceHolders::_3,
-        bdlf::PlaceHolders::_4,
-        bdlf::PlaceHolders::_5,
-        '.'));
+    lmc.setDefaultThresholdLevelsCallback([](int*        recordLevel,
+                                             int*        passLevel,
+                                             int*        triggerLevel,
+                                             int*        triggerAllLevel,
+                                             const char* categoryName) {
+        ball::LoggerFunctorPayloads::loadParentCategoryThresholdValues(
+            recordLevel,
+            passLevel,
+            triggerLevel,
+            triggerAllLevel,
+            categoryName,
+            '.');
+    });
     rc = lmc.setDefaultRecordBufferSizeIfValid(config.recordBufferSizeBytes());
     if (rc != 0) {
         errorDescription << "Unable to set default record buffer size on lmc "
@@ -644,10 +646,9 @@ int LogController::initialize(bsl::ostream&              errorDescription,
 
     // Register log rotation callback
     d_fileObserver.setOnFileRotationCallback(
-        bdlf::BindUtil::bind(&LogController::afterFileRotation,
-                             this,
-                             bdlf::PlaceHolders::_1,    // status
-                             bdlf::PlaceHolders::_2));  // rotatedFileName
+        [this](int status, const bsl::string& rotatedFileName) {
+            afterFileRotation(status, rotatedFileName);
+        });
 
     updateLastLogSymlink();  // Force creation of the .last now
 
