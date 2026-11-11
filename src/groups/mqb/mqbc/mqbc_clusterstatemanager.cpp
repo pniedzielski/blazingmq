@@ -359,11 +359,7 @@ void ClusterStateManager::do_updatePrimaryInPFSMs(
     const ClusterStateTableEvent::Enum eventType = event.first;
     const bsl::vector<int>&            modifiedPartitions =
         event.second.modifiedPartitions();
-    for (bsl::vector<int>::const_iterator it = modifiedPartitions.cbegin();
-         it != modifiedPartitions.cend();
-         ++it) {
-        const int pid = *it;
-
+    for (const int pid : modifiedPartitions) {
         if (d_state_p->partition(pid).primaryNode() == 0) {
             // Loss of primary
             BSLS_ASSERT_SAFE(eventType ==
@@ -409,12 +405,7 @@ void ClusterStateManager::do_sendFollowerLSNRequests(
     ClusterUtil::loadPeerNodes(&followers, *d_clusterData_p);
     BSLS_ASSERT_SAFE(!followers.empty());
 
-    for (bsl::vector<mqbnet::ClusterNode*>::const_iterator it =
-             followers.cbegin();
-         it != followers.cend();
-         ++it) {
-        mqbnet::ClusterNode* follower = *it;
-
+    for (mqbnet::ClusterNode* follower : followers) {
         RequestContextSp request =
             d_clusterData_p->requestManager().createRequest();
         request->setComponentId(
@@ -574,12 +565,10 @@ void ClusterStateManager::do_findHighestLSN(
     mqbnet::ClusterNode* highestLSNNode            = selfNode;
     bmqp_ctrlmsg::LeaderMessageSequence highestLSN = d_nodeToLedgerLSNMap.at(
         selfNode);
-    for (NodeToLSNMapCIter cit = d_nodeToLedgerLSNMap.cbegin();
-         cit != d_nodeToLedgerLSNMap.cend();
-         ++cit) {
-        if (cit->second > highestLSN) {
-            highestLSNNode = cit->first;
-            highestLSN     = cit->second;
+    for (const auto& nodeLSN : d_nodeToLedgerLSNMap) {
+        if (nodeLSN.second > highestLSN) {
+            highestLSNNode = nodeLSN.first;
+            highestLSN     = nodeLSN.second;
         }
     }
 
