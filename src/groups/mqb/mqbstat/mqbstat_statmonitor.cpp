@@ -21,7 +21,6 @@
 #include <bmqst_statvalue.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bdls_processutil.h>
 #include <bsl_c_errno.h>
 #include <bsl_cmath.h>
@@ -397,11 +396,7 @@ StatMonitorUtil::getOperatingSystemStat(const bmqst::StatContext& statContext,
         const bmqst::StatContext& statContext,                                \
         int                       snapshotId)                                 \
     {                                                                         \
-        const AccessorInt64 accessor = bdlf::BindUtil::bind(                  \
-            &StatMonitorUtil::getSystemStat,                                  \
-            bdlf::PlaceHolders::_1,                                           \
-            bdlf::PlaceHolders::_2,                                           \
-            bdlf::PlaceHolders::_3);                                          \
+        const AccessorInt64 accessor = &StatMonitorUtil::getSystemStat;       \
         return genericAccessor(statContext, snapshotId, ID, accessor);        \
     }
 
@@ -409,11 +404,7 @@ StatMonitorUtil::getOperatingSystemStat(const bmqst::StatContext& statContext,
     double StatMonitorUtil::NAME(const bmqst::StatContext& statContext,       \
                                  int                       snapshotId)        \
     {                                                                         \
-        const AccessorDouble accessor = bdlf::BindUtil::bind(                 \
-            &StatMonitorUtil::getCpuStat,                                     \
-            bdlf::PlaceHolders::_1,                                           \
-            bdlf::PlaceHolders::_2,                                           \
-            bdlf::PlaceHolders::_3);                                          \
+        const AccessorDouble accessor = &StatMonitorUtil::getCpuStat;         \
         return genericAccessor(statContext,                                   \
                                snapshotId,                                    \
                                k_SUBCONTEXT_CPU,                              \
@@ -426,11 +417,7 @@ StatMonitorUtil::getOperatingSystemStat(const bmqst::StatContext& statContext,
         const bmqst::StatContext& statContext,                                \
         int                       snapshotId)                                 \
     {                                                                         \
-        const AccessorInt64 accessor = bdlf::BindUtil::bind(                  \
-            &StatMonitorUtil::getMemStat,                                     \
-            bdlf::PlaceHolders::_1,                                           \
-            bdlf::PlaceHolders::_2,                                           \
-            bdlf::PlaceHolders::_3);                                          \
+        const AccessorInt64 accessor = &StatMonitorUtil::getMemStat;          \
         return genericAccessor(statContext,                                   \
                                snapshotId,                                    \
                                k_SUBCONTEXT_MEM,                              \
@@ -443,11 +430,8 @@ StatMonitorUtil::getOperatingSystemStat(const bmqst::StatContext& statContext,
         const bmqst::StatContext& statContext,                                \
         int                       snapshotId)                                 \
     {                                                                         \
-        const AccessorInt64 accessor = bdlf::BindUtil::bind(                  \
-            &StatMonitorUtil::getOperatingSystemStat,                         \
-            bdlf::PlaceHolders::_1,                                           \
-            bdlf::PlaceHolders::_2,                                           \
-            bdlf::PlaceHolders::_3);                                          \
+        const AccessorInt64 accessor =                                        \
+            &StatMonitorUtil::getOperatingSystemStat;                         \
         return genericAccessor(statContext,                                   \
                                snapshotId,                                    \
                                k_SUBCONTEXT_OS,                               \

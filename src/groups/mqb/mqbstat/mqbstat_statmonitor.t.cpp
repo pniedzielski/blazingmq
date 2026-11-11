@@ -18,7 +18,6 @@
 #include <bmqu_memoutstream.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_functional.h>
 #include <bslmt_barrier.h>
@@ -204,12 +203,11 @@ void doWorkAndPostWhenDone(bslmt::Semaphore* workDoneSemaphore)
     bslmt::Barrier     workDoneBarrier(k_NUM_THREADS + 1);
 
     for (int i = 0; i < k_NUM_THREADS; ++i) {
-        int rc = threadGroup.addThread(
-            bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                  &doWork_threadFunction,
-                                  &workDoneBarrier,
+        int rc = threadGroup.addThread([&workDoneBarrier]() {
+            doWork_threadFunction(&workDoneBarrier,
                                   10000,  // rate
-                                  3));    // duration
+                                  3);     // duration
+        });
         BSLS_ASSERT_OPT(rc == 0);
     }
 
@@ -469,9 +467,9 @@ static void test4_snapshot()
     bslmt::ThreadUtil::createWithAllocator(
         &handle,
         attributes,
-        bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                              &doWorkAndPostWhenDone,
-                              &workDoneSemaphore),
+        [&workDoneSemaphore]() {
+            doWorkAndPostWhenDone(&workDoneSemaphore);
+        },
         bmqtst::TestHelperUtil::allocator());
 
     bslmt::ThreadUtil::sleep(
@@ -513,9 +511,9 @@ static void test4_snapshot()
     bslmt::ThreadUtil::createWithAllocator(
         &handle,
         attributes,
-        bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                              &doWorkAndPostWhenDone,
-                              &workDoneSemaphore),
+        [&workDoneSemaphore]() {
+            doWorkAndPostWhenDone(&workDoneSemaphore);
+        },
         bmqtst::TestHelperUtil::allocator());
     workDoneSemaphore.wait();
     BSLS_ASSERTTEST_ASSERT_OPT_PASS(obj.snapshot());
@@ -535,9 +533,9 @@ static void test4_snapshot()
     bslmt::ThreadUtil::createWithAllocator(
         &handle,
         attributes,
-        bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                              &doWorkAndPostWhenDone,
-                              &workDoneSemaphore),
+        [&workDoneSemaphore]() {
+            doWorkAndPostWhenDone(&workDoneSemaphore);
+        },
         bmqtst::TestHelperUtil::allocator());
     workDoneSemaphore.wait();
     BSLS_ASSERTTEST_ASSERT_OPT_PASS(obj.snapshot());
