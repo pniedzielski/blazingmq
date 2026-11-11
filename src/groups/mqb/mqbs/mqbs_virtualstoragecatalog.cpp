@@ -322,23 +322,21 @@ VirtualStorageCatalog::gc(const bmqt::MessageGUID& msgGUID)
     const mqbi::DataStreamMessage& dataStreamMessage = *data->second;
     // Update each App so the math of numMessages/numBytes stays correct.
     // REVISIT.
-    for (VirtualStoragesIter it = d_virtualStorages.begin();
-         it != d_virtualStorages.end();
-         ++it) {
+    for (const auto& entry : d_virtualStorages) {
         const mqbi::AppMessage& appMessage =
-            appMessageView(dataStreamMessage, it->value()->ordinal());
+            appMessageView(dataStreamMessage, entry.value()->ordinal());
         if (appMessage.isPending()) {
             const bsls::Types::Int64 appNumMessages =
-                d_numMessages - it->value()->numRemoved() - 1;
+                d_numMessages - entry.value()->numRemoved() - 1;
             const bsls::Types::Int64 appNumBytes =
-                d_totalBytes - it->value()->removedBytes() -
+                d_totalBytes - entry.value()->removedBytes() -
                 dataStreamMessage.d_size;
             d_queueStats_sp->setOutstandingData(appNumMessages,
                                                 appNumBytes,
-                                                it->value()->appId());
+                                                entry.value()->appId());
         }
         else {
-            it->value()->onGC(dataStreamMessage.d_size);
+            entry.value()->onGC(dataStreamMessage.d_size);
         }
     }
 
@@ -356,24 +354,20 @@ void VirtualStorageCatalog::gcAutoConfirms(
     // Reverse autoConfirm effects on VirtualStorage counters for a message
     // that was never inserted into the catalog.
 
-    for (VirtualStoragesIter it = d_virtualStorages.begin();
-         it != d_virtualStorages.end();
-         ++it) {
+    for (const auto& entry : d_virtualStorages) {
         const mqbi::AppMessage& appMessage =
-            appMessageView(dataStreamMessage, it->value()->ordinal());
+            appMessageView(dataStreamMessage, entry.value()->ordinal());
 
         if (!appMessage.isPending()) {
-            it->value()->onGC(dataStreamMessage.d_size);
+            entry.value()->onGC(dataStreamMessage.d_size);
         }
     }
 }
 
 void VirtualStorageCatalog::removeAll()
 {
-    for (VirtualStoragesIter it = d_virtualStorages.begin();
-         it != d_virtualStorages.end();
-         ++it) {
-        it->value()->resetStats();
+    for (const auto& entry : d_virtualStorages) {
+        entry.value()->resetStats();
     }
     d_dataStream.clear();
     d_numMessages = 0;
@@ -718,15 +712,13 @@ void VirtualStorageCatalog::autoConfirm(
 
 void VirtualStorageCatalog::calibrate()
 {
-    for (VirtualStoragesIter it = d_virtualStorages.begin();
-         it != d_virtualStorages.end();
-         ++it) {
+    for (const auto& entry : d_virtualStorages) {
         DataStreamIterator itData;
         bsls::Types::Int64 bytes       = 0;
         bsls::Types::Int64 numMessages = seek(&itData,
-                                              it->value().get(),
+                                              entry.value().get(),
                                               &bytes);
-        it->value()->setNumRemoved(numMessages, bytes);
+        entry.value()->setNumRemoved(numMessages, bytes);
     }
 }
 
@@ -786,9 +778,9 @@ void VirtualStorageCatalog::loadVirtualStorageDetails(AppInfos* buffer) const
     BSLS_ASSERT_SAFE(buffer);
 
     // Return ordered by ordinals
-    for (size_t i = 0; i < d_ordinals.size(); ++i) {
-        BSLS_ASSERT_SAFE(d_ordinals[i]);
-        const VirtualStorage& storage = *d_ordinals[i];
+    for (const VirtualStorageSp& storageSp : d_ordinals) {
+        BSLS_ASSERT_SAFE(storageSp);
+        const VirtualStorage& storage = *storageSp;
 
         buffer->insert(bsl::make_pair(storage.appId(), storage.appKey()));
     }
