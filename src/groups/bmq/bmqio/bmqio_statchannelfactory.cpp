@@ -24,8 +24,6 @@
 #include <bmqst_tableschema.h>
 
 // BDE
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bsl_utility.h>
 #include <bslmt_lockguard.h>
 #include <bsls_assert.h>
@@ -170,12 +168,11 @@ void StatChannelFactory::listen(Status*                      status,
         status,
         &handleSp->d_baseConnectHandle,
         options,
-        bdlf::BindUtil::bind(&StatChannelFactory::baseResultCallback,
-                             this,
-                             handleSp,
-                             bdlf::PlaceHolders::_1,    // event
-                             bdlf::PlaceHolders::_2,    // status
-                             bdlf::PlaceHolders::_3));  // channel
+        [this, handleSp](ChannelFactoryEvent::Enum       event,
+                         const Status&                   baseStatus,
+                         const bsl::shared_ptr<Channel>& channel) {
+            baseResultCallback(handleSp, event, baseStatus, channel);
+        });
 }
 
 void StatChannelFactory::connect(Status*                      status,
@@ -199,12 +196,11 @@ void StatChannelFactory::connect(Status*                      status,
         status,
         &handleSp->d_baseConnectHandle,
         options,
-        bdlf::BindUtil::bind(&StatChannelFactory::baseResultCallback,
-                             this,
-                             handleSp,
-                             bdlf::PlaceHolders::_1,    // event
-                             bdlf::PlaceHolders::_2,    // status
-                             bdlf::PlaceHolders::_3));  // channel
+        [this, handleSp](ChannelFactoryEvent::Enum       event,
+                         const Status&                   baseStatus,
+                         const bsl::shared_ptr<Channel>& channel) {
+            baseResultCallback(handleSp, event, baseStatus, channel);
+        });
 }
 
 int StatChannelFactory::start()
