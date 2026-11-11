@@ -65,63 +65,6 @@ bsls::TimeInterval secondsFromNow(double seconds)
     return bsls::SystemTime::nowMonotonicClock() + seconds;
 }
 
-// ==================
-// struct Synchronize
-// ==================
-
-/// A functor providing syncronization.
-struct Synchronize {
-    // TYPES
-
-    /// Defines the result type of the call operator.
-    typedef void ResultType;
-
-    // ACCESSORS
-    void operator()(bslmt::Semaphore* semaphore) const { semaphore->wait(); }
-};
-
-// ===============
-// struct PushBack
-// ===============
-
-/// A functor to store a value in a container.
-struct PushBack {
-    // TYPES
-
-    /// Defines the result type of the call operator.
-    typedef void ResultType;
-
-    // ACCESSORS
-    template <class CONTAINER, class VALUE>
-    void operator()(CONTAINER* container, const VALUE& value) const
-    {
-        container->pushBack(value);
-    }
-};
-
-// ==========================
-// struct PushBackSynchronize
-// ==========================
-
-/// A functor to store a value in a container while providing
-/// syncronization.
-struct PushBackSynchronize {
-    // TYPES
-
-    /// Defines the result type of the call operator.
-    typedef void ResultType;
-
-    // ACCESSORS
-    template <class CONTAINER, class VALUE>
-    void operator()(bslmt::Semaphore* semaphore,
-                    CONTAINER*        container,
-                    const VALUE&      value) const
-    {
-        semaphore->wait();
-        container->pushBack(value);
-    }
-};
-
 // =======================
 // struct PushBackRndSleep
 // =======================
@@ -402,7 +345,7 @@ static void test3_chain_startStop(bdlmt::ThreadPool* threadPool)
                     asyncNullOperation(threadPool, callback);
                 },
                 [&completionIds, operationId]() {
-                    PushBack()(&completionIds, operationId);
+                    completionIds.pushBack(operationId);
                 });
         }
 
@@ -448,9 +391,8 @@ static void test3_chain_startStop(bdlmt::ThreadPool* threadPool)
                     asyncNullOperation(threadPool, callback);
                 },
                 [&semaphore, &completionIds, operationId]() {
-                    PushBackSynchronize()(&semaphore,
-                                          &completionIds,
-                                          operationId);
+                    semaphore.wait();
+                    completionIds.pushBack(operationId);
                 });
         }
 
@@ -625,7 +567,7 @@ static void test5_chain_append1(bdlmt::ThreadPool* threadPool)
                 asyncNullOperation(threadPool, callback);
             },
             [&semaphore]() {
-                Synchronize()(&semaphore);
+                semaphore.wait();
             });
 
         // the chain is executing one operation
@@ -639,7 +581,7 @@ static void test5_chain_append1(bdlmt::ThreadPool* threadPool)
                 asyncNullOperation(threadPool, callback);
             },
             [&semaphore]() {
-                Synchronize()(&semaphore);
+                semaphore.wait();
             });
 
         // the chain is still executing only one operation
@@ -917,7 +859,7 @@ static void test8_chain_popBack(bdlmt::ThreadPool* threadPool)
                 asyncNullOperation(threadPool, callback);
             },
             [&semaphore]() {
-                Synchronize()(&semaphore);
+                semaphore.wait();
             });
 
         // the chain is executing one operation
@@ -1041,7 +983,7 @@ static void test9_chain_removeAll(bdlmt::ThreadPool* threadPool)
                     asyncNullOperation(threadPool, callback);
                 },
                 [&semaphore]() {
-                    Synchronize()(&semaphore);
+                    semaphore.wait();
                 });
         }
 
