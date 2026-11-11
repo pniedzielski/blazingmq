@@ -63,20 +63,18 @@ if( "${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?Clang" )
 
 
 
-  if( DEFINED CMAKE_CXX_STANDARD AND CMAKE_CXX_STANDARD GREATER_EQUAL 17 )
-    # The below warnings are disabled, but should be revisited and properly
-    # addressed
-    add_compile_options(
-            "-Wno-atomic-implicit-seq-cst"
-            "-Wno-c++98-compat-pedantic"
-            "-Wno-deprecated"
-            "-Wno-disabled-macro-expansion"
-            "-Wno-extra-semi-stmt"
-            "-Wno-zero-as-null-pointer-constant"
-            # to compile hello_world: uncomment or add 'override' specifier (C++11)
-            # "-Wno-suggest-override"
+  # The below warnings are disabled, but should be revisited and properly
+  # addressed
+  add_compile_options(
+          "-Wno-atomic-implicit-seq-cst"
+          "-Wno-c++98-compat-pedantic"
+          "-Wno-deprecated"
+          "-Wno-disabled-macro-expansion"
+          "-Wno-extra-semi-stmt"
+          "-Wno-zero-as-null-pointer-constant"
+          # to compile hello_world: uncomment or add 'override' specifier (C++11)
+          # "-Wno-suggest-override"
   )
-  endif()
 endif()
 
 if( "${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" )
