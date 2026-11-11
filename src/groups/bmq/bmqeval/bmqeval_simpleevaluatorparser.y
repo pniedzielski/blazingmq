@@ -112,21 +112,11 @@ variable
 
 expression
     : variable {
-        #if defined(BSLS_COMPILERFEATURES_SUPPORT_RVALUE_REFERENCES) \
-&& defined(BSLS_COMPILERFEATURES_SUPPORT_NOEXCEPT)
             $$ = ctx.makeUnaryExpression<SimpleEvaluator::Property, bsl::string>(bsl::move($1));
-#else
-            $$ = ctx.makeUnaryExpression<SimpleEvaluator::Property, bsl::string>($1);
-#endif
     }
     | EXISTS LPAR variable RPAR
         {
-#if defined(BSLS_COMPILERFEATURES_SUPPORT_RVALUE_REFERENCES) \
-&& defined(BSLS_COMPILERFEATURES_SUPPORT_NOEXCEPT)
             $$ = ctx.makeUnaryExpression<SimpleEvaluator::Exists, bsl::string>(bsl::move($3));
-#else
-            $$ = ctx.makeUnaryExpression<SimpleEvaluator::Exists, bsl::string>($3);
-#endif
         }
     | INTEGER
         { $$ = ctx.makeLiteral<SimpleEvaluator::IntegerLiteral>($1); }

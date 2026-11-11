@@ -157,18 +157,9 @@ class SimpleEvaluator {
         virtual bdld::Datum evaluate(EvaluationContext& context) const = 0;
     };
 
-    // Bison generates different code for different available standards:
-    // - For C++ >= 11 it generates the 'emplace' with a move constructor, so
-    // it's possible to use 'bslma::ManagedPtr'.
-    // - For C++ < 11 (Solaris) it generates the 'emplace' with a const&
-    // copy constructor, but this constructor is deleted for
-    // 'bslma::ManagedPtr', so it's impossible to use here. Use
-    // 'bsl::shared_ptr' instead.
-#if 201103L <= BSLS_COMPILERFEATURES_CPLUSPLUS
+    // Bison generates an 'emplace' taking its argument by rvalue reference,
+    // so a move-only smart pointer can be used here.
     typedef bslma::ManagedPtr<Expression> ExpressionPtr;
-#else
-    typedef bsl::shared_ptr<Expression> ExpressionPtr;
-#endif
 
     // --------
     // Property
@@ -188,12 +179,9 @@ class SimpleEvaluator {
         /// evaluation context, as a boolean.
         explicit Property(const bsl::string& name);
 
-#if defined(BSLS_COMPILERFEATURES_SUPPORT_RVALUE_REFERENCES) &&               \
-    defined(BSLS_COMPILERFEATURES_SUPPORT_NOEXCEPT)
         /// Create an object that evaluates property `name`, in the
         /// evaluation context, as a boolean.
         explicit Property(bsl::string&& name) noexcept;
-#endif
 
         // ACCESSORS
 
@@ -245,11 +233,8 @@ class SimpleEvaluator {
         /// Create an object that evaluates to string `value`.
         explicit StringLiteral(const bsl::string& name);
 
-#if defined(BSLS_COMPILERFEATURES_SUPPORT_RVALUE_REFERENCES) &&               \
-    defined(BSLS_COMPILERFEATURES_SUPPORT_NOEXCEPT)
         /// Create an object that evaluates to string `value`.
         explicit StringLiteral(bsl::string&& name) noexcept;
-#endif
 
         // ACCESSORS
 
@@ -488,12 +473,9 @@ class SimpleEvaluator {
         /// evaluation context, as a boolean.
         explicit Exists(const bsl::string& name);
 
-#if defined(BSLS_COMPILERFEATURES_SUPPORT_RVALUE_REFERENCES) &&               \
-    defined(BSLS_COMPILERFEATURES_SUPPORT_NOEXCEPT)
         /// Create an object that evaluates property `name`, in the
         /// evaluation context, as a boolean.
         explicit Exists(bsl::string&& name) noexcept;
-#endif
 
         // ACCESSORS
 
@@ -1039,15 +1021,9 @@ CompilationContext::makeLiteral(typename NodeType::ValueType value)
         return ExpressionPtr();  // RETURN
     }
 
-#if defined(BSLS_COMPILERFEATURES_SUPPORT_RVALUE_REFERENCES) &&               \
-    defined(BSLS_COMPILERFEATURES_SUPPORT_NOEXCEPT)
     return SimpleEvaluator::ExpressionPtr(new (*d_allocator)
                                               NodeType(bsl::move(value)),
                                           d_allocator);  // RETURN
-#else
-    return SimpleEvaluator::ExpressionPtr(new (*d_allocator) NodeType(value),
-                                          d_allocator);  // RETURN
-#endif
 }
 
 template <template <typename> class Op>

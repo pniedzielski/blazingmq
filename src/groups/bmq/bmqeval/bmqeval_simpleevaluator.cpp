@@ -164,13 +164,10 @@ SimpleEvaluator::Property::Property(const bsl::string& name)
 {
 }
 
-#if defined(BSLS_COMPILERFEATURES_SUPPORT_RVALUE_REFERENCES) &&               \
-    defined(BSLS_COMPILERFEATURES_SUPPORT_NOEXCEPT)
 SimpleEvaluator::Property::Property(bsl::string&& name) noexcept
 : d_name(bsl::move(name))
 {
 }
-#endif
 
 bdld::Datum
 SimpleEvaluator::Property::evaluate(EvaluationContext& context) const
@@ -255,13 +252,10 @@ SimpleEvaluator::StringLiteral::StringLiteral(const bsl::string& value)
 {
 }
 
-#if defined(BSLS_COMPILERFEATURES_SUPPORT_RVALUE_REFERENCES) &&               \
-    defined(BSLS_COMPILERFEATURES_SUPPORT_NOEXCEPT)
 SimpleEvaluator::StringLiteral::StringLiteral(bsl::string&& value) noexcept
 : d_value(bsl::move(value))
 {
 }
-#endif
 
 bdld::Datum
 SimpleEvaluator::StringLiteral::evaluate(EvaluationContext& context) const
@@ -367,13 +361,10 @@ SimpleEvaluator::Exists::Exists(const bsl::string& name)
 {
 }
 
-#if defined(BSLS_COMPILERFEATURES_SUPPORT_RVALUE_REFERENCES) &&               \
-    defined(BSLS_COMPILERFEATURES_SUPPORT_NOEXCEPT)
 SimpleEvaluator::Exists::Exists(bsl::string&& name) noexcept
 : d_name(bsl::move(name))
 {
 }
-#endif
 
 bdld::Datum SimpleEvaluator::Exists::evaluate(EvaluationContext& context) const
 {
