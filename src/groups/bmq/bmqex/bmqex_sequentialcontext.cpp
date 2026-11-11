@@ -18,7 +18,6 @@
 #include <bmqscm_version.h>
 
 // BDE
-#include <bdlf_memfn.h>
 #include <bsl_algorithm.h>  // bsl::swap
 #include <bslmt_threadattributes.h>
 #include <bsls_assert.h>
@@ -129,7 +128,9 @@ int SequentialContext::start(const bslmt::ThreadAttributes& threadAttributes)
     if (bslmt::ThreadUtil::createWithAllocator(
             &d_workingThread,
             threadAttributes,
-            bdlf::MemFnUtil::memFn(&SequentialContext::run, this),
+            [this]() {
+                run();
+            },
             allocator()) != 0) {
         // Failed to create the thread.
         return -1;  // RETURN
