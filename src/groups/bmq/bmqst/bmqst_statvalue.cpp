@@ -167,9 +167,9 @@ void StatValue::addSnapshot(const StatValue& other)
 
 void StatValue::setFromUpdate(const bmqstm::StatValueUpdate& update)
 {
-    typedef bmqstm::StatValueFields                 Fields;
-    bsl::vector<bsls::Types::Int64>::const_iterator f =
-        update.fields().begin();
+    typedef bmqstm::StatValueFields Fields;
+
+    auto f = update.fields().begin();
     for (int i = 0; f != update.fields().end() && i < Fields::NUM_ENUMERATORS;
          ++i) {
         if (bdlb::BitUtil::isBitSet(update.fieldMask(), i)) {
