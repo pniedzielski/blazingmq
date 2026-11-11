@@ -225,7 +225,7 @@ int ConfigProvider::processCommand(
             const bsl::string& domainName = command.clearCache().domain();
             {
                 bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCK
-                if (d_cache.find(domainName) == d_cache.end()) {
+                if (!d_cache.contains(domainName)) {
                     bmqu::MemOutStream os;
                     os << "Domain '" << domainName << "' doesn't exist";
                     error->message() = os.str();
