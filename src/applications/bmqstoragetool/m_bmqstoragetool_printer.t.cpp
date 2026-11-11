@@ -192,14 +192,12 @@ static void test2_humanReadableMessageTest()
         false);
 
     // Prepare MessageDetails
-    bslma::ManagedPtr<MessageDetails>                details;
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.begin();
-    for (; recordIter != records.cend(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    bslma::ManagedPtr<MessageDetails> details;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
-                recordIter->second.buffer());
+                record.second.buffer());
             details.load(
                 new (*bmqtst::TestHelperUtil::allocator())
                     MessageDetails(msg,
@@ -212,7 +210,7 @@ static void test2_humanReadableMessageTest()
         else if (rtype == RecordType::e_CONFIRM) {
             const ConfirmRecord& conf =
                 *reinterpret_cast<const ConfirmRecord*>(
-                    recordIter->second.buffer());
+                    record.second.buffer());
             details->addConfirmRecord(conf,
                                       conf.header().sequenceNumber(),
                                       recordOffset(conf));
@@ -220,7 +218,7 @@ static void test2_humanReadableMessageTest()
         else if (rtype == RecordType::e_DELETION) {
             const DeletionRecord& del =
                 *reinterpret_cast<const DeletionRecord*>(
-                    recordIter->second.buffer());
+                    record.second.buffer());
             details->addDeleteRecord(del,
                                      del.header().sequenceNumber(),
                                      recordOffset(del));
@@ -954,14 +952,12 @@ static void test10_jsonPrettyMessageTest()
         false);
 
     // Prepare MessageDetails
-    bslma::ManagedPtr<MessageDetails>                details;
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.begin();
-    for (; recordIter != records.cend(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    bslma::ManagedPtr<MessageDetails> details;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
-                recordIter->second.buffer());
+                record.second.buffer());
             details.load(
                 new (*bmqtst::TestHelperUtil::allocator())
                     MessageDetails(msg,
@@ -974,7 +970,7 @@ static void test10_jsonPrettyMessageTest()
         else if (rtype == RecordType::e_CONFIRM) {
             const ConfirmRecord& conf =
                 *reinterpret_cast<const ConfirmRecord*>(
-                    recordIter->second.buffer());
+                    record.second.buffer());
             details->addConfirmRecord(conf,
                                       conf.header().sequenceNumber(),
                                       recordOffset(conf));
@@ -982,7 +978,7 @@ static void test10_jsonPrettyMessageTest()
         else if (rtype == RecordType::e_DELETION) {
             const DeletionRecord& del =
                 *reinterpret_cast<const DeletionRecord*>(
-                    recordIter->second.buffer());
+                    record.second.buffer());
             details->addDeleteRecord(del,
                                      del.header().sequenceNumber(),
                                      recordOffset(del));
@@ -1902,14 +1898,12 @@ static void test18_jsonLineMessageTest()
         false);
 
     // Prepare MessageDetails
-    bslma::ManagedPtr<MessageDetails>                details;
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.begin();
-    for (; recordIter != records.cend(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    bslma::ManagedPtr<MessageDetails> details;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
-                recordIter->second.buffer());
+                record.second.buffer());
             details.load(
                 new (*bmqtst::TestHelperUtil::allocator())
                     MessageDetails(msg,
@@ -1922,7 +1916,7 @@ static void test18_jsonLineMessageTest()
         else if (rtype == RecordType::e_CONFIRM) {
             const ConfirmRecord& conf =
                 *reinterpret_cast<const ConfirmRecord*>(
-                    recordIter->second.buffer());
+                    record.second.buffer());
             details->addConfirmRecord(conf,
                                       conf.header().sequenceNumber(),
                                       recordOffset(conf));
@@ -1930,7 +1924,7 @@ static void test18_jsonLineMessageTest()
         else if (rtype == RecordType::e_DELETION) {
             const DeletionRecord& del =
                 *reinterpret_cast<const DeletionRecord*>(
-                    recordIter->second.buffer());
+                    record.second.buffer());
             details->addDeleteRecord(del,
                                      del.header().sequenceNumber(),
                                      recordOffset(del));
