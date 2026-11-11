@@ -398,7 +398,7 @@ void Tester::packPushMessage(const bslstl::StringRef& uri,
                              unsigned int             subscriptionId)
 {
     // PRECONDITIONS
-    BSLS_ASSERT_OPT(d_queueIdsByUri.find(uri) != d_queueIdsByUri.end() &&
+    BSLS_ASSERT_OPT(d_queueIdsByUri.contains(uri) &&
                     "queue with 'uri' was not previously inserted ");
 
     bmqp::QueueId     queueId(bmqimp::Queue::k_INVALID_QUEUE_ID);
@@ -432,7 +432,7 @@ void Tester::appendAckMessage(const bslstl::StringRef& uri,
                               bmqt::AckResult::Enum    ackResult)
 {
     // PRECONDITIONS
-    BSLS_ASSERT_OPT(d_queueIdsByUri.find(uri) != d_queueIdsByUri.end() &&
+    BSLS_ASSERT_OPT(d_queueIdsByUri.contains(uri) &&
                     "queue with 'uri' was not previously inserted ");
 
     bmqp::QueueId     queueId(bmqimp::Queue::k_INVALID_QUEUE_ID);
@@ -457,7 +457,7 @@ void Tester::packPutMessage(const bslstl::StringRef& uri,
                             const bslstl::StringRef& payload)
 {
     // PRECONDITIONS
-    BSLS_ASSERT_OPT(d_queueIdsByUri.find(uri) != d_queueIdsByUri.end() &&
+    BSLS_ASSERT_OPT(d_queueIdsByUri.contains(uri) &&
                     "queue with 'uri' was not previously inserted ");
 
     bmqp::QueueId      queueId(bmqimp::Queue::k_INVALID_QUEUE_ID);
@@ -482,7 +482,7 @@ void Tester::appendConfirmMessage(const bslstl::StringRef& uri)
 
 {
     // PRECONDITIONS
-    BSLS_ASSERT_OPT(d_queueIdsByUri.find(uri) != d_queueIdsByUri.end() &&
+    BSLS_ASSERT_OPT(d_queueIdsByUri.contains(uri) &&
                     "queue with 'uri' was not previously inserted ");
 
     bmqp::QueueId     queueId(bmqimp::Queue::k_INVALID_QUEUE_ID);
