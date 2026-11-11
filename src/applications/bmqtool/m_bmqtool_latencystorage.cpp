@@ -72,12 +72,10 @@ bsls::Types::Int64 LatencyStorage::computePercentile(double percentile) const
         bsl::ceil(percentile * static_cast<double>(d_totalCount) / 100.0));
 
     bsls::Types::Int64 accumulated = 0;
-    for (LatencyMap::const_iterator it = d_latencies.begin();
-         it != d_latencies.end();
-         ++it) {
-        accumulated += it->second;
+    for (const auto& [latency, count] : d_latencies) {
+        accumulated += count;
         if (targetCount <= accumulated) {
-            return it->first;  // RETURN
+            return latency;  // RETURN
         }
     }
 
@@ -109,10 +107,8 @@ bsls::Types::Int64 LatencyStorage::avgLatency() const
     }
 
     bsls::Types::Int64 sum = 0;
-    for (LatencyMap::const_iterator it = d_latencies.begin();
-         it != d_latencies.end();
-         ++it) {
-        sum += it->first * it->second;
+    for (const auto& [latency, count] : d_latencies) {
+        sum += latency * count;
     }
     return sum / d_totalCount;
 }
