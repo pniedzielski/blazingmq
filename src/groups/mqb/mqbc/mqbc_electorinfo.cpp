@@ -172,10 +172,8 @@ ElectorInfo& ElectorInfo::setLeaderStatus(ElectorInfoLeaderStatus::Enum value)
         oldStatus != ElectorInfoLeaderStatus::e_ACTIVE) {
         // We only notify the observers if we are the leader transitioning to
         // *active* state, and only the first time this happens.
-        for (ObserversSet::iterator it = d_observers.begin();
-             it != d_observers.end();
-             ++it) {
-            (*it)->onClusterLeader(d_leaderNode_p, d_leaderStatus);
+        for (const auto& observer : d_observers) {
+            observer->onClusterLeader(d_leaderNode_p, d_leaderStatus);
         }
     }
 
@@ -223,10 +221,8 @@ ElectorInfo& ElectorInfo::setElectorInfo(mqbnet::ElectorState::Enum    state,
         // candidate).  Here, we only notify the observers when the leader is
         // gone; notifying of the leader elected is taken care of by the
         // 'setLeaderStatus' method; unless there is a new leader.
-        for (ObserversSet::iterator it = d_observers.begin();
-             it != d_observers.end();
-             ++it) {
-            (*it)->onClusterLeader(d_leaderNode_p, status);
+        for (const auto& observer : d_observers) {
+            observer->onClusterLeader(d_leaderNode_p, status);
         }
     }
 
