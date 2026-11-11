@@ -319,7 +319,7 @@ class ClusterStateManager final
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void onWatchdogDispatched(int generation);
+    void processWatchdog(int generation);
 
     /// Process the follower LSN response contained in the specified
     /// `requestContext`, sent by the specified `source`.

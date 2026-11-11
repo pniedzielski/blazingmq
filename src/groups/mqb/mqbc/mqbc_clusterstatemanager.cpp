@@ -1399,12 +1399,12 @@ void ClusterStateManager::onWatchdog(int generation)
 
     dispatcher()->execute(
         [this, generation]() {
-            onWatchdogDispatched(generation);
+            processWatchdog(generation);
         },
         d_cluster_p);
 }
 
-void ClusterStateManager::onWatchdogDispatched(int generation)
+void ClusterStateManager::processWatchdog(int generation)
 {
     // executed by the cluster *DISPATCHER* thread
 
