@@ -148,8 +148,9 @@
 //  MessageProcessor::start()
 //  {
 //      // subscribe to messages
-//      d_messageProvider_p->registerMessageCallback(
-//                 bdlf::MemFnUtil::memFn(&MessageProcessor::onMessage, this));
+//      d_messageProvider_p->registerMessageCallback([this](int message) {
+//          onMessage(message);
+//      });
 //  }
 //..
 
