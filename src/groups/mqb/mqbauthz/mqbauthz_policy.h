@@ -155,7 +155,6 @@
 #include <bsl_variant.h>
 #include <bsl_vector.h>
 #include <bsla_nodiscard.h>
-#include <bslmf_movableref.h>
 
 namespace BloombergLP {
 
@@ -239,12 +238,12 @@ class Policy_Permission {
 
     Policy_Permission& operator=(const Policy_Permission& other);
 
-    Policy_Permission(bslmf::MovableRef<Policy_Permission> other) noexcept;
+    Policy_Permission(Policy_Permission&& other) noexcept;
 
-    Policy_Permission(bslmf::MovableRef<Policy_Permission> other,
-                      const allocator_type&                allocator);
+    Policy_Permission(Policy_Permission&&   other,
+                      const allocator_type& allocator);
 
-    Policy_Permission& operator=(bslmf::MovableRef<Policy_Permission> other);
+    Policy_Permission& operator=(Policy_Permission&& other);
 
     allocator_type get_allocator() const;
 
@@ -306,11 +305,11 @@ class Policy {
 
     Policy& operator=(const Policy& other);
 
-    Policy(bslmf::MovableRef<Policy> other) noexcept;
+    Policy(Policy&& other) noexcept;
 
-    Policy(bslmf::MovableRef<Policy> other, const allocator_type& allocator);
+    Policy(Policy&& other, const allocator_type& allocator);
 
-    Policy& operator=(bslmf::MovableRef<Policy> other);
+    Policy& operator=(Policy&& other);
 
     ~Policy() noexcept;
 

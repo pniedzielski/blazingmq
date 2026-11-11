@@ -41,7 +41,6 @@
 #include <bsl_unordered_set.h>
 #include <bsl_utility.h>
 #include <bsl_vector.h>
-#include <bslmf_movableref.h>
 
 namespace BloombergLP {
 namespace mqbauthn {

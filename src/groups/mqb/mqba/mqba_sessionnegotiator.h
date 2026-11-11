@@ -32,7 +32,6 @@
 /// are called only from there.  It is not thread safe.
 
 // MQB
-#include <bslmf_movableref.h>
 #include <mqbconfm_messages.h>
 #include <mqbnet_negotiationcontext.h>
 #include <mqbnet_negotiator.h>

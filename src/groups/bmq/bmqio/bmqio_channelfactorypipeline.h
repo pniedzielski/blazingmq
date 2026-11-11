@@ -23,7 +23,6 @@
 #include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bslma_managedptr.h>
-#include <bslmf_movableref.h>
 #include <bslstl_sharedptr.h>
 
 namespace BloombergLP {
@@ -59,9 +58,8 @@ class ChannelFactoryPipeline : public bmqio::ChannelFactory {
         // Create a pipeline builder based on `baseFactory`
         explicit Config(const ChannelFactorySP& baseFactory,
                         const allocator_type&   allocator = allocator_type());
-        Config(bslmf::MovableRef<Config> other) noexcept;
-        Config(bslmf::MovableRef<Config> other,
-               const allocator_type&     allocator);
+        Config(Config&& other) noexcept;
+        Config(Config&& other, const allocator_type& allocator);
 
       private:
         // PRIVATE CONSTRUCTORS
@@ -100,13 +98,12 @@ class ChannelFactoryPipeline : public bmqio::ChannelFactory {
 
   public:
     // CONSTRUCTORS
-    ChannelFactoryPipeline(
-        bslmf::MovableRef<ChannelFactoryPipeline> other) noexcept;
+    ChannelFactoryPipeline(ChannelFactoryPipeline&& other) noexcept;
 
-    ChannelFactoryPipeline(bslmf::MovableRef<ChannelFactoryPipeline> other,
-                           const allocator_type& allocator);
+    ChannelFactoryPipeline(ChannelFactoryPipeline&& other,
+                           const allocator_type&    allocator);
 
-    ChannelFactoryPipeline(bslmf::MovableRef<Config> builder,
+    ChannelFactoryPipeline(Config&&              builder,
                            const allocator_type& allocator = allocator_type());
 
     ~ChannelFactoryPipeline() noexcept override;

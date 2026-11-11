@@ -42,7 +42,6 @@
 #include <bslma_managedptr.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_decay.h>
-#include <bslmf_movableref.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmf_util.h>
 #include <bsls_compilerfeatures.h>

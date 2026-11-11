@@ -36,8 +36,7 @@ class VoidCallback : public bmqu::ManagedCallback::CallbackFunctor {
         // NOTHING
     }
 
-    explicit VoidCallback(
-        bslmf::MovableRef<bmqu::ManagedCallback::VoidFunctor> callback)
+    explicit VoidCallback(bmqu::ManagedCallback::VoidFunctor&& callback)
     : d_callback(bsl::move(callback))
     {
         // NOTHING
@@ -79,7 +78,7 @@ void ManagedCallback::set(const VoidFunctor& callback)
     new (place<VoidCallback>()) VoidCallback(callback);
 }
 
-void ManagedCallback::set(bslmf::MovableRef<VoidFunctor> callback)
+void ManagedCallback::set(VoidFunctor&& callback)
 {
     // Preconditions for placement are checked in `place`.
     // Destructor is called by `reset` of the holding DispatcherEvent.

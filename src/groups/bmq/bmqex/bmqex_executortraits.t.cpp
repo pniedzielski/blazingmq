@@ -19,7 +19,6 @@
 #include <bmqtst_testhelper.h>
 #include <bsl_iostream.h>
 #include <bsl_ostream.h>
-#include <bslmf_movableref.h>
 #include <bsls_compilerfeatures.h>
 
 // CONVENIENCE

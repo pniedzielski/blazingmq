@@ -310,7 +310,7 @@ class Dispatcher {
     // TYPES
 
     typedef bsl::shared_ptr<mqbi::DispatcherEvent> DispatcherEventSp;
-    typedef bslmf::MovableRef<DispatcherEventSp>   DispatcherEventRvRef;
+    typedef DispatcherEventSp&&                    DispatcherEventRvRef;
 
     /// Type representing a handle to a processor in the dispatcher.
     typedef int ProcessorHandle;
@@ -390,17 +390,17 @@ class Dispatcher {
     // C++03 compatibility:
     // It is not possible to cast mqbevt movable refs to mqbi movable ref.
     template <class EVENT_TYPE>
-    void dispatchEvent(bslmf::MovableRef<bsl::shared_ptr<EVENT_TYPE> > event,
-                       DispatcherClient* destination)
+    void dispatchEvent(bsl::shared_ptr<EVENT_TYPE>&& event,
+                       DispatcherClient*             destination)
     {
         DispatcherEventSp base(event);
         dispatchEvent(bsl::move(base), destination);
     }
 
     template <class EVENT_TYPE>
-    void dispatchEvent(bslmf::MovableRef<bsl::shared_ptr<EVENT_TYPE> > event,
-                       DispatcherClientType::Enum                      type,
-                       ProcessorHandle                                 handle)
+    void dispatchEvent(bsl::shared_ptr<EVENT_TYPE>&& event,
+                       DispatcherClientType::Enum    type,
+                       ProcessorHandle               handle)
     {
         DispatcherEventSp base(event);
         dispatchEvent(bsl::move(base), type, handle);

@@ -30,7 +30,6 @@
 #include <bsl_ostream.h>
 #include <bsl_utility.h>
 #include <bsla_annotations.h>
-#include <bslmf_movableref.h>
 #include <bslmt_semaphore.h>
 #include <bslmt_threadutil.h>
 #include <bsls_assert.h>

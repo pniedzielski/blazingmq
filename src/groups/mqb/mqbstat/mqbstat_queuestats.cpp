@@ -45,7 +45,6 @@
 #include <bsl_ostream.h>
 #include <bsl_utility.h>
 #include <bsl_vector.h>
-#include <bslmf_movableref.h>
 #include <bsls_assert.h>
 
 namespace BloombergLP {

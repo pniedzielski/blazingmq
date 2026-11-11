@@ -41,7 +41,6 @@
     !defined(BSLS_COMPILERFEATURES_SUPPORT_VARIADIC_TEMPLATES) ||             \
     !defined(BSLS_COMPILERFEATURES_SUPPORT_DEFAULT_TEMPLATE_ARGS)
 #include <bsl_functional.h>
-#include <bslmf_movableref.h>
 #endif
 #include <bsl_type_traits.h>
 
@@ -79,12 +78,12 @@ struct ExecutorTraits_CanDispatch {
     // Note that due to the lack of expression SFINAE in C++03, this
     // metafunction tries to detect the presence of a 'dispatch' member
     // function on the 'EXECUTOR' class having 'void(EXECUTOR::*)(F) const'
-    // signature, 'F' being any of 'F1', 'const F1&', 'bslmf::MovableRef<F1>',
+    // signature, 'F' being any of 'F1', 'const F1&', 'F1&&',
     // and 'F1' being 'bsl::function<void()>'.
 
     // TYPES
     typedef bsl::function<void()>                     Job;
-    typedef bslmf::MovableRef<bsl::function<void()> > JobRef;
+    typedef bsl::function<void()>&&                   JobRef;
 
     template <class U, void (U::*)(Job) const>
     struct Test1 {};
@@ -175,7 +174,7 @@ struct ExecutorTraits {
     /// function tries to detect the presence of a `dispatch` member
     /// function on the `EXECUTOR` class having `void(EXECUTOR::*)(F) const`
     /// signature, and falls back to `post` if no such function is detected,
-    /// `F` being any of `F1`, `const F1&`, `bslmf::MovableRef<F1>`, and
+    /// `F` being any of `F1`, `const F1&`, `F1&&`, and
     /// `F1` being `bsl::function<void()>`.
     template <class FUNCTION>
     static void dispatch(const EXECUTOR& executor,

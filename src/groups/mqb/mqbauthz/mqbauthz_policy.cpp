@@ -34,7 +34,6 @@
 #include <bsla_maybeunused.h>
 #include <bsla_nodiscard.h>
 #include <bslma_constructionutil.h>
-#include <bslmf_movableref.h>
 
 // Helpers for writing AA-aware move constructors
 #define COPY_INIT(OBJ, FIELD) FIELD(OBJ.FIELD)
@@ -220,8 +219,7 @@ Policy_Permission& Policy_Permission::operator=(const Policy_Permission& other)
     return *this;
 }
 
-Policy_Permission::Policy_Permission(
-    bslmf::MovableRef<Policy_Permission> other) noexcept
+Policy_Permission::Policy_Permission(Policy_Permission&& other) noexcept
 : MOVE_INIT(other, d_id),
   MOVE_INIT(other, d_connectClient),
   MOVE_INIT(other, d_connectProxy),
@@ -233,9 +231,8 @@ Policy_Permission::Policy_Permission(
 {
 }
 
-Policy_Permission::Policy_Permission(
-    bslmf::MovableRef<Policy_Permission> other,
-    const allocator_type&                allocator)
+Policy_Permission::Policy_Permission(Policy_Permission&&   other,
+                                     const allocator_type& allocator)
 : MOVE_INIT_ALLOC(other, d_id, allocator.mechanism())
 , MOVE_INIT(other, d_connectClient)
 , MOVE_INIT(other, d_connectProxy)
@@ -247,8 +244,7 @@ Policy_Permission::Policy_Permission(
 {
 }
 
-Policy_Permission&
-Policy_Permission::operator=(bslmf::MovableRef<Policy_Permission> other)
+Policy_Permission& Policy_Permission::operator=(Policy_Permission&& other)
 {
     Policy_Permission& otherRef = other;
     if (this == &otherRef) {
@@ -463,19 +459,17 @@ Policy& Policy::operator=(const Policy& other)
     return *this;
 }
 
-Policy::Policy(bslmf::MovableRef<Policy> other) noexcept
-: MOVE_INIT(other, d_rolePermissions)
+Policy::Policy(Policy&& other) noexcept : MOVE_INIT(other, d_rolePermissions)
 {
     // NOTHING
 }
 
-Policy::Policy(bslmf::MovableRef<Policy> other,
-               const allocator_type&     allocator)
+Policy::Policy(Policy&& other, const allocator_type& allocator)
 : MOVE_INIT_ALLOC(other, d_rolePermissions, allocator)
 {
 }
 
-Policy& Policy::operator=(bslmf::MovableRef<Policy> other)
+Policy& Policy::operator=(Policy&& other)
 {
     Policy& otherRef = other;
     if (this == &otherRef) {

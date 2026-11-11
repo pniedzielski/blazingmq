@@ -39,7 +39,6 @@
 #include <bsl_string.h>
 #include <bsla_nodiscard.h>
 #include <bslma_managedptr.h>
-#include <bslmf_movableref.h>
 
 namespace BloombergLP {
 
@@ -86,7 +85,7 @@ class DefaultAuthorizer : public mqbplug::Authorizer {
 
     /// Create a `DefaultAuthorizer` using the optionally specified
     /// `policy` to define access rulse.
-    explicit DefaultAuthorizer(bslmf::MovableRef<PolicyMP> policy);
+    explicit DefaultAuthorizer(PolicyMP&& policy);
 
     /// Destructor.
     ~DefaultAuthorizer() override;

@@ -29,7 +29,6 @@
 #include <bsl_memory.h>
 #include <bsl_utility.h>
 #include <bsla_annotations.h>
-#include <bslmf_movableref.h>
 #include <bsls_asserttestexception.h>
 
 // TEST_DRIVER

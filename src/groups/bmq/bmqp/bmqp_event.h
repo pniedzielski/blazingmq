@@ -42,7 +42,6 @@
 #include <bsl_memory.h>
 #include <bslma_allocator.h>
 #include <bslma_usesbslmaallocator.h>
-#include <bslmf_movableref.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
 #include <bsls_performancehint.h>
@@ -139,7 +138,7 @@ class Event {
     /// specified `original` object, leaving `original` in a valid but
     /// unspecified state.  Optionally specify an `allocator` used to supply
     /// memory.  If `allocator` is 0, the default memory allocator is used.
-    Event(bslmf::MovableRef<Event> src, bslma::Allocator* allocator = 0);
+    Event(Event&& src, bslma::Allocator* allocator = 0);
 
     // MANIPULATORS
 
@@ -148,7 +147,7 @@ class Event {
 
     /// Replace the contents of `*this` with those of `rhs`, leaving `rhs` in a
     /// valid but unspecified state.  Return `*this`.
-    Event& operator=(bslmf::MovableRef<Event> rhs);
+    Event& operator=(Event&& rhs);
 
     /// Reset this Event to use the specified `blob`.  If the optionally
     /// specified `clone` is true, this object will clone the blob into its
@@ -407,7 +406,7 @@ inline Event::Event(const Event& src, bslma::Allocator* allocator)
     initialize(src.d_blob_p);
 }
 
-inline Event::Event(bslmf::MovableRef<Event> src, bslma::Allocator* allocator)
+inline Event::Event(Event&& src, bslma::Allocator* allocator)
 : d_allocator_p(allocator)
 , d_blob_sp(0, allocator)
 , d_blob_p(0)
@@ -429,7 +428,7 @@ inline Event& Event::operator=(const Event& rhs)
     return *this;
 }
 
-inline Event& Event::operator=(bslmf::MovableRef<Event> rhs)
+inline Event& Event::operator=(Event&& rhs)
 {
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(this == &rhs)) {
         // Return early on self-assignment.

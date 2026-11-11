@@ -169,7 +169,6 @@
 #include <bslmf_decay.h>
 #include <bslmf_integralconstant.h>
 #include <bslmf_isnothrowmoveconstructible.h>
-#include <bslmf_movableref.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmf_util.h>
 #include <bslmt_condition.h>
@@ -539,7 +538,7 @@ class OperationChain {
     /// This function meets the strong exception guarantee. If an exception
     /// is thrown, this function has no effect.
     void append(Link* link);
-    void append(bslmf::MovableRef<Link> link);
+    void append(Link&& link);
 
 #ifdef BSLS_COMPILERFEATURES_SUPPORT_GENERALIZED_INITIALIZERS
     /// Append all links from the specified `links` list to this operation
@@ -689,7 +688,7 @@ class OperationChainLink {
     /// specified `original` object by moving the contents of `original` to
     /// the new link. The allocator associated with `original` is propagated
     /// for use in the newly-created link. `original` is left empty.
-    OperationChainLink(bslmf::MovableRef<OperationChainLink> original);
+    OperationChainLink(OperationChainLink&& original);
 
   public:
     // MANIPULATORS
@@ -699,8 +698,7 @@ class OperationChainLink {
     /// contents of `rhs` are moved to this link. `rhs` is left empty. The
     /// behavior is undefined unless `rhs` uses that same allocator as this
     /// object.
-    OperationChainLink&
-    operator=(bslmf::MovableRef<OperationChainLink> rhs) noexcept;
+    OperationChainLink& operator=(OperationChainLink&& rhs) noexcept;
 
     /// Insert an operation into this link. Specify a `opCallback` operation
     /// callback initiating the operation. Optionally specify a `coCallback`
@@ -893,7 +891,7 @@ inline void OperationChain::append(Link* link)
     append(&link, 1);
 }
 
-inline void OperationChain::append(bslmf::MovableRef<Link> link)
+inline void OperationChain::append(Link&& link)
 {
     Link* link_p = &link;
     append(&link_p, 1);

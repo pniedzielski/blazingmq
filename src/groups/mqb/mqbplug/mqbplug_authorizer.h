@@ -30,7 +30,6 @@
 #include <bsl_variant.h>
 #include <bslma_bslallocator.h>
 #include <bslmf_iscopyconstructible.h>
-#include <bslmf_movableref.h>
 #include <bsls_compilerfeatures.h>
 #include <bslstl_inplace.h>
 

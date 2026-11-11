@@ -81,8 +81,7 @@ class CallbackEvent : public mqbi::DispatcherEvent {
     /// Set the callback to the specified `value` and return a reference
     /// offering modifiable access to this object.
     CallbackEvent& setCallback(const mqbi::Dispatcher::VoidFunction& value);
-    CallbackEvent&
-    setCallback(bslmf::MovableRef<mqbi::Dispatcher::VoidFunction> value);
+    CallbackEvent& setCallback(mqbi::Dispatcher::VoidFunction&& value);
 
     /// Set the source client to the specified `value` and return a
     /// reference offering modifiable access to this object.
@@ -139,8 +138,8 @@ CallbackEvent::setCallback(const mqbi::Dispatcher::VoidFunction& value)
     return *this;
 }
 
-inline CallbackEvent& CallbackEvent::setCallback(
-    bslmf::MovableRef<mqbi::Dispatcher::VoidFunction> value)
+inline CallbackEvent&
+CallbackEvent::setCallback(mqbi::Dispatcher::VoidFunction&& value)
 {
     d_callback.set(value);
     return *this;

@@ -79,7 +79,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_decay.h>
 #include <bslmf_istriviallycopyable.h>
-#include <bslmf_movableref.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmf_util.h>
 #include <bslmt_condition.h>

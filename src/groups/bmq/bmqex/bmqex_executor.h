@@ -117,7 +117,6 @@
 #include <bslma_default.h>
 #include <bslmf_assert.h>
 #include <bslmf_conditional.h>
-#include <bslmf_movableref.h>
 #include <bslmf_util.h>
 #include <bsls_alignedbuffer.h>
 #include <bsls_assert.h>
@@ -316,8 +315,7 @@ class Executor_Box_SboImp {
 
     /// Create a `Executor_Box_SboImp` object containing a copy of the
     /// specified `original` object's target.
-    Executor_Box_SboImp(
-        bslmf::MovableRef<Executor_Box_SboImp> original) noexcept;
+    Executor_Box_SboImp(Executor_Box_SboImp&& original) noexcept;
 
     /// Destroy this object and the contained target with it.
     ~Executor_Box_SboImp();
@@ -327,8 +325,7 @@ class Executor_Box_SboImp {
     Executor_Box_SboImp& operator=(const Executor_Box_SboImp& rhs) noexcept;
 
     /// Assign the contents of `rhs` to `*this`. Return `*this`.
-    Executor_Box_SboImp&
-    operator=(bslmf::MovableRef<Executor_Box_SboImp> rhs) noexcept;
+    Executor_Box_SboImp& operator=(Executor_Box_SboImp&& rhs) noexcept;
 
     /// Swap the contents of `*this` and `other`.
     void swap(Executor_Box_SboImp& other) noexcept;
@@ -434,8 +431,8 @@ class Executor {
     /// Note that the specified `dummyAllocator` is ignored.  It is only
     /// provided so this constructor overload would be selected against the
     /// template one.
-    Executor(bslmf::MovableRef<Executor> original,
-             bslma::Allocator*           dummyAllocator = 0) noexcept;
+    Executor(Executor&&        original,
+             bslma::Allocator* dummyAllocator = 0) noexcept;
 
   public:
     // MANIPULATORS
@@ -457,7 +454,7 @@ class Executor {
     /// Make `*this` share a target with the specified `rhs` object, or
     /// contain a copy of that target, leaving `rhs` in an unspecified
     /// state.  Return `*this`.
-    Executor& operator=(bslmf::MovableRef<Executor> rhs) noexcept;
+    Executor& operator=(Executor&& rhs) noexcept;
 
     /// If `*this` has a target, release the shared ownership, or destroy
     /// it.  Then direct-non-list-initialize a new executor target of type

@@ -887,7 +887,7 @@ class FileStore final : public DataStore {
     // C++03 compatibility:
     // It is not possible to cast mqbevt movable refs to mqbi movable ref.
     template <class EVENT_TYPE>
-    void dispatchEvent(bslmf::MovableRef<bsl::shared_ptr<EVENT_TYPE> > event)
+    void dispatchEvent(bsl::shared_ptr<EVENT_TYPE>&& event)
     {
         mqbi::Dispatcher::DispatcherEventSp base(event);
         dispatchEvent(bsl::move(base));

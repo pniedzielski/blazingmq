@@ -98,7 +98,6 @@
 #include <bsl_utility.h>
 #include <bslma_allocator.h>
 #include <bslma_default.h>
-#include <bslmf_movableref.h>
 #include <bslmf_util.h>
 #include <bsls_assert.h>
 

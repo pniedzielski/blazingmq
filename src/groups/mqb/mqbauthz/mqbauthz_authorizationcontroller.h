@@ -34,7 +34,6 @@
 #include <bsl_string_view.h>
 #include <bsl_unordered_set.h>
 #include <bslma_managedptr.h>
-#include <bslmf_movableref.h>
 
 namespace BloombergLP {
 
@@ -113,7 +112,7 @@ class AuthorizationController {
   public:
     // CREATORS
 
-    AuthorizationController(bslmf::MovableRef<AuthorizerMp> authorizer);
+    AuthorizationController(AuthorizerMp&& authorizer);
 
     /// Create the AuthorizationController.  Return 0 on success, or a non-zero
     /// return code on error and fill in the specified `errorDescription`

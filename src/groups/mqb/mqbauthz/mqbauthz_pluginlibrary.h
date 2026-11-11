@@ -28,7 +28,6 @@
 // BDE
 #include <bsl_vector.h>
 #include <bslma_allocator.h>
-#include <bslmf_movableref.h>
 
 namespace BloombergLP {
 namespace mqbauthz {

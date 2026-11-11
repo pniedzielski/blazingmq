@@ -36,7 +36,6 @@
 #include <bslma_allocator.h>
 #include <bslma_default.h>
 #include <bslma_managedptr.h>
-#include <bslmf_movableref.h>
 #include <bsls_platform.h>
 
 // POSIX

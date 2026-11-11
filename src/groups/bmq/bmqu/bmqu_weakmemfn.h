@@ -177,7 +177,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_forwardingtype.h>
 #include <bslmf_memberfunctionpointertraits.h>
-#include <bslmf_movableref.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmf_typelist.h>
 #include <bsls_assert.h>
@@ -962,8 +961,8 @@ class WeakMemFnResult {
     /// memory to the contained value if `VALUE` declares the
     /// `bslma::UsesBslmaAllocator` trait.  If `basicAllocator` is 0, the
     /// default memory allocator is used.
-    WeakMemFnResult(bslmf::MovableRef<WeakMemFnResult> original,
-                    bslma::Allocator*                  basicAllocator);
+    WeakMemFnResult(WeakMemFnResult&& original,
+                    bslma::Allocator* basicAllocator);
 
   public:
     // MANIPULATORS
@@ -974,7 +973,7 @@ class WeakMemFnResult {
 
     /// Make this object assume the state the specified `original`, leaving
     /// `original` in a valid but unspecified state.  Return `*this`.
-    WeakMemFnResult& operator=(bslmf::MovableRef<WeakMemFnResult> original);
+    WeakMemFnResult& operator=(WeakMemFnResult&& original);
 
   public:
     // ACCESSORS
@@ -1999,8 +1998,8 @@ inline WeakMemFnResult<VALUE>::WeakMemFnResult(
 
 template <class VALUE>
 inline WeakMemFnResult<VALUE>::WeakMemFnResult(
-    bslmf::MovableRef<WeakMemFnResult> original,
-    bslma::Allocator*                  basicAllocator)
+    WeakMemFnResult&& original,
+    bslma::Allocator* basicAllocator)
 : d_value(bsl::move(original.d_value.object()), basicAllocator)
 {
     // NOTHING
@@ -2017,7 +2016,7 @@ WeakMemFnResult<VALUE>::operator=(const WeakMemFnResult& original)
 
 template <class VALUE>
 inline WeakMemFnResult<VALUE>&
-WeakMemFnResult<VALUE>::operator=(bslmf::MovableRef<WeakMemFnResult> original)
+WeakMemFnResult<VALUE>::operator=(WeakMemFnResult&& original)
 {
     d_value.object() = bsl::move(original.d_value.object());
     return *this;

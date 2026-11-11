@@ -49,8 +49,8 @@ class AuthnCredential {
     explicit AuthnCredential(const AuthnCredential& other,
                              bslma::Allocator*      allocator = 0);
 
-    explicit AuthnCredential(bslmf::MovableRef<AuthnCredential> other,
-                             bslma::Allocator*                  allocator = 0);
+    explicit AuthnCredential(AuthnCredential&& other,
+                             bslma::Allocator* allocator = 0);
 
     /// Create an `AuthnCredential` object with the specified `mechanism`
     /// and `data`, using the specified `allocator` to supply memory.  If
@@ -63,7 +63,7 @@ class AuthnCredential {
 
     // ASSIGNMENT (no allocator parameters)
     AuthnCredential& operator=(const AuthnCredential& rhs);
-    AuthnCredential& operator=(bslmf::MovableRef<AuthnCredential> rhs);
+    AuthnCredential& operator=(AuthnCredential&& rhs);
 
     // ACCESSORS
     const bsl::string&       mechanism() const;

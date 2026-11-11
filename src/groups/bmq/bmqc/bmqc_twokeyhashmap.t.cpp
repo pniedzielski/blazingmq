@@ -25,7 +25,6 @@
 #include <bsl_utility.h>  // bsl::pair
 #include <bsl_vector.h>
 #include <bslma_testallocator.h>
-#include <bslmf_movableref.h>
 #include <bsls_assert.h>
 
 // TEST DRIVER

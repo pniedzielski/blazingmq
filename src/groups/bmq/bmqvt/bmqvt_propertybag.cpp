@@ -21,7 +21,6 @@
 #include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bslim_printer.h>
-#include <bslmf_movableref.h>
 
 namespace BloombergLP {
 namespace bmqvt {

@@ -31,7 +31,6 @@
 #include <bsl_vector.h>
 #include <bsla_nodiscard.h>
 #include <bslma_managedptr.h>
-#include <bslmf_movableref.h>
 
 // TEST_DRIVER
 #include <bmqtst_testhelper.h>

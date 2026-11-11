@@ -203,7 +203,7 @@ class ManagedCallback final {
     ///       In performance-critical paths, `createInplace` should always be
     ///       used together with reusable ManagedCallback object(s).
     void set(const VoidFunctor& callback);
-    void set(bslmf::MovableRef<VoidFunctor> callback);
+    void set(VoidFunctor&& callback);
 
     // ACCESSORS
     /// Is this object empty or not.

@@ -60,7 +60,7 @@ class DispatcherEventSource final : public mqbi::DispatcherEventSource {
   public:
     // PUBLIC TYPES
     typedef bsl::shared_ptr<mqbi::DispatcherEvent> DispatcherEventSp;
-    typedef bslmf::MovableRef<DispatcherEventSp>   DispatcherEventRvRef;
+    typedef DispatcherEventSp&&                    DispatcherEventRvRef;
 
   private:
     // PRIVATE TYPES

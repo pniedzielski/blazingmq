@@ -61,7 +61,7 @@ Executor_Box_SboImp::Executor_Box_SboImp(
 }
 
 Executor_Box_SboImp::Executor_Box_SboImp(
-    bslmf::MovableRef<Executor_Box_SboImp> original) noexcept
+    Executor_Box_SboImp&& original) noexcept
 {
     original.target()->move(this);
 }
@@ -81,8 +81,8 @@ Executor_Box_SboImp::operator=(const Executor_Box_SboImp& rhs) noexcept
     return *this;
 }
 
-Executor_Box_SboImp& Executor_Box_SboImp::operator=(
-    bslmf::MovableRef<Executor_Box_SboImp> rhs) noexcept
+Executor_Box_SboImp&
+Executor_Box_SboImp::operator=(Executor_Box_SboImp&& rhs) noexcept
 {
     target()->~Executor_TargetBase();
     rhs.target()->move(this);
@@ -158,8 +158,7 @@ Executor::Executor(const Executor& original, bslma::Allocator*) noexcept
     // NOTHING
 }
 
-Executor::Executor(bslmf::MovableRef<Executor> original,
-                   bslma::Allocator*) noexcept
+Executor::Executor(Executor&& original, bslma::Allocator*) noexcept
 : d_box(bsl::move(original.d_box))
 {
     // NOTHING
@@ -172,7 +171,7 @@ Executor& Executor::operator=(const Executor& rhs) noexcept
     return *this;
 }
 
-Executor& Executor::operator=(bslmf::MovableRef<Executor> rhs) noexcept
+Executor& Executor::operator=(Executor&& rhs) noexcept
 {
     d_box = bsl::move(rhs.d_box);
     return *this;

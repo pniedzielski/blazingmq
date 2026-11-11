@@ -47,7 +47,6 @@
 #include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
-#include <bslmf_movableref.h>
 #include <bsls_assert.h>
 #include <bsls_timeinterval.h>
 

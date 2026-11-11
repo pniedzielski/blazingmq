@@ -34,7 +34,6 @@
 #include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bslma_managedptr.h>
-#include <bslmf_movableref.h>
 
 namespace BloombergLP {
 namespace mqbauthz {
@@ -49,8 +48,7 @@ namespace {
 
 // CREATORS
 
-AuthorizationController::AuthorizationController(
-    bslmf::MovableRef<AuthorizerMp> authorizer)
+AuthorizationController::AuthorizationController(AuthorizerMp&& authorizer)
 : d_authorizer_mp(bsl::move(authorizer))
 {
     // PRECONDITIONS

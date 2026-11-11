@@ -146,7 +146,6 @@
 #include <bslma_constructionutil.h>
 #include <bslma_managedptr.h>
 #include <bslma_usesbslmaallocator.h>
-#include <bslmf_movableref.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmf_util.h>
 #include <bsls_assert.h>
@@ -567,8 +566,8 @@ class TwoKeyHashMap {
     /// allocator is used.  Hash functions are copied from the `original`
     /// object.  Note that the order of elements in `*this` may differ from
     /// that of `original`.
-    TwoKeyHashMap(bslmf::MovableRef<TwoKeyHashMap> original,
-                  bslma::Allocator*                basicAllocator = 0);
+    TwoKeyHashMap(TwoKeyHashMap&&   original,
+                  bslma::Allocator* basicAllocator = 0);
 
     /// Destroy this object.
     ~TwoKeyHashMap();
@@ -585,7 +584,7 @@ class TwoKeyHashMap {
     /// a valid but unspecified state'.  Return `*this`.  Hash functions are
     /// copied from the `rhs` object.  Note that the order of elements in
     /// `*this` may differ from that of `rhs`.
-    TwoKeyHashMap& operator=(bslmf::MovableRef<TwoKeyHashMap> rhs);
+    TwoKeyHashMap& operator=(TwoKeyHashMap&& rhs);
 
     /// Return 'insert(value.key1(), value.key2(), value.value(),
     /// keyIndex)'.
@@ -1108,8 +1107,8 @@ inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::TwoKeyHashMap(
 
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::TwoKeyHashMap(
-    bslmf::MovableRef<TwoKeyHashMap> original,
-    bslma::Allocator*                basicAllocator)
+    TwoKeyHashMap&&   original,
+    bslma::Allocator* basicAllocator)
 : d_k1Map(1,  // bucket count
           H1(),
           typename K1Map::key_equal(),
@@ -1118,7 +1117,7 @@ inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::TwoKeyHashMap(
           H2(),
           typename K2Map::key_equal(),
           basicAllocator)
-, d_nodeAllocator(new(*allocator()) bdlma::Pool(sizeof(Node), allocator()),
+, d_nodeAllocator(new (*allocator()) bdlma::Pool(sizeof(Node), allocator()),
                   allocator())
 {
     if (allocator() == original.allocator()) {
@@ -1163,8 +1162,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::operator=(const TwoKeyHashMap& rhs)
 
 template <class K1, class K2, class VALUE, class H1, class H2>
 inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>&
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::operator=(
-    bslmf::MovableRef<TwoKeyHashMap> rhs)
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::operator=(TwoKeyHashMap&& rhs)
 {
 #ifdef BSLS_ASSERT_SAFE_IS_ACTIVE
     // POSTCONDITIONS

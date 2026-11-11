@@ -61,7 +61,6 @@
 #include <bsl_vector.h>
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
-#include <bslmf_movableref.h>
 #include <bslmt_lockguard.h>
 #include <bslmt_mutexassert.h>
 #include <bslmt_once.h>

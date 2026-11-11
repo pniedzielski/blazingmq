@@ -267,7 +267,7 @@ class MonitoredQueue {
     /// queue, blocking until either space is available - if necessary - or
     /// the queue is disabled.  Return 0 on success, and a nonzero value if
     /// the queue is disabled.
-    int pushBack(bslmf::MovableRef<ElementType> value);
+    int pushBack(ElementType&& value);
 
     /// Attempt to append the specified `value` to the back of this queue
     /// without blocking.  Return 0 on success, and a non-zero value if the
@@ -278,7 +278,7 @@ class MonitoredQueue {
     /// of this queue without blocking.  `value` is left in a valid but
     /// unspecified state.  Return 0 on success, and a non-zero value if the
     /// queue is full or disabled.
-    int tryPushBack(bslmf::MovableRef<ElementType> value);
+    int tryPushBack(ElementType&& value);
 
     /// Remove the element from the front of this queue and load that
     /// element into the specified `value`.  If the queue is empty, block
@@ -533,8 +533,8 @@ MonitoredQueue<QUEUE, QUEUE_TRAITS>::tryPushBack(const ElementType& object)
 }
 
 template <class QUEUE, class QUEUE_TRAITS>
-inline int MonitoredQueue<QUEUE, QUEUE_TRAITS>::tryPushBack(
-    bslmf::MovableRef<ElementType> object)
+inline int
+MonitoredQueue<QUEUE, QUEUE_TRAITS>::tryPushBack(ElementType&& object)
 {
     if (d_queue.tryPushBack(bsl::move(object))) {
         // We've filled the queue.  Alarm
@@ -578,8 +578,7 @@ MonitoredQueue<QUEUE, QUEUE_TRAITS>::pushBack(const ElementType& object)
 }
 
 template <class QUEUE, class QUEUE_TRAITS>
-inline int MonitoredQueue<QUEUE, QUEUE_TRAITS>::pushBack(
-    bslmf::MovableRef<ElementType> value)
+inline int MonitoredQueue<QUEUE, QUEUE_TRAITS>::pushBack(ElementType&& value)
 {
     const bsls::Types::Int64 currentQueueLen = numElements();
     if (currentQueueLen + 1 >= capacity()) {

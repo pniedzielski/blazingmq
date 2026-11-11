@@ -27,7 +27,6 @@
 #include <bsl_utility.h>
 #include <bslma_testallocator.h>
 #include <bslmf_assert.h>
-#include <bslmf_movableref.h>
 #include <bsls_assert.h>
 #include <bsls_compilerfeatures.h>
 

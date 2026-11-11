@@ -85,7 +85,6 @@
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bslalg_swaputil.h>
-#include <bslmf_movableref.h>
 #include <bslmt_lockguard.h>
 #include <bslmt_once.h>
 #include <bslmt_threadattributes.h>

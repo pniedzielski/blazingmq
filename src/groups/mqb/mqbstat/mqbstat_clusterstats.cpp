@@ -33,7 +33,6 @@
 #include <bsl_utility.h>
 #include <bsla_annotations.h>
 #include <bslmf_assert.h>
-#include <bslmf_movableref.h>
 #include <bsls_assert.h>
 
 namespace BloombergLP {

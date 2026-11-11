@@ -487,13 +487,13 @@ class MultiQueueThreadPool final {
     /// @param queueId Queue id of the destination queue for the event.
     /// @return 0 on success, non-zero on failure.
     /// NOTE: if the requested queue is full, this will block.
-    int enqueueEvent(bslmf::MovableRef<EventSp> event, int queueId);
+    int enqueueEvent(EventSp&& event, int queueId);
 
     /// @brief Enqueue an event to all queues.
     /// @param event Event to enqueue.
     /// @return 0 on success, non-zero on failure.
     /// NOTE: if the requested queue is full, this will block.
-    int enqueueEventOnAllQueues(bslmf::MovableRef<EventSp> event);
+    int enqueueEventOnAllQueues(EventSp&& event);
 
     /// Block until all queues are empty.  Note that calling this only makes
     /// sense after making sure that no other threads can enqueue any new
@@ -913,9 +913,8 @@ inline void MultiQueueThreadPool<TYPE>::stop()
 }
 
 template <typename TYPE>
-inline int
-MultiQueueThreadPool<TYPE>::enqueueEvent(bslmf::MovableRef<EventSp> event,
-                                         int                        queueId)
+inline int MultiQueueThreadPool<TYPE>::enqueueEvent(EventSp&& event,
+                                                    int       queueId)
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(event);
@@ -927,8 +926,7 @@ MultiQueueThreadPool<TYPE>::enqueueEvent(bslmf::MovableRef<EventSp> event,
 }
 
 template <typename TYPE>
-inline int MultiQueueThreadPool<TYPE>::enqueueEventOnAllQueues(
-    bslmf::MovableRef<EventSp> event)
+inline int MultiQueueThreadPool<TYPE>::enqueueEventOnAllQueues(EventSp&& event)
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(event);

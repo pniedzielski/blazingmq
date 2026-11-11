@@ -56,8 +56,8 @@ AuthnCredential::AuthnCredential(const AuthnCredential& other,
     // NOTHING
 }
 
-AuthnCredential::AuthnCredential(bslmf::MovableRef<AuthnCredential> otherRef,
-                                 bslma::Allocator*                  allocator)
+AuthnCredential::AuthnCredential(AuthnCredential&& otherRef,
+                                 bslma::Allocator* allocator)
 : d_mechanism(bsl::move(otherRef.d_mechanism), allocator)
 , d_data(bsl::move(otherRef.d_data), allocator)
 {
@@ -75,8 +75,7 @@ AuthnCredential& AuthnCredential::operator=(const AuthnCredential& rhs)
     return *this;
 }
 
-AuthnCredential&
-AuthnCredential::operator=(bslmf::MovableRef<AuthnCredential> rhsRef)
+AuthnCredential& AuthnCredential::operator=(AuthnCredential&& rhsRef)
 {
     AuthnCredential& rhs = rhsRef;
     if (this != &rhs) {

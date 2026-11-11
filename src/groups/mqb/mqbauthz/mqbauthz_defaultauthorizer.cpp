@@ -37,7 +37,6 @@
 #include <bsla_maybeunused.h>
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
-#include <bslmf_movableref.h>
 
 namespace BloombergLP {
 namespace mqbauthz {
@@ -122,7 +121,7 @@ DefaultAuthorizer::DefaultAuthorizer()
     // NOTHING
 }
 
-DefaultAuthorizer::DefaultAuthorizer(bslmf::MovableRef<PolicyMP> policy)
+DefaultAuthorizer::DefaultAuthorizer(PolicyMP&& policy)
 : d_policy(bsl::move(policy))
 {
     // NOTHING
