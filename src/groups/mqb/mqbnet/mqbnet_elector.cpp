@@ -37,7 +37,6 @@
 #include <bdlb_string.h>
 #include <bdlb_stringrefutil.h>
 #include <bdlbb_blob.h>
-#include <bdlf_bind.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_algorithm.h>
 #include <bsl_cstddef.h>  // for NULL
@@ -1940,13 +1939,14 @@ void Elector::scheduleElectorCallback()
     // Dispatch the elector state change callback in the associated cluster's
     // dispatcher thread.
     d_cluster_p->dispatcher()->execute(
-        bdlf::BindUtil::bind(&Elector::electorStateInternalCb,
-                             this,
-                             d_state.state(),
-                             d_state.reason(),
-                             d_state.leaderNodeId(),
-                             d_state.term(),
-                             d_state.age()),
+        [this,
+         state        = d_state.state(),
+         reason       = d_state.reason(),
+         leaderNodeId = d_state.leaderNodeId(),
+         term         = d_state.term(),
+         age          = d_state.age()]() {
+            electorStateInternalCb(state, reason, leaderNodeId, term, age);
+        },
         d_cluster_p);
 }
 
@@ -1975,10 +1975,11 @@ void Elector::scheduleTimer(ElectorTimerEventType::Enum type)
         bsls::TimeInterval after(bmqu::Time::nowMonotonicClock());
         after.addMilliseconds(d_config.initialWaitTimeoutMs());
 
-        d_scheduler.scheduleEvent(
-            &d_initialWaitTimeoutHandle,
-            after,
-            bdlf::BindUtil::bind(&Elector::initialWaitTimeoutCb, this));
+        d_scheduler.scheduleEvent(&d_initialWaitTimeoutHandle,
+                                  after,
+                                  [this]() {
+                                      initialWaitTimeoutCb();
+                                  });
     } break;  // BREAK
 
     case ElectorTimerEventType::e_RANDOM_WAIT_TIMER: {
@@ -1991,10 +1992,9 @@ void Elector::scheduleTimer(ElectorTimerEventType::Enum type)
         bsls::TimeInterval after(bmqu::Time::nowMonotonicClock());
         after.addMilliseconds(randomMs);
 
-        d_scheduler.scheduleEvent(
-            &d_randomWaitTimeoutHandle,
-            after,
-            bdlf::BindUtil::bind(&Elector::randomWaitTimerCb, this));
+        d_scheduler.scheduleEvent(&d_randomWaitTimeoutHandle, after, [this]() {
+            randomWaitTimerCb();
+        });
     } break;  // BREAK
 
     case ElectorTimerEventType::e_ELECTION_RESULT_TIMER: {
@@ -2002,10 +2002,11 @@ void Elector::scheduleTimer(ElectorTimerEventType::Enum type)
         bsls::TimeInterval after(bmqu::Time::nowMonotonicClock());
         after.addMilliseconds(d_config.electionResultTimeoutMs());
 
-        d_scheduler.scheduleEvent(
-            &d_electionResultTimeoutHandle,
-            after,
-            bdlf::BindUtil::bind(&Elector::electionResultTimeoutCb, this));
+        d_scheduler.scheduleEvent(&d_electionResultTimeoutHandle,
+                                  after,
+                                  [this]() {
+                                      electionResultTimeoutCb();
+                                  });
     } break;  // BREAK
 
     case ElectorTimerEventType::e_HEARTBEAT_CHECK_TIMER: {
@@ -2015,8 +2016,9 @@ void Elector::scheduleTimer(ElectorTimerEventType::Enum type)
         d_scheduler.scheduleRecurringEvent(
             &d_heartbeatCheckerRecurringHandle,
             interval,
-            bdlf::BindUtil::bind(&Elector::heartbeatCheckerRecurringTimerCb,
-                                 this));
+            [this]() {
+                heartbeatCheckerRecurringTimerCb();
+            });
     } break;  // BREAK
 
     case ElectorTimerEventType::e_HEARTBEAT_BROADCAST_TIMER: {
@@ -2026,18 +2028,20 @@ void Elector::scheduleTimer(ElectorTimerEventType::Enum type)
         d_scheduler.scheduleRecurringEvent(
             &d_heartbeatSenderRecurringHandle,
             interval,
-            bdlf::BindUtil::bind(&Elector::heartbeatSenderRecurringTimerCb,
-                                 this));
+            [this]() {
+                heartbeatSenderRecurringTimerCb();
+            });
     } break;  // BREAK
 
     case ElectorTimerEventType::e_SCOUTING_RESULT_TIMER: {
         bsls::TimeInterval after(bmqu::Time::nowMonotonicClock());
         after.addMilliseconds(d_config.scoutingResultTimeoutMs());
 
-        d_scheduler.scheduleEvent(
-            &d_scoutingResultTimeoutHandle,
-            after,
-            bdlf::BindUtil::bind(&Elector::scoutingResultTimeoutCb, this));
+        d_scheduler.scheduleEvent(&d_scoutingResultTimeoutHandle,
+                                  after,
+                                  [this]() {
+                                      scoutingResultTimeoutCb();
+                                  });
     } break;  // BREAK
 
     case ElectorTimerEventType::e_NONE:
@@ -2272,10 +2276,11 @@ Elector::Elector(mqbcfg::ElectorConfig&        config,
     // Per scheduler's contract, it's ok to schedule events before its
     // started.
 
-    d_scheduler.scheduleEvent(
-        bsls::TimeInterval(0, 0),  // now
-        bdlf::BindUtil::bind(&bslmt::ThreadUtil::setThreadName,
-                             "bmqSchedElec"));
+    d_scheduler.scheduleEvent(bsls::TimeInterval(0, 0),  // now
+                              []() {
+                                  bslmt::ThreadUtil::setThreadName(
+                                      "bmqSchedElec");
+                              });
 }
 
 Elector::~Elector()
@@ -2340,10 +2345,10 @@ int Elector::start()
     // scheduler's threadId can change every time, and thus we capture is
     // every time scheduler is started.
 
-    d_scheduler.scheduleEvent(
-        bsls::TimeInterval(0, 0),  // now
-        bdlf::BindUtil::bind(&Elector::getSchedulerDispatcherThreadHandle,
-                             this));
+    d_scheduler.scheduleEvent(bsls::TimeInterval(0, 0),  // now
+                              [this]() {
+                                  getSchedulerDispatcherThreadHandle();
+                              });
 
     // Enable the state machine.
 
@@ -2360,10 +2365,9 @@ int Elector::start()
     bsls::TimeInterval after(bmqu::Time::nowMonotonicClock());
     after.addMilliseconds(d_config.initialWaitTimeoutMs());
 
-    d_scheduler.scheduleEvent(
-        &d_initialWaitTimeoutHandle,
-        after,
-        bdlf::BindUtil::bind(&Elector::initialWaitTimeoutCb, this));
+    d_scheduler.scheduleEvent(&d_initialWaitTimeoutHandle, after, [this]() {
+        initialWaitTimeoutCb();
+    });
     return rc_SUCCESS;
 }
 
