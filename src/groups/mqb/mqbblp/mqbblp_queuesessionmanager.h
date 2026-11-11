@@ -244,7 +244,7 @@ class QueueSessionManager {
     /// otherwise `status` contains the category, error code and description
     /// of the failure.  The `queueHandle` must be released once no longer
     /// needed.
-    void onQueueOpenCbDispatched(
+    void processOpenQueueResponse(
         const bmqp_ctrlmsg::Status&                status,
         mqbi::QueueHandle*                         queueHandle,
         const bmqp_ctrlmsg::OpenQueueResponse&     openQueueResponse,
@@ -268,16 +268,16 @@ class QueueSessionManager {
     /// this shared pointer.  Note that it is undefined to call any method
     /// such as `postMessage`, `confirmMessage`, etc., on this `handle` in
     /// this case as it has been released from the queue, and per contract,
-    /// no more downstream actions are expected.  The `dispatched` flavor of
-    /// this method must be executed on the client dispatcher thread.  The
-    /// specified `validator` must be checked to ensure the session is still
-    /// valid at the time the method is invoked.
-    void onHandleReleasedDispatched(
-        const bsl::shared_ptr<mqbi::QueueHandle>& handle,
-        const mqbi::QueueHandleReleaseResult&     result,
-        const CloseHandleCallback&                successCallback,
-        const ErrorCallback&                      errorCallback,
-        const bmqp_ctrlmsg::ControlMessage&       request);
+    /// no more downstream actions are expected.  This method must be executed
+    /// on the client dispatcher thread.  The `validator` passed to
+    /// `onHandleReleased` must be checked to ensure the session is still
+    /// valid at the time that method is invoked.
+    void
+    processHandleReleased(const bsl::shared_ptr<mqbi::QueueHandle>& handle,
+                          const mqbi::QueueHandleReleaseResult&     result,
+                          const CloseHandleCallback&          successCallback,
+                          const ErrorCallback&                errorCallback,
+                          const bmqp_ctrlmsg::ControlMessage& request);
 
     void
     dispatchErrorCallback(const ErrorCallback&                errorCallback,

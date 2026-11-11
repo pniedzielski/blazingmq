@@ -259,17 +259,17 @@ void QueueSessionManager::onQueueOpenCb(
          confirmationCookie,
          responseCallback,
          request]() {
-            onQueueOpenCbDispatched(status,
-                                    queueHandle,
-                                    openQueueResponse,
-                                    confirmationCookie,
-                                    responseCallback,
-                                    request);
+            processOpenQueueResponse(status,
+                                     queueHandle,
+                                     openQueueResponse,
+                                     confirmationCookie,
+                                     responseCallback,
+                                     request);
         },
         d_dispatcherClient_p);
 }
 
-void QueueSessionManager::onQueueOpenCbDispatched(
+void QueueSessionManager::processOpenQueueResponse(
     const bmqp_ctrlmsg::Status&                status,
     mqbi::QueueHandle*                         queueHandle,
     const bmqp_ctrlmsg::OpenQueueResponse&     openQueueResponse,
@@ -415,28 +415,28 @@ void QueueSessionManager::onHandleReleased(
     }
 
     // NOTE: We don't check 'd_shutdownInProgress' and always enqueue execution
-    //       of 'onHandleReleasedDispatched to the dispatcher.  This is valid,
+    //       of 'processHandleReleased' to the dispatcher.  This is valid,
     //       because we successfully acquired the 'validator', so we have
     //       guarantees that we are *before* the 'teardown' method (since the
     //       very first thing it does is invalidate the guard), so it is always
     //       fine to enqueue that method (it will itself check
     //       'd_shutdownInProgress').
     //
-    //       Refer to the comments inside 'onHandleReleasedDispatched' for the
+    //       Refer to the comments inside 'processHandleReleased' for the
     //       reason why this is needed.
 
     d_dispatcherClient_p->dispatcher()->execute(
         [this, handle, result, successCallback, errorCallback, request]() {
-            onHandleReleasedDispatched(handle,
-                                       result,
-                                       successCallback,
-                                       errorCallback,
-                                       request);
+            processHandleReleased(handle,
+                                  result,
+                                  successCallback,
+                                  errorCallback,
+                                  request);
         },
         d_dispatcherClient_p);
 }
 
-void QueueSessionManager::onHandleReleasedDispatched(
+void QueueSessionManager::processHandleReleased(
     const bsl::shared_ptr<mqbi::QueueHandle>& handle,
     const mqbi::QueueHandleReleaseResult&     result,
     const CloseHandleCallback&                successCallback,

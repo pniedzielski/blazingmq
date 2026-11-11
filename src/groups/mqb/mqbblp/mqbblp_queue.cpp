@@ -243,7 +243,7 @@ void Queue::dropHandleDispatched(mqbi::QueueHandle* handle, bool doDeconfigure)
         //    The queue invokes 'onHandleReleased' callback to inform the
         //    client session with a shared_ptr of the removed handle, which is
         //    then enqueued to the client dispatcher thread.
-        // 4) 'onHandleReleasedDispatched' with handle's shared_ptr is invoked
+        // 4) 'processHandleReleased' with handle's shared_ptr is invoked
         //    in the client dispatcher thread, client session removes 'handle'
         //    from its 'd_queues' and lets go of the handle's shared_ptr, which
         //    ends up deleting the handle.
