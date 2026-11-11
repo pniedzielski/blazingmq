@@ -87,29 +87,27 @@ void LogCleaner::cleanLogs()
     bdls::FilesystemUtil::findMatchingPaths(&files, d_filePattern.c_str());
 
     int filesDeleted = 0;
-    for (bsl::vector<bsl::string>::iterator it = files.begin();
-         it != files.end();
-         ++it) {
+    for (const bsl::string& file : files) {
         bdlt::Datetime modificationTime;
         int            rc = bdls::FilesystemUtil::getLastModificationTime(
             &modificationTime,
-            *it);
+            file);
         if (rc != 0) {
             BALL_LOG_WARN << "Failed retrieving last modification time of '"
-                          << *it << "' [rc: " << rc << "]";
+                          << file << "' [rc: " << rc << "]";
             continue;  // CONTINUE
         }
 
         if (modificationTime < keepThreshold) {
-            rc = bdls::FilesystemUtil::remove(*it);
+            rc = bdls::FilesystemUtil::remove(file);
 
             if (rc != 0) {
-                BALL_LOG_WARN << "Failed deleting file '" << *it << "' "
+                BALL_LOG_WARN << "Failed deleting file '" << file << "' "
                               << "[rc: " << rc << "]";
             }
             else {
                 ++filesDeleted;
-                BALL_LOG_TRACE << "Deleted file '" << *it << "'";
+                BALL_LOG_TRACE << "Deleted file '" << file << "'";
             }
         }
     }
