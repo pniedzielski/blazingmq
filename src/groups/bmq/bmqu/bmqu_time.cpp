@@ -17,7 +17,6 @@
 
 #include <bmqscm_version.h>
 // BDE
-#include <bdlf_bind.h>
 #include <bslma_default.h>
 #include <bslmf_allocatorargt.h>
 #include <bslmt_qlock.h>
@@ -78,20 +77,20 @@ void Time::initialize(bslma::Allocator* allocator)
 
     bslma::Allocator* alloc = bslma::Default::globalAllocator(allocator);
 
-    new (g_realTimeClock.buffer()) SystemTimeCb(
-        bsl::allocator_arg,
-        alloc,
-        bdlf::BindUtil::bind(&bsls::SystemTime::nowRealtimeClock));
+    new (g_realTimeClock.buffer())
+        SystemTimeCb(bsl::allocator_arg, alloc, []() {
+            return bsls::SystemTime::nowRealtimeClock();
+        });
 
-    new (g_monotonicClock.buffer()) SystemTimeCb(
-        bsl::allocator_arg,
-        alloc,
-        bdlf::BindUtil::bind(&bsls::SystemTime::nowMonotonicClock));
+    new (g_monotonicClock.buffer())
+        SystemTimeCb(bsl::allocator_arg, alloc, []() {
+            return bsls::SystemTime::nowMonotonicClock();
+        });
 
     new (g_highResTimer.buffer())
-        HighResolutionTimeCb(bsl::allocator_arg,
-                             alloc,
-                             bdlf::BindUtil::bind(&bsls::TimeUtil::getTimer));
+        HighResolutionTimeCb(bsl::allocator_arg, alloc, []() {
+            return bsls::TimeUtil::getTimer();
+        });
 
     bsls::TimeUtil::initialize();
 }
