@@ -14,6 +14,7 @@
 // limitations under the License.
 
 #include <bmqio_channelfactorypipeline.h>
+#include <bsl_utility.h>
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
 
@@ -27,15 +28,15 @@ ChannelFactoryPipeline::Config::Config(const ChannelFactorySP& baseFactory,
     BSLS_ASSERT(baseFactory != NULL);
 }
 
-ChannelFactoryPipeline::Config::Config(bslmf::MovableRef<Config> other)
-    noexcept : d_pipeline(MoveUtil::move(other.d_pipeline),
-                          other.d_pipeline.get_allocator())
+ChannelFactoryPipeline::Config::Config(
+    bslmf::MovableRef<Config> other) noexcept
+: d_pipeline(bsl::move(other.d_pipeline), other.d_pipeline.get_allocator())
 {
 }
 
 ChannelFactoryPipeline::Config::Config(bslmf::MovableRef<Config> other,
                                        const allocator_type&     allocator)
-: d_pipeline(MoveUtil::move(other.d_pipeline), allocator)
+: d_pipeline(bsl::move(other.d_pipeline), allocator)
 {
 }
 
@@ -75,7 +76,7 @@ size_t ChannelFactoryPipeline::Config::size() const
 
 ChannelFactoryPipeline::ChannelFactoryPipeline(
     bslmf::MovableRef<ChannelFactoryPipeline> other) noexcept
-: d_pipeline(MoveUtil::move(other.d_pipeline), other.get_allocator())
+: d_pipeline(bsl::move(other.d_pipeline), other.get_allocator())
 {
     BSLS_ASSERT(!d_pipeline.empty());
 }
@@ -83,7 +84,7 @@ ChannelFactoryPipeline::ChannelFactoryPipeline(
 ChannelFactoryPipeline::ChannelFactoryPipeline(
     bslmf::MovableRef<ChannelFactoryPipeline> other,
     const allocator_type&                     allocator)
-: d_pipeline(MoveUtil::move(other.d_pipeline), allocator)
+: d_pipeline(bsl::move(other.d_pipeline), allocator)
 {
     BSLS_ASSERT(!d_pipeline.empty());
 }
@@ -91,7 +92,7 @@ ChannelFactoryPipeline::ChannelFactoryPipeline(
 ChannelFactoryPipeline::ChannelFactoryPipeline(
     bslmf::MovableRef<Config> builder,
     const allocator_type&     allocator)
-: d_pipeline(MoveUtil::move(builder.d_pipeline), allocator)
+: d_pipeline(bsl::move(builder.d_pipeline), allocator)
 {
     BSLS_ASSERT(!d_pipeline.empty());
 }

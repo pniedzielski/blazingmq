@@ -27,6 +27,7 @@
 #include <bdlf_bind.h>
 #include <bdlf_placeholder.h>
 #include <bsl_memory.h>
+#include <bsl_utility.h>
 #include <bsla_annotations.h>
 #include <bslmf_movableref.h>
 #include <bsls_asserttestexception.h>
@@ -102,7 +103,6 @@ class ChannelFactoryPipelineConfigTest : public ::testing::Test {
 
     typedef bsl::allocator<unsigned char>         allocator_type;
     typedef bmqio::ChannelFactoryPipeline::Config Config;
-    typedef bslmf::MovableRefUtil                 MoveUtil;
 
     allocator_type get_allocator() const
     {
@@ -183,7 +183,7 @@ TEST_F(ChannelFactoryPipelineConfigTest, addWithFails)
 TEST_F(ChannelFactoryPipelineConfigTest, canMove)
 {
     Config builder(testFactory(), get_allocator());
-    Config builder2(MoveUtil::move(builder), get_allocator());
+    Config builder2(bsl::move(builder), get_allocator());
 }
 
 class ChannelFactoryPipelineTest : public ::testing::Test {
@@ -192,7 +192,6 @@ class ChannelFactoryPipelineTest : public ::testing::Test {
     ~ChannelFactoryPipelineTest() override;
 
     typedef bsl::allocator<unsigned char>         allocator_type;
-    typedef bslmf::MovableRefUtil                 MoveUtil;
     typedef bsl::shared_ptr<MockChannelFactory>   MockFactorySP;
     typedef bmqio::ChannelFactoryPipeline::Config Config;
 
@@ -247,8 +246,7 @@ ChannelFactoryPipelineTest::~ChannelFactoryPipelineTest()
 TEST_F(ChannelFactoryPipelineTest, breathingTest)
 {
     Config                        config(mockFactory(), get_allocator());
-    bmqio::ChannelFactoryPipeline pipeline(MoveUtil::move(config),
-                                           get_allocator());
+    bmqio::ChannelFactoryPipeline pipeline(bsl::move(config), get_allocator());
 }
 
 TEST_F(ChannelFactoryPipelineTest, stopOnDestructor)
@@ -257,8 +255,7 @@ TEST_F(ChannelFactoryPipelineTest, stopOnDestructor)
     EXPECT_CALL(*factory, stop());
 
     Config                        config(factory, get_allocator());
-    bmqio::ChannelFactoryPipeline pipeline(MoveUtil::move(config),
-                                           get_allocator());
+    bmqio::ChannelFactoryPipeline pipeline(bsl::move(config), get_allocator());
 }
 
 TEST_F(ChannelFactoryPipelineTest, listenFollowsChain)
@@ -275,8 +272,7 @@ TEST_F(ChannelFactoryPipelineTest, listenFollowsChain)
     EXPECT_CALL(*factory, listen(&status, &handle, Ref(options), Ref(cb)));
 
     Config                        config(factory, get_allocator());
-    bmqio::ChannelFactoryPipeline pipeline(MoveUtil::move(config),
-                                           get_allocator());
+    bmqio::ChannelFactoryPipeline pipeline(bsl::move(config), get_allocator());
 
     pipeline.start();
     pipeline.listen(&status, &handle, options, cb);
@@ -297,7 +293,7 @@ TEST_F(ChannelFactoryPipelineTest, connectFollowsChain)
 
     Config                        config(factory, get_allocator());
     bmqio::ChannelFactoryPipeline pipeline(
-        MoveUtil::move(config.addWith(wrappedFactoryConfig())),
+        bsl::move(config.addWith(wrappedFactoryConfig())),
         get_allocator());
 
     pipeline.connect(&status, &handle, options, cb);
@@ -312,8 +308,7 @@ TEST_F(ChannelFactoryPipelineTest, startIsForwarded)
     EXPECT_CALL(*factory1, start()).WillRepeatedly(Return(0));
 
     Config                        config(factory1, get_allocator());
-    bmqio::ChannelFactoryPipeline pipeline(MoveUtil::move(config),
-                                           get_allocator());
+    bmqio::ChannelFactoryPipeline pipeline(bsl::move(config), get_allocator());
 
     EXPECT_EQ(0, pipeline.start());
 }
@@ -327,8 +322,7 @@ TEST_F(ChannelFactoryPipelineTest, startFailureIsForwarded)
     EXPECT_CALL(*factory1, start()).WillRepeatedly(Return(1));
 
     Config                        config(factory1, get_allocator());
-    bmqio::ChannelFactoryPipeline pipeline(MoveUtil::move(config),
-                                           get_allocator());
+    bmqio::ChannelFactoryPipeline pipeline(bsl::move(config), get_allocator());
 
     EXPECT_NE(0, pipeline.start());
 }
@@ -344,8 +338,7 @@ TEST_F(ChannelFactoryPipelineTest, startIsForwardedToLastFactory)
 
     Config config(factory1, get_allocator());
     config.add(factory2);
-    bmqio::ChannelFactoryPipeline pipeline(MoveUtil::move(config),
-                                           get_allocator());
+    bmqio::ChannelFactoryPipeline pipeline(bsl::move(config), get_allocator());
 
     EXPECT_EQ(0, pipeline.start());
 }
@@ -357,8 +350,7 @@ TEST_F(ChannelFactoryPipelineTest, stopIsForwarded)
     EXPECT_CALL(*factory1, stop());
 
     Config                        config(factory1, get_allocator());
-    bmqio::ChannelFactoryPipeline pipeline(MoveUtil::move(config),
-                                           get_allocator());
+    bmqio::ChannelFactoryPipeline pipeline(bsl::move(config), get_allocator());
 
     pipeline.stop();
     ASSERT_TRUE(::testing::Mock::VerifyAndClearExpectations(factory1.get()));
@@ -376,8 +368,7 @@ TEST_F(ChannelFactoryPipelineTest, stopIsForwardedToLastFactory)
 
     Config config(factory1, get_allocator());
     config.add(factory2);
-    bmqio::ChannelFactoryPipeline pipeline(MoveUtil::move(config),
-                                           get_allocator());
+    bmqio::ChannelFactoryPipeline pipeline(bsl::move(config), get_allocator());
 
     pipeline.stop();
 }
@@ -389,8 +380,7 @@ TEST_F(ChannelFactoryPipelineTest, stopIsCalledOnDestruction)
     EXPECT_CALL(*factory1, stop());
 
     Config                        config(factory1, get_allocator());
-    bmqio::ChannelFactoryPipeline pipeline(MoveUtil::move(config),
-                                           get_allocator());
+    bmqio::ChannelFactoryPipeline pipeline(bsl::move(config), get_allocator());
 }
 
 TEST_F(ChannelFactoryPipelineTest, getFindsChannelFactorySubtype)
@@ -398,8 +388,7 @@ TEST_F(ChannelFactoryPipelineTest, getFindsChannelFactorySubtype)
     MockFactorySP factory = mockFactory();
 
     Config                        config(factory, get_allocator());
-    bmqio::ChannelFactoryPipeline pipeline(MoveUtil::move(config),
-                                           get_allocator());
+    bmqio::ChannelFactoryPipeline pipeline(bsl::move(config), get_allocator());
 
     MockChannelFactory* result = pipeline.get<MockChannelFactory>();
 
@@ -411,8 +400,7 @@ TEST_F(ChannelFactoryPipelineTest, getDoesntFindNonexistantSubtype)
     MockFactorySP factory = mockFactory();
 
     Config                        config(factory, get_allocator());
-    bmqio::ChannelFactoryPipeline pipeline(MoveUtil::move(config),
-                                           get_allocator());
+    bmqio::ChannelFactoryPipeline pipeline(bsl::move(config), get_allocator());
 
     bmqio::NtcChannelFactory* result =
         pipeline.get<bmqio::NtcChannelFactory>();

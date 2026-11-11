@@ -259,14 +259,13 @@ Policy_Permission::operator=(bslmf::MovableRef<Policy_Permission> other)
         *this = otherRef;
     }
     else {
-        typedef bslmf::MovableRefUtil Move;
-        d_id                  = Move::move(otherRef.d_id);
+        d_id                  = bsl::move(otherRef.d_id);
         d_connectClient       = otherRef.d_connectClient;
         d_connectProxy        = otherRef.d_connectProxy;
         d_connectAdmin        = otherRef.d_connectAdmin;
         d_connectClusterNode  = otherRef.d_connectClusterNode;
-        d_queueRead           = Move::move(otherRef.d_queueRead);
-        d_queueWrite          = Move::move(otherRef.d_queueWrite);
+        d_queueRead           = bsl::move(otherRef.d_queueRead);
+        d_queueWrite          = bsl::move(otherRef.d_queueWrite);
         d_executeAdminCommand = otherRef.d_executeAdminCommand;
     }
 
@@ -487,8 +486,7 @@ Policy& Policy::operator=(bslmf::MovableRef<Policy> other)
         *this = otherRef;
     }
     else {
-        typedef bslmf::MovableRefUtil Move;
-        d_rolePermissions = Move::move(otherRef.d_rolePermissions);
+        d_rolePermissions = bsl::move(otherRef.d_rolePermissions);
     }
 
     return *this;

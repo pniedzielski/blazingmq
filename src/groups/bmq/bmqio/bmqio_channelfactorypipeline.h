@@ -20,6 +20,7 @@
 
 #include <bsl_functional.h>
 #include <bsl_memory.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bslma_managedptr.h>
 #include <bslmf_movableref.h>
@@ -29,10 +30,6 @@ namespace BloombergLP {
 namespace bmqio {
 
 class ChannelFactoryPipeline : public bmqio::ChannelFactory {
-  private:
-    // PRIVATE TYPES
-    typedef bslmf::MovableRefUtil MoveUtil;
-
   public:
     /// The allocator type.
     typedef bsl::allocator<unsigned char> allocator_type;
