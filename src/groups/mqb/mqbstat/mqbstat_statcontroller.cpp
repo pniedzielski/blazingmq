@@ -384,12 +384,10 @@ void StatController::setTunable(mqbcmd::StatResult*       result,
         // Look up the target configuration.
         const mqbcfg::StatPluginConfig* targetConsumerCfg = 0;
         {
-            bsl::vector<mqbcfg::StatPluginConfig>::const_iterator it =
-                statsCfg.plugins().begin();
-            for (; it != statsCfg.plugins().end(); ++it) {
-                if (bdlb::StringRefUtil::areEqualCaseless(it->name(),
+            for (const auto& pluginConfig : statsCfg.plugins()) {
+                if (bdlb::StringRefUtil::areEqualCaseless(pluginConfig.name(),
                                                           consumerName)) {
-                    targetConsumerCfg = &(*it);
+                    targetConsumerCfg = &pluginConfig;
                     break;
                 }
             }
@@ -406,12 +404,11 @@ void StatController::setTunable(mqbcmd::StatResult*       result,
         // Look up the target consumer.
         mqbplug::StatConsumer* targetConsumer = 0;
         {
-            bsl::vector<StatConsumerMp>::const_iterator it =
-                d_statConsumers.begin();
-            for (; it != d_statConsumers.end(); ++it) {
-                if (bdlb::StringRefUtil::areEqualCaseless(it->get()->name(),
-                                                          consumerName)) {
-                    targetConsumer = it->get();
+            for (const auto& consumer : d_statConsumers) {
+                if (bdlb::StringRefUtil::areEqualCaseless(
+                        consumer.get()->name(),
+                        consumerName)) {
+                    targetConsumer = consumer.get();
                     break;
                 }
             }
@@ -506,12 +503,10 @@ void StatController::getTunable(mqbcmd::StatResult* result,
 
         // Look up the target consumer.
         mqbplug::StatConsumer*                      targetConsumer = 0;
-        bsl::vector<StatConsumerMp>::const_iterator it =
-            d_statConsumers.begin();
-        for (; it != d_statConsumers.end(); ++it) {
-            if (bdlb::StringRefUtil::areEqualCaseless(it->get()->name(),
+        for (const auto& consumer : d_statConsumers) {
+            if (bdlb::StringRefUtil::areEqualCaseless(consumer.get()->name(),
                                                       consumerName)) {
-                targetConsumer = it->get();
+                targetConsumer = consumer.get();
                 break;
             }
         }
@@ -560,23 +555,22 @@ void StatController::listTunables(mqbcmd::StatResult* result,
 
     mqbcmd::Tunables& tunables = result->makeTunables();
 
-    bsl::vector<StatConsumerMp>::const_iterator it = d_statConsumers.begin();
-    for (; it != d_statConsumers.end(); ++it) {
+    for (const auto& consumer : d_statConsumers) {
         mqbcmd::Tunable& tunable = tunables.tunables().emplace_back();
 
         bmqu::MemOutStream tunableConfirmationName;
         {
-            bsl::string consumerNameUpper((*it)->name(), d_allocator_p);
+            bsl::string consumerNameUpper(consumer->name(), d_allocator_p);
             bdlb::String::toUpper(&consumerNameUpper);
             tunableConfirmationName << consumerNameUpper << ".PUBLISHINTERVAL";
         }
         tunable.name() = tunableConfirmationName.str();
-        tunable.value().makeTheInteger((*it)->publishInterval().seconds());
+        tunable.value().makeTheInteger(consumer->publishInterval().seconds());
 
         bmqu::MemOutStream description;
         description
             << "non-negative integer value of the publish interval for the '"
-            << (*it)->name()
+            << consumer->name()
             << "' StatConsumer. Must be a multiple of "
                "snapshot interval and cannot be greater than max publish "
                "interval. It can be specified as 0 to disable the publishing "
@@ -604,12 +598,10 @@ bool StatController::snapshot()
     d_lastSnapshotTime = now;
 
     // Snapshot all root stat contexts
-    for (StatContextDetailsMap::iterator mit = d_statContextsMap.begin();
-         mit != d_statContextsMap.end();
-         ++mit) {
-        if (!mit->second.d_managed) {
-            BSLS_ASSERT_SAFE(mit->second.d_statContext_sp);
-            mit->second.d_statContext_sp->snapshot();
+    for (const auto& [name, details] : d_statContextsMap) {
+        if (!details.d_managed) {
+            BSLS_ASSERT_SAFE(details.d_statContext_sp);
+            details.d_statContext_sp->snapshot();
         }
     }
 
@@ -639,10 +631,9 @@ void StatController::snapshotAndNotify()
     }
 
     // StatConsumers will report all stats
-    bsl::vector<StatConsumerMp>::iterator it = d_statConsumers.begin();
-    for (; it != d_statConsumers.end(); ++it) {
+    for (const auto& consumer : d_statConsumers) {
         try {
-            (*it)->onSnapshot();
+            consumer->onSnapshot();
         }
         catch (const bsl::exception& e) {
             BALL_LOG_ERROR << "#PLUGIN_ERROR " << e.what();
@@ -676,11 +667,9 @@ void StatController::snapshotAndNotify()
     // - We don't log stats (so we don't have an explicit trigger for cleanup)
     // - We've just logged stats on this snapshot
     if (!d_snapshotTracker.isEnabled() || willPrint) {
-        for (StatContextDetailsMap::iterator mit = d_statContextsMap.begin();
-             mit != d_statContextsMap.end();
-             ++mit) {
-            if (mit->second.d_statContext_sp) {
-                mit->second.d_statContext_sp->cleanup();
+        for (const auto& [name, details] : d_statContextsMap) {
+            if (details.d_statContext_sp) {
+                details.d_statContext_sp->cleanup();
             }
         }
     }
@@ -704,30 +693,30 @@ int StatController::validateConfig(bsl::ostream& errorDescription) const
         return -1;  // RETURN
     }
 
-    bsl::vector<mqbcfg::StatPluginConfig>::const_iterator it =
-        brkrCfg.stats().plugins().begin();
-    for (; it != brkrCfg.stats().plugins().end(); ++it) {
-        if (it->name().empty()) {
+    for (const auto& pluginConfig : brkrCfg.stats().plugins()) {
+        if (pluginConfig.name().empty()) {
             errorDescription << "StatController: Plugin 'name' must be given "
                                 "a value";
             return -1;
         }
 
-        if ((it->publishInterval() % brkrCfg.stats().snapshotInterval()) !=
-            0) {
+        if ((pluginConfig.publishInterval() %
+             brkrCfg.stats().snapshotInterval()) != 0) {
             errorDescription << "StatController: 'publishInterval' for "
                                 "consumer '"
-                             << it->name() << "' (" << it->publishInterval()
+                             << pluginConfig.name() << "' ("
+                             << pluginConfig.publishInterval()
                              << ") must be a multiple of 'snapshotInterval' ("
                              << brkrCfg.stats().snapshotInterval() << ")";
             return -1;  // RETURN
         }
 
-        if (it->publishInterval() >
+        if (pluginConfig.publishInterval() >
             brkrCfg.stats().printer().printInterval()) {
             errorDescription << "StatController: publishInterval for "
                                 "consumer '"
-                             << it->name() << "' (" << it->publishInterval()
+                             << pluginConfig.name() << "' ("
+                             << pluginConfig.publishInterval()
                              << ") cannot be greater than 'printInterval' ("
                              << brkrCfg.stats().printer().printInterval()
                              << ")";
@@ -822,10 +811,8 @@ int StatController::start(bsl::ostream& errorDescription)
     // the dashboard screen, stat consumers, stats printer, ...  So we need to
     // configure the SystemStatMonitor to hold the max of those two intervals.
     int maxInterval = brkrCfg.stats().printer().printInterval();
-    bsl::vector<mqbcfg::StatPluginConfig>::const_iterator consumerIt =
-        brkrCfg.stats().plugins().begin();
-    for (; consumerIt != brkrCfg.stats().plugins().end(); ++consumerIt) {
-        maxInterval = bsl::max(maxInterval, consumerIt->publishInterval());
+    for (const auto& pluginConfig : brkrCfg.stats().plugins()) {
+        maxInterval = bsl::max(maxInterval, pluginConfig.publishInterval());
     }
     d_systemStatMonitor_mp =
         bslma::ManagedPtrUtil::allocateManaged<mqbstat::StatMonitor>(
@@ -857,11 +844,8 @@ int StatController::start(bsl::ostream& errorDescription)
     // Build Map to be passed to all lower level components
     bsl::unordered_map<bsl::string, bmqst::StatContext*> ctxPtrMap(
         d_allocator_p);
-    for (StatContextDetailsMap::iterator ctxIt = d_statContextsMap.begin();
-         ctxIt != d_statContextsMap.end();
-         ++ctxIt) {
-        ctxPtrMap.insert(bsl::make_pair(ctxIt->first,
-                                        ctxIt->second.d_statContext_sp.get()));
+    for (const auto& [name, details] : d_statContextsMap) {
+        ctxPtrMap.insert(bsl::make_pair(name, details.d_statContext_sp.get()));
     }
 
     // Initialize StatConsumers from plugins.
@@ -870,13 +854,13 @@ int StatController::start(bsl::ostream& errorDescription)
         d_pluginManager_p->get(&pluginFactories,
                                mqbplug::PluginType::e_STATS_CONSUMER);
 
-        PluginFactories::const_iterator factoryIt = pluginFactories.cbegin();
-        for (; factoryIt != pluginFactories.cend(); ++factoryIt) {
+        for (mqbplug::PluginFactory* pluginFactory : pluginFactories) {
             mqbplug::StatConsumerPluginFactory* factory =
-                dynamic_cast<mqbplug::StatConsumerPluginFactory*>(*factoryIt);
+                dynamic_cast<mqbplug::StatConsumerPluginFactory*>(
+                    pluginFactory);
             if (!factory) {
                 BMQTSK_ALARMLOG_ALARM("#STATS")
-                    << "Not a StatConsumerPluginFactory [" << (*factoryIt)
+                    << "Not a StatConsumerPluginFactory [" << pluginFactory
                     << "]" << BMQTSK_ALARMLOG_END;
                 continue;  // CONTINUE
             }
@@ -899,12 +883,10 @@ int StatController::start(bsl::ostream& errorDescription)
             const mqbcfg::StatPluginConfig*              consumerCfg = 0;
             const bsl::vector<mqbcfg::StatPluginConfig>& consumersCfg =
                 mqbcfg::BrokerConfig::get().stats().plugins();
-            bsl::vector<mqbcfg::StatPluginConfig>::const_iterator cfgIt =
-                consumersCfg.begin();
-            for (; cfgIt != consumersCfg.end(); ++cfgIt) {
-                if (bdlb::StringRefUtil::areEqualCaseless(cfgIt->name(),
+            for (const auto& pluginConfig : consumersCfg) {
+                if (bdlb::StringRefUtil::areEqualCaseless(pluginConfig.name(),
                                                           consumer->name())) {
-                    consumerCfg = &(*cfgIt);
+                    consumerCfg = &pluginConfig;
                     break;
                 }
             }
@@ -1051,11 +1033,9 @@ void StatController::stop()
 void StatController::loadStatContexts(StatContexts* contexts)
 {
     contexts->reserve(d_statContextsMap.size());
-    for (StatContextDetailsMap::const_iterator cit = d_statContextsMap.begin();
-         cit != d_statContextsMap.end();
-         ++cit) {
-        StatContextSp statContextSp = cit->second.d_statContext_sp;
-        (*contexts)[cit->first]     = statContextSp.get();
+    for (const auto& [name, details] : d_statContextsMap) {
+        StatContextSp statContextSp = details.d_statContext_sp;
+        (*contexts)[name]           = statContextSp.get();
     }
 }
 
