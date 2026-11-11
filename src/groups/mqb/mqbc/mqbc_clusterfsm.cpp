@@ -73,26 +73,20 @@ void ClusterFSM::processEvent(const EventWithMetadata& event)
     if (d_state != oldState) {
         switch (d_state) {
         case State::e_UNKNOWN: {
-            for (ObserversSetIter it = d_observers.begin();
-                 it != d_observers.end();
-                 ++it) {
-                (*it)->onUnknown();
+            for (const auto& observer : d_observers) {
+                observer->onUnknown();
             }
             break;  // BREAK
         }
         case State::e_FOL_HEALED: {
-            for (ObserversSetIter it = d_observers.begin();
-                 it != d_observers.end();
-                 ++it) {
-                (*it)->onHealedFollower();
+            for (const auto& observer : d_observers) {
+                observer->onHealedFollower();
             }
             break;  // BREAK
         }
         case State::e_LDR_HEALED: {
-            for (ObserversSetIter it = d_observers.begin();
-                 it != d_observers.end();
-                 ++it) {
-                (*it)->onHealedLeader();
+            for (const auto& observer : d_observers) {
+                observer->onHealedLeader();
             }
             break;  // BREAK
         }
