@@ -49,8 +49,6 @@
 #include <bmqu_time.h>
 
 // BDE
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlmt_fixedthreadpool.h>
 #include <bdls_filesystemutil.h>
 #include <bdls_pathutil.h>
@@ -240,13 +238,17 @@ void StorageManager::startRecoveryCb(int partitionId)
     d_recoveryManager_mp->startRecovery(
         partitionId,
         dispatcherClientData,
-        bdlf::BindUtil::bind(&StorageManager::onPartitionRecovery,
-                             this,
-                             bdlf::PlaceHolders::_1,  // partitionId
-                             bdlf::PlaceHolders::_2,  // status
-                             bdlf::PlaceHolders::_3,  // events
-                             bdlf::PlaceHolders::_4,  // peer
-                             bmqu::Time::highResolutionTimer()));
+        [this, recoveryStartTime = bmqu::Time::highResolutionTimer()](
+            int                        recoveredPartitionId,
+            int                        status,
+            const bsl::vector<BlobSp>& recoveryEvents,
+            mqbnet::ClusterNode*       recoveryPeer) {
+            onPartitionRecovery(recoveredPartitionId,
+                                status,
+                                recoveryEvents,
+                                recoveryPeer,
+                                recoveryStartTime);
+        });
 }
 
 void StorageManager::onPartitionRecovery(
@@ -414,7 +416,9 @@ void StorageManager::onPartitionRecovery(
         d_clusterData_p->scheduler().scheduleRecurringEvent(
             &d_gcMessagesEventHandle,
             bsls::TimeInterval(k_GC_MESSAGES_INTERVAL_SECONDS),
-            bdlf::BindUtil::bind(&StorageManager::forceFlushFileStores, this));
+            [this]() {
+                forceFlushFileStores();
+            });
 
         d_recoveryStatusCb(0, d_recoveredPrimaryLeaseIds);
     }
@@ -691,10 +695,9 @@ void StorageManager::setPrimaryForPartitionDispatched(
     d_recoveryManager_mp->startPartitionPrimarySync(
         fs,
         peers,
-        bdlf::BindUtil::bind(&StorageManager::onPartitionPrimarySync,
-                             this,
-                             bdlf::PlaceHolders::_1,    // partitionId
-                             bdlf::PlaceHolders::_2));  // status
+        [this](int syncedPartitionId, int status) {
+            onPartitionPrimarySync(syncedPartitionId, status);
+        });
 }
 
 void StorageManager::clearPrimaryForPartitionDispatched(
@@ -836,12 +839,9 @@ void StorageManager::processPartitionSyncEvent(
     mqbs::FileStore* fs = d_fileStores[pid].get();
     BSLS_ASSERT_SAFE(fs);
 
-    fs->execute(bdlf::BindUtil::bind(
-        &StorageManager::processPartitionSyncEventDispatched,
-        this,
-        pid,
-        event.blob(),
-        source));
+    fs->execute([this, pid, blob = event.blob(), source]() {
+        processPartitionSyncEventDispatched(pid, blob, source);
+    });
 }
 
 void StorageManager::processPartitionSyncEventDispatched(
@@ -1166,14 +1166,21 @@ void StorageManager::unregisterQueue(const bmqt::Uri& uri, int partitionId)
     bsl::shared_ptr<mqbevt::DispatcherEvent> event_sp =
         d_cluster_p->getEvent<mqbevt::DispatcherEvent>();
     (*event_sp).callback().set(
-        bdlf::BindUtil::bind(&mqbc::StorageUtil::unregisterQueueDispatched,
-                             fs,
-                             &d_storages[partitionId],
-                             d_storageLockVec[partitionId].get(),
-                             d_clusterData_p,
-                             partitionId,
-                             bsl::cref(d_partitionInfoVec[partitionId]),
-                             uri));
+        [fs,
+         storageMap   = &d_storages[partitionId],
+         storagesLock = d_storageLockVec[partitionId].get(),
+         clusterData  = d_clusterData_p,
+         partitionId,
+         &pinfo = d_partitionInfoVec[partitionId],
+         uri]() {
+            mqbc::StorageUtil::unregisterQueueDispatched(fs,
+                                                         storageMap,
+                                                         storagesLock,
+                                                         clusterData,
+                                                         partitionId,
+                                                         pinfo,
+                                                         uri);
+        });
 
     fs->dispatchEvent(bsl::move(event_sp));
 }
@@ -1275,12 +1282,17 @@ int StorageManager::start(bsl::ostream& errorDescription)
     d_clusterData_p->scheduler().scheduleRecurringEvent(
         &d_storageMonitorEventHandle,
         bsls::TimeInterval(bdlt::TimeUnitRatio::k_SECONDS_PER_MINUTE),
-        bdlf::BindUtil::bind(&mqbc::StorageUtil::storageMonitorCb,
-                             &d_lowDiskspaceWarning,
-                             &d_isStarted,
-                             d_minimumRequiredDiskSpace,
-                             d_clusterData_p->identity().description(),
-                             d_clusterConfig.partitionConfig()));
+        [lowDiskspaceWarning      = &d_lowDiskspaceWarning,
+         isStarted                = &d_isStarted,
+         minimumRequiredDiskSpace = d_minimumRequiredDiskSpace,
+         clusterDescription       = d_clusterData_p->identity().description(),
+         partitionConfig          = d_clusterConfig.partitionConfig()]() {
+            mqbc::StorageUtil::storageMonitorCb(lowDiskspaceWarning,
+                                                isStarted,
+                                                minimumRequiredDiskSpace,
+                                                clusterDescription,
+                                                partitionConfig);
+        });
 
     rc = mqbc::StorageUtil::assignPartitionDispatcherThreads(
         d_miscWorkThreadPool_p,
@@ -1293,23 +1305,26 @@ int StorageManager::start(bsl::ostream& errorDescription)
         &d_allocators,
         errorDescription,
         d_replicationFactor,
-        bdlf::BindUtil::bind(&StorageManager::recoveredQueuesCb,
-                             this,
-                             bdlf::PlaceHolders::_1,   // partitionId
-                             bdlf::PlaceHolders::_2),  // queueKeyUriMap)
-        bdlf::BindUtil::bind(&StorageManager::queueCreationCb,
-                             this,
-                             bdlf::PlaceHolders::_1,   // partitionId
-                             bdlf::PlaceHolders::_2,   // QueueUri
-                             bdlf::PlaceHolders::_3,   // QueueKey
-                             bdlf::PlaceHolders::_4,   // AppInfos
-                             bdlf::PlaceHolders::_5),  // IsNewQueue)
-        bdlf::BindUtil::bind(&StorageManager::queueDeletionCb,
-                             this,
-                             bdlf::PlaceHolders::_1,    // partitionId
-                             bdlf::PlaceHolders::_2,    // QueueUri
-                             bdlf::PlaceHolders::_3,    // QueueKey
-                             bdlf::PlaceHolders::_4));  // AppKey
+        [this](int partitionId, const QueueKeyInfoMap* queueKeyInfoMap) {
+            recoveredQueuesCb(partitionId, queueKeyInfoMap);
+        },
+        [this](int                     partitionId,
+               const bmqt::Uri&        uri,
+               const mqbu::StorageKey& queueKey,
+               const AppInfos&         appIdKeyPairs,
+               bool                    isNewQueue) {
+            queueCreationCb(partitionId,
+                            uri,
+                            queueKey,
+                            appIdKeyPairs,
+                            isNewQueue);
+        },
+        [this](int                     partitionId,
+               const bmqt::Uri&        uri,
+               const mqbu::StorageKey& queueKey,
+               const mqbu::StorageKey& appKey) {
+            queueDeletionCb(partitionId, uri, queueKey, appKey);
+        });
 
     BALL_LOG_INFO_BLOCK
     {
@@ -1377,9 +1392,9 @@ int StorageManager::start(bsl::ostream& errorDescription)
         mqbs::FileStore* fs = d_fileStores[i].get();
         BSLS_ASSERT_SAFE(fs);
 
-        fs->execute(bdlf::BindUtil::bind(&StorageManager::startRecoveryCb,
-                                         this,
-                                         static_cast<int>(i)));  // partitionId
+        fs->execute([this, partitionId = static_cast<int>(i)]() {
+            startRecoveryCb(partitionId);
+        });
     }
 
     d_isStarted = true;
@@ -1405,13 +1420,11 @@ void StorageManager::stop()
         &d_storageMonitorEventHandle);
     d_recoveryManager_mp->stop();
 
-    mqbc::StorageUtil::stop(
-        &d_fileStores,
-        d_clusterData_p->identity().description(),
-        bdlf::BindUtil::bind(&StorageManager::shutdownCb,
-                             this,
-                             bdlf::PlaceHolders::_1,    // partitionId
-                             bdlf::PlaceHolders::_2));  // latch
+    mqbc::StorageUtil::stop(&d_fileStores,
+                            d_clusterData_p->identity().description(),
+                            [this](int partitionId, bslmt::Latch* latch) {
+                                shutdownCb(partitionId, latch);
+                            });
 }
 
 void StorageManager::initializeQueueKeyInfoMap(
@@ -1466,13 +1479,12 @@ void StorageManager::setPrimaryForPartition(int                  partitionId,
         }
     }
 
-    fs->execute(
-        bdlf::BindUtil::bind(&StorageManager::setPrimaryForPartitionDispatched,
-                             this,
-                             partitionId,
-                             primaryNode,
-                             primaryLeaseId,
-                             peers));
+    fs->execute([this, partitionId, primaryNode, primaryLeaseId, peers]() {
+        setPrimaryForPartitionDispatched(partitionId,
+                                         primaryNode,
+                                         primaryLeaseId,
+                                         peers);
+    });
 }
 
 void StorageManager::clearPrimaryForPartition(int                  partitionId,
@@ -1490,11 +1502,9 @@ void StorageManager::clearPrimaryForPartition(int                  partitionId,
     mqbs::FileStore* fs = d_fileStores[pid].get();
     BSLS_ASSERT_SAFE(fs);
 
-    fs->execute(bdlf::BindUtil::bind(
-        &StorageManager::clearPrimaryForPartitionDispatched,
-        this,
-        partitionId,
-        primary));
+    fs->execute([this, partitionId, primary]() {
+        clearPrimaryForPartitionDispatched(partitionId, primary);
+    });
 }
 
 void StorageManager::setPrimaryStatusForPartition(
@@ -1666,12 +1676,9 @@ void StorageManager::processStorageEvent(const mqbevt::StorageEvent& event)
     mqbs::FileStore* fs = d_fileStores[pid].get();
     BSLS_ASSERT_SAFE(fs);
 
-    fs->execute(
-        bdlf::BindUtil::bind(&StorageManager::processStorageEventDispatched,
-                             this,
-                             pid,
-                             event.blob(),
-                             source));
+    fs->execute([this, pid, blob = event.blob(), source]() {
+        processStorageEventDispatched(pid, blob, source);
+    });
 }
 
 void StorageManager::processStorageSyncRequest(
@@ -1708,12 +1715,9 @@ void StorageManager::processStorageSyncRequest(
 
     BSLS_ASSERT_SAFE(d_recoveryManager_mp->isStarted());
 
-    d_fileStores[partitionId]->execute(bdlf::BindUtil::bind(
-        &StorageManager::processStorageSyncRequestDispatched,
-        this,
-        partitionId,
-        message,
-        source));
+    d_fileStores[partitionId]->execute([this, partitionId, message, source]() {
+        processStorageSyncRequestDispatched(partitionId, message, source);
+    });
 }
 
 void StorageManager::processPartitionSyncStateRequest(
@@ -1751,12 +1755,11 @@ void StorageManager::processPartitionSyncStateRequest(
         return;  // RETURN
     }
 
-    d_fileStores[partitionId]->execute(bdlf::BindUtil::bind(
-        &StorageManager::processPartitionSyncStateRequestDispatched,
-        this,
-        partitionId,
-        message,
-        source));
+    d_fileStores[partitionId]->execute([this, partitionId, message, source]() {
+        processPartitionSyncStateRequestDispatched(partitionId,
+                                                   message,
+                                                   source);
+    });
 }
 
 void StorageManager::processPartitionSyncDataRequest(
@@ -1794,12 +1797,11 @@ void StorageManager::processPartitionSyncDataRequest(
         return;  // RETURN
     }
 
-    d_fileStores[partitionId]->execute(bdlf::BindUtil::bind(
-        &StorageManager::processPartitionSyncDataRequestDispatched,
-        this,
-        partitionId,
-        message,
-        source));
+    d_fileStores[partitionId]->execute([this, partitionId, message, source]() {
+        processPartitionSyncDataRequestDispatched(partitionId,
+                                                  message,
+                                                  source);
+    });
 }
 
 void StorageManager::processPartitionSyncDataRequestStatus(
@@ -1837,12 +1839,11 @@ void StorageManager::processPartitionSyncDataRequestStatus(
         return;  // RETURN
     }
 
-    d_fileStores[partitionId]->execute(bdlf::BindUtil::bind(
-        &StorageManager::processPartitionSyncDataRequestStatusDispatched,
-        this,
-        partitionId,
-        message,
-        source));
+    d_fileStores[partitionId]->execute([this, partitionId, message, source]() {
+        processPartitionSyncDataRequestStatusDispatched(partitionId,
+                                                        message,
+                                                        source);
+    });
 }
 
 void StorageManager::processRecoveryEvent(const mqbevt::RecoveryEvent& event)
@@ -1912,11 +1913,12 @@ void StorageManager::processRecoveryEvent(const mqbevt::RecoveryEvent& event)
     BSLS_ASSERT_SAFE(fs);
 
     // All good.  Forward the event to recovery manager.
-    fs->execute(bdlf::BindUtil::bind(&RecoveryManager::processRecoveryEvent,
-                                     d_recoveryManager_mp.get(),
-                                     pid,
-                                     event.blob(),
-                                     source));
+    fs->execute([recoveryManager = d_recoveryManager_mp.get(),
+                 pid,
+                 blob = event.blob(),
+                 source]() {
+        recoveryManager->processRecoveryEvent(pid, blob, source);
+    });
 }
 
 void StorageManager::processReceiptEvent(const bmqp::Event&   event,
@@ -1956,11 +1958,12 @@ void StorageManager::processReceiptEvent(const bmqp::Event&   event,
 
     // TODO: The same event can be dispatched to the 'fs' without this 'bind'
     //       (and potential heap allocation).
-    fs->execute(bdlf::BindUtil::bind(&mqbs::FileStore::processReceiptEvent,
-                                     fs,
-                                     receipt->primaryLeaseId(),
-                                     receipt->sequenceNum(),
-                                     source));
+    fs->execute([fs,
+                 primaryLeaseId = receipt->primaryLeaseId(),
+                 sequenceNum    = receipt->sequenceNum(),
+                 source]() {
+        fs->processReceiptEvent(primaryLeaseId, sequenceNum, source);
+    });
 }
 
 void StorageManager::processPrimaryStatusAdvisory(
@@ -1982,13 +1985,18 @@ void StorageManager::processPrimaryStatusAdvisory(
     BSLS_ASSERT_SAFE(fs);
 
     fs->execute(
-        bdlf::BindUtil::bind(&processPrimaryStatusAdvisoryDispatched,
-                             fs,
-                             &d_partitionInfoVec[advisory.partitionId()],
-                             advisory,
-                             d_clusterData_p->identity().description(),
-                             source,
-                             false));  // isFSMWorkflow
+        [fs,
+         pinfo = &d_partitionInfoVec[advisory.partitionId()],
+         advisory,
+         clusterDescription = d_clusterData_p->identity().description(),
+         source]() {
+            processPrimaryStatusAdvisoryDispatched(fs,
+                                                   pinfo,
+                                                   advisory,
+                                                   clusterDescription,
+                                                   source,
+                                                   false);  // isFSMWorkflow
+        });
 }
 
 void StorageManager::processReplicaStatusAdvisory(
@@ -2005,14 +2013,19 @@ void StorageManager::processReplicaStatusAdvisory(
     mqbs::FileStore* fs = d_fileStores[partitionId].get();
     BSLS_ASSERT_SAFE(fs);
 
-    fs->execute(bdlf::BindUtil::bind(
-        &mqbc::StorageUtil::processReplicaStatusAdvisoryDispatched,
-        d_clusterData_p,
-        fs,
-        partitionId,
-        bsl::cref(d_partitionInfoVec[partitionId]),
-        source,
-        status));
+    fs->execute([clusterData = d_clusterData_p,
+                 fs,
+                 partitionId,
+                 &pinfo = d_partitionInfoVec[partitionId],
+                 source,
+                 status]() {
+        mqbc::StorageUtil::processReplicaStatusAdvisoryDispatched(clusterData,
+                                                                  fs,
+                                                                  partitionId,
+                                                                  pinfo,
+                                                                  source,
+                                                                  status);
+    });
 }
 
 void StorageManager::processShutdownEvent()
@@ -2026,10 +2039,9 @@ void StorageManager::processShutdownEvent()
     for (size_t i = 0; i < d_fileStores.size(); ++i) {
         mqbs::FileStore* fs = d_fileStores[i].get();
 
-        fs->execute(bdlf::BindUtil::bind(
-            &StorageManager::processShutdownEventDispatched,
-            this,
-            i));  // partitionId
+        fs->execute([this, partitionId = static_cast<int>(i)]() {
+            processShutdownEventDispatched(partitionId);
+        });
     }
 }
 
