@@ -228,8 +228,8 @@ void PropertyBag::loadAll(bsl::vector<bslma::ManagedPtr<Value> >* dest) const
 bool PropertyBag::load(bslma::ManagedPtr<Value>* dest,
                        const bslstl::StringRef&  key) const
 {
-    bsls::SpinLockGuard      guard(&d_lock);  // LOCK
-    ValueMap::const_iterator iter = d_values.find(key);
+    bsls::SpinLockGuard guard(&d_lock);  // LOCK
+    auto                iter = d_values.find(key);
     if (iter == d_values.end()) {
         return false;  // RETURN
     }
@@ -240,8 +240,8 @@ bool PropertyBag::load(bslma::ManagedPtr<Value>* dest,
 
 bool PropertyBag::load(int* dest, const bslstl::StringRef& key) const
 {
-    bsls::SpinLockGuard      guard(&d_lock);  // LOCK
-    ValueMap::const_iterator iter = d_values.find(key);
+    bsls::SpinLockGuard guard(&d_lock);  // LOCK
+    auto                iter = d_values.find(key);
     if (iter == d_values.end() || !iter->second->isDatum() ||
         !iter->second->theDatum().isInteger()) {
         return false;  // RETURN
@@ -254,8 +254,8 @@ bool PropertyBag::load(int* dest, const bslstl::StringRef& key) const
 bool PropertyBag::load(bsls::Types::Int64*      dest,
                        const bslstl::StringRef& key) const
 {
-    bsls::SpinLockGuard      guard(&d_lock);  // LOCK
-    ValueMap::const_iterator iter = d_values.find(key);
+    bsls::SpinLockGuard guard(&d_lock);  // LOCK
+    auto                iter = d_values.find(key);
     if (iter == d_values.end() || !iter->second->isDatum() ||
         !iter->second->theDatum().isInteger64()) {
         return false;  // RETURN
@@ -268,8 +268,8 @@ bool PropertyBag::load(bsls::Types::Int64*      dest,
 bool PropertyBag::load(bslstl::StringRef*       dest,
                        const bslstl::StringRef& key) const
 {
-    bsls::SpinLockGuard      guard(&d_lock);  // LOCK
-    ValueMap::const_iterator iter = d_values.find(key);
+    bsls::SpinLockGuard guard(&d_lock);  // LOCK
+    auto                iter = d_values.find(key);
     if (iter == d_values.end() || !iter->second->isDatum() ||
         !iter->second->theDatum().isString()) {
         return false;  // RETURN
