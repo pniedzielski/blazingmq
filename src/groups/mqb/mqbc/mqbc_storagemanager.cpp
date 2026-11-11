@@ -44,9 +44,6 @@
 
 // BDE
 #include <bdlbb_blob.h>
-#include <bdlf_bind.h>
-#include <bdlf_memfn.h>
-#include <bdlf_placeholder.h>
 #include <bsl_algorithm.h>
 #include <bsl_queue.h>
 #include <bsl_utility.h>
@@ -260,10 +257,9 @@ void StorageManager::onWatchdog(int partitionId, int generation)
     // executed by the *SCHEDULER* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&StorageManager::onWatchdogDispatched,
-                             this,
-                             partitionId,
-                             generation),
+        [this, partitionId, generation]() {
+            onWatchdogDispatched(partitionId, generation);
+        },
         d_cluster_p);
 }
 
@@ -403,11 +399,9 @@ void StorageManager::enqueuePartitionFSMEvent(
         enqueuePartitionFSMEventDispatched(event, eventData);
     }
     else {
-        fs->execute(bdlf::BindUtil::bind(
-            &StorageManager::enqueuePartitionFSMEventDispatched,
-            this,
-            event,
-            eventData));
+        fs->execute([this, event, eventData]() {
+            enqueuePartitionFSMEventDispatched(event, eventData);
+        });
     }
 }
 
@@ -812,11 +806,9 @@ void StorageManager::sendReplicaDataRequestPush(
         replicaDataRqst.endSequenceNumber() =
             nodeToPSNCtxMap.at(selfNode).d_PSN;
 
-        request->setResponseCb(
-            bdlf::BindUtil::bind(&StorageManager::processReplicaDataResponse,
-                                 this,
-                                 bdlf::PlaceHolders::_1,
-                                 destNode));
+        request->setResponseCb([this, destNode](const RequestSp& context) {
+            processReplicaDataResponse(context, destNode);
+        });
 
         const bmqt::GenericResult::Enum status =
             d_clusterData_p->cluster().sendRequest(request,
@@ -882,11 +874,9 @@ void StorageManager::sendReplicaDataRequestDrop(
         replicaDataRqst.replicaDataType() =
             bmqp_ctrlmsg::ReplicaDataType::E_DROP;
 
-        request->setResponseCb(
-            bdlf::BindUtil::bind(&StorageManager::processReplicaDataResponse,
-                                 this,
-                                 bdlf::PlaceHolders::_1,
-                                 destNode));
+        request->setResponseCb([this, destNode](const RequestSp& context) {
+            processReplicaDataResponse(context, destNode);
+        });
 
         const bmqt::GenericResult::Enum status =
             d_clusterData_p->cluster().sendRequest(request,
@@ -1473,11 +1463,9 @@ void StorageManager::processPrimaryStateResponse(
     }
     else {
         d_dispatcher_p->execute(
-            bdlf::BindUtil::bind(
-                &StorageManager::processPrimaryStateResponseDispatched,
-                this,
-                context,
-                responder),
+            [this, context, responder]() {
+                processPrimaryStateResponseDispatched(context, responder);
+            },
             d_cluster_p);
     }
 }
@@ -1591,11 +1579,9 @@ void StorageManager::processReplicaStateResponse(
     // executed by *any* thread
     // dispatch to the CLUSTER DISPATCHER
     d_dispatcher_p->execute(
-        bdlf::BindUtil::bind(
-            &StorageManager::processReplicaStateResponseDispatched,
-            this,
-            requestContext,
-            responder),
+        [this, requestContext, responder]() {
+            processReplicaStateResponseDispatched(requestContext, responder);
+        },
         d_cluster_p);
 }
 
@@ -1783,11 +1769,9 @@ void StorageManager::processReplicaDataResponse(const RequestSp&     context,
 
     // dispatch to the CLUSTER DISPATCHER
     d_dispatcher_p->execute(
-        bdlf::BindUtil::bind(
-            &StorageManager::processReplicaDataResponseDispatched,
-            this,
-            context,
-            responder),
+        [this, context, responder]() {
+            processReplicaDataResponseDispatched(context, responder);
+        },
         d_cluster_p);
 }
 
@@ -1844,10 +1828,9 @@ void StorageManager::do_startWatchdog(
         d_clusterData_p->scheduler().scheduleEvent(
             &ctx.d_eventHandle,
             d_clusterData_p->scheduler().now() + d_watchdogTimeoutInterval,
-            bdlf::BindUtil::bind(&StorageManager::onWatchdog,
-                                 this,
-                                 partitionId,
-                                 generation));
+            [this, partitionId, generation]() {
+                onWatchdog(partitionId, generation);
+            });
 
         ctx.d_active = true;
     }
@@ -2170,10 +2153,9 @@ void StorageManager::do_replicaStateRequest(
             selfFirstSyncAfterRolloverPSN;
 
         contextSp->setResponseCb(
-            bdlf::BindUtil::bind(&StorageManager::processReplicaStateResponse,
-                                 this,
-                                 bdlf::PlaceHolders::_1,
-                                 replica));
+            [this, replica](const RequestSp& requestContext) {
+                processReplicaStateResponse(requestContext, replica);
+            });
 
         const bmqt::GenericResult::Enum status =
             d_clusterData_p->cluster().sendRequest(contextSp,
@@ -2427,11 +2409,9 @@ void StorageManager::do_primaryStateRequest(
     primaryStateRequest.firstSyncPointAfterRolloverSequenceNumber() =
         getSelfFirstSyncPointAfterRolloverPSN(partitionId);
 
-    request->setResponseCb(
-        bdlf::BindUtil::bind(&StorageManager::processPrimaryStateResponse,
-                             this,
-                             bdlf::PlaceHolders::_1,
-                             primary));
+    request->setResponseCb([this, primary](const RequestSp& context) {
+        processPrimaryStateResponse(context, primary);
+    });
 
     bmqt::GenericResult::Enum status = d_clusterData_p->cluster().sendRequest(
         request,
@@ -2627,11 +2607,9 @@ void StorageManager::do_replicaDataRequestPull(
     replicaDataRequest.endSequenceNumber() =
         d_nodeToPSNCtxMapVec[partitionId][destNode].d_PSN;
 
-    request->setResponseCb(
-        bdlf::BindUtil::bind(&StorageManager::processReplicaDataResponse,
-                             this,
-                             bdlf::PlaceHolders::_1,
-                             destNode));
+    request->setResponseCb([this, destNode](const RequestSp& context) {
+        processReplicaDataResponse(context, destNode);
+    });
 
     const bmqt::GenericResult::Enum status =
         d_clusterData_p->cluster().sendRequest(request,
@@ -4172,23 +4150,26 @@ int StorageManager::start(bsl::ostream& errorDescription)
         &d_allocators,
         errorDescription,
         d_replicationFactor,
-        bdlf::BindUtil::bind(&StorageManager::recoveredQueuesCb,
-                             this,
-                             bdlf::PlaceHolders::_1,   // partitionId
-                             bdlf::PlaceHolders::_2),  // queueKeyUriMap)
-        bdlf::BindUtil::bind(&StorageManager::queueCreationCb,
-                             this,
-                             bdlf::PlaceHolders::_1,   // partitionId
-                             bdlf::PlaceHolders::_2,   // QueueUri
-                             bdlf::PlaceHolders::_3,   // QueueKey
-                             bdlf::PlaceHolders::_4,   // AppInfos
-                             bdlf::PlaceHolders::_5),  // IsNewQueue)
-        bdlf::BindUtil::bind(&StorageManager::queueDeletionCb,
-                             this,
-                             bdlf::PlaceHolders::_1,    // partitionId
-                             bdlf::PlaceHolders::_2,    // QueueUri
-                             bdlf::PlaceHolders::_3,    // QueueKey
-                             bdlf::PlaceHolders::_4));  // AppKey
+        [this](int partitionId, const QueueKeyInfoMap* queueKeyInfoMap) {
+            recoveredQueuesCb(partitionId, queueKeyInfoMap);
+        },
+        [this](int                     partitionId,
+               const bmqt::Uri&        uri,
+               const mqbu::StorageKey& queueKey,
+               const AppInfos&         appIdKeyPairs,
+               bool                    isNewQueue) {
+            queueCreationCb(partitionId,
+                            uri,
+                            queueKey,
+                            appIdKeyPairs,
+                            isNewQueue);
+        },
+        [this](int                     partitionId,
+               const bmqt::Uri&        uri,
+               const mqbu::StorageKey& queueKey,
+               const mqbu::StorageKey& appKey) {
+            queueDeletionCb(partitionId, uri, queueKey, appKey);
+        });
 
     if (rc != rc_SUCCESS) {
         return rc * 10 + rc_THREAD_POOL_START_FAILURE;  // RETURN
@@ -4226,9 +4207,9 @@ int StorageManager::start(bsl::ostream& errorDescription)
         mqbs::FileStore* fs = d_fileStores[i].get();
         BSLS_ASSERT_SAFE(fs);
 
-        fs->execute(bdlf::BindUtil::bind(&StorageManager::startRecoveryCb,
-                                         this,
-                                         static_cast<int>(i)));  // partitionId
+        fs->execute([this, partitionId = static_cast<int>(i)]() {
+            startRecoveryCb(partitionId);
+        });
     }
 
     // Schedule a periodic event (every minute) which monitors storage
@@ -4236,12 +4217,17 @@ int StorageManager::start(bsl::ostream& errorDescription)
     d_clusterData_p->scheduler().scheduleRecurringEvent(
         &d_storageMonitorEventHandle,
         bsls::TimeInterval(bdlt::TimeUnitRatio::k_SECONDS_PER_MINUTE),
-        bdlf::BindUtil::bind(&StorageUtil::storageMonitorCb,
-                             &d_lowDiskspaceWarning,
-                             &d_isStarted,
-                             d_minimumRequiredDiskSpace,
-                             d_clusterData_p->identity().description(),
-                             d_clusterConfig.partitionConfig()));
+        [lowDiskspaceWarning      = &d_lowDiskspaceWarning,
+         isStarted                = &d_isStarted,
+         minimumRequiredDiskSpace = d_minimumRequiredDiskSpace,
+         clusterDescription       = d_clusterData_p->identity().description(),
+         partitionConfig          = d_clusterConfig.partitionConfig()]() {
+            StorageUtil::storageMonitorCb(lowDiskspaceWarning,
+                                          isStarted,
+                                          minimumRequiredDiskSpace,
+                                          clusterDescription,
+                                          partitionConfig);
+        });
 
     // Schedule a periodic event which will in turn enqueue an event in each
     // partition's dispatcher thread for GC'ing expired messages as well as
@@ -4249,7 +4235,9 @@ int StorageManager::start(bsl::ostream& errorDescription)
     d_clusterData_p->scheduler().scheduleRecurringEvent(
         &d_gcMessagesEventHandle,
         bsls::TimeInterval(k_GC_MESSAGES_INTERVAL_SECONDS),
-        bdlf::BindUtil::bind(&StorageManager::forceFlushFileStores, this));
+        [this]() {
+            forceFlushFileStores();
+        });
 
     d_isStarted = true;
     return rc_SUCCESS;
@@ -4273,19 +4261,23 @@ void StorageManager::stop()
         BSLS_ASSERT_SAFE(fs);
 
         fs->execute(
-            bdlf::BindUtil::bind(&StorageUtil::clearPrimaryForPartition,
-                                 fs,
-                                 &d_partitionInfoVec[pid],
-                                 d_clusterData_p->identity().description(),
-                                 pid));
+            [fs,
+             partitionInfo      = &d_partitionInfoVec[pid],
+             clusterDescription = d_clusterData_p->identity().description(),
+             pid]() {
+                StorageUtil::clearPrimaryForPartition(fs,
+                                                      partitionInfo,
+                                                      clusterDescription,
+                                                      static_cast<int>(pid));
+            });
     }
 
     for (int p = 0; p < d_clusterConfig.partitionConfig().numPartitions();
          p++) {
         d_fileStores[p]->execute(
-            bdlf::BindUtil::bind(&PartitionFSM::unregisterObserver,
-                                 d_partitionFSMVec[p].get(),
-                                 this));
+            [partitionFSM = d_partitionFSMVec[p].get(), this]() {
+                partitionFSM->unregisterObserver(this);
+            });
     }
 
     d_clusterData_p->scheduler().cancelEventAndWait(&d_gcMessagesEventHandle);
@@ -4293,13 +4285,11 @@ void StorageManager::stop()
         &d_storageMonitorEventHandle);
     d_recoveryManager_mp->stop();
 
-    StorageUtil::stop(
-        &d_fileStores,
-        d_clusterData_p->identity().description(),
-        bdlf::BindUtil::bind(&StorageManager::shutdownCb,
-                             this,
-                             bdlf::PlaceHolders::_1,    // partitionId
-                             bdlf::PlaceHolders::_2));  // latch
+    StorageUtil::stop(&d_fileStores,
+                      d_clusterData_p->identity().description(),
+                      [this](int partitionId, bslmt::Latch* latch) {
+                          shutdownCb(partitionId, latch);
+                      });
 
     d_miscWorkThreadPool.stop();
 }
@@ -4389,14 +4379,21 @@ void StorageManager::unregisterQueue(const bmqt::Uri& uri, int partitionId)
     bsl::shared_ptr<mqbevt::DispatcherEvent> event_sp =
         d_cluster_p->getEvent<mqbevt::DispatcherEvent>();
     (*event_sp).setCallback(
-        bdlf::BindUtil::bind(&StorageUtil::unregisterQueueDispatched,
-                             d_fileStores[partitionId].get(),
-                             &d_storages[partitionId],
-                             d_storageLockVec[partitionId].get(),
-                             d_clusterData_p,
-                             partitionId,
-                             bsl::cref(d_partitionInfoVec[partitionId]),
-                             uri));
+        [fs           = d_fileStores[partitionId].get(),
+         storageMap   = &d_storages[partitionId],
+         storagesLock = d_storageLockVec[partitionId].get(),
+         clusterData  = d_clusterData_p,
+         partitionId,
+         &partitionInfo = d_partitionInfoVec[partitionId],
+         uri]() {
+            StorageUtil::unregisterQueueDispatched(fs,
+                                                   storageMap,
+                                                   storagesLock,
+                                                   clusterData,
+                                                   partitionId,
+                                                   partitionInfo,
+                                                   uri);
+        });
 
     d_fileStores[partitionId]->dispatchEvent(bsl::move(event_sp));
 }
@@ -4450,11 +4447,9 @@ void StorageManager::clearPrimaryForPartition(int                  partitionId,
     mqbs::FileStore* fs = d_fileStores[partitionId].get();
     BSLS_ASSERT_SAFE(fs);
 
-    fs->execute(bdlf::BindUtil::bind(
-        &StorageManager::clearPrimaryForPartitionDispatched,
-        this,
-        partitionId,
-        primary));
+    fs->execute([this, partitionId, primary]() {
+        clearPrimaryForPartitionDispatched(partitionId, primary);
+    });
 }
 
 void StorageManager::setPrimaryStatusForPartition(
@@ -4471,11 +4466,9 @@ void StorageManager::setPrimaryStatusForPartition(
     mqbs::FileStore* fs = d_fileStores[partitionId].get();
     BSLS_ASSERT_SAFE(fs);
 
-    fs->execute(bdlf::BindUtil::bind(
-        &StorageManager::setPrimaryStatusForPartitionDispatched,
-        this,
-        partitionId,
-        value));
+    fs->execute([this, partitionId, value]() {
+        setPrimaryStatusForPartitionDispatched(partitionId, value);
+    });
 }
 
 void StorageManager::stopPFSMs()
@@ -4914,13 +4907,13 @@ void StorageManager::processReceiptEvent(const bmqp::Event&   event,
     BSLS_ASSERT_SAFE(fs);
 
     // TODO: The same event can be dispatched to the 'fs' without this
-    // 'bind'
-    //       (and potential heap allocation).
-    fs->execute(bdlf::BindUtil::bind(&mqbs::FileStore::processReceiptEvent,
-                                     fs,
-                                     receipt->primaryLeaseId(),
-                                     receipt->sequenceNum(),
-                                     source));
+    //       lambda (and potential heap allocation).
+    fs->execute([fs,
+                 primaryLeaseId = receipt->primaryLeaseId(),
+                 sequenceNum    = receipt->sequenceNum(),
+                 source]() {
+        fs->processReceiptEvent(primaryLeaseId, sequenceNum, source);
+    });
 }
 
 void StorageManager::processPrimaryStatusAdvisory(
@@ -4959,14 +4952,19 @@ void StorageManager::processReplicaStatusAdvisory(
     mqbs::FileStore* fs = d_fileStores[partitionId].get();
     BSLS_ASSERT_SAFE(fs);
 
-    fs->execute(bdlf::BindUtil::bind(
-        &StorageUtil::processReplicaStatusAdvisoryDispatched,
-        d_clusterData_p,
-        fs,
-        partitionId,
-        bsl::cref(d_partitionInfoVec[partitionId]),
-        source,
-        status));
+    fs->execute([clusterData = d_clusterData_p,
+                 fs,
+                 partitionId,
+                 &partitionInfo = d_partitionInfoVec[partitionId],
+                 source,
+                 status]() {
+        StorageUtil::processReplicaStatusAdvisoryDispatched(clusterData,
+                                                            fs,
+                                                            partitionId,
+                                                            partitionInfo,
+                                                            source,
+                                                            status);
+    });
 }
 
 void StorageManager::processShutdownEvent()
@@ -4980,10 +4978,9 @@ void StorageManager::processShutdownEvent()
     for (size_t i = 0; i < d_fileStores.size(); ++i) {
         mqbs::FileStore* fs = d_fileStores[i].get();
 
-        fs->execute(bdlf::BindUtil::bind(
-            &StorageManager::processShutdownEventDispatched,
-            this,
-            i));  // partitionId
+        fs->execute([this, partitionId = static_cast<int>(i)]() {
+            processShutdownEventDispatched(partitionId);
+        });
     }
 }
 

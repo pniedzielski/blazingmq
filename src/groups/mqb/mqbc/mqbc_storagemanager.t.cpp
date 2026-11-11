@@ -55,7 +55,6 @@
 // BDE
 #include <bdlbb_blob.h>
 #include <bdlbb_blobutil.h>
-#include <bdlf_bind.h>
 #include <bdlmt_fixedthreadpool.h>
 #include <bdlt_currenttime.h>
 #include <bdlt_epochutil.h>
@@ -219,8 +218,12 @@ struct TestHelper {
 
         bmqu::Time::initialize(
             &bsls::SystemTime::nowRealtimeClock,
-            bdlf::BindUtil::bind(&TestHelper::nowMonotonicClock, this),
-            bdlf::BindUtil::bind(&TestHelper::highResolutionTimer, this),
+            [this]() {
+                return nowMonotonicClock();
+            },
+            [this]() {
+                return highResolutionTimer();
+            },
             bmqtst::TestHelperUtil::allocator());
 
         // Start the cluster
