@@ -137,53 +137,8 @@ class ManagedCallback final {
     /// objects' reusable buffer, with the specified `args` passed to its
     /// constructor.  The buffer must be empty before construction, it is
     /// the user's responsibility to call `reset()` to destroy the callback.
-    template <class CALLBACK_TYPE>
-    void createInplace();
-
-    template <class CALLBACK_TYPE, class ARGS_1>
-    void createInplace(ARGS_1&& args_1);
-
-    template <class CALLBACK_TYPE, class ARGS_1, class ARGS_2>
-    void createInplace(ARGS_1&& args_1, ARGS_2&& args_2);
-
-    template <class CALLBACK_TYPE, class ARGS_1, class ARGS_2, class ARGS_3>
-    void createInplace(ARGS_1&& args_1, ARGS_2&& args_2, ARGS_3&& args_3);
-
-    template <class CALLBACK_TYPE,
-              class ARGS_1,
-              class ARGS_2,
-              class ARGS_3,
-              class ARGS_4>
-    void createInplace(ARGS_1&& args_1,
-                       ARGS_2&& args_2,
-                       ARGS_3&& args_3,
-                       ARGS_4&& args_4);
-
-    template <class CALLBACK_TYPE,
-              class ARGS_1,
-              class ARGS_2,
-              class ARGS_3,
-              class ARGS_4,
-              class ARGS_5>
-    void createInplace(ARGS_1&& args_1,
-                       ARGS_2&& args_2,
-                       ARGS_3&& args_3,
-                       ARGS_4&& args_4,
-                       ARGS_5&& args_5);
-
-    template <class CALLBACK_TYPE,
-              class ARGS_1,
-              class ARGS_2,
-              class ARGS_3,
-              class ARGS_4,
-              class ARGS_5,
-              class ARGS_6>
-    void createInplace(ARGS_1&& args_1,
-                       ARGS_2&& args_2,
-                       ARGS_3&& args_3,
-                       ARGS_4&& args_4,
-                       ARGS_5&& args_5,
-                       ARGS_6&& args_6);
+    template <class CALLBACK_TYPE, class... ARGS>
+    void createInplace(ARGS&&... args);
 
     /// Store the specified `callback` in this object.
     /// Note: these setters are slow because they performs function copy, going
@@ -285,90 +240,10 @@ inline void ManagedCallback::operator()() const
     (*reinterpret_cast<const CallbackFunctor*>(d_callbackBuffer.data()))();
 }
 
-template <class CALLBACK_TYPE>
-inline void ManagedCallback::createInplace()
+template <class CALLBACK_TYPE, class... ARGS>
+inline void ManagedCallback::createInplace(ARGS&&... args)
 {
-    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE();
-}
-
-template <class CALLBACK_TYPE, class ARGS_1>
-inline void ManagedCallback::createInplace(ARGS_1&& args_1)
-{
-    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS_1>(args_1));
-}
-
-template <class CALLBACK_TYPE, class ARGS_1, class ARGS_2>
-inline void ManagedCallback::createInplace(ARGS_1&& args_1, ARGS_2&& args_2)
-{
-    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS_1>(args_1),
-                                               bsl::forward<ARGS_2>(args_2));
-}
-
-template <class CALLBACK_TYPE, class ARGS_1, class ARGS_2, class ARGS_3>
-inline void ManagedCallback::createInplace(ARGS_1&& args_1,
-                                           ARGS_2&& args_2,
-                                           ARGS_3&& args_3)
-{
-    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS_1>(args_1),
-                                               bsl::forward<ARGS_2>(args_2),
-                                               bsl::forward<ARGS_3>(args_3));
-}
-
-template <class CALLBACK_TYPE,
-          class ARGS_1,
-          class ARGS_2,
-          class ARGS_3,
-          class ARGS_4>
-inline void ManagedCallback::createInplace(ARGS_1&& args_1,
-                                           ARGS_2&& args_2,
-                                           ARGS_3&& args_3,
-                                           ARGS_4&& args_4)
-{
-    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS_1>(args_1),
-                                               bsl::forward<ARGS_2>(args_2),
-                                               bsl::forward<ARGS_3>(args_3),
-                                               bsl::forward<ARGS_4>(args_4));
-}
-
-template <class CALLBACK_TYPE,
-          class ARGS_1,
-          class ARGS_2,
-          class ARGS_3,
-          class ARGS_4,
-          class ARGS_5>
-inline void ManagedCallback::createInplace(ARGS_1&& args_1,
-                                           ARGS_2&& args_2,
-                                           ARGS_3&& args_3,
-                                           ARGS_4&& args_4,
-                                           ARGS_5&& args_5)
-{
-    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS_1>(args_1),
-                                               bsl::forward<ARGS_2>(args_2),
-                                               bsl::forward<ARGS_3>(args_3),
-                                               bsl::forward<ARGS_4>(args_4),
-                                               bsl::forward<ARGS_5>(args_5));
-}
-
-template <class CALLBACK_TYPE,
-          class ARGS_1,
-          class ARGS_2,
-          class ARGS_3,
-          class ARGS_4,
-          class ARGS_5,
-          class ARGS_6>
-inline void ManagedCallback::createInplace(ARGS_1&& args_1,
-                                           ARGS_2&& args_2,
-                                           ARGS_3&& args_3,
-                                           ARGS_4&& args_4,
-                                           ARGS_5&& args_5,
-                                           ARGS_6&& args_6)
-{
-    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS_1>(args_1),
-                                               bsl::forward<ARGS_2>(args_2),
-                                               bsl::forward<ARGS_3>(args_3),
-                                               bsl::forward<ARGS_4>(args_4),
-                                               bsl::forward<ARGS_5>(args_5),
-                                               bsl::forward<ARGS_6>(args_6));
+    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS>(args)...);
 }
 
 }  // close package namespace
