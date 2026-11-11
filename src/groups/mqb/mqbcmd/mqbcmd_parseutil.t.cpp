@@ -21,7 +21,6 @@
 // BDE
 #include <baljsn_decoder.h>
 #include <baljsn_decoderoptions.h>
-#include <bdlb_arrayutil.h>
 #include <bdlsb_fixedmeminstreambuf.h>
 #include <bsl_cstddef.h>
 #include <bsl_iostream.h>
@@ -371,8 +370,7 @@ const Test k_TESTS[] = {
 
 void test1_parseExpected()
 {
-    for (const Test* it = k_TESTS; it != bdlb::ArrayUtil::end(k_TESTS); ++it) {
-        const Test& test = *it;
+    for (const Test& test : k_TESTS) {
         if (test.d_expectedJson) {
             verifyExpected(test);
         }
@@ -381,8 +379,7 @@ void test1_parseExpected()
 
 void test2_parseFailure()
 {
-    for (const Test* it = k_TESTS; it != bdlb::ArrayUtil::end(k_TESTS); ++it) {
-        const Test& test = *it;
+    for (const Test& test : k_TESTS) {
         if (!test.d_expectedJson) {
             verifyFailure(test);
         }
@@ -391,8 +388,7 @@ void test2_parseFailure()
 
 void test3_parseFailsWithExtra()
 {
-    for (const Test* it = k_TESTS; it != bdlb::ArrayUtil::end(k_TESTS); ++it) {
-        const Test& test = *it;
+    for (const Test& test : k_TESTS) {
         if (test.d_expectedJson) {
             verifyFailsWithExtra(test);
         }
