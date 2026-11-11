@@ -30,31 +30,17 @@
 namespace BloombergLP {
 namespace bmqp {
 
-namespace {
-
-struct BlobSpCreatorF {
-    bmqp::BlobPoolUtil::BlobSpPool* d_blobSpPool_p;
-
-    explicit BlobSpCreatorF(bmqp::BlobPoolUtil::BlobSpPool* blobSpPool)
-    : d_blobSpPool_p(blobSpPool)
-    {
-        BSLS_ASSERT_SAFE(d_blobSpPool_p);
-    }
-    bsl::shared_ptr<bdlbb::Blob> operator()()
-    {
-        return d_blobSpPool_p->getObject();
-    }
-};
-
-}
-
 // ---------------------
 // class AckEventBuilder
 // ---------------------
 
 AckEventBuilder::AckEventBuilder(BlobSpPool*       blobSpPool_p,
                                  bslma::Allocator* allocator)
-: d_blobSpCreator(bsl::allocator_arg, allocator, BlobSpCreatorF(blobSpPool_p))
+: d_blobSpCreator(bsl::allocator_arg,
+                  allocator,
+                  [blobSpPool_p]() {
+                      return blobSpPool_p->getObject();
+                  })
 , d_blob_sp(0, allocator)       // initialized in `reset()`
 , d_emptyBlob_sp(0, allocator)  // initialized later in constructor
 , d_msgCount(0)
