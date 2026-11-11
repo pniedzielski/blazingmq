@@ -85,7 +85,7 @@
 //..
 //  MQTP::EventFn eventCbCreator(int queueId)
 //  {
-//      return bdlf::BindUtil::bind(&eventCb, bdlf::PlaceHolders::_1);
+//      return [](const MQTP::EventSp& event) { eventCb(event); };
 //  }
 //..
 //
@@ -99,12 +99,15 @@
 //                            bsl::numeric_limits<int>::max()); // maxIdleTime
 //  threadPool.start();
 //
-//  using namespace bdlf::PlaceHolders;
 //  MQTP mfqtp(MQTP::Config(
-//                        3,    // number of queues,
-//                        &threadPool,
-//                        bdlf::BindUtil::bind(&eventCbCreator, _1),
-//                        bdlf::BindUtil::bind(&queueCreator, _1, _2)));
+//              3,    // number of queues,
+//              &threadPool,
+//              [](int queueId, bsls::AtomicInt64*) {
+//                  return eventCbCreator(queueId);
+//              },
+//              [](int queueId, bslma::Allocator* allocator) {
+//                  return queueCreator(queueId, allocator);
+//              }));
 //  mfqtp.start();
 //..
 // Now we can attempt to enqueue some events on our queues.  Since we created
@@ -835,13 +838,17 @@ inline int MultiQueueThreadPool<TYPE>::start()
             d_config.d_eventScheduler_p->scheduleRecurringEvent(
                 &d_alarmMonitorEventHandle,
                 d_config.d_monitorAlarmTimeout,
-                bdlf::BindUtil::bind(&ThisClass::processMonitorEvents, this));
+                [this]() {
+                    processMonitorEvents();
+                });
         }
         if (d_config.d_monitorWarningTimeout != bsls::TimeInterval()) {
             d_config.d_eventScheduler_p->scheduleRecurringEvent(
                 &d_warningMonitorEventHandle,
                 bsls::TimeInterval(k_MONITORING_PERIOD_SEC),
-                bdlf::BindUtil::bind(&ThisClass::checkStuckEvents, this));
+                [this]() {
+                    checkStuckEvents();
+                });
         }
     }
 
