@@ -53,7 +53,7 @@ QueueManager::lookupQueueLocked(const bmqp::QueueId& queueId) const
     // d_queuesLock locked
 
     // Lookup queue
-    QueuesMap::const_iterator it = d_queues.findByKey1(queueId);
+    auto it = d_queues.findByKey1(queueId);
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(it == d_queues.end())) {
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         return QueueSp();  // RETURN
@@ -86,8 +86,7 @@ QueueManager::QueueSp QueueManager::lookupQueueBySubscriptionIdLocked(
     // lookup by 'subscriptionId'
     SubscriptionId id(qId, internalSubscriptionId);
 
-    QueuesBySubscriptions::const_iterator cit = d_queuesBySubscriptionIds.find(
-        id);
+    auto cit = d_queuesBySubscriptionIds.find(id);
 
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
             cit == d_queuesBySubscriptionIds.end())) {
@@ -130,7 +129,7 @@ void QueueManager::insertQueue(const QueueSp& queue)
 
     bsls::SpinLockGuard guard(&d_queuesLock);  // d_queuesLock LOCKED
 
-    UrisMap::iterator uriIter = d_uris.find(
+    auto uriIter = d_uris.find(
         bsl::string(queue->uri().canonical(), d_allocator_p));
     if (uriIter == d_uris.end()) {
         // Canonical URI was not found, this is the first time we insert a
@@ -197,7 +196,7 @@ QueueManager::QueueSp QueueManager::removeQueue(const Queue* queue)
     bsls::SpinLockGuard guard(&d_queuesLock);  // d_queuesLock LOCKED
 
     // Find queue and erase from queues map
-    QueuesMap::iterator iter = d_queues.findByKey1(queueId);
+    auto iter = d_queues.findByKey1(queueId);
     if (iter == d_queues.end()) {
         return QueueSp();  // RETURN
     }
@@ -205,7 +204,7 @@ QueueManager::QueueSp QueueManager::removeQueue(const Queue* queue)
     d_queues.erase(iter);
 
     // Erase appId from subQueueIds map
-    UrisMap::iterator uriIter = d_uris.find(
+    auto uriIter = d_uris.find(
         bsl::string(queue->uri().canonical(), d_allocator_p));
     BSLS_ASSERT_SAFE(uriIter != d_uris.end());
 
@@ -237,8 +236,7 @@ void QueueManager::generateQueueAndSubQueueId(bmqp::QueueId*      queueId,
     bsls::SpinLockGuard guard(&d_queuesLock);  // d_queuesLock LOCKED
 
     // Set the 'queueId'
-    UrisMap::iterator uriIter = d_uris.find(
-        bsl::string(uri.canonical(), d_allocator_p));
+    auto uriIter = d_uris.find(bsl::string(uri.canonical(), d_allocator_p));
     if (uriIter == d_uris.end()) {
         // Canonical URI was not found, generate a new 'queueId'
         queueId->setId(generateNextQueueId());
@@ -511,7 +509,7 @@ int QueueManager::updateStatsOnPutEvent(
 
 void QueueManager::incrementSubStreamCount(const bsl::string& canonicalUri)
 {
-    UrisMap::iterator uriIter = d_uris.find(canonicalUri);
+    auto uriIter = d_uris.find(canonicalUri);
     BSLS_ASSERT_SAFE(uriIter != d_uris.end());
 
     uriIter->second.d_subStreamCount += 1;
@@ -519,7 +517,7 @@ void QueueManager::incrementSubStreamCount(const bsl::string& canonicalUri)
 
 void QueueManager::decrementSubStreamCount(const bsl::string& canonicalUri)
 {
-    UrisMap::iterator uriIter = d_uris.find(canonicalUri);
+    auto uriIter = d_uris.find(canonicalUri);
     BSLS_ASSERT_SAFE(uriIter != d_uris.end());
     BSLS_ASSERT_SAFE(uriIter->second.d_subStreamCount != 0);
 
@@ -528,7 +526,7 @@ void QueueManager::decrementSubStreamCount(const bsl::string& canonicalUri)
 
 void QueueManager::resetSubStreamCount(const bsl::string& canonicalUri)
 {
-    UrisMap::iterator uriIter = d_uris.find(canonicalUri);
+    auto uriIter = d_uris.find(canonicalUri);
     BSLS_ASSERT_SAFE(uriIter != d_uris.end());
 
     uriIter->second.d_subStreamCount = 0;
@@ -565,8 +563,7 @@ QueueManager::QueueSp QueueManager::lookupQueue(const bmqt::Uri& uri) const
     bsls::SpinLockGuard guard(&d_queuesLock);  // d_queuesLock LOCKED
 
     // Find by canonical URI in URIs map
-    UrisMap::const_iterator uriIt = d_uris.find(
-        bsl::string(uri.canonical(), d_allocator_p));
+    auto uriIt = d_uris.find(bsl::string(uri.canonical(), d_allocator_p));
     if (uriIt == d_uris.end()) {
         // Canonical URI was not found
         return QueueSp();  // RETURN
@@ -589,7 +586,7 @@ QueueManager::QueueSp QueueManager::lookupQueue(const bmqt::Uri& uri) const
     const unsigned int  subId = sqidIt->second;
     const bmqp::QueueId queueId(id, subId);
 
-    QueuesMap::const_iterator queueIt = d_queues.findByKey1(queueId);
+    auto queueIt = d_queues.findByKey1(queueId);
     BSLS_ASSERT_SAFE(queueIt != d_queues.end());
     BSLS_ASSERT_SAFE(queueIt->value());
     BSLS_ASSERT_SAFE(queueIt->value()->uri() == uri);
@@ -603,7 +600,7 @@ QueueManager::lookupQueue(const bmqt::CorrelationId& correlationId) const
 {
     bsls::SpinLockGuard guard(&d_queuesLock);  // d_queuesLock LOCKED
 
-    QueuesMap::const_iterator it = d_queues.findByKey2(correlationId);
+    auto it = d_queues.findByKey2(correlationId);
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(it == d_queues.end())) {
         return QueueSp();  // RETURN
     }
@@ -651,7 +648,7 @@ unsigned int
 QueueManager::subStreamCount(const bsl::string& canonicalUri) const
 {
     // Find by canonical URI in URIs map
-    UrisMap::const_iterator uriCiter = d_uris.find(canonicalUri);
+    auto uriCiter = d_uris.find(canonicalUri);
     BSLS_ASSERT_SAFE(uriCiter != d_uris.end());
 
     return uriCiter->second.d_subStreamCount;
