@@ -29,32 +29,6 @@
 namespace BloombergLP {
 namespace m_bmqstoragetool {
 
-namespace {
-
-// ====================
-// class AppKeyMatcher
-// ====================
-
-class AppKeyMatcher {
-    const mqbu::StorageKey* d_appKey;
-
-  public:
-    AppKeyMatcher(const mqbu::StorageKey& appKey)
-    : d_appKey(&appKey)
-    {
-    }
-
-    bool operator()(const bmqp_ctrlmsg::AppIdInfo& appIdInfo)
-    {
-        const mqbu::StorageKey key = mqbu::StorageKey(
-            mqbu::StorageKey::BinaryRepresentation(),
-            appIdInfo.appKey().begin());
-        return (key == *d_appKey);
-    }
-};
-
-}  // close unnamed namespace
-
 bool findQueueAppIdByAppKey(
     bsl::string*                                             appId,
     const bsl::vector<BloombergLP::bmqp_ctrlmsg::AppIdInfo>& appIds,
@@ -67,7 +41,14 @@ bool findQueueAppIdByAppKey(
         return false;  // RETURN
 
     bsl::vector<BloombergLP::bmqp_ctrlmsg::AppIdInfo>::const_iterator it =
-        bsl::find_if(appIds.cbegin(), appIds.cend(), AppKeyMatcher(appKey));
+        bsl::find_if(appIds.cbegin(),
+                     appIds.cend(),
+                     [&appKey](const bmqp_ctrlmsg::AppIdInfo& appIdInfo) {
+                         const mqbu::StorageKey key = mqbu::StorageKey(
+                             mqbu::StorageKey::BinaryRepresentation(),
+                             appIdInfo.appKey().begin());
+                         return key == appKey;
+                     });
 
     if (it != appIds.end()) {
         *appId = it->appId();
