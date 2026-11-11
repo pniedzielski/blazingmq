@@ -149,8 +149,6 @@
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmf_util.h>
 #include <bsls_assert.h>
-#include <bsls_compilerfeatures.h>
-#include <bsls_keyword.h>
 #include <bsls_objectbuffer.h>
 #include <bsls_util.h>
 
@@ -208,9 +206,9 @@ struct TwoKeyHashMap_Node {
 
     // CREATORS
     template <class VALUE_T>
-    TwoKeyHashMap_Node(K1MapIter k1MapIter,
-                       K2MapIter k2MapIter,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(VALUE_T) value,
+    TwoKeyHashMap_Node(K1MapIter         k1MapIter,
+                       K2MapIter         k2MapIter,
+                       VALUE_T&&         value,
                        bslma::Allocator* allocator);
 
     ~TwoKeyHashMap_Node();
@@ -606,11 +604,10 @@ class TwoKeyHashMap {
     /// This function meets the strong exception guarantee. If an exception
     /// is thrown, this function has no effect.
     template <class K1_T, class K2_T, class VALUE_T>
-    bsl::pair<iterator, InsertResult>
-    insert(BSLS_COMPILERFEATURES_FORWARD_REF(K1_T) k1,
-           BSLS_COMPILERFEATURES_FORWARD_REF(K2_T) k2,
-           BSLS_COMPILERFEATURES_FORWARD_REF(VALUE_T) value,
-           KeyIndex keyIndex = e_FIRST_KEY);
+    bsl::pair<iterator, InsertResult> insert(K1_T&&    k1,
+                                             K2_T&&    k2,
+                                             VALUE_T&& value,
+                                             KeyIndex  keyIndex = e_FIRST_KEY);
 
     /// Remove the element referred by the specified iterator `it`.  Return
     /// an iterator to the element following the removed one, as indexed by
@@ -796,11 +793,10 @@ inline void TwoKeyHashMap_Erase::operator()(CONTAINER*   container,
 // CREATORS
 template <class MAP>
 template <class VALUE_T>
-inline TwoKeyHashMap_Node<MAP>::TwoKeyHashMap_Node(
-    K1MapIter k1MapIter,
-    K2MapIter k2MapIter,
-    BSLS_COMPILERFEATURES_FORWARD_REF(VALUE_T) value,
-    bslma::Allocator* allocator)
+inline TwoKeyHashMap_Node<MAP>::TwoKeyHashMap_Node(K1MapIter         k1MapIter,
+                                                   K2MapIter         k2MapIter,
+                                                   VALUE_T&&         value,
+                                                   bslma::Allocator* allocator)
 : d_k1MapIter(k1MapIter)
 , d_k2MapIter(k2MapIter)
 , d_value()
@@ -810,8 +806,7 @@ inline TwoKeyHashMap_Node<MAP>::TwoKeyHashMap_Node(
 
     bslma::ConstructionUtil::construct(d_value.address(),
                                        allocator,
-                                       BSLS_COMPILERFEATURES_FORWARD(VALUE_T,
-                                                                     value));
+                                       bsl::forward<VALUE_T>(value));
 }
 
 template <class MAP>
@@ -1216,11 +1211,10 @@ template <class K1, class K2, class VALUE, class H1, class H2>
 template <class K1_T, class K2_T, class VALUE_T>
 inline bsl::pair<typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::iterator,
                  typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::InsertResult>
-TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(
-    BSLS_COMPILERFEATURES_FORWARD_REF(K1_T) k1,
-    BSLS_COMPILERFEATURES_FORWARD_REF(K2_T) k2,
-    BSLS_COMPILERFEATURES_FORWARD_REF(VALUE_T) value,
-    KeyIndex keyIndex)
+TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(K1_T&&    k1,
+                                             K2_T&&    k2,
+                                             VALUE_T&& value,
+                                             KeyIndex  keyIndex)
 {
     // PRECONDITIONS
     BSLS_ASSERT(keyIndex == e_FIRST_KEY || keyIndex == e_SECOND_KEY);
@@ -1235,9 +1229,8 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(
     bool hasInserted = false;
 
     // try inserting in k1Map
-    bsl::pair<K1MapIter, bool> pair1 = d_k1Map.emplace(
-        BSLS_COMPILERFEATURES_FORWARD(K1_T, k1),
-        static_cast<Node*>(0));
+    bsl::pair<K1MapIter, bool> pair1 = d_k1Map.emplace(bsl::forward<K1_T>(k1),
+                                                       static_cast<Node*>(0));
     K1MapIter k1MapIter = pair1.first;
     hasInserted         = pair1.second;
 
@@ -1253,9 +1246,8 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(
                                                        &k1MapIter));
 
     // try inserting in k2Map
-    bsl::pair<K2MapIter, bool> pair2 = d_k2Map.emplace(
-        BSLS_COMPILERFEATURES_FORWARD(K2_T, k2),
-        static_cast<Node*>(0));
+    bsl::pair<K2MapIter, bool> pair2 = d_k2Map.emplace(bsl::forward<K2_T>(k2),
+                                                       static_cast<Node*>(0));
     K2MapIter k2MapIter = pair2.first;
     hasInserted         = pair2.second;
 
@@ -1272,10 +1264,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(
 
     // store the value
     Node* p = new (*d_nodeAllocator)
-        Node(k1MapIter,
-             k2MapIter,
-             BSLS_COMPILERFEATURES_FORWARD(VALUE_T, value),
-             allocator());
+        Node(k1MapIter, k2MapIter, bsl::forward<VALUE_T>(value), allocator());
 
     k1MapIter->second = k2MapIter->second = p;
 

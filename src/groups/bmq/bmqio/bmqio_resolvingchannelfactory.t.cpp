@@ -24,6 +24,7 @@
 #include <bmqtst_testhelper.h>
 
 #include <bsl_deque.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <ntsa_error.h>
 #include <ntsa_ipaddress.h>
@@ -93,9 +94,9 @@ class TestExecutor {
 
     // MANIPULATORS
     template <class FUNCTION>
-    void post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
+    void post(FUNCTION&& f) const
     {
-        d_store_p->emplace_back(BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+        d_store_p->emplace_back(bsl::forward<FUNCTION>(f));
     }
 
     // ACCESSORS

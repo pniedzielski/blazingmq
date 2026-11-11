@@ -86,9 +86,7 @@
 #include <bslmt_mutex.h>
 #include <bslmt_threadutil.h>
 #include <bsls_atomic.h>
-#include <bsls_compilerfeatures.h>
 #include <bsls_exceptionutil.h>  // BSLS_NOTHROW_SPEC
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 
@@ -291,7 +289,7 @@ class StrandExecutor {
     /// `DECAY_COPY(bsl::forward<FUNCTION>(f))()` shall be a valid
     /// expression.
     template <class FUNCTION>
-    void post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const;
+    void post(FUNCTION&& f) const;
 
     /// If `runningInThisThread()` is `true`, call 'DECAY_COPY(
     /// bsl::forward<FUNCTION>(f))()`. If `f' exits via an exception, the
@@ -303,7 +301,7 @@ class StrandExecutor {
     /// `DECAY_COPY(bsl::forward<FUNCTION>(f))()` shall be a valid
     /// expression.
     template <class FUNCTION>
-    void dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const;
+    void dispatch(FUNCTION&& f) const;
 
     /// Swap the contents of `*this` and `other`.
     void swap(StrandExecutor& other) noexcept;
@@ -543,15 +541,12 @@ inline StrandExecutor<EXECUTOR>::StrandExecutor(ContextType* context) noexcept
 // MANIPULATORS
 template <class EXECUTOR>
 template <class FUNCTION>
-inline void
-StrandExecutor<EXECUTOR>::post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION)
-                                   f) const
+inline void StrandExecutor<EXECUTOR>::post(FUNCTION&& f) const
 {
     bslmt::LockGuard<bslmt::Mutex> lock(&d_context_p->d_mutex);  // LOCK
 
     // enqueue the functor
-    d_context_p->d_jobQueue.emplace_back(
-        BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+    d_context_p->d_jobQueue.emplace_back(bsl::forward<FUNCTION>(f));
 
     if (d_context_p->d_isStarted && !d_context_p->d_isRunning) {
         // The strand is started but no async operation is in progress.
@@ -572,14 +567,12 @@ StrandExecutor<EXECUTOR>::post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION)
 
 template <class EXECUTOR>
 template <class FUNCTION>
-inline void
-StrandExecutor<EXECUTOR>::dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION)
-                                       f) const
+inline void StrandExecutor<EXECUTOR>::dispatch(FUNCTION&& f) const
 {
     if (runningInThisThread()) {
         // make a local, non-const copy of the function
         bslalg::ConstructorProxy<typename bsl::decay<FUNCTION>::type> f2(
-            BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f),
+            bsl::forward<FUNCTION>(f),
             d_context_p->allocator());
 
         // invoke in-place
@@ -587,7 +580,7 @@ StrandExecutor<EXECUTOR>::dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION)
     }
     else {
         // fallback to 'post()'
-        post(BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+        post(bsl::forward<FUNCTION>(f));
     }
 }
 

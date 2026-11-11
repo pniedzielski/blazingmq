@@ -180,8 +180,6 @@
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmf_typelist.h>
 #include <bsls_assert.h>
-#include <bsls_compilerfeatures.h>
-#include <bsls_keyword.h>
 #include <bsls_util.h>
 
 namespace BloombergLP {
@@ -944,7 +942,7 @@ class WeakMemFnResult {
     /// `VALUE` must be constructible from `bsl::forward<VALUE_T>(value)`.
     template <class VALUE_T>
     WeakMemFnResult(WeakMemFnResult_InPlaceTag,
-                    BSLS_COMPILERFEATURES_FORWARD_REF(VALUE_T) value,
+                    VALUE_T&&         value,
                     bslma::Allocator* basicAllocator = 0);
 
     /// Create a `WeakMemFnResult` object having the same state as the
@@ -1980,9 +1978,9 @@ template <class VALUE>
 template <class VALUE_T>
 inline WeakMemFnResult<VALUE>::WeakMemFnResult(
     WeakMemFnResult_InPlaceTag,
-    BSLS_COMPILERFEATURES_FORWARD_REF(VALUE_T) value,
+    VALUE_T&&         value,
     bslma::Allocator* basicAllocator)
-: d_value(BSLS_COMPILERFEATURES_FORWARD(VALUE_T, value), basicAllocator)
+: d_value(bsl::forward<VALUE_T>(value), basicAllocator)
 {
     // NOTHING
 }

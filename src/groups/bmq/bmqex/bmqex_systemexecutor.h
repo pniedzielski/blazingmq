@@ -61,6 +61,7 @@
 #include <bdlma_concurrentpoolallocator.h>
 #include <bsl_memory.h>
 #include <bsl_type_traits.h>
+#include <bsl_utility.h>
 #include <bslalg_constructorproxy.h>
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
@@ -75,9 +76,7 @@
 #include <bslmt_threadutil.h>
 #include <bsls_assert.h>
 #include <bsls_atomic.h>
-#include <bsls_compilerfeatures.h>
 #include <bsls_exceptionutil.h>  // BSLS_NOTHROW_SPEC
-#include <bsls_keyword.h>
 #include <bsls_spinlock.h>
 
 namespace BloombergLP {
@@ -134,9 +133,8 @@ struct SystemExecutor_ThreadData {
     /// supply memory.
     template <class FUNCTION_PARAM>
     SystemExecutor_ThreadData(SystemExecutor_Context* context,
-                              BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION_PARAM)
-                                  function,
-                              bslma::Allocator* allocator);
+                              FUNCTION_PARAM&&        function,
+                              bslma::Allocator*       allocator);
 };
 
 // ============================
@@ -227,7 +225,7 @@ class SystemExecutor_Context {
     /// This function meets the strong exception guarantee. If an exception
     /// is thrown, this function has no effect.
     template <class FUNCTION>
-    void executeAsync(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f,
+    void executeAsync(FUNCTION&&                     f,
                       const bslmt::ThreadAttributes& threadAttributes);
 
     /// Equivalent to `DECAY_COPY(bsl::forward<FUNCTION>(f))()`.
@@ -237,7 +235,7 @@ class SystemExecutor_Context {
     /// `DECAY_COPY(bsl::forward<FUNCTION>(f))()` shall be a valid
     /// expression.
     template <class FUNCTION>
-    void executeInPlace(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f);
+    void executeInPlace(FUNCTION&& f);
 
   public:
     // ACCESSORS
@@ -307,7 +305,7 @@ class SystemExecutor {
     /// This function meets the strong exception guarantee. If an exception
     /// is thrown, this function has no effect.
     template <class FUNCTION>
-    void post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const;
+    void post(FUNCTION&& f) const;
 
     /// Equivalent to `DECAY_COPY(bsl::forward<FUNCTION>(f))()`.
     ///
@@ -316,7 +314,7 @@ class SystemExecutor {
     /// `DECAY_COPY(bsl::forward<FUNCTION>(f))()` shall be a valid
     /// expression.
     template <class FUNCTION>
-    void dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const;
+    void dispatch(FUNCTION&& f) const;
 };
 
 // ============================================================================
@@ -332,13 +330,12 @@ template <class FUNCTION>
 template <class FUNCTION_PARAM>
 inline SystemExecutor_ThreadData<FUNCTION>::SystemExecutor_ThreadData(
     SystemExecutor_Context* context,
-    BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION_PARAM) function,
-    bslma::Allocator* allocator)
+    FUNCTION_PARAM&&        function,
+    bslma::Allocator*       allocator)
 : d_context_p(context)
 , d_spinLock()
 , d_thread()
-, d_function(BSLS_COMPILERFEATURES_FORWARD(FUNCTION_PARAM, function),
-             allocator)
+, d_function(bsl::forward<FUNCTION_PARAM>(function), allocator)
 {
     // PRECONDITIONS
     BSLS_ASSERT(context);
@@ -398,7 +395,7 @@ SystemExecutor_Context::onThreadRun(THREAD_DATA* threadData) BSLS_NOTHROW_SPEC
 // MANIPULATORS
 template <class FUNCTION>
 inline void SystemExecutor_Context::executeAsync(
-    BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f,
+    FUNCTION&&                     f,
     const bslmt::ThreadAttributes& threadAttributes)
 {
     // PRECONDITIONS
@@ -413,7 +410,7 @@ inline void SystemExecutor_Context::executeAsync(
         bslma::ManagedPtrUtil::allocateManaged<ThreadData>(
             &d_threadDataAllocator,
             this,  // context
-            BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f),
+            bsl::forward<FUNCTION>(f),
             d_allocator_p);
 
     // ensure the spawned thread synchronizes with postconditions established
@@ -438,12 +435,11 @@ inline void SystemExecutor_Context::executeAsync(
 }
 
 template <class FUNCTION>
-inline void SystemExecutor_Context::executeInPlace(
-    BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f)
+inline void SystemExecutor_Context::executeInPlace(FUNCTION&& f)
 {
     // make a local, non-const copy of the function
     bslalg::ConstructorProxy<typename bsl::decay<FUNCTION>::type> f2(
-        BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f),
+        bsl::forward<FUNCTION>(f),
         d_allocator_p);
 
     // invoke in-place
@@ -456,19 +452,17 @@ inline void SystemExecutor_Context::executeInPlace(
 
 // MANIPULATORS
 template <class FUNCTION>
-inline void SystemExecutor::post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION)
-                                     f) const
+inline void SystemExecutor::post(FUNCTION&& f) const
 {
-    d_context_sp->executeAsync(BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f),
+    d_context_sp->executeAsync(bsl::forward<FUNCTION>(f),
                                d_threadAttributes ? *d_threadAttributes
                                                   : bslmt::ThreadAttributes());
 }
 
 template <class FUNCTION>
-inline void
-SystemExecutor::dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
+inline void SystemExecutor::dispatch(FUNCTION&& f) const
 {
-    d_context_sp->executeInPlace(BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+    d_context_sp->executeInPlace(bsl::forward<FUNCTION>(f));
 }
 
 }  // close package namespace

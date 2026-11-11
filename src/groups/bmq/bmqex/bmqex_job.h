@@ -36,6 +36,7 @@
 
 // BDE
 #include <bsl_type_traits.h>
+#include <bsl_utility.h>
 #include <bslalg_constructorproxy.h>
 #include <bslma_allocator.h>
 #include <bslma_default.h>
@@ -44,8 +45,6 @@
 #include <bslmf_decay.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmf_util.h>
-#include <bsls_compilerfeatures.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 
@@ -102,8 +101,7 @@ class Job_Target : public Job_TargetBase {
     /// FUNCTION_PARAM>(function)`. Specify an `allocator' used to
     /// supply memory.
     template <class FUNCTION_PARAM>
-    Job_Target(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION_PARAM) function,
-               bslma::Allocator* allocator);
+    Job_Target(FUNCTION_PARAM&& function, bslma::Allocator* allocator);
 
   public:
     // MANIPULATORS
@@ -143,8 +141,7 @@ class Job {
     /// object `f` of type `bsl::decay_t<FUNCTION>`, `f()` shall be a valid
     /// expression.
     template <class FUNCTION>
-    explicit Job(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) function,
-                 bslma::Allocator* basicAllocator = 0);
+    explicit Job(FUNCTION&& function, bslma::Allocator* basicAllocator = 0);
 
     /// Destroy this object and the contained function object with it.
     ~Job();
@@ -170,15 +167,14 @@ class Job {
 
 // CREATORS
 template <class FUNCTION>
-inline Job::Job(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) function,
-                bslma::Allocator* basicAllocator)
+inline Job::Job(FUNCTION&& function, bslma::Allocator* basicAllocator)
 {
     typedef Job_Target<typename bsl::decay<FUNCTION>::type> Target;
 
     bslma::Allocator* alloc = bslma::Default::allocator(basicAllocator);
     d_target_mp             = bslma::ManagedPtrUtil::allocateManaged<Target>(
         alloc,
-        BSLS_COMPILERFEATURES_FORWARD(FUNCTION, function),
+        bsl::forward<FUNCTION>(function),
         alloc);
 }
 
@@ -189,11 +185,9 @@ inline Job::Job(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) function,
 // CREATORS
 template <class FUNCTION>
 template <class FUNCTION_PARAM>
-inline Job_Target<FUNCTION>::Job_Target(
-    BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION_PARAM) function,
-    bslma::Allocator* allocator)
-: d_function(BSLS_COMPILERFEATURES_FORWARD(FUNCTION_PARAM, function),
-             allocator)
+inline Job_Target<FUNCTION>::Job_Target(FUNCTION_PARAM&&  function,
+                                        bslma::Allocator* allocator)
+: d_function(bsl::forward<FUNCTION_PARAM>(function), allocator)
 {
     // PRECONDITIONS
     BSLS_ASSERT(allocator);

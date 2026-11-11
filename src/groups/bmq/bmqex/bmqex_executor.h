@@ -120,8 +120,6 @@
 #include <bslmf_util.h>
 #include <bsls_alignedbuffer.h>
 #include <bsls_assert.h>
-#include <bsls_compilerfeatures.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 
@@ -201,8 +199,7 @@ class Executor_Target : public Executor_TargetBase {
     ///
     /// `bsl::decay_t<EXECUTOR_PARM>` shall be the same type as `EXECUTOR`.
     template <class EXECUTOR_PARAM>
-    Executor_Target(BSLS_COMPILERFEATURES_FORWARD_REF(EXECUTOR_PARAM)
-                        executor) noexcept;
+    Executor_Target(EXECUTOR_PARAM&& executor) noexcept;
 
   public:
     // MANIPULATORS
@@ -477,7 +474,7 @@ class Executor {
     /// CopyConstructible as specified in the C++ standard.  'DECAY_COPY(
     /// bsl::forward<FUNCTION>(f))()' shall be a valid expression.
     template <class FUNCTION>
-    void post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const;
+    void post(FUNCTION&& f) const;
 
     /// Invoke `ExecutorTraits<E>::dispatch(e, f2)`, where `e` is the target
     /// object (of type `E`) of `*this`, `f1` is the result of 'DECAY_COPY(
@@ -489,7 +486,7 @@ class Executor {
     /// CopyConstructible as specified in the C++ standard.  'DECAY_COPY(
     /// bsl::forward<FUNCTION>(f))()' shall be a valid expression.
     template <class FUNCTION>
-    void dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const;
+    void dispatch(FUNCTION&& f) const;
 
     /// Swap the contents of `*this` and `other`.
     void swap(Executor& other) noexcept;
@@ -529,9 +526,8 @@ void swap(Executor& lhs, Executor& rhs) noexcept;
 // CREATORS
 template <class EXECUTOR>
 template <class EXECUTOR_PARAM>
-inline Executor_Target<EXECUTOR>::Executor_Target(
-    BSLS_COMPILERFEATURES_FORWARD_REF(EXECUTOR_PARAM) executor) noexcept
-: d_executor(BSLS_COMPILERFEATURES_FORWARD(EXECUTOR_PARAM, executor))
+inline Executor_Target<EXECUTOR>::Executor_Target(EXECUTOR_PARAM&& executor)
+    noexcept : d_executor(bsl::forward<EXECUTOR_PARAM>(executor))
 {
     // NOTHING
 }
@@ -682,22 +678,21 @@ inline void Executor::assign(EXECUTOR          executor,
 }
 
 template <class FUNCTION>
-inline void Executor::post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
+inline void Executor::post(FUNCTION&& f) const
 {
     // PRECONDITIONS
     BSLS_ASSERT(d_box.target());
 
-    d_box.target()->post(BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+    d_box.target()->post(bsl::forward<FUNCTION>(f));
 }
 
 template <class FUNCTION>
-inline void Executor::dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION)
-                                   f) const
+inline void Executor::dispatch(FUNCTION&& f) const
 {
     // PRECONDITIONS
     BSLS_ASSERT(d_box.target());
 
-    d_box.target()->dispatch(BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+    d_box.target()->dispatch(bsl::forward<FUNCTION>(f));
 }
 
 // ACCESSORS

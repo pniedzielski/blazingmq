@@ -28,7 +28,6 @@
 #include <bslma_testallocator.h>
 #include <bslmf_assert.h>
 #include <bsls_assert.h>
-#include <bsls_compilerfeatures.h>
 
 // CONVENIENCE
 using namespace BloombergLP;
@@ -113,7 +112,7 @@ class StatExecutor {
 
     /// Perform `++statistics()->d_postCallCount` followed by `f()`.
     template <class FUNCTION>
-    void post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
+    void post(FUNCTION&& f) const
     {
         ++d_statistics_p->d_postCallCount;
         f();
@@ -121,7 +120,7 @@ class StatExecutor {
 
     /// Perform `++statistics()->d_dispatchCallCount` followed by `f()`.
     template <class FUNCTION>
-    void dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
+    void dispatch(FUNCTION&& f) const
     {
         ++d_statistics_p->d_dispatchCallCount;
         f();
@@ -173,19 +172,16 @@ class ExecutorElarger {
   public:
     // MANIPULATORS
     template <class F>
-    void post(BSLS_COMPILERFEATURES_FORWARD_REF(F) f) const
+    void post(F&& f) const
     {
-        bmqex::ExecutorTraits<EXECUTOR>::post(
-            d_executor,
-            BSLS_COMPILERFEATURES_FORWARD(F, f));
+        bmqex::ExecutorTraits<EXECUTOR>::post(d_executor, bsl::forward<F>(f));
     }
 
     template <class F>
-    void dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(F) f) const
+    void dispatch(F&& f) const
     {
-        bmqex::ExecutorTraits<EXECUTOR>::dispatch(
-            d_executor,
-            BSLS_COMPILERFEATURES_FORWARD(F, f));
+        bmqex::ExecutorTraits<EXECUTOR>::dispatch(d_executor,
+                                                  bsl::forward<F>(f));
     }
 
   public:

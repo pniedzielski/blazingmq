@@ -27,13 +27,13 @@
 #include <bsl_memory.h>  // bsl::allocator_arg
 #include <bsl_numeric.h>
 #include <bsl_ostream.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bslma_testallocator.h>
 #include <bslmt_semaphore.h>
 #include <bslmt_threadattributes.h>
 #include <bsls_assert.h>
-#include <bsls_keyword.h>
 
 // CONVENIENCE
 using namespace BloombergLP;
@@ -317,19 +317,19 @@ class TestExecutionContext {
 
         /// Submit the specified function object `f` for execution.
         template <class FUNCTION>
-        void post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
+        void post(FUNCTION&& f) const
         {
             int rc = d_context_p->d_threadPool.enqueueJob(
-                BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+                bsl::forward<FUNCTION>(f));
             BSLS_ASSERT_OPT(rc == 0);
         }
 
         /// Submit the specified function object `f` for execution.
         template <class FUNCTION>
-        void dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
+        void dispatch(FUNCTION&& f) const
         {
             int rc = d_context_p->d_threadPool.enqueueJob(
-                BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+                bsl::forward<FUNCTION>(f));
             BSLS_ASSERT_OPT(rc == 0);
         }
     };

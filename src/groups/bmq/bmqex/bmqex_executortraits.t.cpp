@@ -19,7 +19,7 @@
 #include <bmqtst_testhelper.h>
 #include <bsl_iostream.h>
 #include <bsl_ostream.h>
-#include <bsls_compilerfeatures.h>
+#include <bsl_utility.h>
 
 // CONVENIENCE
 using namespace BloombergLP;
@@ -69,7 +69,7 @@ struct PostExecutor {
 
     // ACCESSORS
     template <class FUNCTION>
-    void post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
+    void post(FUNCTION&& f) const
     {
         f();
         ++d_postCallCount;
@@ -101,14 +101,14 @@ struct PostDispatchExecutor {
 
     // ACCESSORS
     template <class FUNCTION>
-    void post(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
+    void post(FUNCTION&& f) const
     {
         f();
         ++d_postCallCount;
     }
 
     template <class FUNCTION>
-    void dispatch(BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f) const
+    void dispatch(FUNCTION&& f) const
     {
         f();
         ++d_dispatchCallCount;

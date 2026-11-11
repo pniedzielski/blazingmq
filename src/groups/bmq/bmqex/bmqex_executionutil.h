@@ -244,9 +244,8 @@ class ExecutionUtil_OneOffFunction {
     ///
     /// `F` must be constructible from `bsl::forward<F_PARAM>(f)`.
     template <class F_PARAM>
-    constexpr
-    ExecutionUtil_OneOffFunction(BSLS_COMPILERFEATURES_FORWARD_REF(F_PARAM) f,
-                                 bslma::Allocator* allocator);
+    constexpr ExecutionUtil_OneOffFunction(F_PARAM&&         f,
+                                           bslma::Allocator* allocator);
 
   public:
     // MANIPULATORS
@@ -307,8 +306,7 @@ class ExecutionUtil_UniqueTask {
     ///
     /// `F` must be constructible from `bsl::forward<F_PARAM>(f)`.
     template <class F_PARAM>
-    ExecutionUtil_UniqueTask(BSLS_COMPILERFEATURES_FORWARD_REF(F_PARAM) f,
-                             bslma::Allocator* allocator);
+    ExecutionUtil_UniqueTask(F_PARAM&& f, bslma::Allocator* allocator);
 
   public:
     // MANIPULATORS
@@ -385,8 +383,7 @@ struct ExecutionUtil {
     /// bsl::forward<FUNCTION>(f))()' shall be a valid expression.
     template <class EXECUTOR, class FUNCTION>
     static typename ExecuteResult<ExecutionPolicy<EXECUTOR>, FUNCTION>::Type
-    execute(const ExecutionPolicy<EXECUTOR>& policy,
-            BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f);
+    execute(const ExecutionPolicy<EXECUTOR>& policy, FUNCTION&& f);
 };
 
 // ============================================================================
@@ -461,9 +458,9 @@ template <class R, class F>
 template <class F_PARAM>
 inline constexpr
 ExecutionUtil_OneOffFunction<R, F>::ExecutionUtil_OneOffFunction(
-    BSLS_COMPILERFEATURES_FORWARD_REF(F_PARAM) f,
+    F_PARAM&&         f,
     bslma::Allocator* allocator)
-: d_functionValue(BSLS_COMPILERFEATURES_FORWARD(F_PARAM, f), allocator)
+: d_functionValue(bsl::forward<F_PARAM>(f), allocator)
 {
     // PRECONDITIONS
     BSLS_ASSERT(allocator);
@@ -510,10 +507,10 @@ inline ExecutionUtil_OneOffFunction<R, F>::DestroyFunctionOnScopeExit ::
 template <class F>
 template <class F_PARAM>
 inline ExecutionUtil_UniqueTask<F>::ExecutionUtil_UniqueTask(
-    BSLS_COMPILERFEATURES_FORWARD_REF(F_PARAM) f,
+    F_PARAM&&         f,
     bslma::Allocator* allocator)
 : d_latch(1)
-, d_function(BSLS_COMPILERFEATURES_FORWARD(F_PARAM, f), allocator)
+, d_function(bsl::forward<F_PARAM>(f), allocator)
 {
     // PRECONDITIONS
     BSLS_ASSERT(allocator);
@@ -557,23 +554,20 @@ inline void ExecutionUtil_UniqueTask<F>::wait() const noexcept
 template <class EXECUTOR, class FUNCTION>
 inline typename ExecutionUtil::ExecuteResult<ExecutionPolicy<EXECUTOR>,
                                              FUNCTION>::Type
-ExecutionUtil::execute(const ExecutionPolicy<EXECUTOR>& policy,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f)
+ExecutionUtil::execute(const ExecutionPolicy<EXECUTOR>& policy, FUNCTION&& f)
 {
     switch (policy.blocking()) {
     case ExecutionProperty::e_NEVER_BLOCKING: {
         // submit the function object for execution via 'post'
         ExecutorTraits<EXECUTOR>::post(policy.executor(),
-                                       BSLS_COMPILERFEATURES_FORWARD(FUNCTION,
-                                                                     f));
+                                       bsl::forward<FUNCTION>(f));
         break;  // BREAK
     }
 
     case ExecutionProperty::e_POSSIBLY_BLOCKING: {
         // submit the function object for execution via 'dispatch'
-        ExecutorTraits<EXECUTOR>::dispatch(
-            policy.executor(),
-            BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+        ExecutorTraits<EXECUTOR>::dispatch(policy.executor(),
+                                           bsl::forward<FUNCTION>(f));
         break;  // BREAK
     }
 
@@ -583,8 +577,7 @@ ExecutionUtil::execute(const ExecutionPolicy<EXECUTOR>& policy,
 
         // create a "task" to synchronize with the completion of the
         // submitted function object invocation
-        Task task(BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f),
-                  policy.allocator());
+        Task task(bsl::forward<FUNCTION>(f), policy.allocator());
 
         // submit the function object for execution via 'dispatch'
         ExecutorTraits<EXECUTOR>::dispatch(

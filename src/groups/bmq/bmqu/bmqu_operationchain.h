@@ -184,6 +184,7 @@
 #endif
 #ifdef BSLS_COMPILERFEATURES_SUPPORT_TRAITS_HEADER
 #include <bsl_type_traits.h>
+#include <bsl_utility.h>
 #endif
 
 namespace BloombergLP {
@@ -355,8 +356,8 @@ class OperationChain_Job {
         /// operation callback and `coCallback` completion callback. Specify
         /// an `allocator` used to supply memory.
         template <class OP_CALLBACK_ARG, class CO_CALLBACK_ARG>
-        Target(BSLS_COMPILERFEATURES_FORWARD_REF(OP_CALLBACK_ARG) opCallback,
-               BSLS_COMPILERFEATURES_FORWARD_REF(CO_CALLBACK_ARG) coCallback,
+        Target(OP_CALLBACK_ARG&& opCallback,
+               CO_CALLBACK_ARG&& coCallback,
                bslma::Allocator* allocator);
 
       public:
@@ -397,11 +398,9 @@ class OperationChain_Job {
     /// expression, where `f2` is a function object of unspecified type
     /// callable with the same arguments as `bsl::decay_t<CO_CALLBACK>&&`.
     template <class OP_CALLBACK, class CO_CALLBACK>
-    explicit OperationChain_Job(unsigned id,
-                                BSLS_COMPILERFEATURES_FORWARD_REF(OP_CALLBACK)
-                                    opCallback,
-                                BSLS_COMPILERFEATURES_FORWARD_REF(CO_CALLBACK)
-                                    coCallback,
+    explicit OperationChain_Job(unsigned          id,
+                                OP_CALLBACK&&     opCallback,
+                                CO_CALLBACK&&     coCallback,
                                 bslma::Allocator* allocator);
 
     /// Destroy this object and the contained callback objects with it.
@@ -588,13 +587,9 @@ class OperationChain {
     /// expression, where `f2` is a function object of unspecified type
     /// callable with the same arguments as `bsl::decay_t<CO_CALLBACK>&&`.
     template <class OP_CALLBACK>
-    void appendInplace(BSLS_COMPILERFEATURES_FORWARD_REF(OP_CALLBACK)
-                           opCallback);
+    void appendInplace(OP_CALLBACK&& opCallback);
     template <class OP_CALLBACK, class CO_CALLBACK>
-    void appendInplace(BSLS_COMPILERFEATURES_FORWARD_REF(OP_CALLBACK)
-                           opCallback,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(CO_CALLBACK)
-                           coCallback);
+    void appendInplace(OP_CALLBACK&& opCallback, CO_CALLBACK&& coCallback);
 
     int popBack() noexcept;
 
@@ -715,10 +710,9 @@ class OperationChainLink {
     /// expression, where `f2` is a function object of unspecified type
     /// callable with the same arguments as `bsl::decay_t<CO_CALLBACK>&&`.
     template <class OP_CALLBACK>
-    void insert(BSLS_COMPILERFEATURES_FORWARD_REF(OP_CALLBACK) opCallback);
+    void insert(OP_CALLBACK&& opCallback);
     template <class OP_CALLBACK, class CO_CALLBACK>
-    void insert(BSLS_COMPILERFEATURES_FORWARD_REF(OP_CALLBACK) opCallback,
-                BSLS_COMPILERFEATURES_FORWARD_REF(CO_CALLBACK) coCallback);
+    void insert(OP_CALLBACK&& opCallback, CO_CALLBACK&& coCallback);
 
     /// Remove all operations in this link, if any. Return the number of
     /// operations removed.
@@ -796,11 +790,10 @@ OperationChain_CompletionCallbackWrapper<CO_CALLBACK>::operator()() const
 
 // CREATORS
 template <class OP_CALLBACK, class CO_CALLBACK>
-inline OperationChain_Job::OperationChain_Job(
-    unsigned id,
-    BSLS_COMPILERFEATURES_FORWARD_REF(OP_CALLBACK) opCallback,
-    BSLS_COMPILERFEATURES_FORWARD_REF(CO_CALLBACK) coCallback,
-    bslma::Allocator* allocator)
+inline OperationChain_Job::OperationChain_Job(unsigned          id,
+                                              OP_CALLBACK&&     opCallback,
+                                              CO_CALLBACK&&     coCallback,
+                                              bslma::Allocator* allocator)
 : d_id(id)
 {
     // PRECONDITIONS
@@ -812,8 +805,8 @@ inline OperationChain_Job::OperationChain_Job(
 
     d_target_mp = bslma::ManagedPtrUtil::allocateManaged<Target>(
         allocator,
-        BSLS_COMPILERFEATURES_FORWARD(OP_CALLBACK, opCallback),
-        BSLS_COMPILERFEATURES_FORWARD(CO_CALLBACK, coCallback),
+        bsl::forward<OP_CALLBACK>(opCallback),
+        bsl::forward<CO_CALLBACK>(coCallback),
         allocator);
 }
 
@@ -850,13 +843,11 @@ inline unsigned OperationChain_Job::id() const noexcept
 template <class OP_CALLBACK, class CO_CALLBACK>
 template <class OP_CALLBACK_ARG, class CO_CALLBACK_ARG>
 inline OperationChain_Job::Target<OP_CALLBACK, CO_CALLBACK>::Target(
-    BSLS_COMPILERFEATURES_FORWARD_REF(OP_CALLBACK_ARG) opCallback,
-    BSLS_COMPILERFEATURES_FORWARD_REF(CO_CALLBACK_ARG) coCallback,
+    OP_CALLBACK_ARG&& opCallback,
+    CO_CALLBACK_ARG&& coCallback,
     bslma::Allocator* allocator)
-: d_opCallback(BSLS_COMPILERFEATURES_FORWARD(OP_CALLBACK_ARG, opCallback),
-               allocator)
-, d_coCallback(BSLS_COMPILERFEATURES_FORWARD(CO_CALLBACK_ARG, coCallback),
-               allocator)
+: d_opCallback(bsl::forward<OP_CALLBACK_ARG>(opCallback), allocator)
+, d_coCallback(bsl::forward<CO_CALLBACK_ARG>(coCallback), allocator)
 {
     // PRECONDITIONS
     BSLMF_ASSERT(
@@ -905,22 +896,18 @@ inline void OperationChain::append(bsl::initializer_list<Link*> links)
 #endif  // BSLS_COMPILERFEATURES_SUPPORT_GENERALIZED_INITIALIZERS
 
 template <class OP_CALLBACK>
-inline void
-OperationChain::appendInplace(BSLS_COMPILERFEATURES_FORWARD_REF(OP_CALLBACK)
-                                  opCallback)
+inline void OperationChain::appendInplace(OP_CALLBACK&& opCallback)
 {
     // PRECONDITIONS
     BSLMF_ASSERT(
         OperationChain_IsOperationCallbackCompatible<OP_CALLBACK>::value);
 
-    appendInplace(BSLS_COMPILERFEATURES_FORWARD(OP_CALLBACK, opCallback),
-                  bdlf::noOp);
+    appendInplace(bsl::forward<OP_CALLBACK>(opCallback), bdlf::noOp);
 }
 
 template <class OP_CALLBACK, class CO_CALLBACK>
-inline void OperationChain::appendInplace(
-    BSLS_COMPILERFEATURES_FORWARD_REF(OP_CALLBACK) opCallback,
-    BSLS_COMPILERFEATURES_FORWARD_REF(CO_CALLBACK) coCallback)
+inline void OperationChain::appendInplace(OP_CALLBACK&& opCallback,
+                                          CO_CALLBACK&& coCallback)
 {
     // PRECONDITIONS
     BSLMF_ASSERT(
@@ -930,8 +917,8 @@ inline void OperationChain::appendInplace(
 
     // create a link
     Link link(allocator());
-    link.insert(BSLS_COMPILERFEATURES_FORWARD(OP_CALLBACK, opCallback),
-                BSLS_COMPILERFEATURES_FORWARD(CO_CALLBACK, coCallback));
+    link.insert(bsl::forward<OP_CALLBACK>(opCallback),
+                bsl::forward<CO_CALLBACK>(coCallback));
 
     // append it
     append(&link);
@@ -943,21 +930,18 @@ inline void OperationChain::appendInplace(
 
 // MANIPULATORS
 template <class OP_CALLBACK>
-inline void
-OperationChainLink::insert(BSLS_COMPILERFEATURES_FORWARD_REF(OP_CALLBACK)
-                               opCallback)
+inline void OperationChainLink::insert(OP_CALLBACK&& opCallback)
 {
     // PRECONDITIONS
     BSLMF_ASSERT(
         OperationChain_IsOperationCallbackCompatible<OP_CALLBACK>::value);
 
-    insert(BSLS_COMPILERFEATURES_FORWARD(OP_CALLBACK, opCallback), bdlf::noOp);
+    insert(bsl::forward<OP_CALLBACK>(opCallback), bdlf::noOp);
 }
 
 template <class OP_CALLBACK, class CO_CALLBACK>
-inline void OperationChainLink::insert(
-    BSLS_COMPILERFEATURES_FORWARD_REF(OP_CALLBACK) opCallback,
-    BSLS_COMPILERFEATURES_FORWARD_REF(CO_CALLBACK) coCallback)
+inline void OperationChainLink::insert(OP_CALLBACK&& opCallback,
+                                       CO_CALLBACK&& coCallback)
 {
     // PRECONDITIONS
     BSLMF_ASSERT(
@@ -966,10 +950,9 @@ inline void OperationChainLink::insert(
         OperationChain_IsCompletionCallbackCompatible<CO_CALLBACK>::value);
 
     // create a job
-    d_jobList.emplace_front(
-        d_jobList.size() + 1,  // id
-        BSLS_COMPILERFEATURES_FORWARD(OP_CALLBACK, opCallback),
-        BSLS_COMPILERFEATURES_FORWARD(CO_CALLBACK, coCallback));
+    d_jobList.emplace_front(d_jobList.size() + 1,  // id
+                            bsl::forward<OP_CALLBACK>(opCallback),
+                            bsl::forward<CO_CALLBACK>(coCallback));
 }
 
 }  // close package namespace

@@ -85,10 +85,10 @@
 
 // BDE
 #include <bsl_functional.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bslmf_isaccessiblebaseof.h>
 #include <bsls_assert.h>
-#include <bsls_compilerfeatures.h>
 
 namespace BloombergLP {
 namespace bmqu {
@@ -149,26 +149,23 @@ class ManagedCallback final {
     void createInplace();
 
     template <class CALLBACK_TYPE, class ARGS_1>
-    void createInplace(BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_1) args_1);
+    void createInplace(ARGS_1&& args_1);
 
     template <class CALLBACK_TYPE, class ARGS_1, class ARGS_2>
-    void createInplace(BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_1) args_1,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_2) args_2);
+    void createInplace(ARGS_1&& args_1, ARGS_2&& args_2);
 
     template <class CALLBACK_TYPE, class ARGS_1, class ARGS_2, class ARGS_3>
-    void createInplace(BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_1) args_1,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_2) args_2,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_3) args_3);
+    void createInplace(ARGS_1&& args_1, ARGS_2&& args_2, ARGS_3&& args_3);
 
     template <class CALLBACK_TYPE,
               class ARGS_1,
               class ARGS_2,
               class ARGS_3,
               class ARGS_4>
-    void createInplace(BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_1) args_1,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_2) args_2,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_3) args_3,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_4) args_4);
+    void createInplace(ARGS_1&& args_1,
+                       ARGS_2&& args_2,
+                       ARGS_3&& args_3,
+                       ARGS_4&& args_4);
 
     template <class CALLBACK_TYPE,
               class ARGS_1,
@@ -176,11 +173,11 @@ class ManagedCallback final {
               class ARGS_3,
               class ARGS_4,
               class ARGS_5>
-    void createInplace(BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_1) args_1,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_2) args_2,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_3) args_3,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_4) args_4,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_5) args_5);
+    void createInplace(ARGS_1&& args_1,
+                       ARGS_2&& args_2,
+                       ARGS_3&& args_3,
+                       ARGS_4&& args_4,
+                       ARGS_5&& args_5);
 
     template <class CALLBACK_TYPE,
               class ARGS_1,
@@ -189,12 +186,12 @@ class ManagedCallback final {
               class ARGS_4,
               class ARGS_5,
               class ARGS_6>
-    void createInplace(BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_1) args_1,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_2) args_2,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_3) args_3,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_4) args_4,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_5) args_5,
-                       BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_6) args_6);
+    void createInplace(ARGS_1&& args_1,
+                       ARGS_2&& args_2,
+                       ARGS_3&& args_3,
+                       ARGS_4&& args_4,
+                       ARGS_5&& args_5,
+                       ARGS_6&& args_6);
 
     /// Store the specified `callback` in this object.
     /// Note: these setters are slow because they performs function copy, going
@@ -308,34 +305,26 @@ inline void ManagedCallback::createInplace()
 }
 
 template <class CALLBACK_TYPE, class ARGS_1>
-inline void
-ManagedCallback::createInplace(BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_1)
-                                   args_1)
+inline void ManagedCallback::createInplace(ARGS_1&& args_1)
 {
-    new (place<CALLBACK_TYPE>())
-        CALLBACK_TYPE(BSLS_COMPILERFEATURES_FORWARD(ARGS_1, args_1));
+    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS_1>(args_1));
 }
 
 template <class CALLBACK_TYPE, class ARGS_1, class ARGS_2>
-inline void ManagedCallback::createInplace(
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_1) args_1,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_2) args_2)
+inline void ManagedCallback::createInplace(ARGS_1&& args_1, ARGS_2&& args_2)
 {
-    new (place<CALLBACK_TYPE>())
-        CALLBACK_TYPE(BSLS_COMPILERFEATURES_FORWARD(ARGS_1, args_1),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_2, args_2));
+    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS_1>(args_1),
+                                               bsl::forward<ARGS_2>(args_2));
 }
 
 template <class CALLBACK_TYPE, class ARGS_1, class ARGS_2, class ARGS_3>
-inline void ManagedCallback::createInplace(
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_1) args_1,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_2) args_2,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_3) args_3)
+inline void ManagedCallback::createInplace(ARGS_1&& args_1,
+                                           ARGS_2&& args_2,
+                                           ARGS_3&& args_3)
 {
-    new (place<CALLBACK_TYPE>())
-        CALLBACK_TYPE(BSLS_COMPILERFEATURES_FORWARD(ARGS_1, args_1),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_2, args_2),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_3, args_3));
+    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS_1>(args_1),
+                                               bsl::forward<ARGS_2>(args_2),
+                                               bsl::forward<ARGS_3>(args_3));
 }
 
 template <class CALLBACK_TYPE,
@@ -343,17 +332,15 @@ template <class CALLBACK_TYPE,
           class ARGS_2,
           class ARGS_3,
           class ARGS_4>
-inline void ManagedCallback::createInplace(
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_1) args_1,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_2) args_2,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_3) args_3,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_4) args_4)
+inline void ManagedCallback::createInplace(ARGS_1&& args_1,
+                                           ARGS_2&& args_2,
+                                           ARGS_3&& args_3,
+                                           ARGS_4&& args_4)
 {
-    new (place<CALLBACK_TYPE>())
-        CALLBACK_TYPE(BSLS_COMPILERFEATURES_FORWARD(ARGS_1, args_1),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_2, args_2),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_3, args_3),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_4, args_4));
+    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS_1>(args_1),
+                                               bsl::forward<ARGS_2>(args_2),
+                                               bsl::forward<ARGS_3>(args_3),
+                                               bsl::forward<ARGS_4>(args_4));
 }
 
 template <class CALLBACK_TYPE,
@@ -362,19 +349,17 @@ template <class CALLBACK_TYPE,
           class ARGS_3,
           class ARGS_4,
           class ARGS_5>
-inline void ManagedCallback::createInplace(
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_1) args_1,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_2) args_2,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_3) args_3,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_4) args_4,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_5) args_5)
+inline void ManagedCallback::createInplace(ARGS_1&& args_1,
+                                           ARGS_2&& args_2,
+                                           ARGS_3&& args_3,
+                                           ARGS_4&& args_4,
+                                           ARGS_5&& args_5)
 {
-    new (place<CALLBACK_TYPE>())
-        CALLBACK_TYPE(BSLS_COMPILERFEATURES_FORWARD(ARGS_1, args_1),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_2, args_2),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_3, args_3),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_4, args_4),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_5, args_5));
+    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS_1>(args_1),
+                                               bsl::forward<ARGS_2>(args_2),
+                                               bsl::forward<ARGS_3>(args_3),
+                                               bsl::forward<ARGS_4>(args_4),
+                                               bsl::forward<ARGS_5>(args_5));
 }
 
 template <class CALLBACK_TYPE,
@@ -384,21 +369,19 @@ template <class CALLBACK_TYPE,
           class ARGS_4,
           class ARGS_5,
           class ARGS_6>
-inline void ManagedCallback::createInplace(
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_1) args_1,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_2) args_2,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_3) args_3,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_4) args_4,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_5) args_5,
-    BSLS_COMPILERFEATURES_FORWARD_REF(ARGS_6) args_6)
+inline void ManagedCallback::createInplace(ARGS_1&& args_1,
+                                           ARGS_2&& args_2,
+                                           ARGS_3&& args_3,
+                                           ARGS_4&& args_4,
+                                           ARGS_5&& args_5,
+                                           ARGS_6&& args_6)
 {
-    new (place<CALLBACK_TYPE>())
-        CALLBACK_TYPE(BSLS_COMPILERFEATURES_FORWARD(ARGS_1, args_1),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_2, args_2),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_3, args_3),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_4, args_4),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_5, args_5),
-                      BSLS_COMPILERFEATURES_FORWARD(ARGS_6, args_6));
+    new (place<CALLBACK_TYPE>()) CALLBACK_TYPE(bsl::forward<ARGS_1>(args_1),
+                                               bsl::forward<ARGS_2>(args_2),
+                                               bsl::forward<ARGS_3>(args_3),
+                                               bsl::forward<ARGS_4>(args_4),
+                                               bsl::forward<ARGS_5>(args_5),
+                                               bsl::forward<ARGS_6>(args_6));
 }
 
 }  // close package namespace

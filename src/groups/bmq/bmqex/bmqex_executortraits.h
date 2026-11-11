@@ -128,22 +128,19 @@ struct ExecutorTraits_Imp {
 
     /// Perform `executor.post(bsl::forward<FUNCTION>(f))`.
     template <class EXECUTOR, class FUNCTION>
-    static void post(const EXECUTOR& executor,
-                     BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f);
+    static void post(const EXECUTOR& executor, FUNCTION&& f);
 
     /// Perform `executor.dispatch(bsl::forward<FUNCTION>(f))`.
     template <class EXECUTOR, class FUNCTION>
     static typename bsl::enable_if<
         ExecutorTraits_CanDispatch<EXECUTOR, FUNCTION>::value>::type
-    dispatch(const EXECUTOR& executor,
-             BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f);
+    dispatch(const EXECUTOR& executor, FUNCTION&& f);
 
     /// Perform `executor.post(bsl::forward<FUNCTION>(f))`.
     template <class EXECUTOR, class FUNCTION>
     static typename bsl::enable_if<
         !ExecutorTraits_CanDispatch<EXECUTOR, FUNCTION>::value>::type
-    dispatch(const EXECUTOR& executor,
-             BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f);
+    dispatch(const EXECUTOR& executor, FUNCTION&& f);
 };
 
 // =====================
@@ -163,8 +160,7 @@ struct ExecutorTraits {
 
     /// Perform `executor.post(bsl::forward<FUNCTION>(f))`.
     template <class FUNCTION>
-    static void post(const EXECUTOR& executor,
-                     BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f);
+    static void post(const EXECUTOR& executor, FUNCTION&& f);
 
     /// If `executor.dispatch(bsl::forward<FUNCTION>(f))` is a well-formed
     /// expression, perform `executor.dispatch(bsl::forward<FUNCTION>(f))`.
@@ -177,8 +173,7 @@ struct ExecutorTraits {
     /// `F` being any of `F1`, `const F1&`, `F1&&`, and
     /// `F1` being `bsl::function<void()>`.
     template <class FUNCTION>
-    static void dispatch(const EXECUTOR& executor,
-                         BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f);
+    static void dispatch(const EXECUTOR& executor, FUNCTION&& f);
 };
 
 // ============================================================================
@@ -191,29 +186,25 @@ struct ExecutorTraits {
 
 // CLASS METHODS
 template <class EXECUTOR, class FUNCTION>
-inline void
-ExecutorTraits_Imp::post(const EXECUTOR& executor,
-                         BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f)
+inline void ExecutorTraits_Imp::post(const EXECUTOR& executor, FUNCTION&& f)
 {
-    executor.post(BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+    executor.post(bsl::forward<FUNCTION>(f));
 }
 
 template <class EXECUTOR, class FUNCTION>
 inline typename bsl::enable_if<
     ExecutorTraits_CanDispatch<EXECUTOR, FUNCTION>::value>::type
-ExecutorTraits_Imp::dispatch(const EXECUTOR& executor,
-                             BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f)
+ExecutorTraits_Imp::dispatch(const EXECUTOR& executor, FUNCTION&& f)
 {
-    executor.dispatch(BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+    executor.dispatch(bsl::forward<FUNCTION>(f));
 }
 
 template <class EXECUTOR, class FUNCTION>
 inline typename bsl::enable_if<
     !ExecutorTraits_CanDispatch<EXECUTOR, FUNCTION>::value>::type
-ExecutorTraits_Imp::dispatch(const EXECUTOR& executor,
-                             BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f)
+ExecutorTraits_Imp::dispatch(const EXECUTOR& executor, FUNCTION&& f)
 {
-    executor.post(BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+    executor.post(bsl::forward<FUNCTION>(f));
 }
 
 // ---------------------
@@ -223,23 +214,18 @@ ExecutorTraits_Imp::dispatch(const EXECUTOR& executor,
 // CLASS METHODS
 template <class EXECUTOR>
 template <class FUNCTION>
-inline void
-ExecutorTraits<EXECUTOR>::post(const EXECUTOR& executor,
-                               BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION) f)
+inline void ExecutorTraits<EXECUTOR>::post(const EXECUTOR& executor,
+                                           FUNCTION&&      f)
 {
-    ExecutorTraits_Imp::post(executor,
-                             BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+    ExecutorTraits_Imp::post(executor, bsl::forward<FUNCTION>(f));
 }
 
 template <class EXECUTOR>
 template <class FUNCTION>
-inline void
-ExecutorTraits<EXECUTOR>::dispatch(const EXECUTOR& executor,
-                                   BSLS_COMPILERFEATURES_FORWARD_REF(FUNCTION)
-                                       f)
+inline void ExecutorTraits<EXECUTOR>::dispatch(const EXECUTOR& executor,
+                                               FUNCTION&&      f)
 {
-    ExecutorTraits_Imp::dispatch(executor,
-                                 BSLS_COMPILERFEATURES_FORWARD(FUNCTION, f));
+    ExecutorTraits_Imp::dispatch(executor, bsl::forward<FUNCTION>(f));
 }
 
 }  // close package namespace
