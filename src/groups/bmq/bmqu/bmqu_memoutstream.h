@@ -63,9 +63,9 @@ class MemOutStream_BufferHolder {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    MemOutStream_BufferHolder(const MemOutStream_BufferHolder&);  // = delete
+    MemOutStream_BufferHolder(const MemOutStream_BufferHolder&) = delete;
     MemOutStream_BufferHolder&
-    operator=(const MemOutStream_BufferHolder&);  // = delete
+    operator=(const MemOutStream_BufferHolder&) = delete;
 
   protected:
     // PROTECTED DATA
@@ -96,8 +96,8 @@ class MemOutStream : private virtual MemOutStream_BufferHolder,
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    MemOutStream(const MemOutStream&);             // = delete
-    MemOutStream& operator=(const MemOutStream&);  // = delete
+    MemOutStream(const MemOutStream&)            = delete;
+    MemOutStream& operator=(const MemOutStream&) = delete;
 
   public:
     // CREATORS
