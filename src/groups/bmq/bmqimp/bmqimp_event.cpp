@@ -396,11 +396,9 @@ Event::print(bsl::ostream& stream, int level, int spacesPerLevel) const
             printer.printAttribute("errorDescription", d_errorDescription);
         }
         if (!d_queues.empty()) {
-            for (QueuesMap::const_iterator citer = d_queues.begin();
-                 citer != d_queues.end();
-                 ++citer) {
-                BSLS_ASSERT_SAFE(citer->second);
-                printer.printAttribute("queue", citer->second->uri());
+            for (const auto& [queueId, queue] : d_queues) {
+                BSLS_ASSERT_SAFE(queue);
+                printer.printAttribute("queue", queue->uri());
             }
         }
     } break;
@@ -413,11 +411,9 @@ Event::print(bsl::ostream& stream, int level, int spacesPerLevel) const
             printer.printAttribute("rawEventType", d_rawEvent.type());
         }
         if (!d_queues.empty()) {
-            for (QueuesMap::const_iterator citer = d_queues.begin();
-                 citer != d_queues.end();
-                 ++citer) {
-                BSLS_ASSERT_SAFE(citer->second);
-                printer.printAttribute("queue", citer->second->uri());
+            for (const auto& [queueId, queue] : d_queues) {
+                BSLS_ASSERT_SAFE(queue);
+                printer.printAttribute("queue", queue->uri());
             }
         }
         else {
