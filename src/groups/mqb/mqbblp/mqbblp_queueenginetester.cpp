@@ -42,8 +42,6 @@
 #include <bdlb_tokenizer.h>
 #include <bdlbb_blob.h>
 #include <bdlbb_blobutil.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bsl_limits.h>
 #include <bsl_memory.h>
 #include <bsl_utility.h>
@@ -760,13 +758,15 @@ QueueEngineTester::getHandle(const bsl::string& clientText)
 
         const ClientContextSp& clientContext = clientContextCiter->second;
 
-        mqbi::QueueHandle::GetHandleCallback callback = bdlf::BindUtil::bindS(
-            d_allocator_p,
-            &dummyGetHandleCallback,
-            &handle,
-            handleParams,
-            bdlf::PlaceHolders::_1,   // status
-            bdlf::PlaceHolders::_2);  // handle
+        mqbi::QueueHandle::GetHandleCallback callback =
+            [handleOut = &handle,
+             handleParams](const bmqp_ctrlmsg::Status& status,
+                           mqbi::QueueHandle*          handleIn) {
+                dummyGetHandleCallback(handleOut,
+                                       handleParams,
+                                       status,
+                                       handleIn);
+            };
 
         mqbi::OpenQueueConfirmationCookieSp confirmationCookie;
         confirmationCookie.createInplace(d_allocator_p);
@@ -803,13 +803,15 @@ QueueEngineTester::getHandle(const bsl::string& clientText)
                     10,
                     d_allocator_p));
 
-        mqbi::QueueHandle::GetHandleCallback callback = bdlf::BindUtil::bindS(
-            d_allocator_p,
-            &dummyGetHandleCallback,
-            &handle,
-            handleParams,
-            bdlf::PlaceHolders::_1,
-            bdlf::PlaceHolders::_2);
+        mqbi::QueueHandle::GetHandleCallback callback =
+            [handleOut = &handle,
+             handleParams](const bmqp_ctrlmsg::Status& status,
+                           mqbi::QueueHandle*          handleIn) {
+                dummyGetHandleCallback(handleOut,
+                                       handleParams,
+                                       status,
+                                       handleIn);
+            };
 
         mqbi::OpenQueueConfirmationCookieSp confirmationCookie;
         confirmationCookie.createInplace(d_allocator_p);
@@ -914,12 +916,14 @@ int QueueEngineTester::configureHandle(const bsl::string& clientText)
 
     int rc = bmqp_ctrlmsg::StatusCategory::E_UNKNOWN;
     const mqbi::QueueHandle::HandleConfiguredCallback configuredCb =
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &dummyHandleConfiguredCallback,
-                              &rc,
-                              bdlf::PlaceHolders::_1,  // status
-                              bdlf::PlaceHolders::_2,  // streamParameters
-                              handle);
+        [rcOut = &rc,
+         handle](const bmqp_ctrlmsg::Status&           status,
+                 const bmqp_ctrlmsg::StreamParameters& streamParameters) {
+            dummyHandleConfiguredCallback(rcOut,
+                                          status,
+                                          streamParameters,
+                                          handle);
+        };
 
     handle->configure(streamParams, configuredCb);
 
@@ -1322,13 +1326,11 @@ int QueueEngineTester::releaseHandle(const bsl::string& clientText)
     // 2. Release
     rc = bmqp_ctrlmsg::StatusCategory::E_UNKNOWN;
     const mqbi::QueueHandle::HandleReleasedCallback releasedCb =
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &QueueEngineTester::dummyHandleReleasedCallback,
-                              this,
-                              &rc,
-                              bdlf::PlaceHolders::_1,  // handle
-                              bdlf::PlaceHolders::_2,  // isDeleted
-                              clientKey);
+        [this, rcOut = &rc, clientKey](
+            const bsl::shared_ptr<mqbi::QueueHandle>& handleSp,
+            const mqbi::QueueHandleReleaseResult      result) {
+            dummyHandleReleasedCallback(rcOut, handleSp, result, clientKey);
+        };
 
     d_queueEngine_mp->releaseHandle(handle, handleParams, isFinal, releasedCb);
 
@@ -1415,14 +1417,15 @@ int QueueEngineTester::releaseHandle(const bsl::string& clientText,
     // 2. Release
     rc = bmqp_ctrlmsg::StatusCategory::E_UNKNOWN;
     const mqbi::QueueHandle::HandleReleasedCallback releasedCb =
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &QueueEngineTester::handleReleasedCallback,
-                              this,
-                              &rc,
-                              isDeleted,
-                              bdlf::PlaceHolders::_1,  // handle
-                              bdlf::PlaceHolders::_2,  // isDeleted
-                              clientKey);
+        [this, rcOut = &rc, isDeleted, clientKey](
+            const bsl::shared_ptr<mqbi::QueueHandle>& handleSp,
+            const mqbi::QueueHandleReleaseResult      result) {
+            handleReleasedCallback(rcOut,
+                                   isDeleted,
+                                   handleSp,
+                                   result,
+                                   clientKey);
+        };
 
     d_queueEngine_mp->releaseHandle(handle, handleParams, isFinal, releasedCb);
 
