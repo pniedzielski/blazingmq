@@ -635,8 +635,8 @@ inline void MultiQueueThreadPool<TYPE>::processMonitorEvents()
     // Check each queue to make sure it has processed the last monitor event
     // (this will always succeed on the first iteration because of the way
     // QueueInfo is initialized)
-    for (size_t i = 0; i < d_queues.size(); ++i) {
-        QueueInfo& queue = *d_queues[i];
+    for (const bsl::shared_ptr<QueueInfo>& queueSp : d_queues) {
+        QueueInfo& queue = *queueSp;
 
         const MonitorEventState prevState = static_cast<MonitorEventState>(
             queue.d_monitorState.testAndSwap(e_MONITOR_PROCESSED,
@@ -686,8 +686,8 @@ inline void MultiQueueThreadPool<TYPE>::checkStuckEvents()
 {
     const bsls::Types::Int64 now =
         bsls::SystemTime::nowMonotonicClock().totalNanoseconds();
-    for (size_t i = 0; i < d_queues.size(); ++i) {
-        const QueueInfo& queue = *d_queues[i];
+    for (const bsl::shared_ptr<QueueInfo>& queueSp : d_queues) {
+        const QueueInfo& queue = *queueSp;
 
         const bsls::Types::Int64 lastProcessingStartTime =
             queue.d_lastProcessingStartTime.load();
@@ -825,9 +825,9 @@ inline int MultiQueueThreadPool<TYPE>::start()
 
     // Set up threads and wait until all have started
     bslmt::Latch latch(d_config.d_numQueues);
-    for (size_t i = 0; i < d_queues.size(); ++i) {
+    for (const bsl::shared_ptr<QueueInfo>& queueSp : d_queues) {
         [[maybe_unused]] const int rc = d_config.d_threadPool_p->enqueueJob(
-            ThisClass::ProcessQueueJob(&latch, this, d_queues[i]));
+            ThisClass::ProcessQueueJob(&latch, this, queueSp));
         BSLS_ASSERT_SAFE(rc == 0);
     }
     latch.wait();
@@ -872,8 +872,8 @@ inline void MultiQueueThreadPool<TYPE>::stop()
     }
 
     // Signal all queues to stop.
-    for (size_t i = 0; i < d_queues.size(); ++i) {
-        QueueInfo& info = *d_queues[i];
+    for (const bsl::shared_ptr<QueueInfo>& queueSp : d_queues) {
+        QueueInfo& info = *queueSp;
 
         // According to `d_processQueueRefCount` usage contract,
         // we have to apply the following updates here:
@@ -943,9 +943,9 @@ inline int MultiQueueThreadPool<TYPE>::enqueueEventOnAllQueues(EventSp&& event)
 
     // Enqueue on each selected queue
     int lastError = 0;
-    for (size_t queueIdx = 0; queueIdx < d_queues.size(); ++queueIdx) {
+    for (const bsl::shared_ptr<QueueInfo>& queueSp : d_queues) {
         // [try to] Push back item
-        const int pushRet = d_queues[queueIdx]->d_queue_p->pushBack(eventObj);
+        const int pushRet = queueSp->d_queue_p->pushBack(eventObj);
 
         if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(0 != pushRet)) {
             BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
@@ -962,8 +962,8 @@ inline void MultiQueueThreadPool<TYPE>::waitUntilEmpty()
     bool fullPass = false;
     while (!fullPass) {
         fullPass = true;
-        for (size_t i = 0; i < d_queues.size(); ++i) {
-            while (!d_queues[i]->d_queue_p->isEmpty()) {
+        for (const bsl::shared_ptr<QueueInfo>& queueSp : d_queues) {
+            while (!queueSp->d_queue_p->isEmpty()) {
                 bslmt::ThreadUtil::yield();
                 fullPass = false;
             }
