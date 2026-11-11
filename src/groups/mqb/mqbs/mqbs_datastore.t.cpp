@@ -210,8 +210,8 @@ static void test2_defaultHashUniqueness()
              << "Keys with the highest collisions..: " << endl;
 
         Keys& keys = hashes[maxCollisionsHash];
-        for (size_t i = 0; i < keys.size(); ++i) {
-            cout << "  " << keys[i] << '\n';
+        for (const auto& key : keys) {
+            cout << "  " << key << '\n';
         }
     }
 }
@@ -297,8 +297,8 @@ static void test3_customHashUniqueness()
              << "Keys with the highest collisions..: " << endl;
 
         Keys& keys = hashes[maxCollisionsHash];
-        for (size_t i = 0; i < keys.size(); ++i) {
-            cout << "  " << keys[i] << '\n';
+        for (const auto& key : keys) {
+            cout << "  " << key << '\n';
         }
     }
 }
