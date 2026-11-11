@@ -63,13 +63,13 @@ void QueueHandle::assertConsistentSubStreamInfo(const bsl::string& appId,
 unsigned int
 QueueHandle::subscription2downstreamSubQueueId(unsigned int sId) const
 {
-    Subscriptions::const_iterator cit = d_subscriptions.find(sId);
-    unsigned int                  downstreamSubQueueId;
+    auto         cit = d_subscriptions.find(sId);
+    unsigned int downstreamSubQueueId;
 
     if (cit == d_subscriptions.end()) {
         // To assist those tests which do not bother to configureQueue after
         // OpenQueue, assume this is about bmqp::ProtocolUtil::k_DEFAULT_APP_ID
-        SubStreams::const_iterator citInfo = d_subStreamInfos.find(
+        auto citInfo = d_subStreamInfos.find(
             bmqp::ProtocolUtil::k_DEFAULT_APP_ID);
         BSLS_ASSERT_OPT(citInfo != d_subStreamInfos.end());
 
@@ -134,7 +134,7 @@ QueueHandle::registerSubStream(const bmqp_ctrlmsg::SubQueueIdInfo& stream,
 {
     assertConsistentSubStreamInfo(stream.appId(), stream.subId());
 
-    SubStreams::iterator it = d_subStreamInfos.find(stream.appId());
+    auto it = d_subStreamInfos.find(stream.appId());
 
     if (it == d_subStreamInfos.end()) {
         d_downstreams.emplace(stream.subId(),
@@ -159,10 +159,10 @@ void QueueHandle::registerSubscription(unsigned int downstreamSubId,
                                        const bmqp_ctrlmsg::ConsumerInfo& ci,
                                        unsigned int upstreamId)
 {
-    Downstreams::iterator itDownstream = d_downstreams.find(downstreamSubId);
+    auto itDownstream = d_downstreams.find(downstreamSubId);
     BSLS_ASSERT_SAFE(itDownstream != d_downstreams.end());
 
-    Subscriptions::iterator itS = d_subscriptions.find(downstreamId);
+    auto itS = d_subscriptions.find(downstreamId);
 
     if (itS == d_subscriptions.end()) {
         itS = d_subscriptions
@@ -186,7 +186,7 @@ bool QueueHandle::unregisterSubStream(const bmqp_ctrlmsg::SubQueueIdInfo& info,
                                       const mqbi::QueueCounts& counts,
                                       bool                     isFinal)
 {
-    SubStreams::iterator it = d_subStreamInfos.find(info.appId());
+    auto it = d_subStreamInfos.find(info.appId());
 
     BSLS_ASSERT_SAFE(it != d_subStreamInfos.end());
 
@@ -222,7 +222,7 @@ void QueueHandle::confirmMessage(
     unsigned int                                  downstreamSubQueueId)
 {
     // Update unconfirmed messages collection
-    Downstreams::iterator mapIter = d_downstreams.find(downstreamSubQueueId);
+    auto mapIter = d_downstreams.find(downstreamSubQueueId);
 
     BSLS_ASSERT_OPT(mapIter != d_downstreams.end());
 
@@ -245,7 +245,7 @@ void QueueHandle::rejectMessage(const bmqt::MessageGUID& msgGUID,
                                 unsigned int             downstreamSubQueueId)
 {
     // Update unconfirmed messages collection
-    Downstreams::iterator mapIter = d_downstreams.find(downstreamSubQueueId);
+    auto mapIter = d_downstreams.find(downstreamSubQueueId);
 
     BSLS_ASSERT_OPT(mapIter != d_downstreams.end());
 
@@ -310,7 +310,7 @@ void QueueHandle::deliverMessage(
     for (const auto& subscription : subscriptions) {
         unsigned int sId              = subscription.id();
         unsigned int downstreamSubId  = subscription2downstreamSubQueueId(sId);
-        Downstreams::iterator mapIter = d_downstreams.find(downstreamSubId);
+        auto         mapIter          = d_downstreams.find(downstreamSubId);
         BSLS_ASSERT_OPT(mapIter != d_downstreams.end());
 
         GUIDMap& guids = mapIter->second.d_unconfirmedMessages;
@@ -396,7 +396,7 @@ int QueueHandle::transferUnconfirmedMessageGUID(
     const mqbi::RedeliveryVisitor& out,
     unsigned int                   subQueueId)
 {
-    Downstreams::iterator mapIter = d_downstreams.find(subQueueId);
+    auto mapIter = d_downstreams.find(subQueueId);
     BSLS_ASSERT_OPT(mapIter != d_downstreams.end());
 
     GUIDMap&  guids  = mapIter->second.d_unconfirmedMessages;
@@ -427,8 +427,7 @@ mqbi::QueueHandle* QueueHandle::setHandleParameters(
 mqbi::QueueHandle* QueueHandle::setStreamParameters(
     const bmqp_ctrlmsg::StreamParameters& streamParameters)
 {
-    SubStreams::iterator infoIter = d_subStreamInfos.find(
-        streamParameters.appId());
+    auto infoIter = d_subStreamInfos.find(streamParameters.appId());
 
     BSLS_ASSERT_SAFE(infoIter != d_subStreamInfos.end());
 
@@ -457,7 +456,7 @@ QueueHandle& QueueHandle::_setCanDeliver(const bsl::string& appId, bool value)
     BSLS_ASSERT_OPT(citInfo != d_subStreamInfos.end());
 
     unsigned int downstreamSubQueueId = citInfo->second.d_downstreamSubQueueId;
-    Downstreams::iterator it = d_downstreams.find(downstreamSubQueueId);
+    auto         it = d_downstreams.find(downstreamSubQueueId);
 
     BSLS_ASSERT_OPT(it != d_downstreams.end());
 
@@ -492,8 +491,7 @@ void QueueHandle::_resetUnconfirmed(const bsl::string& appId)
     SubStreams::const_iterator citInfo = d_subStreamInfos.find(appId);
     BSLS_ASSERT_OPT(citInfo != d_subStreamInfos.end());
 
-    Downstreams::iterator it = d_downstreams.find(
-        citInfo->second.d_downstreamSubQueueId);
+    auto it = d_downstreams.find(citInfo->second.d_downstreamSubQueueId);
 
     BSLS_ASSERT_OPT(it != d_downstreams.end());
 
@@ -548,8 +546,7 @@ bool QueueHandle::canDeliver(unsigned int downstreamSubscriptionId) const
     unsigned int downstreamSubQueueId = subscription2downstreamSubQueueId(
         downstreamSubscriptionId);
 
-    Downstreams::const_iterator citDownstream = d_downstreams.find(
-        downstreamSubQueueId);
+    auto citDownstream = d_downstreams.find(downstreamSubQueueId);
     BSLS_ASSERT_OPT(citDownstream != d_downstreams.end());
     return citDownstream->second.d_canDeliver;
 }
@@ -597,7 +594,7 @@ void QueueHandle::loadInternals(mqbcmd::QueueHandle* out) const
         os << subStreamContext.d_streamParameters;
         subStream.parametersJson() = os.str();
 
-        Downstreams::const_iterator cit = d_downstreams.find(subId);
+        auto cit = d_downstreams.find(subId);
 
         BSLS_ASSERT_OPT(cit != d_downstreams.end());
 
@@ -615,14 +612,13 @@ bmqp::SchemaLearner::Context& QueueHandle::schemaLearnerContext() const
 //   (specific to mqbmock::QueueHandle)
 bsl::string QueueHandle::_messages(const bsl::string& appId) const
 {
-    SubStreams::const_iterator citInfo = d_subStreamInfos.find(appId);
+    auto citInfo = d_subStreamInfos.find(appId);
 
     if (citInfo == d_subStreamInfos.end()) {
         return "";  // RETURN
     }
 
-    Downstreams::const_iterator cit = d_downstreams.find(
-        citInfo->second.d_downstreamSubQueueId);
+    auto cit = d_downstreams.find(citInfo->second.d_downstreamSubQueueId);
 
     if (cit == d_downstreams.end()) {
         return "";  // RETURN
@@ -649,14 +645,13 @@ bsl::string QueueHandle::_messages(const bsl::string& appId) const
 
 int QueueHandle::_numMessages(const bsl::string& appId) const
 {
-    SubStreams::const_iterator citInfo = d_subStreamInfos.find(appId);
+    auto citInfo = d_subStreamInfos.find(appId);
 
     if (citInfo == d_subStreamInfos.end()) {
         return 0;  // RETURN
     }
 
-    Downstreams::const_iterator cit = d_downstreams.find(
-        citInfo->second.d_downstreamSubQueueId);
+    auto cit = d_downstreams.find(citInfo->second.d_downstreamSubQueueId);
 
     if (cit == d_downstreams.end()) {
         return 0;  // RETURN
@@ -701,7 +696,7 @@ const bsl::string QueueHandle::_appIds() const
 const bmqp_ctrlmsg::StreamParameters&
 QueueHandle::_streamParameters(const bsl::string& appId) const
 {
-    SubStreams::const_iterator itInfo = d_subStreamInfos.find(appId);
+    auto itInfo = d_subStreamInfos.find(appId);
 
     BSLS_ASSERT_OPT(itInfo != d_subStreamInfos.end() &&
                     "'appId' not registered");
