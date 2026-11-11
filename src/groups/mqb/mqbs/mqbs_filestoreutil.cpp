@@ -38,7 +38,6 @@
 #include <bdlb_scopeexit.h>
 #include <bdlb_string.h>
 #include <bdlb_stringviewutil.h>
-#include <bdlf_bind.h>
 #include <bdls_filesystemutil.h>
 #include <bdlt_currenttime.h>
 #include <bdlt_datetimeutil.h>
@@ -1004,12 +1003,14 @@ int FileStoreUtil::openFileSetWriteMode(bsl::ostream&         errorDescription,
         rc_QLIST_GROW_FAILURE   = -4
     };
 
-    bdlb::ScopeExitAny failureGuard(bdlf::BindUtil::bind(closeAndDeleteFileSet,
-                                                         fileSet,
-                                                         deleteOnFailure,
-                                                         journalFd,
-                                                         dataFd,
-                                                         qlistFd));
+    bdlb::ScopeExitAny failureGuard(
+        [fileSet, deleteOnFailure, journalFd, dataFd, qlistFd]() {
+            closeAndDeleteFileSet(fileSet,
+                                  deleteOnFailure,
+                                  journalFd,
+                                  dataFd,
+                                  qlistFd);
+        });
 
     int rc = openFileSet(errorDescription,
                          fileSet,
