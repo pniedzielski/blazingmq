@@ -52,10 +52,9 @@ BlobPoolUtil::createBlobPool(bdlbb::BlobBufferFactory* blobBufferFactory_p,
 
     return bsl::allocate_shared<BlobSpPool>(
         alloc,
-        bdlf::BindUtil::bind(&createBlob,
-                             blobBufferFactory_p,
-                             bdlf::PlaceHolders::_1,   // arena
-                             bdlf::PlaceHolders::_2),  // allocator
+        [blobBufferFactory_p](void* arena, bslma::Allocator* blobAllocator) {
+            createBlob(blobBufferFactory_p, arena, blobAllocator);
+        },
         k_BLOB_POOL_GROWTH_STRATEGY);
 }
 
