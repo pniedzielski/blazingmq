@@ -65,8 +65,8 @@ void snapshotValueVec(bsl::vector<StatValue>* vec,
                       bsls::Types::Int64      snapshotTime)
 {
     if (vec) {
-        for (size_t i = 0; i < vec->size(); ++i) {
-            (*vec)[i].takeSnapshot(snapshotTime);
+        for (StatValue& value : *vec) {
+            value.takeSnapshot(snapshotTime);
         }
     }
 }
@@ -98,8 +98,8 @@ void syncValues(bsl::vector<StatValue>*       vec,
 void clearStats(bsl::vector<StatValue>* values)
 {
     if (values) {
-        for (size_t i = 0; i < values->size(); ++i) {
-            (*values)[i].clearCurrentStats();
+        for (StatValue& value : *values) {
+            value.clearCurrentStats();
         }
     }
 }
@@ -213,13 +213,10 @@ void StatContext::initValues(ValueVecPtr& vec, bsls::Types::Int64 initTime)
 void StatContext::clearDeletedSubcontexts(
     bsl::vector<ValueVec*>* expiredValuesVec)
 {
-    for (StatContextVector::iterator iter = d_deletedSubcontexts.begin();
-         iter != d_deletedSubcontexts.end();
-         ++iter) {
+    for (StatContext* context : d_deletedSubcontexts) {
         if (expiredValuesVec) {
-            for (size_t i = 0; i < expiredValuesVec->size(); ++i) {
-                addValues((*expiredValuesVec)[i],
-                          (*iter)->d_directValues_p.ptr());
+            for (ValueVec* expiredValues : *expiredValuesVec) {
+                addValues(expiredValues, context->d_directValues_p.ptr());
             }
         }
 
@@ -229,10 +226,10 @@ void StatContext::clearDeletedSubcontexts(
             // pointer on the subcontext gives us an iterator into this vector,
             // that we use to erase the element.
 
-            BSLS_ASSERT((*iter)->d_update_p);
+            BSLS_ASSERT(context->d_update_p);
             bsl::vector<bmqstm::StatContextUpdate>& updates =
                 d_update_p->subcontexts();
-            bmqstm::StatContextUpdate* update = (*iter)->d_update_p;
+            bmqstm::StatContextUpdate* update = context->d_update_p;
             BSLS_ASSERT(updates.begin() <= update && update < updates.end());
 
             // Swap the update to be deleted with the last update, update the
@@ -248,11 +245,11 @@ void StatContext::clearDeletedSubcontexts(
             updates.resize(updates.size() - 1);
         }
 
-        BSLS_ASSERT(d_subcontextsById.find((*iter)->d_uniqueId) !=
+        BSLS_ASSERT(d_subcontextsById.find(context->d_uniqueId) !=
                     d_subcontextsById.end());
-        d_subcontextsById.erase(d_subcontextsById.find((*iter)->d_uniqueId));
+        d_subcontextsById.erase(d_subcontextsById.find(context->d_uniqueId));
 
-        d_allocator_p->deleteObject(*iter);
+        d_allocator_p->deleteObject(context);
     }
 
     d_deletedSubcontexts.clear();
@@ -274,10 +271,7 @@ void StatContext::moveNewSubcontexts()
         updates->reserve(updates->size() + localNewSubcontexts.size());
     }
 
-    for (StatContextVector::iterator iter = localNewSubcontexts.begin();
-         iter != localNewSubcontexts.end();
-         ++iter) {
-        StatContext*               context = *iter;
+    for (StatContext* context : localNewSubcontexts) {
         StatContextMap::value_type val(Id(context->d_id, d_allocator_p),
                                        context);
         d_subcontexts.insert(val);
@@ -361,10 +355,8 @@ void StatContext::snapshotImp(bsls::Types::Int64 snapshotTime)
 
     // Snapshot all subcontexts and, if we're a table, add them to our
     // children's total
-    for (StatContextVector::iterator iter = d_deletedSubcontexts.begin();
-         iter != d_deletedSubcontexts.end();
-         ++iter) {
-        snapshotSubcontext(*iter, snapshotTime);
+    for (StatContext* context : d_deletedSubcontexts) {
+        snapshotSubcontext(context, snapshotTime);
     }
 
     for (StatContextMap::iterator iter = d_subcontexts.begin();
@@ -445,10 +437,8 @@ void StatContext::cleanupImp(bsl::vector<ValueVec*>* expiredValuesVec)
 
     clearDeletedSubcontexts(expiredValuesVec);
 
-    for (StatContextMap::iterator iter = d_subcontexts.begin();
-         iter != d_subcontexts.end();
-         ++iter) {
-        iter->second->cleanupImp(expiredValuesVec);
+    for (const auto& [id, context] : d_subcontexts) {
+        context->cleanupImp(expiredValuesVec);
     }
 
     if (expiredValuesVec) {
@@ -473,13 +463,11 @@ void StatContext::applyUpdate(const bmqstm::StatContextUpdate& update)
     // Create, update, or delete subcontexts as specified in the update.
 
     typedef bmqstm::StatContextUpdateFlags Flags;
-    for (bsl::vector<bmqstm::StatContextUpdate>::const_iterator i =
-             update.subcontexts().begin();
-         i != update.subcontexts().end();
-         ++i) {
+    for (const bmqstm::StatContextUpdate& subUpdate : update.subcontexts()) {
         StatContext* context = 0;
-        if (bdlb::BitUtil::isBitSet(i->flags(), Flags::E_CONTEXT_CREATED)) {
-            StatContextConfiguration config(*i);
+        if (bdlb::BitUtil::isBitSet(subUpdate.flags(),
+                                    Flags::E_CONTEXT_CREATED)) {
+            StatContextConfiguration config(subUpdate);
 
             // Subcontexts added by an update are only deletable by another
             // update, but they must be cleaned up when this object is
@@ -489,16 +477,18 @@ void StatContext::applyUpdate(const bmqstm::StatContextUpdate& update)
             context->d_released = true;
         }
         else {
-            StatContextIdMap::iterator si = d_subcontextsById.find(i->id());
+            StatContextIdMap::iterator si = d_subcontextsById.find(
+                subUpdate.id());
             if (si == d_subcontextsById.end()) {
                 continue;  // CONTINUE
             }
             context = si->second;
-            context->applyUpdate(*i);
+            context->applyUpdate(subUpdate);
         }
         BSLS_ASSERT(context);
 
-        if (bdlb::BitUtil::isBitSet(i->flags(), Flags::E_CONTEXT_DELETED)) {
+        if (bdlb::BitUtil::isBitSet(subUpdate.flags(),
+                                    Flags::E_CONTEXT_DELETED)) {
             context->d_isDeleted = true;
         }
     }
@@ -549,9 +539,9 @@ StatContext::StatContext(const Config&     config,
 
         // Configure any value defs without a history size with the default
         // history size.
-        for (size_t i = 0; i < d_valueDefs_p->size(); ++i) {
-            if ((*d_valueDefs_p)[i].d_sizes.empty()) {
-                (*d_valueDefs_p)[i].d_sizes = config.d_defaultHistorySizes;
+        for (ValueDefinition& valueDef : *d_valueDefs_p) {
+            if (valueDef.d_sizes.empty()) {
+                valueDef.d_sizes = config.d_defaultHistorySizes;
             }
         }
 
@@ -653,21 +643,16 @@ void StatContext::cleanup()
 void StatContext::clearValues()
 {
     moveNewSubcontexts();
-    for (StatContextMap::iterator iter = d_subcontexts.begin();
-         iter != d_subcontexts.end();
-         ++iter) {
-        iter->second->clearValues();
+    for (const auto& [id, context] : d_subcontexts) {
+        context->clearValues();
     }
 
     struct Local {
         static void clearVec(bmqst::StatContext::ValueVecPtr& vec)
         {
             if (vec) {
-                for (bmqst::StatContext::ValueVec::iterator iter =
-                         vec->begin();
-                     iter != vec->end();
-                     ++iter) {
-                    iter->clear(0);
+                for (bmqst::StatValue& value : *vec) {
+                    value.clear(0);
                 }
             }
         }
@@ -689,14 +674,12 @@ void StatContext::clearSubcontexts()
 {
     moveNewSubcontexts();
 
-    for (StatContextMap::iterator iter = d_subcontexts.begin();
-         iter != d_subcontexts.end();
-         ++iter) {
-        if (iter->second->d_released.swap(true)) {
+    for (const auto& [id, context] : d_subcontexts) {
+        if (context->d_released.swap(true)) {
             // Subcontext has no external references, so we can safely delete
             // it.
 
-            d_allocator_p->deleteObject(iter->second);
+            d_allocator_p->deleteObject(context);
         }
     }
     d_subcontexts.clear();
