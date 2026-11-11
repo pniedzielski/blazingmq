@@ -433,9 +433,9 @@ inline void Strand<EXECUTOR>::start()
     if (!d_jobQueue.empty() && !d_isRunning) {
         // The job queue isn't empty but no async operation is in progress.
         // Initiate one.
-        ExecutorTraits<EXECUTOR>::post(d_innerExecutor,
-                                       bdlf::MemFnUtil::memFn(&Strand::run,
-                                                              this));
+        ExecutorTraits<EXECUTOR>::post(d_innerExecutor, [this]() {
+            run();
+        });
         d_isRunning = true;
     }
 
@@ -552,9 +552,10 @@ inline void StrandExecutor<EXECUTOR>::post(FUNCTION&& f) const
         // Initiate one.
 
         try {
-            ExecutorTraits<EXECUTOR>::post(
-                d_context_p->d_innerExecutor,
-                bdlf::MemFnUtil::memFn(&ContextType::run, d_context_p));
+            ExecutorTraits<EXECUTOR>::post(d_context_p->d_innerExecutor,
+                                           [context = d_context_p]() {
+                                               context->run();
+                                           });
             d_context_p->d_isRunning = true;
         }
         catch (...) {
