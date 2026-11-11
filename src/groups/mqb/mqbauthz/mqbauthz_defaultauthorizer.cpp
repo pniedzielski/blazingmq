@@ -92,20 +92,6 @@ struct DefaultAuthorizer_PolicyHandler {
     }
 };
 
-struct FindKey {
-    bsl::string_view d_key;
-
-    FindKey(bsl::string_view key)
-    : d_key(key)
-    {
-    }
-
-    bool operator()(const mqbcfg::PluginSettingKeyValue& pluginSetting) const
-    {
-        return pluginSetting.key() == d_key;
-    }
-};
-
 }
 
 bsl::string_view DefaultAuthorizer::k_NAME = "DefaultAuthorizer";
@@ -184,9 +170,12 @@ int DefaultAuthorizerPluginFactory::createPolicy(
     // Find the path to the policy document
     typedef bsl::vector<mqbcfg::PluginSettingKeyValue> PluginSettings;
     const PluginSettings&          settings = config.settings();
-    PluginSettings::const_iterator it       = bsl::find_if(settings.cbegin(),
-                                                     settings.cend(),
-                                                     FindKey("policyPath"));
+    PluginSettings::const_iterator it       = bsl::find_if(
+        settings.cbegin(),
+        settings.cend(),
+        [](const mqbcfg::PluginSettingKeyValue& pluginSetting) {
+            return pluginSetting.key() == bsl::string_view("policyPath");
+        });
     if (it == settings.cend()) {
         // No policy set, everything will be denied
         BALL_LOG_WARN
