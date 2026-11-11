@@ -203,7 +203,7 @@ bool QueueOptions::loadSubscription(Subscription*             subscription,
 {
     BSLS_ASSERT_SAFE(subscription);
 
-    Subscriptions::const_iterator cit = d_subscriptions.find(handle);
+    auto cit = d_subscriptions.find(handle);
 
     if (cit == d_subscriptions.end()) {
         return false;  // RETURN
