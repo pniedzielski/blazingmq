@@ -888,10 +888,8 @@ void NtcChannel::notifyWatermark(bmqio::ChannelWatermarkType::Enum type)
         watermarkFns = d_watermarkFns;
     }
 
-    for (bsl::vector<WatermarkFn>::iterator it = watermarkFns.begin();
-         it != watermarkFns.end();
-         ++it) {
-        (*it)(type);
+    for (const WatermarkFn& watermarkFn : watermarkFns) {
+        watermarkFn(type);
     }
 }
 
