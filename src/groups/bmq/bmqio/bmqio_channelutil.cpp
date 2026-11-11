@@ -269,10 +269,8 @@ bool ChannelUtil::isLocalHost(const ntsa::IpAddress& ip)
         s_localAddresses_p = &s_localAddresses;
     }
 
-    bsl::vector<ntsa::IpAddress>::const_iterator it;
-    for (it = s_localAddresses_p->begin(); it != s_localAddresses_p->end();
-         ++it) {
-        if (it->equals(ip)) {
+    for (const ntsa::IpAddress& address : *s_localAddresses_p) {
+        if (address.equals(ip)) {
             return true;  // RETURN
         }
     }

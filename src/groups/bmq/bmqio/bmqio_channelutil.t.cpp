@@ -394,10 +394,9 @@ static void test3_isLocalHost()
             bmqio::ResolveUtil::getLocalIpAddress(&localIPs).code(),
             ntsa::Error::e_OK);
 
-        bsl::vector<ntsa::IpAddress>::const_iterator it;
-        for (it = localIPs.begin(); it != localIPs.end(); ++it) {
-            PVV(*it);
-            BMQTST_ASSERT(bmqio::ChannelUtil::isLocalHost(*it));
+        for (const ntsa::IpAddress& address : localIPs) {
+            PVV(address);
+            BMQTST_ASSERT(bmqio::ChannelUtil::isLocalHost(address));
         }
     }
 }
