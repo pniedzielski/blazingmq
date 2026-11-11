@@ -216,8 +216,8 @@ void Interactive::processCommand(const StopCommand& command)
     if (d_parameters.noSessionEventHandler()) {
         // Join on all threads
         BALL_LOG_INFO << "Joining event handler threads";
-        for (size_t i = 0; i < d_eventHandlerThreads.size(); ++i) {
-            bslmt::ThreadUtil::join(d_eventHandlerThreads[i]);
+        for (bslmt::ThreadUtil::Handle& threadHandle : d_eventHandlerThreads) {
+            bslmt::ThreadUtil::join(threadHandle);
         }
         d_eventHandlerThreads.clear();
     }
@@ -451,7 +451,7 @@ void Interactive::processCommand(const PostCommand& command, bool hasMPs)
     // Build the messageEvent
     bmqa::MessageEventBuilder eventBuilder;
     d_session_p->loadMessageEventBuilder(&eventBuilder);
-    for (size_t i = 0; i < command.payload().size(); ++i) {
+    for (const bsl::string& payload : command.payload()) {
         bmqa::Message& msg = eventBuilder.startMessage();
 
         // Put a correlationId if the queue was opened with ACK
@@ -488,8 +488,7 @@ void Interactive::processCommand(const PostCommand& command, bool hasMPs)
         }
 
         // Set data
-        msg.setDataRef(command.payload()[i].c_str(),
-                       command.payload()[i].size());
+        msg.setDataRef(payload.c_str(), payload.size());
 
         bmqt::EventBuilderResult::Enum ebr = eventBuilder.packMessage(queueId);
         if (bmqt::EventBuilderResult::e_SUCCESS != ebr) {
@@ -547,10 +546,8 @@ void Interactive::processCommand(const ConfirmCommand& command)
 
     if (command.guid() == "*") {
         guids.reserve(messages.size());
-        for (MessagesMap::const_iterator it = messages.begin();
-             it != messages.end();
-             ++it) {
-            guids.push_back(it->first);
+        for (const auto& [guid, message] : messages) {
+            guids.push_back(guid);
         }
     }
     else if (command.guid()[0] == '+' || command.guid()[0] == '-') {
@@ -564,10 +561,8 @@ void Interactive::processCommand(const ConfirmCommand& command)
 
         if (value > 0) {
             // Oldest guids
-            for (MessagesMap::const_iterator it = messages.begin();
-                 it != messages.end();
-                 ++it) {
-                guids.push_back(it->first);
+            for (const auto& [guid, message] : messages) {
+                guids.push_back(guid);
                 if (--value == 0) {
                     break;  // BREAK
                 }
@@ -613,13 +608,11 @@ void Interactive::processCommand(const ConfirmCommand& command)
     }
 
     // Retrieve the message from the map
-    for (bsl::vector<bmqt::MessageGUID>::const_iterator itGUID = guids.begin();
-         itGUID != guids.end();
-         ++itGUID) {
-        MessagesMap::const_iterator itMsg = messages.find(*itGUID);
+    for (const bmqt::MessageGUID& guid : guids) {
+        MessagesMap::const_iterator itMsg = messages.find(guid);
         BSLS_ASSERT_SAFE(itMsg != messages.end());
 
-        BALL_LOG_INFO << "--> Confirming message with GUID " << *itGUID;
+        BALL_LOG_INFO << "--> Confirming message with GUID " << guid;
 
         // Send the confirm on the session (sadly under the mutex lock, but
         // this is interactive mode ...)
@@ -632,7 +625,7 @@ void Interactive::processCommand(const ConfirmCommand& command)
             << bmqt::GenericResult::Enum(rc) << " (" << rc << ")";
 
         // Remove from the map
-        messages.erase(*itGUID);
+        messages.erase(guid);
     }
 }
 
@@ -646,10 +639,7 @@ void Interactive::processCommand(const ListCommand& command)
         // Iterate over all open queues' messages
 
         size_t numUnconfirmed = 0;
-        for (UrisMaps::const_iterator mapCiter = d_uris.begin();
-             mapCiter != d_uris.end();
-             ++mapCiter) {
-            const UriEntryPtr& entry = mapCiter->second;
+        for (const auto& [uri, entry] : d_uris) {
             numUnconfirmed += entry->d_messages.size();
         }
 
@@ -659,17 +649,10 @@ void Interactive::processCommand(const ListCommand& command)
                 << "Unconfirmed message listing: " << numUnconfirmed
                 << " messages";
 
-            for (UrisMaps::const_iterator mapCiter = d_uris.begin();
-                 mapCiter != d_uris.end();
-                 ++mapCiter) {
-                const UriEntryPtr& entry    = mapCiter->second;
+            for (const auto& [uri, entry] : d_uris) {
                 const MessagesMap& messages = entry->d_messages;
-                for (MessagesMap::const_iterator msgCiter = messages.begin();
-                     msgCiter != messages.end();
-                     ++msgCiter) {
-                    printMessage(BALL_LOG_OUTPUT_STREAM,
-                                 ++index,
-                                 msgCiter->second);
+                for (const auto& [guid, message] : messages) {
+                    printMessage(BALL_LOG_OUTPUT_STREAM, ++index, message);
                 }
             }
         }
@@ -691,12 +674,8 @@ void Interactive::processCommand(const ListCommand& command)
                 << "Unconfirmed message listing: " << messages.size()
                 << " messages";
 
-            for (MessagesMap::const_iterator msgCiter = messages.begin();
-                 msgCiter != messages.end();
-                 ++msgCiter) {
-                printMessage(BALL_LOG_OUTPUT_STREAM,
-                             ++index,
-                             msgCiter->second);
+            for (const auto& [guid, message] : messages) {
+                printMessage(BALL_LOG_OUTPUT_STREAM, ++index, message);
             }
         }
     }
