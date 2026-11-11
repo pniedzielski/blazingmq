@@ -18,7 +18,6 @@
 #include <bmqscm_version.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bdlmt_eventscheduler.h>
 #include <bslma_default.h>
 #include <bslmt_semaphore.h>
@@ -48,15 +47,6 @@ struct SchedulerLockGuard_Context {
 };
 
 namespace {
-
-/// Post on the specified `sem_p`.
-void postSemaphore(bslmt::Semaphore* sem_p)
-{
-    // PRECONDITIONS
-    BSLS_ASSERT_SAFE(sem_p);
-
-    sem_p->post();
-}
 
 /// Functor scheduled by `SchedulerLockGuard` to park the scheduler's
 /// dispatcher thread.  Co-owns the shared context via a `shared_ptr` so it
@@ -121,9 +111,9 @@ SchedulerLockGuard::~SchedulerLockGuard()
     d_context_sp->d_releaseSem.post();
 
     bslmt::Semaphore drainSem;
-    d_scheduler_p->scheduleEvent(d_scheduler_p->now(),
-                                 bdlf::BindUtil::bind(&postSemaphore,
-                                                      &drainSem));
+    d_scheduler_p->scheduleEvent(d_scheduler_p->now(), [&drainSem]() {
+        drainSem.post();
+    });
     drainSem.wait();
 }
 
