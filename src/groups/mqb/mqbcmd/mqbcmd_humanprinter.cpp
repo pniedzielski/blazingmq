@@ -115,17 +115,16 @@ void printQueueStatus(bsl::ostream&         os,
     const Storages&                       storages = storageContent.storages();
     bmqu::OutStreamFormatSaver            fmtSaver(os);
 
-    for (Storages::const_iterator cit = storages.cbegin();
-         cit != storages.cend();
-         ++cit) {
+    for (const auto& storage : storages) {
         os << bmqu::PrintUtil::newlineAndIndent(level, spacesPerLevel)
-           << cit->queueKey() << " " << bsl::setfill(' ') << bsl::setw(7)
-           << cit->partitionId() << "      " << bsl::setfill(' ')
-           << bsl::setw(8) << bmqu::PrintUtil::prettyNumber(cit->numMessages())
-           << "  " << bsl::setfill(' ') << bsl::setw(10)
-           << bmqu::PrintUtil::prettyBytes(cit->numBytes()) << "    "
-           << cit->queueUri()
-           << (cit->isPersistent() ? "" : "  (non-persistent)");
+           << storage.queueKey() << " " << bsl::setfill(' ') << bsl::setw(7)
+           << storage.partitionId() << "      " << bsl::setfill(' ')
+           << bsl::setw(8)
+           << bmqu::PrintUtil::prettyNumber(storage.numMessages()) << "  "
+           << bsl::setfill(' ') << bsl::setw(10)
+           << bmqu::PrintUtil::prettyBytes(storage.numBytes()) << "    "
+           << storage.queueUri()
+           << (storage.isPersistent() ? "" : "  (non-persistent)");
     }
 }
 
@@ -184,24 +183,18 @@ void printClusterList(bsl::ostream& os, const ClusterList& clusterList)
     bmqu::OutStreamFormatSaver fmtSaver(os);
     os << "The following clusters are active:";
 
-    for (bsl::vector<ClusterInfo>::const_iterator itCluster =
-             clusterList.clusters().cbegin();
-         itCluster != clusterList.clusters().end();
-         ++itCluster) {
+    for (const ClusterInfo& cluster : clusterList.clusters()) {
         os << "\n    ";
 
-        bsl::string locality(Locality::toString(itCluster->locality()));
+        bsl::string locality(Locality::toString(cluster.locality()));
         bdlb::String::toUpper(&locality);
         os << "[" << bsl::left << bsl::setw(6) << locality << "] "
-           << itCluster->name() << ":";
+           << cluster.name() << ":";
 
-        for (bsl::vector<ClusterNode>::const_iterator itNode =
-                 itCluster->nodes().cbegin();
-             itNode != itCluster->nodes().cend();
-             ++itNode) {
-            os << "\n        " << bsl::left << bsl::setw(20)
-               << itNode->hostName() << bsl::setw(7) << itNode->nodeId()
-               << bsl::setw(14) << itNode->dataCenter();
+        for (const ClusterNode& node : cluster.nodes()) {
+            os << "\n        " << bsl::left << bsl::setw(20) << node.hostName()
+               << bsl::setw(7) << node.nodeId() << bsl::setw(14)
+               << node.dataCenter();
         }
         os << "\n";
     }
@@ -255,23 +248,18 @@ void printTunableList(bsl::ostream& os, const Tunables& tunables)
 
     // Compute the longest tunable name, for pretty-alignment
     bsl::size_t longestName = 0;
-    for (bsl::vector<Tunable>::const_iterator it =
-             tunables.tunables().cbegin();
-         it != tunables.tunables().cend();
-         ++it) {
-        longestName = bsl::max(longestName, it->name().length());
+    for (const Tunable& tunable : tunables.tunables()) {
+        longestName = bsl::max(longestName, tunable.name().length());
     }
 
     // Print all tunables
-    for (bsl::vector<Tunable>::const_iterator it =
-             tunables.tunables().cbegin();
-         it != tunables.tunables().cend();
-         ++it) {
-        os << it->name() << bsl::setw(longestName - it->name().length() + 4)
+    for (const Tunable& tunable : tunables.tunables()) {
+        os << tunable.name()
+           << bsl::setw(longestName - tunable.name().length() + 4)
            << bsl::setfill('.') << ": ";
         // NOTE: '+ 4' in order to have at least 2 '.' (and then the ": ")
-        printValue(os, it->value());
-        os << "\n    " << it->description() << "\n";
+        printValue(os, tunable.value());
+        os << "\n    " << tunable.description() << "\n";
     }
 }
 
@@ -303,15 +291,13 @@ void printPurgedQueues(bsl::ostream& os, const PurgedQueues& purgedQueueList)
     bsls::Types::Int64 totalBytes    = 0;
     bsls::Types::Int64 totalMessages = 0;
 
-    for (bsl::vector<PurgeQueueResult>::const_iterator it = queues.begin();
-         it != queues.end();
-         ++it) {
-        if (it->isErrorValue()) {
-            errorStream << "\n" << it->error().message();
+    for (const PurgeQueueResult& result : queues) {
+        if (result.isErrorValue()) {
+            errorStream << "\n" << result.error().message();
             continue;  // CONTINUE
         }
 
-        const PurgedQueueDetails& queue = it->queue();
+        const PurgedQueueDetails& queue = result.queue();
         stream << bsl::endl
                << "  " << bsl::setfill(' ') << bsl::setw(10) << bsl::right
                << bmqu::PrintUtil::prettyBytes(queue.numBytesPurged()) << "  "
@@ -403,13 +389,11 @@ void printFileStoreSummary(bsl::ostream&           os,
 
     typedef bsl::vector<FileSet> FileSets;
     const FileSets&              fileSets = summary.fileSets();
-    for (FileSets::const_iterator cit = fileSets.cbegin();
-         cit != fileSets.cend();
-         ++cit) {
+    for (const auto& fileSet : fileSets) {
         os << newlineAndIndent(level + 2, spacesPerLevel)
-           << cit->dataFileName() << " : "
+           << fileSet.dataFileName() << " : "
            << prettyNumber(static_cast<bsls::Types::Int64>(
-                  cit->aliasedBlobBufferCount()));
+                  fileSet.aliasedBlobBufferCount()));
     }
 
     const ActiveFileSet& activeFileSet = summary.activeFileSet();
@@ -491,23 +475,21 @@ void printClusterStorageSummary(bsl::ostream&                os,
 
     typedef bsl::vector<FileStore> FileStores;
     const FileStores&              fileStores = summary.fileStores();
-    for (FileStores::const_iterator cit = fileStores.cbegin();
-         cit != fileStores.cend();
-         ++cit) {
-        if (cit->state() == FileStoreState::CLOSED) {
+    for (const auto& fileStore : fileStores) {
+        if (fileStore.state() == FileStoreState::CLOSED) {
             os << bmqu::PrintUtil::newlineAndIndent(level, spacesPerLevel)
-               << "Partition [" << cit->partitionId() << "]: NOT OPEN.";
+               << "Partition [" << fileStore.partitionId() << "]: NOT OPEN.";
             continue;  // CONTINUE
         }
-        else if (cit->state() == FileStoreState::STOPPING) {
+        else if (fileStore.state() == FileStoreState::STOPPING) {
             os << bmqu::PrintUtil::newlineAndIndent(level, spacesPerLevel)
-               << "Partition [" << cit->partitionId() << "]: STOPPING.";
+               << "Partition [" << fileStore.partitionId() << "]: STOPPING.";
             continue;  // CONTINUE
         }
 
         printFileStoreSummary(os,
-                              cit->summary(),
-                              cit->partitionId(),
+                              fileStore.summary(),
+                              fileStore.partitionId(),
                               level + 1,
                               spacesPerLevel);
         os << "\n";
@@ -542,20 +524,18 @@ void printClusterQueueHelper(bsl::ostream&             os,
     bsl::size_t                        maxDomainLength = 0;
     typedef bsl::vector<ClusterDomain> ClusterDomains;
     const ClusterDomains& clusterDomains = clusterQueueHelper.domains();
-    for (ClusterDomains::const_iterator cit = clusterDomains.cbegin();
-         cit != clusterDomains.cend();
-         ++cit) {
-        maxDomainLength = bsl::max(maxDomainLength, cit->name().length());
+    for (const auto& clusterDomain : clusterDomains) {
+        maxDomainLength = bsl::max(maxDomainLength,
+                                   clusterDomain.name().length());
     }
 
-    for (ClusterDomains::const_iterator cit = clusterDomains.cbegin();
-         cit != clusterDomains.cend();
-         ++cit) {
+    for (const auto& clusterDomain : clusterDomains) {
         os << bmqu::PrintUtil::newlineAndIndent(level + 2, spacesPerLevel)
-           << cit->name() << bsl::setw(maxDomainLength - cit->name().length())
+           << clusterDomain.name()
+           << bsl::setw(maxDomainLength - clusterDomain.name().length())
            << bsl::setfill('.')
-           << ": numAssignedQueues=" << cit->numAssignedQueues();
-        if (!cit->loaded()) {
+           << ": numAssignedQueues=" << clusterDomain.numAssignedQueues();
+        if (!clusterDomain.loaded()) {
             os << " (domain not yet loaded)";
         }
         os << "\n";
@@ -569,28 +549,28 @@ void printClusterQueueHelper(bsl::ostream&             os,
 
     typedef bsl::vector<ClusterQueue> ClusterQueues;
     const ClusterQueues& clusterQueues = clusterQueueHelper.queues();
-    for (ClusterQueues::const_iterator cit = clusterQueues.cbegin();
-         cit != clusterQueues.cend();
-         ++cit) {
+    for (const auto& clusterQueue : clusterQueues) {
         // Queue URI
         os << bmqu::PrintUtil::newlineAndIndent(level + 2, spacesPerLevel)
-           << cit->uri();
+           << clusterQueue.uri();
 
         // Info
         os << bmqu::PrintUtil::newlineAndIndent(level + 3, spacesPerLevel)
-           << "inFlightContexts.: " << cit->numInFlightContexts()
+           << "inFlightContexts.: " << clusterQueue.numInFlightContexts()
            << bmqu::PrintUtil::newlineAndIndent(level + 3, spacesPerLevel)
-           << "assigned.........: " << bsl::boolalpha << cit->isAssigned()
+           << "assigned.........: " << bsl::boolalpha
+           << clusterQueue.isAssigned()
            << bmqu::PrintUtil::newlineAndIndent(level + 3, spacesPerLevel)
            << "primaryAvailable..: " << bsl::boolalpha
-           << cit->isPrimaryAvailable()
+           << clusterQueue.isPrimaryAvailable()
            << bmqu::PrintUtil::newlineAndIndent(level + 3, spacesPerLevel)
-           << "id...............: " << bmqp::QueueId::QueueIdInt(cit->id())
+           << "id...............: "
+           << bmqp::QueueId::QueueIdInt(clusterQueue.id())
            << bmqu::PrintUtil::newlineAndIndent(level + 3, spacesPerLevel)
            << "subIds...........: ";
 
         typedef bsl::vector<SubId> SubIds;
-        const SubIds&              subIds = cit->subIds();
+        const SubIds&              subIds = clusterQueue.subIds();
         for (SubIds::const_iterator citer = subIds.cbegin();
              citer != subIds.cend();
              ++citer) {
@@ -603,21 +583,22 @@ void printClusterQueueHelper(bsl::ostream&             os,
         }
 
         os << bmqu::PrintUtil::newlineAndIndent(level + 3, spacesPerLevel)
-           << "partitionId......: " << cit->partitionId();
-        if (!cit->primaryNodeDescription().isNull()) {
-            os << cit->primaryNodeDescription().value();
+           << "partitionId......: " << clusterQueue.partitionId();
+        if (!clusterQueue.primaryNodeDescription().isNull()) {
+            os << clusterQueue.primaryNodeDescription().value();
         }
         os << bmqu::PrintUtil::newlineAndIndent(level + 3, spacesPerLevel)
-           << "key..............: " << cit->key()
+           << "key..............: " << clusterQueue.key()
            << bmqu::PrintUtil::newlineAndIndent(level + 3, spacesPerLevel)
            << "queue............: "
-           << (cit->isCreated() ? "created" : "*NOT* created");
+           << (clusterQueue.isCreated() ? "created" : "*NOT* created");
 
         // Contexts
         os << bmqu::PrintUtil::newlineAndIndent(level + 3, spacesPerLevel)
-           << "nbContext........: " << cit->contexts().size();
-        for (size_t ctxId = 0; ctxId != cit->contexts().size(); ++ctxId) {
-            const Context& context = cit->contexts()[ctxId];
+           << "nbContext........: " << clusterQueue.contexts().size();
+        for (size_t ctxId = 0; ctxId != clusterQueue.contexts().size();
+             ++ctxId) {
+            const Context& context = clusterQueue.contexts()[ctxId];
             os << bmqu::PrintUtil::newlineAndIndent(level + 4, spacesPerLevel)
                << "#" << (ctxId + 1) << ": "
                << "[handle parameters: " << context.queueHandleParametersJson()
@@ -678,11 +659,8 @@ void printQueueHandleSubStream(bsl::ostream&               os,
        << bmqu::PrintUtil::newlineAndIndent(level + 1, spacesPerLevel)
        << "--------";
 
-    for (size_t i = 0; i != subStream.unconfirmedMonitors().size(); ++i) {
-        printResourceUsageMonitor(os,
-                                  subStream.unconfirmedMonitors()[i],
-                                  0,
-                                  -1);
+    for (const auto& monitor : subStream.unconfirmedMonitors()) {
+        printResourceUsageMonitor(os, monitor, 0, -1);
     }
 
     if (!subStream.numUnconfirmedMessages().isNull()) {
@@ -708,10 +686,8 @@ void printQueueHandle(bsl::ostream&      os,
 
     typedef bsl::vector<QueueHandleSubStream> SubStreams;
     const SubStreams&                         subStreams = handle.subStreams();
-    for (SubStreams::const_iterator cit = subStreams.begin();
-         cit != subStreams.end();
-         ++cit) {
-        printQueueHandleSubStream(os, *cit, level, spacesPerLevel);
+    for (const auto& subStream : subStreams) {
+        printQueueHandleSubStream(os, subStream, level, spacesPerLevel);
     }
 }
 
@@ -773,15 +749,14 @@ void printQueueState(bsl::ostream&     os,
         if (storage.virtualStorages().size()) {
             typedef bsl::vector<VirtualStorage> VirtualStorages;
             const VirtualStorages& virtualStorages = storage.virtualStorages();
-            for (VirtualStorages::const_iterator cit =
-                     virtualStorages.cbegin();
-                 cit != virtualStorages.cend();
-                 ++cit) {
+            for (const auto& virtualStorage : virtualStorages) {
                 bdlb::Print::newlineAndIndent(os, level + 2, spacesPerLevel);
-                os << cit->appId() << " : [appKey: " << cit->appKey()
+                os << virtualStorage.appId()
+                   << " : [appKey: " << virtualStorage.appKey()
                    << ", numMessages: "
                    << bmqu::PrintUtil::prettyNumber(
-                          static_cast<bsls::Types::Int64>(cit->numMessages()))
+                          static_cast<bsls::Types::Int64>(
+                              virtualStorage.numMessages()))
                    << "]";
             }
         }
@@ -827,15 +802,14 @@ void printMessageGroupIdManagerIndex(
         typedef bsl::vector<LeastRecentlyUsedGroupId> LruGroupIds;
         const LruGroupIds&                            lruGroupIds =
             messageGroupIdManagerIndex.leastRecentlyUsedGroupIds();
-        for (LruGroupIds::const_iterator cit = lruGroupIds.begin();
-             cit != lruGroupIds.end();
-             ++cit) {
+        for (const auto& lruGroupId : lruGroupIds) {
             bsl::ostringstream key;
             bsl::ostringstream timeDelta;
-            key << cit->clientDescription() << "#" << cit->msgGroupId();
+            key << lruGroupId.clientDescription() << "#"
+                << lruGroupId.msgGroupId();
             bmqu::PrintUtil::prettyTimeInterval(
                 timeDelta,
-                cit->lastSeenDeltaNanoseconds());
+                lruGroupId.lastSeenDeltaNanoseconds());
             printer.printAttribute(key.str().c_str(), timeDelta.str());
         }
         printer.end();
@@ -849,12 +823,9 @@ void printMessageGroupIdManagerIndex(
         typedef bsl::vector<ClientMsgGroupsCount> NumMsgGroupsPerClient;
         const NumMsgGroupsPerClient&              numMsgGroupsPerClient =
             messageGroupIdManagerIndex.numMsgGroupsPerClient();
-        for (NumMsgGroupsPerClient::const_iterator cit =
-                 numMsgGroupsPerClient.begin();
-             cit != numMsgGroupsPerClient.end();
-             ++cit) {
-            printer.printAttribute(cit->clientDescription().c_str(),
-                                   cit->numMsgGroupIds());
+        for (const auto& clientGroups : numMsgGroupsPerClient) {
+            printer.printAttribute(clientGroups.clientDescription().c_str(),
+                                   clientGroups.numMsgGroupIds());
         }
         printer.end();
     }
@@ -921,28 +892,25 @@ void printFanoutQueueEngine(bsl::ostream&            os,
     bsl::size_t                        maxAppIdLength = 0;
     typedef bsl::vector<ConsumerState> ConsumerStates;
     const ConsumerStates& consumerStates = queueEngine.consumerStates();
-    for (ConsumerStates::const_iterator cit = consumerStates.begin();
-         cit != consumerStates.end();
-         ++cit) {
-        maxAppIdLength = bsl::max(maxAppIdLength, cit->appId().length());
+    for (const auto& consumerState : consumerStates) {
+        maxAppIdLength = bsl::max(maxAppIdLength,
+                                  consumerState.appId().length());
     }
 
-    for (ConsumerStates::const_iterator cit = consumerStates.begin();
-         cit != consumerStates.end();
-         ++cit) {
+    for (const auto& consumerState : consumerStates) {
         os << bmqu::PrintUtil::newlineAndIndent(level + 1, spacesPerLevel)
            << bsl::setw(maxAppIdLength) << bsl::setfill(' ') << bsl::left
-           << cit->appId() << ": status=" << cit->status();
+           << consumerState.appId() << ": status=" << consumerState.status();
 
-        if (!cit->isAtEndOfStorage().isNull()) {
+        if (!consumerState.isAtEndOfStorage().isNull()) {
             os << ", StorageIter.atEnd=" << bsl::boolalpha
-               << cit->isAtEndOfStorage().value();
+               << consumerState.isAtEndOfStorage().value();
         }
 
         os << bmqu::PrintUtil::newlineAndIndent(level + 1, spacesPerLevel)
            << bsl::setw(maxAppIdLength) << bsl::setfill('-') << "-";
 
-        printAppState(os, cit->appState(), level + 2, spacesPerLevel);
+        printAppState(os, consumerState.appState(), level + 2, spacesPerLevel);
     }
     os << '\n';
 }
@@ -962,25 +930,21 @@ void printRelayQueueEngine(bsl::ostream&           os,
     if (queueEngine.numSubstreams()) {
         typedef bsl::vector<RelayQueueEngineSubStream> SubStreams;
         const SubStreams& subStreams = queueEngine.subStreams();
-        for (SubStreams::const_iterator cit = subStreams.cbegin();
-             cit != subStreams.cend();
-             ++cit) {
+        for (const auto& subStream : subStreams) {
             os << bmqu::PrintUtil::newlineAndIndent(level + 2, spacesPerLevel)
-               << "[" << cit->appId() << "] - [" << cit->appKey()
-               << "] : " << cit->numMessages();
+               << "[" << subStream.appId() << "] - [" << subStream.appKey()
+               << "] : " << subStream.numMessages();
         }
     }
 
     typedef bsl::vector<AppState> AppStates;
     const AppStates&              appStates = queueEngine.appStates();
-    for (AppStates::const_iterator cit = appStates.begin();
-         cit != appStates.end();
-         ++cit) {
+    for (const auto& appState : appStates) {
         os << bmqu::PrintUtil::newlineAndIndent(level + 1, spacesPerLevel)
-           << "App: " << cit->appId()
+           << "App: " << appState.appId()
            << bmqu::PrintUtil::newlineAndIndent(level + 1, spacesPerLevel)
            << "-----------------";
-        printAppState(os, *cit, level + 2, spacesPerLevel);
+        printAppState(os, appState, level + 2, spacesPerLevel);
     }
 
     os << "\n";
@@ -1107,13 +1071,12 @@ void printQueuesInfo(bsl::ostream&         os,
            << " QueueKey    Partition    Internal QueueId          QueueUri";
     }
 
-    for (QueuesInfo::const_iterator cit = queues.begin(); cit != queues.end();
-         ++cit) {
+    for (const auto& queue : queues) {
         os << bmqu::PrintUtil::newlineAndIndent(level, spacesPerLevel)
-           << cit->queueKey() << "       " << cit->partitionId()
+           << queue.queueKey() << "       " << queue.partitionId()
            << "           " << bsl::setfill(' ') << bsl::setw(10)
-           << bmqp::QueueId::QueueIdInt(cit->internalQueueId()) << "       "
-           << cit->queueUri();
+           << bmqp::QueueId::QueueIdInt(queue.internalQueueId()) << "       "
+           << queue.queueUri();
     }
 }
 
@@ -1182,28 +1145,27 @@ void printNodeStatuses(bsl::ostream&       os,
     os << bmqu::PrintUtil::newlineAndIndent(level, spacesPerLevel) << "-----";
     typedef bsl::vector<ClusterNodeInfo> Nodes;
     const Nodes&                         nodes = nodeStatuses.nodes();
-    for (Nodes::const_iterator cit = nodes.cbegin(); cit != nodes.cend();
-         ++cit) {
+    for (const auto& node : nodes) {
         os << bmqu::PrintUtil::newlineAndIndent(level, spacesPerLevel)
-           << cit->description();
+           << node.description();
         os << bmqu::PrintUtil::newlineAndIndent(level + 1, spacesPerLevel);
-        if (cit->isAvailable().isNull()) {
+        if (node.isAvailable().isNull()) {
             os << "IsConnected: self";
         }
         else {
             os << "IsConnected: " << bsl::boolalpha
-               << cit->isAvailable().value();
+               << node.isAvailable().value();
         }
         os << bmqu::PrintUtil::newlineAndIndent(level + 1, spacesPerLevel)
-           << "Node Status: " << cit->status();
+           << "Node Status: " << node.status();
 
-        if (cit->primaryForPartitionIds().size() > 0) {
+        if (node.primaryForPartitionIds().size() > 0) {
             os << bmqu::PrintUtil::newlineAndIndent(level + 1, spacesPerLevel)
                << "Primary for partitions: [ ";
-            for (unsigned int i = 0; i < cit->primaryForPartitionIds().size();
+            for (unsigned int i = 0; i < node.primaryForPartitionIds().size();
                  ++i) {
-                os << cit->primaryForPartitionIds()[i];
-                if (i != (cit->primaryForPartitionIds().size() - 1)) {
+                os << node.primaryForPartitionIds()[i];
+                if (i != (node.primaryForPartitionIds().size() - 1)) {
                     os << ", ";
                 }
             }
@@ -1315,11 +1277,9 @@ void printHelpCommands(bsl::ostream& os, const Help& helpCommands)
         os << "This process responds to the following CMD subcommands:\n";
     }
 
-    for (Commands::const_iterator cit = commands.cbegin();
-         cit != commands.cend();
-         ++cit) {
-        os << separator1 << cit->command() << separator2 << cit->description()
-           << "\n";
+    for (const auto& command : commands) {
+        os << separator1 << command.command() << separator2
+           << command.description() << "\n";
     }
 }
 
@@ -1436,13 +1396,11 @@ HumanPrinter::printResponses(bsl::ostream&            os,
 
     RouteResponseVector responses = responseList.responses();
 
-    for (RouteResponseVector::const_iterator respIt = responses.begin();
-         respIt != responses.end();
-         ++respIt) {
-        os << "Response from node \"" << respIt->sourceNodeDescription()
+    for (const auto& routeResponse : responses) {
+        os << "Response from node \"" << routeResponse.sourceNodeDescription()
            << "\":";
         os << bsl::endl;
-        os << respIt->response();
+        os << routeResponse.response();
         os << bsl::endl;
     }
     return os;
