@@ -39,8 +39,6 @@
 #include <bmqu_time.h>
 
 // BDE
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_algorithm.h>
 #include <bsl_cstddef.h>  // size_t
@@ -144,9 +142,9 @@ void ClusterStateManager::leaderSyncCb()
     // executed by the *SCHEDULER* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&ClusterStateManager::initiateLeaderSync,
-                             this,
-                             false),  // don't wait
+        [this]() {
+            initiateLeaderSync(false);  // don't wait
+        },
         d_cluster_p);
 }
 
@@ -296,11 +294,10 @@ void ClusterStateManager::onLeaderSyncStateQueryResponse(
         .choice()
         .makeLeaderSyncDataQuery();
 
-    request->setResponseCb(bdlf::BindUtil::bind(
-        &ClusterStateManager::onLeaderSyncDataQueryResponse,
-        this,
-        bdlf::PlaceHolders::_1,
-        maxSeqNode));
+    request->setResponseCb(
+        [this, maxSeqNode](const RequestManagerType::RequestSp& context) {
+            onLeaderSyncDataQueryResponse(context, maxSeqNode);
+        });
 
     bmqt::GenericResult::Enum status =
         d_cluster_p->sendRequest(request, maxSeqNode, bsls::TimeInterval(10));
@@ -724,10 +721,10 @@ ClusterStateManager::ClusterStateManager(
     BSLS_ASSERT_SAFE(d_clusterStateLedger_mp);
 
     d_clusterStateLedger_mp->setCommitCb(
-        bdlf::BindUtil::bind(&ClusterStateManager::onCommit,
-                             this,
-                             bdlf::PlaceHolders::_1,    // advisory
-                             bdlf::PlaceHolders::_2));  // status
+        [this](const bmqp_ctrlmsg::ControlMessage&        advisory,
+               mqbc::ClusterStateLedgerCommitStatus::Enum status) {
+            onCommit(advisory, status);
+        });
 }
 
 ClusterStateManager::~ClusterStateManager()
@@ -1031,8 +1028,9 @@ void ClusterStateManager::initiateLeaderSync(bool wait)
             d_clusterData_p->scheduler().scheduleEvent(
                 d_clusterData_p->electorInfo().leaderSyncEventHandle(),
                 after,
-                bdlf::BindUtil::bind(&ClusterStateManager::leaderSyncCb,
-                                     this));
+                [this]() {
+                    leaderSyncCb();
+                });
 
             return;  // RETURN
         }
@@ -1067,11 +1065,11 @@ void ClusterStateManager::initiateLeaderSync(bool wait)
         .makeLeaderSyncStateQuery();
 
     contextSp->setDestinationNodes(availableFollowers);
-    contextSp->setResponseCb(bdlf::BindUtil::bind(
-        &ClusterStateManager::onLeaderSyncStateQueryResponse,
-        this,
-        bdlf::PlaceHolders::_1,
-        d_clusterData_p->electorInfo().electorTerm()));
+    contextSp->setResponseCb(
+        [this, term = d_clusterData_p->electorInfo().electorTerm()](
+            const RequestContextSp& requestContext) {
+            onLeaderSyncStateQueryResponse(requestContext, term);
+        });
 
     d_clusterData_p->multiRequestManager().sendRequest(contextSp,
                                                        bsls::TimeInterval(10));
