@@ -151,40 +151,18 @@ void StorageCollectionUtil::loadStorages(StorageList*       storages,
     }
 }
 
-namespace {
-
-template <class Predicate>
-struct Not1 {
-    Not1(const Predicate& predicate)
-    : d_predicate(predicate)
-    {
-    }
-
-    template <class Value>
-    bool operator()(const Value& value) const
-    {
-        return !d_predicate(value);
-    }
-    Predicate d_predicate;
-};
-
-template <class Predicate>
-Not1<Predicate> not_pred(const Predicate& predicate)
-{
-    return Not1<Predicate>(predicate);
-}
-
-}  // close anonymous namespace
-
 void StorageCollectionUtil::filterStorages(StorageList*         storages,
                                            const StorageFilter& filter)
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(storages);
 
-    StorageListIter iter = bsl::remove_if(storages->begin(),
-                                          storages->end(),
-                                          not_pred(filter));
+    StorageListIter iter = bsl::remove_if(
+        storages->begin(),
+        storages->end(),
+        [&filter](const ReplicatedStorage* storage) {
+            return !filter(storage);
+        });
     storages->erase(iter, storages->end());
 }
 
