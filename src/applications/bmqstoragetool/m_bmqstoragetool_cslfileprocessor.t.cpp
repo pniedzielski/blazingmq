@@ -325,17 +325,16 @@ struct Tester {
             .setLogIdGenerator(d_logIdGenerator_sp)
             .setKeepOldLogs(true)
             .setLogFactory(d_logFactory_sp)
-            .setExtractLogIdCallback(
-                bdlf::BindUtil::bind(&extractLogIdCallback,
-                                     bdlf::PlaceHolders::_1,  // logId
-                                     bdlf::PlaceHolders::_2,  // logPath
-                                     d_logIdGenerator_sp))
+            .setExtractLogIdCallback([logIdGenerator = d_logIdGenerator_sp](
+                                         mqbu::StorageKey*  logId,
+                                         const bsl::string& logPath) {
+                return extractLogIdCallback(logId, logPath, logIdGenerator);
+            })
             .setValidateLogCallback(mqbc::ClusterStateLedgerUtil::validateLog)
-            .setRolloverCallback(
-                bdlf::BindUtil::bind(&Tester::onRolloverCallback,
-                                     this,
-                                     bdlf::PlaceHolders::_1,   // oldLogId
-                                     bdlf::PlaceHolders::_2))  // newLogId
+            .setRolloverCallback([this](const mqbu::StorageKey& oldLogId,
+                                        const mqbu::StorageKey& newLogId) {
+                return onRolloverCallback(oldLogId, newLogId);
+            })
             .setCleanupCallback(&cleanupCallback);
 
         // Create and open the ledger
