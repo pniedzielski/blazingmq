@@ -391,8 +391,16 @@ class ClientSession : public mqbnet::Session,
     /// message.
     void sendPacket(const bsl::shared_ptr<bdlbb::Blob>& blob,
                     bool                                flushBuilders);
-    void sendPacketDispatched(const bsl::shared_ptr<bdlbb::Blob>& blob,
-                              bool flushBuilders);
+
+    /// Write the specified `blob` to the channel, or append it to the
+    /// internal `channelBufferQueue` if it can't be written right away.
+    /// If the specified `flushBuilders` is `true`, all internal builders
+    /// (PUSH and ACK) are flushed before `blob`.  This is the single place
+    /// where data is sent to the client over the channel.
+    ///
+    /// THREAD: This method is called from the Client's dispatcher thread.
+    void writePacket(const bsl::shared_ptr<bdlbb::Blob>& blob,
+                     bool                                flushBuilders);
 
     /// Flush as much as possible of the content of the internal
     /// `channelBufferQueue`.
@@ -437,26 +445,29 @@ class ClientSession : public mqbnet::Session,
 
     /// Called when handle configure response comes to the client session
     /// with the specified `status`, `streamParameters` and
-    /// `streamParamsCtrlMsg`.
-    void onHandleConfiguredDispatched(
+    /// `streamParamsCtrlMsg`: update the subscriptions of the queue and
+    /// send the configure response to the client.
+    ///
+    /// THREAD: This method is called from the Client's dispatcher thread.
+    void completeConfigureStream(
         const bmqp_ctrlmsg::Status&                   status,
         const bmqp_ctrlmsg::StreamParameters&         streamParameters,
         const bmqp_ctrlmsg::ControlMessage&           streamParamsCtrlMsg,
         const bsl::shared_ptr<bmqu::OperationLogger>& opLogger);
 
     /// Initiate the shutdown of the session.
-    void initiateShutdownDispatched();
+    ///
+    /// THREAD: This method is called from the Client's dispatcher thread.
+    void beginShutdown();
 
-    /// Weak-ref wrapper for `initiateShutdownDispatched`.  If the specified
-    /// `self` can be locked, delegates to `initiateShutdownDispatched`;
+    /// Weak-ref wrapper for `beginShutdown`.  If the specified
+    /// `self` can be locked, delegates to `beginShutdown`;
     /// otherwise invokes the specified `callback` directly.  The specified
     /// `callback` is guaranteed to be invoked in either case.  Using a weak
     /// ref avoids deadlock with `d_self.invalidate()` in `tearDownImpl`
     /// when both events are queued on the same client dispatcher.
     static void initiateShutdownSafe(bsl::weak_ptr<ClientSession> self,
                                      const ShutdownCb&            callback);
-
-    void invalidateDispatched();
 
     void processClusterMessage(const bmqp_ctrlmsg::ControlMessage& message);
     void processStopRequest(ShutdownContextSp& context);

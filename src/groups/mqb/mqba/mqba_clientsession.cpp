@@ -450,7 +450,7 @@ void ClientSession::sendErrorResponse(
                   << " failure response: " << response;
 
     // Send the response
-    sendPacketDispatched(d_state.d_schemaEventBuilder.blob(), true);
+    writePacket(d_state.d_schemaEventBuilder.blob(), true);
 }
 
 void ClientSession::sendPacket(const bsl::shared_ptr<bdlbb::Blob>& blob,
@@ -459,18 +459,17 @@ void ClientSession::sendPacket(const bsl::shared_ptr<bdlbb::Blob>& blob,
     // executed by *ANY* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bindS(d_state.d_allocator_p,
-                              bmqu::WeakMemFnUtil::weakMemFn(
-                                  &ClientSession::sendPacketDispatched,
-                                  d_self.acquireWeak()),
-                              blob,
-                              flushBuilders),
+        bdlf::BindUtil::bindS(
+            d_state.d_allocator_p,
+            bmqu::WeakMemFnUtil::weakMemFn(&ClientSession::writePacket,
+                                           d_self.acquireWeak()),
+            blob,
+            flushBuilders),
         this);
 }
 
-void ClientSession::sendPacketDispatched(
-    const bsl::shared_ptr<bdlbb::Blob>& blob,
-    bool                                flushBuilders)
+void ClientSession::writePacket(const bsl::shared_ptr<bdlbb::Blob>& blob,
+                                bool flushBuilders)
 {
     // executed by the *CLIENT* dispatcher thread
 
@@ -817,15 +816,15 @@ void ClientSession::onHandleConfigured(
 
     dispatcher()->execute(
         [this, status, streamParameters, streamParamsCtrlMsg, opLogger]() {
-            onHandleConfiguredDispatched(status,
-                                         streamParameters,
-                                         streamParamsCtrlMsg,
-                                         opLogger);
+            completeConfigureStream(status,
+                                    streamParameters,
+                                    streamParamsCtrlMsg,
+                                    opLogger);
         },
         this);
 }
 
-void ClientSession::onHandleConfiguredDispatched(
+void ClientSession::completeConfigureStream(
     const bmqp_ctrlmsg::Status&                   status,
     const bmqp_ctrlmsg::StreamParameters&         streamParameters,
     const bmqp_ctrlmsg::ControlMessage&           streamParamsCtrlMsg,
@@ -927,10 +926,10 @@ void ClientSession::onHandleConfiguredDispatched(
                   << " for request: " << streamParamsCtrlMsg;
 
     // Send the response
-    sendPacketDispatched(d_state.d_schemaEventBuilder.blob(), true);
+    writePacket(d_state.d_schemaEventBuilder.blob(), true);
 }
 
-void ClientSession::initiateShutdownDispatched()
+void ClientSession::beginShutdown()
 {
     // executed by the *CLIENT* dispatcher thread
 
@@ -955,19 +954,6 @@ void ClientSession::initiateShutdownDispatched()
 
     d_operationState = e_DISCONNECTING;
     d_queueSessionManager.shutDown();
-}
-
-void ClientSession::invalidateDispatched()
-{
-    // PRECONDITIONS
-    BSLS_ASSERT_SAFE(inDispatcherThread());
-
-    if (d_operationState == e_DEAD) {
-        return;  // RETURN
-    }
-
-    d_self.invalidate();
-    d_operationState = e_DEAD;
 }
 
 void ClientSession::closeChannel()
@@ -1116,7 +1102,7 @@ void ClientSession::processDisconnect(
                   << ": Sending disconnect response: " << response;
 
     // Send the response
-    sendPacketDispatched(d_state.d_schemaEventBuilder.blob(), true);
+    writePacket(d_state.d_schemaEventBuilder.blob(), true);
 
     // Setting the 'd_operationState' to 'e_DISCONNECTED' implies that no
     // messages will be pushed to the client after this one: we set it now
@@ -1216,7 +1202,7 @@ void ClientSession::openQueueCb(
                   << " for request: " << handleParamsCtrlMsg;
 
     // Send the response
-    sendPacketDispatched(d_state.d_schemaEventBuilder.blob(), true);
+    writePacket(d_state.d_schemaEventBuilder.blob(), true);
 }
 
 void ClientSession::processCloseQueue(
@@ -1282,7 +1268,7 @@ void ClientSession::closeQueueCb(
                   << ": Sending closeQueue response: " << response;
 
     // Send the response.
-    sendPacketDispatched(d_state.d_schemaEventBuilder.blob(), true);
+    writePacket(d_state.d_schemaEventBuilder.blob(), true);
 
     // Release the handle's ptr in the queue's context to guarantee that the
     // handle will be destroyed after all ongoing queue events are handled.
@@ -2762,7 +2748,7 @@ void ClientSession::initiateShutdown(const ShutdownCb& callback)
     // If 'd_self' has been invalidated (by tearDownImpl), invoke the callback
     // directly.  Otherwise, dispatch via 'initiateShutdownSafe' which uses a
     // weak ref to avoid deadlock: if tearDownImpl's d_self.invalidate() and
-    // initiateShutdownDispatched end up queued on the same client dispatcher,
+    // beginShutdown end up queued on the same client dispatcher,
     // a strong ref would cause invalidate() to block forever waiting for the
     // queued event to release it.
 
@@ -2794,7 +2780,7 @@ void ClientSession::initiateShutdownSafe(bsl::weak_ptr<ClientSession> self,
     {
         bsl::shared_ptr<ClientSession> ptr = self.lock();
         if (ptr) {
-            ptr->initiateShutdownDispatched();
+            ptr->beginShutdown();
         }
     }
 
@@ -2808,7 +2794,15 @@ void ClientSession::invalidate()
 
     dispatcher()->execute(
         [this]() {
-            invalidateDispatched();
+            // PRECONDITIONS
+            BSLS_ASSERT_SAFE(inDispatcherThread());
+
+            if (d_operationState == e_DEAD) {
+                return;  // RETURN
+            }
+
+            d_self.invalidate();
+            d_operationState = e_DEAD;
         },
         this);
     dispatcher()->synchronize(this);
@@ -2963,7 +2957,7 @@ void ClientSession::flush()
         BALL_LOG_TRACE << description() << ": Flushing "
                        << d_state.d_pushBuilder.messageCount()
                        << " PUSH messages";
-        sendPacketDispatched(d_state.d_pushBuilder.blob(), false);
+        writePacket(d_state.d_pushBuilder.blob(), false);
         d_state.d_pushBuilder.reset();
     }
 
@@ -2972,7 +2966,7 @@ void ClientSession::flush()
         BALL_LOG_TRACE << description() << ": Flushing "
                        << d_state.d_ackBuilder.messageCount()
                        << " ACK messages";
-        sendPacketDispatched(d_state.d_ackBuilder.blob(), false);
+        writePacket(d_state.d_ackBuilder.blob(), false);
         d_state.d_ackBuilder.reset();
     }
 }
