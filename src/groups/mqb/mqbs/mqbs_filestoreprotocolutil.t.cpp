@@ -25,7 +25,6 @@
 
 // BDE
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 #include <bsl_string.h>
 #include <bsl_unordered_map.h>
 #include <bslma_default.h>
@@ -1355,11 +1354,9 @@ static void test8_calculateMd5Digest()
         bslmt::Barrier     barrier(numThreads + 1);
 
         for (bsl::size_t i = 0; i < numThreads; ++i) {
-            int rc = threadGroup.addThread(
-                bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                      &jobForThreadPool,
-                                      &correctMd5s,
-                                      &barrier));
+            int rc = threadGroup.addThread([&correctMd5s, &barrier]() {
+                jobForThreadPool(&correctMd5s, &barrier);
+            });
             BMQTST_ASSERT_EQ(0, rc);
         }
         barrier.wait();
