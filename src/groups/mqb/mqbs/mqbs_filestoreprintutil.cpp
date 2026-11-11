@@ -143,12 +143,11 @@ void FileStorePrintUtil::loadQueuesStatus(
     unsigned int            maxNumQueues)
 {
     storageContent->storages().reserve(storages.size());
-    for (StorageListConstIter cit = storages.begin(); cit != storages.end();
-         ++cit) {
+    for (const ReplicatedStorage* replicatedStorage : storages) {
         storageContent->storages().resize(storageContent->storages().size() +
                                           1);
         mqbcmd::StorageQueueInfo& storage = storageContent->storages().back();
-        loadQueueStatus(&storage, *cit);
+        loadQueueStatus(&storage, replicatedStorage);
 
         maxNumQueues--;
         if (maxNumQueues == 0) {
