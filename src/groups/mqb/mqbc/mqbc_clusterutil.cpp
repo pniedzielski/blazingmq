@@ -124,12 +124,7 @@ void applyPartitionPrimary(
 void applyQueueAssignment(mqbc::ClusterState* clusterState,
                           const bsl::vector<bmqp_ctrlmsg::QueueInfo>& queues)
 {
-    for (bsl::vector<bmqp_ctrlmsg::QueueInfo>::const_iterator it =
-             queues.begin();
-         it != queues.end();
-         ++it) {
-        const bmqp_ctrlmsg::QueueInfo& queueInfo = *it;
-
+    for (const bmqp_ctrlmsg::QueueInfo& queueInfo : queues) {
         // CSL commit
         clusterState->assignQueue(queueInfo);
     }
@@ -138,11 +133,8 @@ void applyQueueAssignment(mqbc::ClusterState* clusterState,
 void applyQueueUnassignment(mqbc::ClusterState* clusterState,
                             const bsl::vector<bmqp_ctrlmsg::QueueInfo>& queues)
 {
-    for (bsl::vector<bmqp_ctrlmsg::QueueInfo>::const_iterator it =
-             queues.begin();
-         it != queues.end();
-         ++it) {
-        clusterState->unassignQueue(it->uri());
+    for (const auto& queueInfo : queues) {
+        clusterState->unassignQueue(queueInfo.uri());
         // NOTE: There are cases where the persistent entry may not
         //       exist when receiving this advisory, so the return code
         //       of the 'unassignQueue' operation is not checked.
@@ -155,11 +147,7 @@ void applyQueueUpdate(mqbc::ClusterState* clusterState,
 {
     BALL_LOG_SET_CATEGORY(k_LOG_CATEGORY);
 
-    for (bsl::vector<bmqp_ctrlmsg::QueueInfoUpdate>::const_iterator it =
-             queues.begin();
-         it != queues.end();
-         ++it) {
-        const bmqp_ctrlmsg::QueueInfoUpdate& queueUpdate = *it;
+    for (const bmqp_ctrlmsg::QueueInfoUpdate& queueUpdate : queues) {
         const bmqt::Uri                      uri(queueUpdate.uri());
         const mqbu::StorageKey               queueKey(
             mqbu::StorageKey::BinaryRepresentation(),
@@ -331,17 +319,11 @@ bool populateQueueUpdate(bmqp_ctrlmsg::QueueUpdateAdvisory* queueAdvisory,
     bsl::unordered_set<mqbu::StorageKey> appKeys;
     const AppInfos&                      appInfos = from.appInfos();
 
-    for (AppInfosCIter appInfoCit = appInfos.cbegin();
-         appInfoCit != appInfos.cend();
-         ++appInfoCit) {
-        appKeys.insert(appInfoCit->second);
+    for (const auto& appInfo : appInfos) {
+        appKeys.insert(appInfo.second);
     }
 
-    for (bsl::vector<bsl::string>::const_iterator cit = added.begin();
-         cit != added.end();
-         ++cit) {
-        const bsl::string& appId = *cit;
-
+    for (const bsl::string& appId : added) {
         AppInfos::const_iterator existing = from.appInfos().find(appId);
 
         if (existing == from.appInfos().end()) {
@@ -356,10 +338,7 @@ bool populateQueueUpdate(bmqp_ctrlmsg::QueueUpdateAdvisory* queueAdvisory,
         }
     }
 
-    for (bsl::vector<bsl::string>::const_iterator cit = removed.begin();
-         cit != removed.end();
-         ++cit) {
-        const bsl::string&       appId    = *cit;
+    for (const bsl::string& appId : removed) {
         AppInfos::const_iterator existing = from.appInfos().find(appId);
 
         if (existing != from.appInfos().end()) {
@@ -500,15 +479,13 @@ void ClusterUtil::assignPartitions(
 
     bsl::vector<mqbc::ClusterStatePartitionInfo>::const_iterator cit2 =
         partitionsToChange.cbegin();
-    for (NumNewPartitionsMapCIter cit = numNewPartitions.cbegin();
-         cit != numNewPartitions.cend();
-         ++cit) {
-        mqbc::ClusterNodeSession* primaryNs = cit->first;
+    for (const auto& [nodeSession, numPartitions] : numNewPartitions) {
+        mqbc::ClusterNodeSession* primaryNs = nodeSession;
         mqbnet::ClusterNode*      primary   = primaryNs->clusterNode();
         BSLS_ASSERT_SAFE(primary);
 
-        // Assign 'cit->second' partitions to 'primary'.
-        for (unsigned int i = 0; i < cit->second; ++i) {
+        // Assign 'numPartitions' partitions to 'primary'.
+        for (unsigned int i = 0; i < numPartitions; ++i) {
             const mqbc::ClusterStatePartitionInfo& pinfo = *cit2;
 
             BALL_LOG_INFO << clusterData.identity().description()
@@ -1214,14 +1191,12 @@ void ClusterUtil::populateAppInfos(
             domainConfig.fanout().appIDs();
         bsl::unordered_set<mqbu::StorageKey> appKeys;
 
-        for (bsl::vector<bsl::string>::const_iterator cit = cfgAppIds.begin();
-             cit != cfgAppIds.end();
-             ++cit) {
+        for (const auto& cfgAppId : cfgAppIds) {
             bmqp_ctrlmsg::AppIdInfo appIdInfo;
-            appIdInfo.appId() = *cit;
+            appIdInfo.appId() = cfgAppId;
 
             mqbu::StorageKey appKey;
-            mqbs::StorageUtil::generateStorageKey(&appKey, &appKeys, *cit);
+            mqbs::StorageUtil::generateStorageKey(&appKey, &appKeys, cfgAppId);
             // This is the only place generating keys upon queue assignment
             // for both CSL (FSM) and non-CSL (non-FSM).  The latter used to
             // generate keys in 'StorageUtil::registerQueue'.
@@ -1312,20 +1287,16 @@ ClusterUtil::updateAppIds(ClusterData*                    clusterData,
         queueUpdate.domain() = domainName;
 
         // Populate AppInfos
-        for (bsl::vector<bsl::string>::const_iterator cit = added.begin();
-             cit != added.end();
-             ++cit) {
+        for (const auto& addedAppId : added) {
             bmqp_ctrlmsg::AppIdInfo appIdInfo;
-            appIdInfo.appId() = *cit;
+            appIdInfo.appId() = addedAppId;
             mqbu::StorageKey::k_NULL_KEY.loadBinary(&appIdInfo.appKey());
 
             queueUpdate.addedAppIds().push_back(appIdInfo);
         }
-        for (bsl::vector<bsl::string>::const_iterator cit = removed.begin();
-             cit != removed.end();
-             ++cit) {
+        for (const auto& removedAppId : removed) {
             bmqp_ctrlmsg::AppIdInfo appIdInfo;
-            appIdInfo.appId() = *cit;
+            appIdInfo.appId() = removedAppId;
             mqbu::StorageKey::k_NULL_KEY.loadBinary(&appIdInfo.appKey());
 
             queueUpdate.removedAppIds().push_back(appIdInfo);
@@ -1334,24 +1305,21 @@ ClusterUtil::updateAppIds(ClusterData*                    clusterData,
         queueAdvisory.queueUpdates().push_back(queueUpdate);
     }
     else if (uri.empty()) {
-        for (UriToQueueInfoMapCIter qinfoCit =
-                 domCit->second->queuesInfo().cbegin();
-             qinfoCit != domCit->second->queuesInfo().cend();
-             ++qinfoCit) {
-            BSLS_ASSERT_SAFE(qinfoCit->second->uri().qualifiedDomain() ==
+        for (const auto& queueEntry : domCit->second->queuesInfo()) {
+            BSLS_ASSERT_SAFE(queueEntry.second->uri().qualifiedDomain() ==
                              domainName);
 
             const bool success = populateQueueUpdate(&queueAdvisory,
                                                      added,
                                                      removed,
-                                                     *qinfoCit->second,
+                                                     *queueEntry.second,
                                                      allocator);
 
             if (!success) {
                 BALL_LOG_ERROR << "Failed to unregister appIds "
                                << printRemoved << " and to register appIds "
                                << printAdded << " for '" << uri
-                               << "'.  Current state: " << *qinfoCit->second;
+                               << "'.  Current state: " << *queueEntry.second;
 
                 return mqbi::ClusterErrorCode::e_UNKNOWN;  // RETURN
             }
@@ -1508,22 +1476,20 @@ void ClusterUtil::sendClusterState(
             if (!newlyAssigned.empty()) {
                 advisory.partitions() = newlyAssigned;
 
-                for (bsl::vector<bmqp_ctrlmsg::PartitionPrimaryInfo>::iterator
-                         pit = advisory.partitions().begin();
-                     pit != advisory.partitions().end();
-                     ++pit) {
-                    const int          pid = pit->partitionId();
+                for (auto& partitionInfo : advisory.partitions()) {
+                    const int          pid = partitionInfo.partitionId();
                     const unsigned int leaseIdInCSL =
-                        tempState.partition(pit->partitionId())
+                        tempState.partition(partitionInfo.partitionId())
                             .primaryLeaseId();
-                    if (leaseIdInCSL == pit->primaryLeaseId() &&
-                        tempState.partition(pit->partitionId())
-                                .primaryNodeId() == pit->primaryNodeId()) {
+                    if (leaseIdInCSL == partitionInfo.primaryLeaseId() &&
+                        tempState.partition(partitionInfo.partitionId())
+                                .primaryNodeId() ==
+                            partitionInfo.primaryNodeId()) {
                         // For this partition, existing primary is preserved.
                         // All good.
                         continue;  // CONTINUE
                     }
-                    if (leaseIdInCSL >= pit->primaryLeaseId()) {
+                    if (leaseIdInCSL >= partitionInfo.primaryLeaseId()) {
                         BALL_LOG_WARN
                             << clusterData->identity().description()
                             << " Partition [" << pid
@@ -1531,10 +1497,10 @@ void ClusterUtil::sendClusterState(
                                "leaseId of "
                             << leaseIdInCSL
                             << ", while self was about to assign a leaseId of "
-                            << pit->primaryLeaseId() << ".  Bumping up to "
-                            << leaseIdInCSL + 1
+                            << partitionInfo.primaryLeaseId()
+                            << ".  Bumping up to " << leaseIdInCSL + 1
                             << " to avoid potential conflict.";
-                        pit->primaryLeaseId() = leaseIdInCSL + 1;
+                        partitionInfo.primaryLeaseId() = leaseIdInCSL + 1;
                     }
                 }
             }
@@ -1713,14 +1679,12 @@ int ClusterUtil::validateState(bsl::ostream&       errorDescription,
         out << "Incorrect Partition Infos :";
         bdlb::Print::newlineAndIndent(out, level);
         out << "---------------------------";
-        for (bsl::vector<ClusterStatePartitionInfo>::const_iterator citer =
-                 incorrectPartitions.cbegin();
-             citer != incorrectPartitions.cend();
-             ++citer) {
+        for (const auto& incorrectPartition : incorrectPartitions) {
             bdlb::Print::newlineAndIndent(out, level + 1);
-            out << "Partition [" << citer->partitionId()
-                << "]:  primaryLeaseId: " << citer->primaryLeaseId()
-                << ", primaryNodeId: " << citer->primaryNodeId();
+            out << "Partition [" << incorrectPartition.partitionId()
+                << "]:  primaryLeaseId: "
+                << incorrectPartition.primaryLeaseId()
+                << ", primaryNodeId: " << incorrectPartition.primaryNodeId();
         }
 
         bdlb::Print::newlineAndIndent(out, level);
@@ -1746,39 +1710,31 @@ int ClusterUtil::validateState(bsl::ostream&       errorDescription,
                           bsl::shared_ptr<ClusterStateQueueInfo> > >
                                                          incorrectQueues;
     bsl::vector<bsl::shared_ptr<ClusterStateQueueInfo> > extraQueues;
-    for (ClusterState::DomainStatesCIter domCit = state.domainStates().begin();
-         domCit != state.domainStates().end();
-         ++domCit) {
-        const bsl::string& domainName = domCit->first;
+    for (const auto& domainEntry : state.domainStates()) {
+        const bsl::string& domainName = domainEntry.first;
 
         ClusterState::DomainStatesCIter refDomCit =
             reference.domainStates().find(domainName);
         if (refDomCit == reference.domainStates().cend()) {
             // Entire domain is extra
-            for (ClusterState::UriToQueueInfoMapCIter citer =
-                     domCit->second->queuesInfo().cbegin();
-                 citer != domCit->second->queuesInfo().cend();
-                 ++citer) {
-                extraQueues.push_back(citer->second);
+            for (const auto& queueEntry : domainEntry.second->queuesInfo()) {
+                extraQueues.push_back(queueEntry.second);
             }
             continue;  // CONTINUE
         }
 
-        for (ClusterState::UriToQueueInfoMapCIter citer =
-                 domCit->second->queuesInfo().begin();
-             citer != domCit->second->queuesInfo().end();
-             ++citer) {
-            const bmqt::Uri& uri = citer->first;
+        for (const auto& queueEntry : domainEntry.second->queuesInfo()) {
+            const bmqt::Uri& uri = queueEntry.first;
 
             ClusterState::UriToQueueInfoMapCIter refCiter =
                 refDomCit->second->queuesInfo().find(uri);
             if (refCiter == refDomCit->second->queuesInfo().cend()) {
                 // Extra queue
-                extraQueues.push_back(citer->second);
+                extraQueues.push_back(queueEntry.second);
             }
             else {
                 const bsl::shared_ptr<ClusterStateQueueInfo>& info =
-                    citer->second;
+                    queueEntry.second;
                 const bsl::shared_ptr<ClusterStateQueueInfo>& referenceInfo =
                     refCiter->second;
                 if (!info->isEquivalent(*referenceInfo)) {
@@ -1797,15 +1753,11 @@ int ClusterUtil::validateState(bsl::ostream&       errorDescription,
         out << "Incorrect Queues :";
         bdlb::Print::newlineAndIndent(out, level);
         out << "-----------------";
-        for (bsl::vector<bsl::pair<bsl::shared_ptr<ClusterStateQueueInfo>,
-                                   bsl::shared_ptr<ClusterStateQueueInfo> > >::
-                 const_iterator citer = incorrectQueues.cbegin();
-             citer != incorrectQueues.cend();
-             ++citer) {
+        for (const auto& incorrectQueue : incorrectQueues) {
             bdlb::Print::newlineAndIndent(out, level + 1);
-            out << *citer->first;
+            out << *incorrectQueue.first;
             bdlb::Print::newlineAndIndent(out, level + 1);
-            out << "(correct queue info) " << *citer->second;
+            out << "(correct queue info) " << *incorrectQueue.second;
         }
     }
 
@@ -1816,48 +1768,37 @@ int ClusterUtil::validateState(bsl::ostream&       errorDescription,
         out << "Extra queues :";
         bdlb::Print::newlineAndIndent(out, level);
         out << "--------------";
-        for (bsl::vector<bsl::shared_ptr<ClusterStateQueueInfo> >::
-                 const_iterator citer = extraQueues.cbegin();
-             citer != extraQueues.cend();
-             ++citer) {
+        for (const auto& extraQueue : extraQueues) {
             bdlb::Print::newlineAndIndent(out, level + 1);
-            out << **citer;
+            out << *extraQueue;
         }
     }
 
     // Check missing queues
     bsl::vector<bsl::shared_ptr<ClusterStateQueueInfo> > missingQueues;
-    for (ClusterState::DomainStatesCIter refDomCit =
-             reference.domainStates().begin();
-         refDomCit != reference.domainStates().end();
-         ++refDomCit) {
-        const bsl::string& domainName = refDomCit->first;
+    for (const auto& refDomainEntry : reference.domainStates()) {
+        const bsl::string& domainName = refDomainEntry.first;
 
         ClusterState::DomainStatesCIter domCit = state.domainStates().find(
             domainName);
         if (domCit == state.domainStates().cend()) {
             // Entire domain is missing
-            for (ClusterState::UriToQueueInfoMapCIter refCiter =
-                     refDomCit->second->queuesInfo().cbegin();
-                 refCiter != refDomCit->second->queuesInfo().cend();
-                 ++refCiter) {
-                missingQueues.push_back(refCiter->second);
+            for (const auto& refQueueEntry :
+                 refDomainEntry.second->queuesInfo()) {
+                missingQueues.push_back(refQueueEntry.second);
             }
 
             continue;  // CONTINUE
         }
 
-        for (ClusterState::UriToQueueInfoMapCIter refCiter =
-                 refDomCit->second->queuesInfo().cbegin();
-             refCiter != refDomCit->second->queuesInfo().cend();
-             ++refCiter) {
-            const bmqt::Uri& uri = refCiter->first;
+        for (const auto& refQueueEntry : refDomainEntry.second->queuesInfo()) {
+            const bmqt::Uri& uri = refQueueEntry.first;
 
             ClusterState::UriToQueueInfoMapCIter citer =
                 domCit->second->queuesInfo().find(uri);
             if (citer == domCit->second->queuesInfo().cend()) {
                 // Missing queue
-                missingQueues.push_back(refCiter->second);
+                missingQueues.push_back(refQueueEntry.second);
             }
         }
     }
@@ -1869,12 +1810,9 @@ int ClusterUtil::validateState(bsl::ostream&       errorDescription,
         out << "Missing queues :";
         bdlb::Print::newlineAndIndent(out, level);
         out << "----------------";
-        for (bsl::vector<bsl::shared_ptr<ClusterStateQueueInfo> >::
-                 const_iterator citer = missingQueues.cbegin();
-             citer != missingQueues.cend();
-             ++citer) {
+        for (const auto& missingQueue : missingQueues) {
             bdlb::Print::newlineAndIndent(out, level + 1);
-            out << **citer;
+            out << *missingQueue;
         }
     }
 
@@ -1888,16 +1826,10 @@ int ClusterUtil::validateState(bsl::ostream&       errorDescription,
         out << "QUEUES IN CLUSTER STATE :";
         bdlb::Print::newlineAndIndent(out, level);
         out << "-------------------------";
-        for (ClusterState::DomainStatesCIter domCit =
-                 reference.domainStates().cbegin();
-             domCit != reference.domainStates().cend();
-             ++domCit) {
-            for (ClusterState::UriToQueueInfoMapCIter citer =
-                     domCit->second->queuesInfo().cbegin();
-                 citer != domCit->second->queuesInfo().cend();
-                 ++citer) {
+        for (const auto& domainEntry : reference.domainStates()) {
+            for (const auto& queueEntry : domainEntry.second->queuesInfo()) {
                 bdlb::Print::newlineAndIndent(out, level + 1);
-                out << *citer->second;
+                out << *queueEntry.second;
             }
         }
     }
@@ -2092,17 +2024,13 @@ void ClusterUtil::loadQueuesInfo(bsl::vector<bmqp_ctrlmsg::QueueInfo>* out,
     BSLS_ASSERT_SAFE(out);
 
     const DomainStates& domainsInfo = state.domainStates();
-    for (DomainStatesCIter domCit = domainsInfo.cbegin();
-         domCit != domainsInfo.cend();
-         ++domCit) {
-        ClusterState::DomainState& domainState = *domCit->second;
+    for (const auto& domainEntry : domainsInfo) {
+        ClusterState::DomainState& domainState = *domainEntry.second;
 
         const UriToQueueInfoMap& queuesInfoPerDomain =
             domainState.queuesInfo();
-        for (UriToQueueInfoMapCIter qCit = queuesInfoPerDomain.cbegin();
-             qCit != queuesInfoPerDomain.cend();
-             ++qCit) {
-            const ClusterState::QueueInfoSp& infoSp = qCit->second;
+        for (const auto& queueEntry : queuesInfoPerDomain) {
+            const ClusterState::QueueInfoSp& infoSp = queueEntry.second;
             if (infoSp->state() != ClusterStateQueueInfo::State::k_ASSIGNED &&
                 infoSp->state() !=
                     ClusterStateQueueInfo::State::k_UNASSIGNING) {
@@ -2118,11 +2046,9 @@ void ClusterUtil::loadQueuesInfo(bsl::vector<bmqp_ctrlmsg::QueueInfo>* out,
 
             queueInfo.appIds().resize(infoSp->appInfos().size());
             size_t i = 0;
-            for (AppInfosCIter appCIt = infoSp->appInfos().cbegin();
-                 appCIt != infoSp->appInfos().cend();
-                 ++appCIt) {
-                queueInfo.appIds().at(i).appId() = appCIt->first;
-                appCIt->second.loadBinary(&queueInfo.appIds().at(i).appKey());
+            for (const auto& appInfo : infoSp->appInfos()) {
+                queueInfo.appIds().at(i).appId() = appInfo.first;
+                appInfo.second.loadBinary(&queueInfo.appIds().at(i).appKey());
                 ++i;
             }
 
@@ -2140,12 +2066,10 @@ void ClusterUtil::loadPeerNodes(bsl::vector<mqbnet::ClusterNode*>* out,
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(out);
 
-    for (ClusterNodeSessionMapConstIter cit =
-             clusterData.membership().clusterNodeSessionMap().begin();
-         cit != clusterData.membership().clusterNodeSessionMap().end();
-         ++cit) {
-        if (cit->first != clusterData.membership().selfNode()) {
-            out->push_back(cit->first);
+    for (const auto& [node, nodeSession] :
+         clusterData.membership().clusterNodeSessionMap()) {
+        if (node != clusterData.membership().selfNode()) {
+            out->push_back(node);
         }
     }
 }
