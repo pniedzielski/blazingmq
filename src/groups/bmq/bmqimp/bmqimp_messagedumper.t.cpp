@@ -45,7 +45,6 @@
 #include <bdlbb_blob.h>
 #include <bdlbb_blobutil.h>
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 #include <bdlpcre_regex.h>
 #include <bsl_functional.h>
 #include <bsl_string.h>
@@ -331,11 +330,15 @@ Tester::Tester(bslma::Allocator* allocator)
 , d_allocator_p(allocator)
 {
     bmqu::Time::initialize(
-        bdlf::BindUtil::bindS(d_allocator_p, &Tester::now, this),
-        bdlf::BindUtil::bindS(d_allocator_p, &Tester::now, this),
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &Tester::highResolutionTimer,
-                              this),
+        [this]() {
+            return now();
+        },
+        [this]() {
+            return now();
+        },
+        [this]() {
+            return highResolutionTimer();
+        },
         allocator);
 }
 
