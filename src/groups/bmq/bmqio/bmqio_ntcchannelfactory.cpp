@@ -23,9 +23,6 @@
 
 // BDE
 #include <ball_log.h>
-#include <bdlf_bind.h>
-#include <bdlf_memfn.h>
-#include <bdlf_placeholder.h>
 #include <bsl_iomanip.h>
 #include <bsl_ios.h>
 #include <bsl_iostream.h>
@@ -92,10 +89,9 @@ void NtcChannelFactory::processListenerResult(
                 const int catalogHandle = addChannel(alias);
 
                 alias->setChannelId(catalogHandle);
-                alias->onClose(
-                    bdlf::BindUtil::bind(&NtcChannelFactory::removeChannel,
-                                         this,
-                                         catalogHandle));
+                alias->onClose([this, catalogHandle](const bmqio::Status&) {
+                    removeChannel(catalogHandle);
+                });
 
                 d_createSignaler(alias, alias);
 
@@ -282,13 +278,12 @@ void NtcChannelFactory::listen(Status*                      status,
         return;  // RETURN
     }
 
-    ResultCallback resultCallbackProxy = bdlf::BindUtil::bind(
-        &NtcChannelFactory::processListenerResult,
-        this,
-        bdlf::PlaceHolders::_1,
-        bdlf::PlaceHolders::_2,
-        bdlf::PlaceHolders::_3,
-        cb);
+    ResultCallback resultCallbackProxy =
+        [this, cb](bmqio::ChannelFactoryEvent::Enum       event,
+                   const bmqio::Status&                   resultStatus,
+                   const bsl::shared_ptr<bmqio::Channel>& channel) {
+            processListenerResult(event, resultStatus, channel, cb);
+        };
 
     bsl::shared_ptr<bmqio::NtcListener> listener;
     listener.createInplace(d_allocator_p,
@@ -297,9 +292,9 @@ void NtcChannelFactory::listen(Status*                      status,
                            d_allocator_p);
 
     const int catalogHandle = addListener(listener);
-    listener->onClose(bdlf::BindUtil::bind(&NtcChannelFactory::removeListener,
-                                           this,
-                                           catalogHandle));
+    listener->onClose([this, catalogHandle](const bmqio::Status&) {
+        removeListener(catalogHandle);
+    });
 
     // `handle` might be modified from another thread once we call
     // `channel->listen`, make sure to initialize it before.
@@ -349,13 +344,12 @@ void NtcChannelFactory::connect(Status*                      status,
         return;  // RETURN
     }
 
-    ResultCallback resultCallbackProxy = bdlf::BindUtil::bind(
-        &NtcChannelFactory::processChannelResult,
-        this,
-        bdlf::PlaceHolders::_1,
-        bdlf::PlaceHolders::_2,
-        bdlf::PlaceHolders::_3,
-        cb);
+    ResultCallback resultCallbackProxy =
+        [this, cb](bmqio::ChannelFactoryEvent::Enum       event,
+                   const bmqio::Status&                   resultStatus,
+                   const bsl::shared_ptr<bmqio::Channel>& channel) {
+            processChannelResult(event, resultStatus, channel, cb);
+        };
 
     bsl::shared_ptr<bmqio::NtcChannel> channel;
     channel.createInplace(d_allocator_p,
@@ -367,9 +361,9 @@ void NtcChannelFactory::connect(Status*                      status,
 
     channel->setChannelId(catalogHandle);
 
-    channel->onClose(bdlf::BindUtil::bind(&NtcChannelFactory::removeChannel,
-                                          this,
-                                          catalogHandle));
+    channel->onClose([this, catalogHandle](const bmqio::Status&) {
+        removeChannel(catalogHandle);
+    });
 
     // `handle` might be modified from another thread once we call
     // `channel->connect`, make sure to initialize it before.
