@@ -1080,21 +1080,20 @@ int FileStore::openInRecoveryMode(bsl::ostream&    errorDescription,
             }
         }
         else {
-            for (StorageKeys::const_iterator it = extraQueueKeys.begin();
-                 it != extraQueueKeys.end();
-                 ++it) {
+            for (const mqbu::StorageKey& extraQueueKey : extraQueueKeys) {
                 BALL_LOG_WARN
                     << partitionDesc()
                     << "Conforming journal to cluster state: writing a "
                     << "corrective QueueOp.DELETION for extra queueKey " << "["
-                    << *it << "].";
-                rc = writeCorrectiveQueueDeletionDuringRecovery(*it,
+                    << extraQueueKey << "].";
+                rc = writeCorrectiveQueueDeletionDuringRecovery(extraQueueKey,
                                                                 timestamp);
                 if (0 != rc) {
                     BALL_LOG_ERROR
                         << partitionDesc()
                         << "Failed to write corrective QueueOp.DELETION for "
-                        << "extra queueKey [" << *it << "], rc: " << rc;
+                        << "extra queueKey [" << extraQueueKey
+                        << "], rc: " << rc;
                     return 100 * rc + rc_CONFORM_FAILURE;  // RETURN
                 }
             }
@@ -2235,15 +2234,15 @@ int FileStore::recoverMessages(QueueKeyInfoMap*     queueKeyInfoMap,
                         return rc_INVALID_QLIST_RECORD;  // RETURN
                     }
 
-                    for (AppInfos::const_iterator cit = appIdKeyPairs.cbegin();
-                         cit != appIdKeyPairs.cend();
-                         ++cit) {
-                        if (0 == deletedAppKeysOffsets.count(cit->second)) {
+                    for (const auto& [recoveredAppId, recoveredAppKey] :
+                         appIdKeyPairs) {
+                        if (0 ==
+                            deletedAppKeysOffsets.count(recoveredAppKey)) {
                             if (withClusterState) {
                                 DataStoreConfigQueueInfo::AppInfos::
                                     const_iterator qinfoAppCit =
                                         qinfo.appIdKeyPairs().find(
-                                            cit->second);
+                                            recoveredAppKey);
                                 if (qinfoAppCit ==
                                     qinfo.appIdKeyPairs().cend()) {
                                     BMQTSK_ALARMLOG_ALARM("RECOVERY")
@@ -2256,12 +2255,14 @@ int FileStore::recoverMessages(QueueKeyInfoMap*     queueKeyInfoMap,
                                         << ", index: " << jit->recordIndex()
                                         << ", with appId/appKey mismatch. "
                                         << "Recovered appId/appKey ["
-                                        << cit->first << ", " << cit->second
+                                        << recoveredAppId << ", "
+                                        << recoveredAppKey
                                         << "] is not found in the cluster "
                                         << "state." << BMQTSK_ALARMLOG_END;
                                     return rc_APP_ID_KEY_MISMATCH;  // RETURN
                                 }
-                                else if (qinfoAppCit->second != cit->first) {
+                                else if (qinfoAppCit->second !=
+                                         recoveredAppId) {
                                     BMQTSK_ALARMLOG_ALARM("RECOVERY")
                                         << partitionDesc()
                                         << "Encountered a QueueOp ["
@@ -2275,8 +2276,8 @@ int FileStore::recoverMessages(QueueKeyInfoMap*     queueKeyInfoMap,
                                         << qinfoAppCit->second << ", "
                                         << qinfoAppCit->first
                                         << "] in the cluster state, recovered "
-                                        << "appId/appKey [" << cit->first
-                                        << ", " << cit->second << "]."
+                                        << "appId/appKey [" << recoveredAppId
+                                        << ", " << recoveredAppKey << "]."
                                         << BMQTSK_ALARMLOG_END;
                                     return rc_APP_ID_KEY_MISMATCH;  // RETURN
                                 }
@@ -2289,18 +2290,18 @@ int FileStore::recoverMessages(QueueKeyInfoMap*     queueKeyInfoMap,
                                 // done in StorageMgr because we have recovered
                                 // all appId/appKey pairs by that time.
 
-                                qinfo.addAppInfo(cit->first,
-                                                 cit->second,
+                                qinfo.addAppInfo(recoveredAppId,
+                                                 recoveredAppKey,
                                                  withClusterState);
                             }
-                            BALL_LOG_INFO << partitionDesc()
-                                          << "Recovered appId/appKey pair ['"
-                                          << cit->first << "' (" << cit->second
-                                          << ")] in QueueOp [" << queueOpType
-                                          << "] record for queue ["
-                                          << qinfo.canonicalQueueUri()
-                                          << "] with queue key [" << queueKey
-                                          << "].";
+                            BALL_LOG_INFO
+                                << partitionDesc()
+                                << "Recovered appId/appKey pair ['"
+                                << recoveredAppId << "' (" << recoveredAppKey
+                                << ")] in QueueOp [" << queueOpType
+                                << "] record for queue ["
+                                << qinfo.canonicalQueueUri()
+                                << "] with queue key [" << queueKey << "].";
                         }
                     }
                 }
@@ -2744,11 +2745,8 @@ int FileStore::recoverMessages(QueueKeyInfoMap*     queueKeyInfoMap,
             << partitionDesc()
             << "Initialized highest sequence numbers for primary lease "
             << "ids: { ";
-        for (LeaseIdToSeqNumMapCIter cit = d_highestSeqNums.cbegin();
-             cit != d_highestSeqNums.cend();
-             ++cit) {
-            BALL_LOG_OUTPUT_STREAM << cit->first << ": " << cit->second
-                                   << ", ";
+        for (const auto& [leaseId, seqNum] : d_highestSeqNums) {
+            BALL_LOG_OUTPUT_STREAM << leaseId << ": " << seqNum << ", ";
         }
         BALL_LOG_OUTPUT_STREAM << " }";
     }
@@ -2791,29 +2789,21 @@ void FileStore::logQueueRolloverSummary(
 
     QueueKeyCounterList queueKeyCounters;
     queueKeyCounters.reserve(queueKeyCounterMap.size());
-    for (QueueKeyCounterMapCIter queueKeyCounterCIter =
-             queueKeyCounterMap.cbegin();
-         queueKeyCounterCIter != queueKeyCounterMap.cend();
-         ++queueKeyCounterCIter) {
-        queueKeyCounters.push_back(*queueKeyCounterCIter);
+    for (const auto& queueKeyCounter : queueKeyCounterMap) {
+        queueKeyCounters.push_back(queueKeyCounter);
     }
     bsl::sort(queueKeyCounters.begin(), queueKeyCounters.end(), compareByByte);
 
-    for (QueueKeyCounterListCIter queueCountersCIter =
-             queueKeyCounters.cbegin();
-         queueCountersCIter != queueKeyCounters.cend();
-         ++queueCountersCIter) {
-        StorageMapConstIter sit = d_storages.find(queueCountersCIter->first);
+    for (const auto& [queueKey, counter] : queueKeyCounters) {
+        StorageMapConstIter sit = d_storages.find(queueKey);
         BSLS_ASSERT_SAFE(sit != d_storages.cend());
 
-        outStream << "\n    [" << queueCountersCIter->first << "] "
-                  << bsl::setw(8)
+        outStream << "\n    [" << queueKey << "] " << bsl::setw(8)
                   << bmqu::PrintUtil::prettyNumber(
-                         static_cast<int>(queueCountersCIter->second.first))
+                         static_cast<int>(counter.first))
                   << " " << bsl::setw(10)
-                  << bmqu::PrintUtil::prettyBytes(
-                         queueCountersCIter->second.second)
-                  << " " << sit->second->queueUri();
+                  << bmqu::PrintUtil::prettyBytes(counter.second) << " "
+                  << sit->second->queueUri();
     }
     BALL_LOG_INFO << outStream.str();
 }
@@ -2896,10 +2886,8 @@ int FileStore::rolloverImpl(bsls::Types::Uint64 timestamp)
     // rollover set.
 
     QueueKeyCounterMap queueKeyCounterMap;
-    for (RecordIterator recordIt = d_records.begin();
-         recordIt != d_records.end();
-         ++recordIt) {
-        writeRolledOverRecord(&(recordIt->second),
+    for (auto& [recordKey, record] : d_records) {
+        writeRolledOverRecord(&record,
                               &queueKeyCounterMap,
                               activeFileSet,
                               newActiveFileSetSp.get());
@@ -4445,11 +4433,8 @@ void FileStore::processReceiptEvent(unsigned int         primaryLeaseId,
             ++from;
         }
     }
-    for (bsl::unordered_set<mqbi::Queue*>::iterator it =
-             affectedQueues.begin();
-         it != affectedQueues.end();
-         ++it) {
-        (*it)->onReplicatedBatch();
+    for (mqbi::Queue* queue : affectedQueues) {
+        queue->onReplicatedBatch();
     }
 }
 
@@ -4950,8 +4935,8 @@ int FileStore::applyQueueOpRecord(const mqbs::RecordHeader& recHeader,
             const ReplicatedStorage::RecordHandles& recHandles =
                 rstorage->queueOpRecordHandles();
 
-            for (size_t idx = 0; idx < recHandles.size(); ++idx) {
-                removeRecordRaw(recHandles[idx]);
+            for (const DataStoreRecordHandle& recHandle : recHandles) {
+                removeRecordRaw(recHandle);
             }
 
             // Delete the QueueOpRecord.DELETION record written above.
@@ -7200,9 +7185,8 @@ void FileStore::setActivePrimary(mqbnet::ClusterNode* primaryNode,
     d_partitionStats_sp->setNodeRole(
         mqbstat::PartitionStats::PrimaryStatus::e_PRIMARY);
 
-    for (StorageMapIter sIt = d_storages.begin(); sIt != d_storages.end();
-         ++sIt) {
-        sIt->second->setPrimary();
+    for (const auto& [queueKey, storage] : d_storages) {
+        storage->setPrimary();
     }
 
     // Schedule recurring timers only if not already scheduled.  This avoids
@@ -7371,10 +7355,8 @@ void FileStore::gcExpiredMessages()
             bdlt::EpochUtil::convertToTimeT64(currentTimeUtc));
 
     bool needToFlush = false;
-    for (StorageMapIter it = d_storages.begin(); it != d_storages.end();
-         ++it) {
-        ReplicatedStorage* rs        = it->second;
-        const int          numMsgsGc = rs->gcExpiredMessages(currentTimeUtc,
+    for (const auto& [queueKey, rs] : d_storages) {
+        const int numMsgsGc = rs->gcExpiredMessages(currentTimeUtc,
                                                     currentSecondsFromEpoch);
         if (numMsgsGc > 0) {
             needToFlush = true;
@@ -7406,9 +7388,8 @@ void FileStore::gcHistory()
     // as well as get OOM due to uncontrollable history size increase.
 
     const bsls::Types::Int64 now = bmqu::Time::highResolutionTimer();
-    for (StorageMapIter it = d_storages.begin(); it != d_storages.end();
-         ++it) {
-        it->second->gcHistory(now);
+    for (const auto& [queueKey, storage] : d_storages) {
+        storage->gcHistory(now);
     }
 }
 
@@ -7422,10 +7403,9 @@ void FileStore::applyForEachQueue(const QueueFunctor& functor) const
         return;  // RETURN
     }
 
-    for (StorageMapConstIter it = d_storages.begin(); it != d_storages.end();
-         ++it) {
-        if (it->second->queue()) {
-            functor(it->second->queue());
+    for (const auto& [queueKey, storage] : d_storages) {
+        if (storage->queue()) {
+            functor(storage->queue());
         }
     }
 }
@@ -7612,11 +7592,8 @@ void FileStore::setReplicationFactor(int value)
             break;
         }
     }
-    for (bsl::unordered_set<mqbi::Queue*>::iterator qit =
-             affectedQueues.begin();
-         qit != affectedQueues.end();
-         ++qit) {
-        (*qit)->queueEngine()->afterNewMessage();
+    for (mqbi::Queue* queue : affectedQueues) {
+        queue->queueEngine()->afterNewMessage();
     }
 }
 
@@ -7628,9 +7605,8 @@ void FileStore::getStorages(StorageList*          storages,
 
     StorageCollectionUtil::loadStorages(storages, d_storages);
 
-    for (StorageFiltersconstIter cit = filters.cbegin(); cit != filters.cend();
-         ++cit) {
-        StorageCollectionUtil::filterStorages(storages, *cit);
+    for (const StorageCollectionUtil::StorageFilter& filter : filters) {
+        StorageCollectionUtil::filterStorages(storages, filter);
     }
 }
 
