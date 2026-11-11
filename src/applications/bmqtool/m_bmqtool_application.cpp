@@ -72,72 +72,6 @@ namespace {
 
 BALL_LOG_SET_NAMESPACE_CATEGORY("BMQTOOL.APPLICATION");
 
-/// Stack-built functor to pass to `bmqp::ProtocolUtil::buildEvent`
-struct BuildConfirmFunctor {
-    // DATA
-    bmqa::ConfirmEventBuilder& d_confirmBuilder;
-    const bmqa::Message&       d_message;
-
-    // CREATORS
-    inline explicit BuildConfirmFunctor(
-        bmqa::ConfirmEventBuilder& confirmBuilder,
-        const bmqa::Message&       message)
-    : d_confirmBuilder(confirmBuilder)
-    , d_message(message)
-    {
-        // NOTHING
-    }
-
-    // MANIPULATORS
-    inline bmqt::EventBuilderResult::Enum operator()()
-    {
-        return d_confirmBuilder.addMessageConfirmation(d_message);
-    }
-};
-
-/// Stack-built functor to pass to `bmqp::ProtocolUtil::buildEvent`
-struct BuildConfirmOverflowFunctor {
-    // DATA
-    bmqa::Session&             d_session;
-    bmqa::ConfirmEventBuilder& d_builder;
-
-    // CREATORS
-    inline explicit BuildConfirmOverflowFunctor(
-        bmqa::Session&             session,
-        bmqa::ConfirmEventBuilder& builder)
-    : d_session(session)
-    , d_builder(builder)
-    {
-        // NOTHING
-    }
-
-    // MANIPULATORS
-    inline void operator()() { d_session.confirmMessages(&d_builder); }
-};
-
-/// Functor that returns a fixed `AuthnCredential` when invoked.
-struct AuthnCredentialProvider {
-    // DATA
-    bsl::string       d_mechanism;
-    bsl::vector<char> d_data;
-
-    // CREATORS
-    AuthnCredentialProvider(const bsl::string& mechanism,
-                            const bsl::string& data)
-    : d_mechanism(mechanism)
-    , d_data(data.begin(), data.end())
-    {
-    }
-
-    // MANIPULATORS
-    bsl::optional<bmqt::AuthnCredential> operator()() const
-    {
-        return bsl::optional<bmqt::AuthnCredential>(bsl::in_place,
-                                                    d_mechanism,
-                                                    d_data);
-    }
-};
-
 }  // close unnamed namespace
 
 // -----------------
@@ -479,9 +413,14 @@ int Application::initialize()
         .setUserAgentPrefix("bmqtool");
 
     if (!d_parameters.authnMechanism().empty()) {
+        const bsl::string& authnData = d_parameters.authnData();
         options.setAuthnCredentialCb(
-            AuthnCredentialProvider(d_parameters.authnMechanism(),
-                                    d_parameters.authnData()));
+            [mechanism = d_parameters.authnMechanism(),
+             data = bsl::vector<char>(authnData.begin(), authnData.end())]() {
+                return bsl::optional<bmqt::AuthnCredential>(bsl::in_place,
+                                                            mechanism,
+                                                            data);
+            });
     }
 
     // Create the session
@@ -694,9 +633,13 @@ void Application::onMessageEvent(const bmqa::MessageEvent& event)
             if (d_parameters.confirmMsg()) {
                 [[maybe_unused]] bmqt::EventBuilderResult::Enum rc =
                     bmqp::ProtocolUtil::buildEvent(
-                        BuildConfirmFunctor(confirmBuilder, message),
-                        BuildConfirmOverflowFunctor(*d_session_mp.get(),
-                                                    confirmBuilder));
+                        [&confirmBuilder, &message]() {
+                            return confirmBuilder.addMessageConfirmation(
+                                message);
+                        },
+                        [this, &confirmBuilder]() {
+                            d_session_mp->confirmMessages(&confirmBuilder);
+                        });
 
                 if (rc == 0) {
                     // Write to log file
