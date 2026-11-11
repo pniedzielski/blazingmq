@@ -18,8 +18,6 @@
 
 // BDE
 #include <bdlb_print.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bsl_algorithm.h>
 #include <bsls_assert.h>
 
@@ -211,9 +209,9 @@ void StorageCollectionUtil::sortStorages(
 StorageCollectionUtil::StorageFilter
 StorageCollectionUtilFilterFactory::byDomain(const bsl::string& domainName)
 {
-    return bdlf::BindUtil::bind(&byDomainFilter,
-                                bdlf::PlaceHolders::_1,  // storage
-                                domainName);
+    return [domainName](const ReplicatedStorage* storage) {
+        return byDomainFilter(storage, domainName);
+    };
 }
 
 StorageCollectionUtil::StorageFilter
@@ -221,20 +219,18 @@ StorageCollectionUtilFilterFactory::byMessageCount(
     bsls::Types::Int64 lowerLimit,
     bsls::Types::Int64 upperLimit)
 {
-    return bdlf::BindUtil::bind(&byMessageCountFilter,
-                                bdlf::PlaceHolders::_1,  // storage
-                                lowerLimit,
-                                upperLimit);
+    return [lowerLimit, upperLimit](const ReplicatedStorage* storage) {
+        return byMessageCountFilter(storage, lowerLimit, upperLimit);
+    };
 }
 
 StorageCollectionUtil::StorageFilter
 StorageCollectionUtilFilterFactory::byByteCount(bsls::Types::Int64 lowerLimit,
                                                 bsls::Types::Int64 upperLimit)
 {
-    return bdlf::BindUtil::bind(&byByteCountFilter,
-                                bdlf::PlaceHolders::_1,  // storage
-                                lowerLimit,
-                                upperLimit);
+    return [lowerLimit, upperLimit](const ReplicatedStorage* storage) {
+        return byByteCountFilter(storage, lowerLimit, upperLimit);
+    };
 }
 
 }  // close package namespace
