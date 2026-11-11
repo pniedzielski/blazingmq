@@ -42,7 +42,6 @@
 #include <bdlb_print.h>
 #include <bdlb_scopeexit.h>
 #include <bdlb_string.h>
-#include <bdlf_bind.h>
 #include <bdlt_currenttime.h>
 #include <bdlt_epochutil.h>
 #include <bsl_iostream.h>
@@ -726,11 +725,9 @@ static bool postEvent(const bsl::string&   text,
     // the builder must be reset before it can be reused.
     const bmqa::MessageEvent& messageEvent = builder.messageEvent();
     queueManager->trackMessage(message, queueId, msgCorrelationId);
-    bdlb::ScopeExitAny untrackGuard(
-        bdlf::BindUtil::bind(&QueueManager::untrackMessage,
-                             queueManager,
-                             queueId,
-                             msgCorrelationId));
+    bdlb::ScopeExitAny untrackGuard([&]() {
+        queueManager->untrackMessage(queueId, msgCorrelationId);
+    });
     rc = session->post(messageEvent);
     if (rc != 0) {
         BALL_LOG_ERROR << "Failed to post message: rc: " << rc;
