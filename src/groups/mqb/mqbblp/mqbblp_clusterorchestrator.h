@@ -195,8 +195,8 @@ class ClusterOrchestrator {
     /// Return the dispatcher of the associated cluster.
     mqbi::Dispatcher* dispatcher();
 
-    void processElectorEventDispatched(const bmqp::Event&   event,
-                                       mqbnet::ClusterNode* source);
+    void forwardElectorEvent(const bmqp::Event&   event,
+                             mqbnet::ClusterNode* source);
 
     /// Callback provided to the elector instance for notification in change
     /// of elector to the specified `state` having specified `term`, and
@@ -226,10 +226,11 @@ class ClusterOrchestrator {
     ///         dispatcher thread.
     void electorTransitionToLeader(int leaderNodeId, bsls::Types::Uint64 term);
 
-    /// Executed by any thread.
-    void onPartitionPrimaryStatusDispatched(int          partitionId,
-                                            int          status,
-                                            unsigned int primaryLeaseId);
+    /// THREAD: This method is invoked in the associated cluster's
+    ///         dispatcher thread.
+    void applyPartitionPrimaryStatus(int          partitionId,
+                                     int          status,
+                                     unsigned int primaryLeaseId);
 
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
@@ -238,10 +239,6 @@ class ClusterOrchestrator {
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
     void dropPeerQueues(mqbc::ClusterNodeSession* ns);
-
-    void timerCb();
-
-    void timerCbDispatched();
 
     /// THREAD: Executed by the dispatcher thread for the specified
     ///         `partitionId`.

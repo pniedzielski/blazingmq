@@ -81,7 +81,7 @@ ClusterOrchestrator::OnElectorEventFunctor::~OnElectorEventFunctor()
 void ClusterOrchestrator::OnElectorEventFunctor::operator()() const
 {
     // Thread: CLUSTER dispatcher
-    d_orchestrator_p->processElectorEventDispatched(d_event, d_source_p);
+    d_orchestrator_p->forwardElectorEvent(d_event, d_source_p);
 }
 
 // -------------------------
@@ -89,9 +89,8 @@ void ClusterOrchestrator::OnElectorEventFunctor::operator()() const
 // -------------------------
 
 // PRIVATE MANIPULATORS
-void ClusterOrchestrator::processElectorEventDispatched(
-    const bmqp::Event&   event,
-    mqbnet::ClusterNode* source)
+void ClusterOrchestrator::forwardElectorEvent(const bmqp::Event&   event,
+                                              mqbnet::ClusterNode* source)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -352,7 +351,7 @@ void ClusterOrchestrator::registerQueueInfo(const bmqt::Uri& uri,
     d_stateManager_mp->registerQueueInfo(advisory, forceUpdate);
 }
 
-void ClusterOrchestrator::onPartitionPrimaryStatusDispatched(
+void ClusterOrchestrator::applyPartitionPrimaryStatus(
     int          partitionId,
     int          status,
     unsigned int primaryLeaseId)
@@ -1935,9 +1934,7 @@ void ClusterOrchestrator::onPartitionPrimaryStatus(int          partitionId,
 
     dispatcher()->execute(
         [this, partitionId, status, primaryLeaseId]() {
-            onPartitionPrimaryStatusDispatched(partitionId,
-                                               status,
-                                               primaryLeaseId);
+            applyPartitionPrimaryStatus(partitionId, status, primaryLeaseId);
         },
         d_cluster_p);
 }
