@@ -48,7 +48,6 @@
 // BDE
 #include <ball_log.h>
 #include <bdlb_scopeexit.h>
-#include <bdlf_bind.h>
 #include <bsl_memory.h>
 #include <bsl_optional.h>
 #include <bsl_ostream.h>
@@ -173,13 +172,9 @@ int Authenticator::authenticateAsync(
     // executed by one of the *IO* threads
 
     const int rc = d_threadPool.enqueueJob(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &Authenticator::authenticate,
-                              this,
-                              context_sp,
-                              channel,
-                              isDefaultAuthn,
-                              isReauthn));
+        [this, context_sp, channel, isDefaultAuthn, isReauthn]() {
+            authenticate(context_sp, channel, isDefaultAuthn, isReauthn);
+        });
 
     if (rc != 0) {
         errorDescription << "Failed to enqueue authentication job for '"
@@ -218,22 +213,22 @@ void Authenticator::authenticate(
 
     if (isReauthn) {
         // For reauthentication: set up error guard to handle failures
-        scopeGuard.emplace(bdlf::BindUtil::bind(
-            &mqbnet::AuthenticationContext::onReauthenticationError,
-            context_sp.get(),
-            channel,
-            bsl::ref(rc),
-            bsl::ref(error)));
+        scopeGuard.emplace(
+            [context = context_sp.get(), channel, &rc, &error]() {
+                context->onReauthenticationError(channel, rc, error);
+            });
     }
     else {
         // For initial authentication: set up state machine transition
         event.emplace(InitialConnectionEvent::e_ERROR);
-        scopeGuard.emplace(bdlf::BindUtil::bind(
-            &mqbnet::InitialConnectionContext::handleEvent,
-            context_sp->initialConnectionContext(),
-            bsl::ref(error),
-            bsl::ref(event.value()),
-            bsl::monostate()));
+        scopeGuard.emplace(
+            [initialContext = context_sp->initialConnectionContext(),
+             &error,
+             &eventValue = event.value()]() {
+                initialContext->handleEvent(error,
+                                            eventValue,
+                                            bsl::monostate());
+            });
     }
 
     // Skip authentication if the client disconnected while waiting in queue
