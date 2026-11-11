@@ -74,14 +74,6 @@
 //      callback.reset();
 //  }
 //..
-//
-// NOTE: In C++03, the forwarding macros used below pass arguments as
-//       (const &) because perfect forwarding with `&&` is not available.
-//       This makes it impossible to call `createInplace` with classes that
-//       expect non-const references in constructor arguments.
-//       Consider passing output arguments with equivalent code using pointers
-//       to mutable variables instead.
-//
 
 // BDE
 #include <bsl_functional.h>
@@ -271,13 +263,8 @@ inline char* ManagedCallback::place()
     BSLS_ASSERT_SAFE(d_empty);
 
     /// Ensure that CALLBACK_TYPE inherits from CallbackFunctor interface.
-#if __cplusplus >= 201103L
     static_assert(
         bslmf::IsAccessibleBaseOf<CallbackFunctor, CALLBACK_TYPE>::value);
-#else
-    typedef bslmf::IsAccessibleBaseOf<CallbackFunctor, CALLBACK_TYPE> IsBase;
-    BSLS_ASSERT_SAFE(IsBase::value);
-#endif
 
     d_callbackBuffer.resize(
         bsls::AlignmentUtil::roundUpToMaximalAlignment(sizeof(CALLBACK_TYPE)));

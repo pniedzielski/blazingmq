@@ -175,17 +175,11 @@
 #include <bslmt_lockguard.h>
 #include <bslmt_mutex.h>
 #include <bsls_assert.h>
-#include <bsls_compilerfeatures.h>
 #include <bsls_exceptionutil.h>  // BSLS_NOTHROW_SPEC
-#include <bsls_keyword.h>
 
-#ifdef BSLS_COMPILERFEATURES_SUPPORT_GENERALIZED_INITIALIZERS
 #include <bsl_initializer_list.h>
-#endif
-#ifdef BSLS_COMPILERFEATURES_SUPPORT_TRAITS_HEADER
 #include <bsl_type_traits.h>
 #include <bsl_utility.h>
-#endif
 
 namespace BloombergLP {
 
@@ -204,19 +198,12 @@ class OperationChain_Job;
 /// requirements for a completion callback. To satisfy those requirements
 /// `TYPE` must meet the requirements of Destructible and MoveConstructible
 /// as specified in the C++ standard.
-///
-/// Note that unless compiled with C++17 support, this metafunction always
-/// returns `true`.
 template <class TYPE>
 struct OperationChain_IsCompletionCallbackCompatible
-#if __cplusplus >= 201703L
 : bsl::integral_constant<
       bool,
       bsl::is_destructible_v<bsl::decay_t<TYPE> > &&
           bsl::is_move_constructible_v<bsl::decay_t<TYPE> > >
-#else
-: bsl::integral_constant<bool, true>
-#endif
 {
 };
 
@@ -230,21 +217,14 @@ struct OperationChain_IsCompletionCallbackCompatible
 /// as specified in the C++ standard, as well as be Invocable with a single
 /// parameter that is a functor object of unspecified type taking an
 /// arbitrary number of template arguments.
-///
-/// Note that unless compiled with C++17 support, this metafunction always
-/// returns `true`.
 template <class TYPE>
 struct OperationChain_IsOperationCallbackCompatible
-#if __cplusplus >= 201703L
 : bsl::integral_constant<
       bool,
       bsl::is_destructible_v<bsl::decay_t<TYPE> > &&
           bsl::is_move_constructible_v<bsl::decay_t<TYPE> > &&
           bsl::is_invocable_v<bsl::add_rvalue_reference_t<bsl::decay_t<TYPE> >,
                               bdlf::NoOp> >
-#else
-: bsl::integral_constant<bool, true>
-#endif
 {
 };
 
@@ -539,7 +519,6 @@ class OperationChain {
     void append(Link* link);
     void append(Link&& link);
 
-#ifdef BSLS_COMPILERFEATURES_SUPPORT_GENERALIZED_INITIALIZERS
     /// Append all links from the specified `links` list to this operation
     /// chain in the order they appear in the list. If the chain is started
     /// and the first appended link is the first one in the chain, execute
@@ -553,7 +532,6 @@ class OperationChain {
     /// This function meets the strong exception guarantee. If an exception
     /// is thrown, this function has no effect.
     void append(bsl::initializer_list<Link*> links);
-#endif
 
     /// Append the specified `count` number of links from the specified
     /// `links` array to this operation chain in the order they appear in
@@ -888,12 +866,10 @@ inline void OperationChain::append(Link&& link)
     append(&link_p, 1);
 }
 
-#ifdef BSLS_COMPILERFEATURES_SUPPORT_GENERALIZED_INITIALIZERS
 inline void OperationChain::append(bsl::initializer_list<Link*> links)
 {
     append(links.begin(), links.size());
 }
-#endif  // BSLS_COMPILERFEATURES_SUPPORT_GENERALIZED_INITIALIZERS
 
 template <class OP_CALLBACK>
 inline void OperationChain::appendInplace(OP_CALLBACK&& opCallback)
