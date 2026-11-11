@@ -242,8 +242,8 @@ class CapacityMeter {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented
-    CapacityMeter(const CapacityMeter&, bslma::Allocator*);
-    CapacityMeter& operator=(const CapacityMeter&);
+    CapacityMeter(const CapacityMeter&, bslma::Allocator*) = delete;
+    CapacityMeter& operator=(const CapacityMeter&)         = delete;
 
   public:
     // TRAITS
