@@ -1083,9 +1083,9 @@ inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::TwoKeyHashMap(
                   allocator())
 {
     // free memory on failure
-    BDLB_SCOPEEXIT_PROCTOR(guard,
-                           bdlf::MemFnUtil::memFn(&TwoKeyHashMap::clear,
-                                                  this));
+    BDLB_SCOPEEXIT_PROCTOR(guard, [this]() {
+        clear();
+    });
 
     // copy elements from 'original' to '*this'
     d_nodeAllocator->reserveCapacity(static_cast<int>(original.size()));
@@ -1142,9 +1142,9 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::operator=(const TwoKeyHashMap& rhs)
 {
 #ifdef BSLS_ASSERT_SAFE_IS_ACTIVE
     // POSTCONDITIONS
-    BDLB_SCOPEEXIT_PROCTOR(
-        invariantsGuard,
-        bdlf::MemFnUtil::memFn(&TwoKeyHashMap::assertInvariants, this));
+    BDLB_SCOPEEXIT_PROCTOR(invariantsGuard, [this]() {
+        assertInvariants();
+    });
 #endif
 
     if (&rhs != this) {
@@ -1161,13 +1161,13 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::operator=(TwoKeyHashMap&& rhs)
 {
 #ifdef BSLS_ASSERT_SAFE_IS_ACTIVE
     // POSTCONDITIONS
-    BDLB_SCOPEEXIT_PROCTOR(
-        invariantsGuard1,
-        bdlf::MemFnUtil::memFn(&TwoKeyHashMap::assertInvariants, this));
+    BDLB_SCOPEEXIT_PROCTOR(invariantsGuard1, [this]() {
+        assertInvariants();
+    });
 
-    BDLB_SCOPEEXIT_PROCTOR(
-        invariantsGuard2,
-        bdlf::MemFnUtil::memFn(&TwoKeyHashMap::assertInvariants, &rhs));
+    BDLB_SCOPEEXIT_PROCTOR(invariantsGuard2, [&rhs]() {
+        rhs.assertInvariants();
+    });
 #endif
 
     if (&rhs != this) {
@@ -1198,9 +1198,9 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(const value_type& value,
 
 #ifdef BSLS_ASSERT_SAFE_IS_ACTIVE
     // POSTCONDITIONS
-    BDLB_SCOPEEXIT_PROCTOR(
-        invariantsGuard,
-        bdlf::MemFnUtil::memFn(&TwoKeyHashMap::assertInvariants, this));
+    BDLB_SCOPEEXIT_PROCTOR(invariantsGuard, [this]() {
+        assertInvariants();
+    });
 #endif
 
     // do insert
@@ -1221,9 +1221,9 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(K1_T&&    k1,
 
 #ifdef BSLS_ASSERT_SAFE_IS_ACTIVE
     // POSTCONDITIONS
-    BDLB_SCOPEEXIT_PROCTOR(
-        invariantsGuard,
-        bdlf::MemFnUtil::memFn(&TwoKeyHashMap::assertInvariants, this));
+    BDLB_SCOPEEXIT_PROCTOR(invariantsGuard, [this]() {
+        assertInvariants();
+    });
 #endif
 
     bool hasInserted = false;
@@ -1240,10 +1240,9 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(K1_T&&    k1,
     }
 
     // rollback k1Map insertion on failure
-    BDLB_SCOPEEXIT_PROCTOR(k1MapGuard,
-                           bdlf::BindUtil::bindR<void>(TwoKeyHashMap_Erase(),
-                                                       &d_k1Map,
-                                                       &k1MapIter));
+    BDLB_SCOPEEXIT_PROCTOR(k1MapGuard, [&]() {
+        TwoKeyHashMap_Erase()(&d_k1Map, &k1MapIter);
+    });
 
     // try inserting in k2Map
     bsl::pair<K2MapIter, bool> pair2 = d_k2Map.emplace(bsl::forward<K2_T>(k2),
@@ -1257,10 +1256,9 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(K1_T&&    k1,
     }
 
     // rollback k2Map insertion on failure
-    BDLB_SCOPEEXIT_PROCTOR(k2MapGuard,
-                           bdlf::BindUtil::bindR<void>(TwoKeyHashMap_Erase(),
-                                                       &d_k2Map,
-                                                       &k2MapIter));
+    BDLB_SCOPEEXIT_PROCTOR(k2MapGuard, [&]() {
+        TwoKeyHashMap_Erase()(&d_k2Map, &k2MapIter);
+    });
 
     // store the value
     Node* p = new (*d_nodeAllocator)
@@ -1284,9 +1282,9 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::erase(const_iterator it)
 
 #ifdef BSLS_ASSERT_SAFE_IS_ACTIVE
     // POSTCONDITIONS
-    BDLB_SCOPEEXIT_PROCTOR(
-        invariantsGuard,
-        bdlf::MemFnUtil::memFn(&TwoKeyHashMap::assertInvariants, this));
+    BDLB_SCOPEEXIT_PROCTOR(invariantsGuard, [this]() {
+        assertInvariants();
+    });
 #endif
 
     // obtain a iterator to the next element
@@ -1313,9 +1311,9 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::eraseByKey1(const first_key_type& k1)
 {
 #ifdef BSLS_ASSERT_SAFE_IS_ACTIVE
     // POSTCONDITIONS
-    BDLB_SCOPEEXIT_PROCTOR(
-        invariantsGuard,
-        bdlf::MemFnUtil::memFn(&TwoKeyHashMap::assertInvariants, this));
+    BDLB_SCOPEEXIT_PROCTOR(invariantsGuard, [this]() {
+        assertInvariants();
+    });
 #endif
 
     iterator it = findByKey1(k1);
@@ -1328,9 +1326,9 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::eraseByKey2(const second_key_type& k2)
 {
 #ifdef BSLS_ASSERT_SAFE_IS_ACTIVE
     // POSTCONDITIONS
-    BDLB_SCOPEEXIT_PROCTOR(
-        invariantsGuard,
-        bdlf::MemFnUtil::memFn(&TwoKeyHashMap::assertInvariants, this));
+    BDLB_SCOPEEXIT_PROCTOR(invariantsGuard, [this]() {
+        assertInvariants();
+    });
 #endif
 
     iterator it = findByKey2(k2);
@@ -1342,9 +1340,9 @@ inline void TwoKeyHashMap<K1, K2, VALUE, H1, H2>::clear() noexcept
 {
 #ifdef BSLS_ASSERT_SAFE_IS_ACTIVE
     // POSTCONDITIONS
-    BDLB_SCOPEEXIT_PROCTOR(
-        invariantsGuard,
-        bdlf::MemFnUtil::memFn(&TwoKeyHashMap::assertInvariants, this));
+    BDLB_SCOPEEXIT_PROCTOR(invariantsGuard, [this]() {
+        assertInvariants();
+    });
 #endif
 
     // erase all nodes
