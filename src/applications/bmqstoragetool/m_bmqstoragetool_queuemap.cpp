@@ -121,9 +121,8 @@ QueueMap::QueueInfos QueueMap::queueInfos() const
     QueueMap::QueueInfos result(d_allocator_p);
     result.reserve(d_queueKeyToInfoMap.size());
 
-    QueueKeyToInfoMap::const_iterator it = d_queueKeyToInfoMap.begin();
-    for (; it != d_queueKeyToInfoMap.end(); ++it) {
-        result.push_back(it->second);
+    for (const auto& [queueKey, queueInfo] : d_queueKeyToInfoMap) {
+        result.push_back(queueInfo);
     }
     return result;
 }
