@@ -131,9 +131,8 @@ class Task_AllocatorManager {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    Task_AllocatorManager(const Task_AllocatorManager&);  // = delete;
-    Task_AllocatorManager&
-    operator=(const Task_AllocatorManager&);  // = delete;
+    Task_AllocatorManager(const Task_AllocatorManager&)            = delete;
+    Task_AllocatorManager& operator=(const Task_AllocatorManager&) = delete;
 
   public:
     // CREATORS
