@@ -25,7 +25,6 @@
 
 // BDE
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 #include <bdlmt_eventscheduler.h>
 #include <bsl_string.h>
 
@@ -88,16 +87,12 @@ static void test1_breathingTest()
     mqbplug::PluginManager pluginManager;
 
     scheduler.start();
-    mqbstat::StatController obj(
-        bdlf::BindUtil::bind(&processCommand,
-                             bdlf::PlaceHolders::_1,   // source
-                             bdlf::PlaceHolders::_2,   // cmd
-                             bdlf::PlaceHolders::_3),  // os
-        &pluginManager,
-        &bufferFactory,
-        0,  // no allocatorsStatContext
-        &scheduler,
-        bmqtst::TestHelperUtil::allocator());
+    mqbstat::StatController obj(&processCommand,
+                                &pluginManager,
+                                &bufferFactory,
+                                0,  // no allocatorsStatContext
+                                &scheduler,
+                                bmqtst::TestHelperUtil::allocator());
 
     bmqu::MemOutStream errStream(bmqtst::TestHelperUtil::allocator());
     int                rc = obj.start(errStream);

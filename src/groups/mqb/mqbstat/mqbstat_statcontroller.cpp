@@ -54,8 +54,6 @@
 #include <bdlb_string.h>
 #include <bdlb_stringrefutil.h>
 #include <bdlbb_blob.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlmt_eventscheduler.h>
 #include <bdlmt_timereventscheduler.h>
 #include <bdlt_timeunitratio.h>
@@ -363,8 +361,9 @@ void StatController::setTunable(mqbcmd::StatResult*       result,
     // executed by the *SCHEDULER* thread
 
     // RAII to ensure we will post on the semaphore no matter how we return
-    bdlb::ScopeExitAny semaphorePost(
-        bdlf::BindUtil::bind(&optionalSemaphorePost, semaphore));
+    bdlb::ScopeExitAny semaphorePost([semaphore]() {
+        optionalSemaphorePost(semaphore);
+    });
 
     const mqbcfg::StatsConfig& statsCfg = mqbcfg::BrokerConfig::get().stats();
     const int                  snapshotInterval = statsCfg.snapshotInterval();
@@ -492,8 +491,9 @@ void StatController::getTunable(mqbcmd::StatResult* result,
     // executed by the *SCHEDULER* thread
 
     // RAII to ensure we will post on the semaphore no matter how we return
-    bdlb::ScopeExitAny semaphorePost(
-        bdlf::BindUtil::bind(&optionalSemaphorePost, semaphore));
+    bdlb::ScopeExitAny semaphorePost([semaphore]() {
+        optionalSemaphorePost(semaphore);
+    });
 
     size_t suffixPos = tunable.size() - (sizeof(k_PUBLISHINTERVAL_SUFFIX) - 1);
     if (tunable.size() > sizeof(k_PUBLISHINTERVAL_SUFFIX) &&
@@ -549,8 +549,9 @@ void StatController::listTunables(mqbcmd::StatResult* result,
     // executed by the *SCHEDULER* thread
 
     // RAII to ensure we will post on the semaphore no matter how we return
-    bdlb::ScopeExitAny semaphorePost(
-        bdlf::BindUtil::bind(&optionalSemaphorePost, semaphore));
+    bdlb::ScopeExitAny semaphorePost([semaphore]() {
+        optionalSemaphorePost(semaphore);
+    });
 
     bsls::TimeInterval publishInterval(0);
     if (d_statConsumers.size() > 0) {
@@ -656,18 +657,18 @@ void StatController::snapshotAndNotify()
 
         if (d_tableStatsFileLogger_mp) {
             d_tableStatsFileLogger_mp->logStats(
-                bdlf::BindUtil::bind(&TablePrinter::printStats,
-                                     d_tablePrinter_mp.get(),
-                                     bdlf::PlaceHolders::_1,
-                                     statId));
+                [printer = d_tablePrinter_mp.get(),
+                 statId](bsl::ostream& stream) {
+                    printer->printStats(stream, statId);
+                });
         }
 
         if (d_jsonStatsFileLogger_mp) {
             d_jsonStatsFileLogger_mp->logStats(
-                bdlf::BindUtil::bind(&FlatJsonPrinter::printStats,
-                                     d_flatJsonPrinter_mp.get(),
-                                     bdlf::PlaceHolders::_1,
-                                     statId));
+                [printer = d_flatJsonPrinter_mp.get(),
+                 statId](bsl::ostream& stream) {
+                    printer->printStats(stream, statId);
+                });
         }
     }
 
@@ -813,8 +814,9 @@ int StatController::start(bsl::ostream& errorDescription)
 
     d_scheduler_mp->scheduleEvent(
         bsls::TimeInterval(0),  // execute as soon as possible
-        bdlf::BindUtil::bind(&bslmt::ThreadUtil::setThreadName,
-                             "bmqSchedStat"));
+        []() {
+            bslmt::ThreadUtil::setThreadName("bmqSchedStat");
+        });
 
     // Create and start the system stat monitor.  The SystemStats are used in
     // the dashboard screen, stat consumers, stats printer, ...  So we need to
@@ -969,7 +971,9 @@ int StatController::start(bsl::ostream& errorDescription)
     // Start the clock
     d_scheduler_mp->startClock(
         bsls::TimeInterval(brkrCfg.stats().snapshotInterval()),
-        bdlf::BindUtil::bind(&StatController::snapshotAndNotify, this));
+        [this]() {
+            snapshotAndNotify();
+        });
     BALL_LOG_INFO << "Starting statistics  [SnapshotInterval: "
                   << brkrCfg.stats().snapshotInterval() << ", PrintInterval: "
                   << brkrCfg.stats().printer().printInterval() << "]";
@@ -1009,18 +1013,18 @@ void StatController::stop()
 
         if (d_tableStatsFileLogger_mp) {
             d_tableStatsFileLogger_mp->logStats(
-                bdlf::BindUtil::bind(&TablePrinter::printStats,
-                                     d_tablePrinter_mp.get(),
-                                     bdlf::PlaceHolders::_1,
-                                     lastStatId));
+                [printer = d_tablePrinter_mp.get(),
+                 lastStatId](bsl::ostream& stream) {
+                    printer->printStats(stream, lastStatId);
+                });
         }
 
         if (d_jsonStatsFileLogger_mp) {
             d_jsonStatsFileLogger_mp->logStats(
-                bdlf::BindUtil::bind(&FlatJsonPrinter::printStats,
-                                     d_flatJsonPrinter_mp.get(),
-                                     bdlf::PlaceHolders::_1,
-                                     lastStatId));
+                [printer = d_flatJsonPrinter_mp.get(),
+                 lastStatId](bsl::ostream& stream) {
+                    printer->printStats(stream, lastStatId);
+                });
         }
     }
 
@@ -1063,11 +1067,9 @@ int StatController::processCommand(mqbcmd::StatResult*        result,
         bslmt::Semaphore semaphore;
         d_scheduler_mp->scheduleEvent(
             bsls::TimeInterval(),  // as soon as possible
-            bdlf::BindUtil::bind(&StatController::captureStatsAndSemaphorePost,
-                                 this,
-                                 result,
-                                 &semaphore,
-                                 encoding));
+            [this, result, &semaphore, encoding]() {
+                captureStatsAndSemaphorePost(result, &semaphore, encoding);
+            });
         semaphore.wait();
         return 0;  // RETURN
     }
@@ -1077,11 +1079,9 @@ int StatController::processCommand(mqbcmd::StatResult*        result,
 
         d_scheduler_mp->scheduleEvent(
             bsls::TimeInterval(),  // asap
-            bdlf::BindUtil::bind(&StatController::setTunable,
-                                 this,
-                                 result,
-                                 command.setTunable(),
-                                 &semaphore));
+            [this, result, tunable = command.setTunable(), &semaphore]() {
+                setTunable(result, tunable, &semaphore);
+            });
         semaphore.wait();
         return 0;  // RETURN
     }
@@ -1091,11 +1091,9 @@ int StatController::processCommand(mqbcmd::StatResult*        result,
 
         d_scheduler_mp->scheduleEvent(
             bsls::TimeInterval(),  // asap
-            bdlf::BindUtil::bind(&StatController::getTunable,
-                                 this,
-                                 result,
-                                 command.getTunable(),
-                                 &semaphore));
+            [this, result, tunable = command.getTunable(), &semaphore]() {
+                getTunable(result, tunable, &semaphore);
+            });
         semaphore.wait();
         return 0;  // RETURN
     }
@@ -1103,12 +1101,10 @@ int StatController::processCommand(mqbcmd::StatResult*        result,
     if (command.isListTunablesValue()) {
         bslmt::Semaphore semaphore;
 
-        d_scheduler_mp->scheduleEvent(
-            bsls::TimeInterval(),  // asap
-            bdlf::BindUtil::bind(&StatController::listTunables,
-                                 this,
-                                 result,
-                                 &semaphore));
+        d_scheduler_mp->scheduleEvent(bsls::TimeInterval(),  // asap
+                                      [this, result, &semaphore]() {
+                                          listTunables(result, &semaphore);
+                                      });
 
         semaphore.wait();
         return 0;  // RETURN
