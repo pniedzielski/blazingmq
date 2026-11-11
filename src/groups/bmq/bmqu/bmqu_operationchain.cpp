@@ -81,8 +81,8 @@ void OperationChain::run(LockGuard* lock) noexcept
     // set the number of running jobs in this chain
     d_numJobsRunning = d_jobList.front().id();
 
-    unsigned          numJobs = d_numJobsRunning;
-    JobList::iterator jobIt   = d_jobList.begin();
+    unsigned numJobs = d_numJobsRunning;
+    auto     jobIt   = d_jobList.begin();
 
     lock->release()->unlock();  // UNLOCK
 
@@ -414,8 +414,8 @@ void OperationChainLink::swap(OperationChainLink& other) noexcept
     lhs.d_jobList.splice(lhs.d_jobList.end(), rhs.d_jobList);
 
     // move jobs from 'lhs' to 'rhs'
-    JobList::iterator first = d_jobList.begin();
-    JobList::iterator last  = d_jobList.begin();
+    auto first = d_jobList.begin();
+    auto last  = d_jobList.begin();
     bsl::advance(last, lhsNumJobs);
     rhs.d_jobList.splice(rhs.d_jobList.end(), lhs.d_jobList, first, last);
 }
