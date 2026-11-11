@@ -261,75 +261,71 @@ int FileStoreUtil::findFileStoreSetsFromPaths(
     if (loadSize) {
         // For every file in the output, also populate the corresponding file
         // size
-        for (bsl::vector<bsl::string>::size_type i = 0; i < files.size();
-             ++i) {
+        for (const bsl::string& file : files) {
             bsl::string timestamp;
-            localRC = extractTimestamp(&timestamp, files[i]);
+            localRC = extractTimestamp(&timestamp, file);
             if (localRC != 0) {
                 returnRC = rc_TIMESTAMP_EXTRACTION_FAILURE;
                 BALL_LOG_ERROR
                     << "Failed to extract timestamp from file name:"
-                    << " [" << files[i] << "], rc: "
+                    << " [" << file << "], rc: "
                     << (10 * localRC + rc_TIMESTAMP_EXTRACTION_FAILURE)
                     << ". File will be skipped from the result.";
                 continue;  // CONTINUE
             }
 
-            if (hasDataFileExtension(files[i])) {
-                (*fileSetMap)[timestamp].setDataFile(files[i]).setDataFileSize(
-                    bdls::FilesystemUtil::getFileSize(files[i].c_str()));
+            if (hasDataFileExtension(file)) {
+                (*fileSetMap)[timestamp].setDataFile(file).setDataFileSize(
+                    bdls::FilesystemUtil::getFileSize(file.c_str()));
             }
-            else if (hasQlistFileExtension(files[i])) {
-                (*fileSetMap)[timestamp]
-                    .setQlistFile(files[i])
-                    .setQlistFileSize(
-                        bdls::FilesystemUtil::getFileSize(files[i].c_str()));
+            else if (hasQlistFileExtension(file)) {
+                (*fileSetMap)[timestamp].setQlistFile(file).setQlistFileSize(
+                    bdls::FilesystemUtil::getFileSize(file.c_str()));
             }
-            else if (hasJournalFileExtension(files[i])) {
+            else if (hasJournalFileExtension(file)) {
                 (*fileSetMap)[timestamp]
-                    .setJournalFile(files[i])
+                    .setJournalFile(file)
                     .setJournalFileSize(
-                        bdls::FilesystemUtil::getFileSize(files[i].c_str()));
+                        bdls::FilesystemUtil::getFileSize(file.c_str()));
             }
             else {
                 localRC  = rc_FILE_EXTENSION_UNKNOWN;
                 returnRC = 10 * returnRC + rc_FILE_EXTENSION_UNKNOWN;
-                BALL_LOG_ERROR << "Invalid file extension for file ["
-                               << files[i] << "]. File will be skipped from "
+                BALL_LOG_ERROR << "Invalid file extension for file [" << file
+                               << "]. File will be skipped from "
                                << "result.";
             }
         }
     }
     else {
         // For every file in the output, populate only the file name
-        for (bsl::vector<bsl::string>::size_type i = 0; i < files.size();
-             ++i) {
+        for (const bsl::string& file : files) {
             bsl::string timestamp;
-            localRC = extractTimestamp(&timestamp, files[i]);
+            localRC = extractTimestamp(&timestamp, file);
             if (localRC != 0) {
                 returnRC = rc_TIMESTAMP_EXTRACTION_FAILURE;
                 BALL_LOG_ERROR
                     << "Failed to extract timestamp from file name:"
-                    << " [" << files[i] << "], rc: "
+                    << " [" << file << "], rc: "
                     << (10 * localRC + rc_TIMESTAMP_EXTRACTION_FAILURE)
                     << ". File will be skipped from the result.";
                 continue;  // CONTINUE
             }
 
-            if (hasDataFileExtension(files[i])) {
-                (*fileSetMap)[timestamp].setDataFile(files[i]);
+            if (hasDataFileExtension(file)) {
+                (*fileSetMap)[timestamp].setDataFile(file);
             }
-            else if (hasQlistFileExtension(files[i])) {
-                (*fileSetMap)[timestamp].setQlistFile(files[i]);
+            else if (hasQlistFileExtension(file)) {
+                (*fileSetMap)[timestamp].setQlistFile(file);
             }
-            else if (hasJournalFileExtension(files[i])) {
-                (*fileSetMap)[timestamp].setJournalFile(files[i]);
+            else if (hasJournalFileExtension(file)) {
+                (*fileSetMap)[timestamp].setJournalFile(file);
             }
             else {
                 localRC  = rc_FILE_EXTENSION_UNKNOWN;
                 returnRC = 10 * returnRC + localRC;
-                BALL_LOG_ERROR << "Invalid file extension for file ["
-                               << files[i] << "]. File will be skipped from "
+                BALL_LOG_ERROR << "Invalid file extension for file [" << file
+                               << "]. File will be skipped from "
                                << "result.";
             }
         }
@@ -1282,13 +1278,13 @@ int FileStoreUtil::openRecoveryFileSet(bsl::ostream&         errorDescription,
     BALL_LOG_INFO << "Partition [" << partitionId << "]: archiving "
                   << archivingIndices.size() << " file sets.";
 
-    for (unsigned int i = 0; i < archivingIndices.size(); ++i) {
-        if (archivingIndices[i] == recoveryIndex) {
+    for (int archivingIndex : archivingIndices) {
+        if (archivingIndex == recoveryIndex) {
             // Should never occur.
             continue;  // CONTINUE
         }
 
-        const FileStoreSet& archivingFileSet = fileSets[archivingIndices[i]];
+        const FileStoreSet& archivingFileSet = fileSets[archivingIndex];
         rc = FileStoreUtil::archiveFileSet(archivingFileSet.dataFile(),
                                            archivingFileSet.journalFile(),
                                            archivingFileSet.qlistFile(),
@@ -1808,12 +1804,8 @@ int FileStoreUtil::writeQueueCreationRecordImpl(
 
         queueUriAppsStr << ", queue [" << uri << "]" << ", with ["
                         << appIdKeyPairs->size() << "] appId/appKey pairs ";
-        for (mqbi::Storage::AppInfos::const_iterator cit =
-                 appIdKeyPairs->cbegin();
-             cit != appIdKeyPairs->cend();
-             ++cit) {
-            queueUriAppsStr << " [" << cit->first << ", " << cit->second
-                            << "]";
+        for (const auto& [appId, appKey] : *appIdKeyPairs) {
+            queueUriAppsStr << " [" << appId << ", " << appKey << "]";
         }
     }
 
