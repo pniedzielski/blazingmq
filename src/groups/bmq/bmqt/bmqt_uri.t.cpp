@@ -20,7 +20,6 @@
 
 // BDE
 #include <ball_log.h>
-#include <bdlf_bind.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_functional.h>
 #include <bsl_string.h>
@@ -495,11 +494,9 @@ static void test3_URIBuilderMultiThreaded()
     bslmt::ThreadGroup threadGroup(bmqtst::TestHelperUtil::allocator());
     for (size_t i = 0; i < k_NUM_THREADS; ++i) {
         const int rc = threadGroup.addThread(
-            bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                  &Local::threadFunction,
-                                  i,
-                                  &threadsData[i],
-                                  &barrier));
+            [i, out = &threadsData[i], &barrier]() {
+                Local::threadFunction(i, out, &barrier);
+            });
         BMQTST_ASSERT_EQ_D(i, rc, 0);
     }
 
@@ -708,12 +705,13 @@ static void testN1_benchmark(benchmark::State& state)
 
     bslmt::ThreadGroup threadGroup(bmqtst::TestHelperUtil::allocator());
     for (size_t i = 0; i < NUM_THREADS; ++i) {
-        const int rc = threadGroup.addThread(
-            bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                  &(BENCHMARK::bench),
-                                  &initThreadLatch,
-                                  &startBenchmarkBarrier,
-                                  &finishBenchmarkLatch));
+        const int rc = threadGroup.addThread([&initThreadLatch,
+                                              &startBenchmarkBarrier,
+                                              &finishBenchmarkLatch]() {
+            BENCHMARK::bench(&initThreadLatch,
+                             &startBenchmarkBarrier,
+                             &finishBenchmarkLatch);
+        });
         BMQTST_ASSERT_EQ_D(i, rc, 0);
     }
 
