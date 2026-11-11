@@ -21,7 +21,6 @@
 
 #include <bmqst_printutil.h>
 
-#include <bdlf_bind.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsls_alignedbuffer.h>
 
@@ -368,7 +367,6 @@ void StatContextTableInfoProvider::addColumn(const bslstl::StringRef& name,
                                              int         statValueIndex,
                                              Int0ArgFunc func)
 {
-    using namespace bdlf::PlaceHolders;
     addColumn(name, statValueIndex, e_INT_VALUE, IntValueFunctor(func));
 }
 
@@ -378,8 +376,9 @@ void StatContextTableInfoProvider::addColumn(
     Int1ArgFunc                        func,
     const StatValue::SnapshotLocation& arg1)
 {
-    using namespace bdlf::PlaceHolders;
-    IntValueFunctor f = bdlf::BindUtil::bind(func, _1, arg1);
+    IntValueFunctor f = [func, arg1](const StatValue& value) {
+        return func(value, arg1);
+    };
     addColumn(name, statValueIndex, e_INT_VALUE, f);
 }
 
@@ -390,8 +389,9 @@ void StatContextTableInfoProvider::addColumn(
     const StatValue::SnapshotLocation& arg1,
     const StatValue::SnapshotLocation& arg2)
 {
-    using namespace bdlf::PlaceHolders;
-    IntValueFunctor f = bdlf::BindUtil::bind(func, _1, arg1, arg2);
+    IntValueFunctor f = [func, arg1, arg2](const StatValue& value) {
+        return func(value, arg1, arg2);
+    };
     addColumn(name, statValueIndex, e_INT_VALUE, f);
 }
 
@@ -399,7 +399,6 @@ void StatContextTableInfoProvider::addColumn(const bslstl::StringRef& name,
                                              int            statValueIndex,
                                              Double0ArgFunc func)
 {
-    using namespace bdlf::PlaceHolders;
     addColumn(name, statValueIndex, e_INT_VALUE, DoubleValueFunctor(func));
 }
 
@@ -409,8 +408,9 @@ void StatContextTableInfoProvider::addColumn(
     Double1ArgFunc                     func,
     const StatValue::SnapshotLocation& arg1)
 {
-    using namespace bdlf::PlaceHolders;
-    DoubleValueFunctor f = bdlf::BindUtil::bind(func, _1, arg1);
+    DoubleValueFunctor f = [func, arg1](const StatValue& value) {
+        return func(value, arg1);
+    };
     addColumn(name, statValueIndex, e_INT_VALUE, f);
 }
 
@@ -421,8 +421,9 @@ void StatContextTableInfoProvider::addColumn(
     const StatValue::SnapshotLocation& arg1,
     const StatValue::SnapshotLocation& arg2)
 {
-    using namespace bdlf::PlaceHolders;
-    DoubleValueFunctor f = bdlf::BindUtil::bind(func, _1, arg1, arg2);
+    DoubleValueFunctor f = [func, arg1, arg2](const StatValue& value) {
+        return func(value, arg1, arg2);
+    };
     addColumn(name, statValueIndex, e_INT_VALUE, f);
 }
 
