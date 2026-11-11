@@ -113,8 +113,8 @@ class LoadBalancer {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    LoadBalancer(const LoadBalancer&);             // = delete
-    LoadBalancer& operator=(const LoadBalancer&);  // = delete
+    LoadBalancer(const LoadBalancer&)            = delete;
+    LoadBalancer& operator=(const LoadBalancer&) = delete;
 
   public:
     // TRAITS
