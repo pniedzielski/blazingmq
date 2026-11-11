@@ -277,9 +277,9 @@ static void test1_ManagedCallback()
 
     // 3. Compatibility with `bsl::function` using `set(...)`
     size_t calls3 = 0;
-    callback.set(bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                       increment,
-                                       &calls3));
+    callback.set([&calls3]() {
+        increment(&calls3);
+    });
     BMQTST_ASSERT(!callback.empty());
 
     callback();
