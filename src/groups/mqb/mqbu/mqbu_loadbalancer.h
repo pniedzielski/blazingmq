@@ -223,7 +223,7 @@ void LoadBalancer<TYPE>::setProcessorForClient(const TYPE* client,
 
     // PRECONDITIONS
     BSLS_ASSERT_OPT(0 <= processorId && processorId < processorsCount());
-    BSLS_ASSERT_SAFE(d_clients.find(client) == d_clients.end());
+    BSLS_ASSERT_SAFE(!d_clients.contains(client));
 
     // Add the client to the map and bump the counter for the selected
     // processor indicating that it now have one more client to serve
