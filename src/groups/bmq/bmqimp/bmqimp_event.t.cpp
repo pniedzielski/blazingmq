@@ -638,14 +638,12 @@ static void test5_configureAsMessageEventTest()
                                 false,
                                 false,
                                 false}};
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
 
     bmqtst::TestHelper::printTestName(
         "CONFIGURE AS MESSAGE EVENT / MESSAGE ITERATOR TEST");
 
     // Iterate over test data grouped by message event types
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
+    for (const Test& test : k_DATA) {
         PVV("Testing " << bmqp::EventType::toAscii(test.d_type)
                        << " message event.");
 
@@ -952,11 +950,8 @@ static void test7_printing()
                       bmqp::EventType::e_PUSH,
                   }};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
     // Iterate over test data.
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        Test&         data = k_DATA[idx];
+    for (Test& data : k_DATA) {
         bmqimp::Event obj(&bufferFactory, bmqtst::TestHelperUtil::allocator());
 
         // Prepare bmqimp::event object based on data.
