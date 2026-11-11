@@ -860,8 +860,7 @@ class TestBench {
             guid,
             queueId);
 
-        bsl::shared_ptr<mqbevt::AckEvent> event_sp =
-            bsl::allocate_shared<mqbevt::AckEvent>(d_allocator_p);
+        auto event_sp = bsl::allocate_shared<mqbevt::AckEvent>(d_allocator_p);
         (*event_sp).setAckMessage(ackMessage);
 
         dispatch(event_sp);
@@ -922,8 +921,7 @@ class TestBench {
         BSLS_ASSERT(pIt2.next());
         BSLS_ASSERT(pIt3.next());
 
-        bsl::shared_ptr<mqbevt::PutEvent> event_sp =
-            bsl::allocate_shared<mqbevt::PutEvent>(d_allocator_p);
+        auto event_sp = bsl::allocate_shared<mqbevt::PutEvent>(d_allocator_p);
         (*event_sp).setPutHeader(putHeader).setBlob(eventBlob).setSource(
             &d_cs);
 
@@ -941,8 +939,7 @@ class TestBench {
     {
         PVV("Sending PUSH with queueId=" << queueId << ", guid=" << msgGUID);
 
-        bsl::shared_ptr<mqbevt::PushEvent> event_sp =
-            bsl::allocate_shared<mqbevt::PushEvent>(d_allocator_p);
+        auto event_sp = bsl::allocate_shared<mqbevt::PushEvent>(d_allocator_p);
 
         (*event_sp)
             .setSource(&d_cs)
@@ -1984,9 +1981,8 @@ static void test9_newStylePush()
     rawEvent.loadPutMessageIterator(&putIt, false);
     BSLS_ASSERT(putIt.next());
 
-    bsl::shared_ptr<mqbevt::PutEvent> event_sp =
-        bsl::allocate_shared<mqbevt::PutEvent>(
-            bmqtst::TestHelperUtil::allocator());
+    auto event_sp = bsl::allocate_shared<mqbevt::PutEvent>(
+        bmqtst::TestHelperUtil::allocator());
     (*event_sp)
         .setSource(&tb.d_cs)
         .setPutHeader(putIt.header())
@@ -2099,9 +2095,8 @@ static void test10_newStyleCompressedPush()
     rawEvent.loadPutMessageIterator(&putIt, false);
     BSLS_ASSERT(putIt.next());
 
-    bsl::shared_ptr<mqbevt::PutEvent> event_sp =
-        bsl::allocate_shared<mqbevt::PutEvent>(
-            bmqtst::TestHelperUtil::allocator());
+    auto event_sp = bsl::allocate_shared<mqbevt::PutEvent>(
+        bmqtst::TestHelperUtil::allocator());
     (*event_sp)
         .setSource(&tb.d_cs)
         .setPutHeader(putIt.header())

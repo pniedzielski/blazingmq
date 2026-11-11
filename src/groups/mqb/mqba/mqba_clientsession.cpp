@@ -893,8 +893,8 @@ void ClientSession::beginShutdown()
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(inDispatcherThread());
 
-    bsl::shared_ptr<bmqu::OperationLogger> opLogger =
-        bsl::allocate_shared<bmqu::OperationLogger>(d_state.d_allocator_p);
+    auto opLogger = bsl::allocate_shared<bmqu::OperationLogger>(
+        d_state.d_allocator_p);
     opLogger->start() << description() << ": shutdown";
 
     // Want to keep `opLogger` until the end of this scope to log the current
@@ -2526,9 +2526,8 @@ void ClientSession::processEvent(const bmqp::Event&                    event,
                 return;  // RETURN
             }
 
-            bsl::shared_ptr<bmqu::OperationLogger> opLogger =
-                bsl::allocate_shared<bmqu::OperationLogger>(
-                    d_state.d_allocator_p);
+            auto opLogger = bsl::allocate_shared<bmqu::OperationLogger>(
+                d_state.d_allocator_p);
             opLogger->start() << description() << ": disconnect";
 
             d_isDisconnecting = true;
@@ -2548,9 +2547,8 @@ void ClientSession::processEvent(const bmqp::Event&                    event,
                                           &localAllocator),
                 &localAllocator);
 
-            bsl::shared_ptr<bmqu::OperationLogger> opLogger =
-                bsl::allocate_shared<bmqu::OperationLogger>(
-                    d_state.d_allocator_p);
+            auto opLogger = bsl::allocate_shared<bmqu::OperationLogger>(
+                d_state.d_allocator_p);
             opLogger->start() << description() << ": open queue [queue: '"
                               << queueUri << "']";
 
@@ -2570,9 +2568,8 @@ void ClientSession::processEvent(const bmqp::Event&                    event,
                                           &localAllocator),
                 &localAllocator);
 
-            bsl::shared_ptr<bmqu::OperationLogger> opLogger =
-                bsl::allocate_shared<bmqu::OperationLogger>(
-                    d_state.d_allocator_p);
+            auto opLogger = bsl::allocate_shared<bmqu::OperationLogger>(
+                d_state.d_allocator_p);
             opLogger->start() << description() << ": close queue [queue: '"
                               << queueUri << "']";
 
@@ -2582,9 +2579,8 @@ void ClientSession::processEvent(const bmqp::Event&                    event,
         } break;
         case MsgChoice::SELECTION_ID_CONFIGURE_QUEUE_STREAM:
         case MsgChoice::SELECTION_ID_CONFIGURE_STREAM: {
-            bsl::shared_ptr<bmqu::OperationLogger> opLogger =
-                bsl::allocate_shared<bmqu::OperationLogger>(
-                    d_state.d_allocator_p);
+            auto opLogger = bsl::allocate_shared<bmqu::OperationLogger>(
+                d_state.d_allocator_p);
             opLogger->start() << description() << ": configure queue";
 
             eventCallback = [this, controlMessage, opLogger]() {

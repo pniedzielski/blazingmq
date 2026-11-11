@@ -464,22 +464,21 @@ static void test2_safeConcurrentTeardown()
     bmqp::Event adminEvent(builder.blob().get(), alloc);
     const bmqp_ctrlmsg::NegotiationMessage negotiationMessage = client();
     const bsl::string                      description("adminSession", alloc);
-    bsl::shared_ptr<TestAuthorizer>        authorizer =
-        bsl::allocate_shared<TestAuthorizer>(alloc);
+    auto authorizer = bsl::allocate_shared<TestAuthorizer>(alloc);
 
     for (int i = 0; i < k_NUM_ITERATIONS; ++i) {
         bsl::shared_ptr<bmqio::TestChannel> channel;
         channel.createInplace(alloc, alloc);
 
-        bsl::shared_ptr<mqba::AdminSession> session =
-            bsl::allocate_shared<mqba::AdminSession>(alloc,
-                                                     channel,
-                                                     negotiationMessage,
-                                                     description,
-                                                     &dispatcher,
-                                                     &blobSpPool,
-                                                     adminCb,
-                                                     authorizer);
+        auto session = bsl::allocate_shared<mqba::AdminSession>(
+            alloc,
+            channel,
+            negotiationMessage,
+            description,
+            &dispatcher,
+            &blobSpPool,
+            adminCb,
+            authorizer);
 
         // All dispatched callbacks may run on the processor thread; allow
         // `inDispatcherThread()` preconditions to pass regardless of thread.
