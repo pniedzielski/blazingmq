@@ -41,20 +41,6 @@ bool isDefaultSubQueueInfo(const Protocol::SubQueueInfosArray& subQueueInfos)
            subQueueInfos[0].id() == Protocol::k_DEFAULT_SUBSCRIPTION_ID;
 }
 
-struct BlobSpCreatorF {
-    bmqp::BlobPoolUtil::BlobSpPool* d_blobSpPool_p;
-
-    explicit BlobSpCreatorF(bmqp::BlobPoolUtil::BlobSpPool* blobSpPool)
-    : d_blobSpPool_p(blobSpPool)
-    {
-        BSLS_ASSERT_SAFE(d_blobSpPool_p);
-    }
-    bsl::shared_ptr<bdlbb::Blob> operator()()
-    {
-        return d_blobSpPool_p->getObject();
-    }
-};
-
 }  // close anonymous namespace
 
 // ----------------------
@@ -165,13 +151,16 @@ PushEventBuilder::PushEventBuilder(BlobSpPool*       blobSpPool_p,
 : d_allocator_p(bslma::Default::allocator(allocator))
 , d_blobSpCreator(bsl::allocator_arg,
                   d_allocator_p,
-                  BlobSpCreatorF(blobSpPool_p))
+                  [blobSpPool_p]() {
+                      return blobSpPool_p->getObject();
+                  })
 , d_blob_sp(0, allocator)  // initialized in `reset()`
 , d_msgCount(0)
 , d_options()
 , d_currPushHeader()
 {
     // PRECONDITIONS
+    BSLS_ASSERT_SAFE(blobSpPool_p);
     BSLS_ASSERT_SAFE(d_blobSpCreator);
 
     // Assume that items built with the given `blobSpPool_p` either all have or
