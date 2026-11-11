@@ -35,7 +35,6 @@
 // BDE
 #include <bdld_datum.h>
 #include <bdld_datummapbuilder.h>
-#include <bdlf_bind.h>
 #include <bsl_ostream.h>
 #include <bsl_string.h>
 #include <bsl_utility.h>
@@ -151,15 +150,21 @@ void QueueSessionManager::onDomainQualifiedCb(
 
     d_domainFactory_p->createDomain(
         qualifiedUri.qualifiedDomain(),
-        bdlf::BindUtil::bind(&QueueSessionManager::onDomainOpenCb,
-                             this,
-                             bdlf::PlaceHolders::_1,  // status
-                             bdlf::PlaceHolders::_2,  // domain
-                             successCallback,
-                             errorCallback,
-                             qualifiedUri,
-                             ctrlMessage,
-                             validator));
+        [this,
+         successCallback,
+         errorCallback,
+         qualifiedUri,
+         ctrlMessage,
+         validator](const bmqp_ctrlmsg::Status& domainStatus,
+                    mqbi::Domain*               domain) {
+            onDomainOpenCb(domainStatus,
+                           domain,
+                           successCallback,
+                           errorCallback,
+                           qualifiedUri,
+                           ctrlMessage,
+                           validator);
+        });
 }
 
 void QueueSessionManager::onDomainOpenCb(
@@ -208,15 +213,19 @@ void QueueSessionManager::onDomainOpenCb(
         uri,
         d_requesterContext_sp,
         request.choice().openQueue().handleParameters(),
-        bdlf::BindUtil::bind(&QueueSessionManager::onQueueOpenCb,
-                             this,
-                             bdlf::PlaceHolders::_1,  // status
-                             bdlf::PlaceHolders::_2,  // queueHandle
-                             bdlf::PlaceHolders::_3,  // openQueueResponse
-                             bdlf::PlaceHolders::_4,  // confirmationCookie
-                             successCallback,
-                             request,
-                             validator));
+        [this, successCallback, request, validator](
+            const bmqp_ctrlmsg::Status&                openStatus,
+            mqbi::QueueHandle*                         queueHandle,
+            const bmqp_ctrlmsg::OpenQueueResponse&     openQueueResponse,
+            const mqbi::OpenQueueConfirmationCookieSp& confirmationCookie) {
+            onQueueOpenCb(openStatus,
+                          queueHandle,
+                          openQueueResponse,
+                          confirmationCookie,
+                          successCallback,
+                          request,
+                          validator);
+        });
 }
 
 void QueueSessionManager::onQueueOpenCb(
@@ -243,14 +252,20 @@ void QueueSessionManager::onQueueOpenCb(
     }
 
     d_dispatcherClient_p->dispatcher()->execute(
-        bdlf::BindUtil::bind(&QueueSessionManager::onQueueOpenCbDispatched,
-                             this,
-                             status,
-                             queueHandle,
-                             openQueueResponse,
-                             confirmationCookie,
-                             responseCallback,
-                             request),
+        [this,
+         status,
+         queueHandle,
+         openQueueResponse,
+         confirmationCookie,
+         responseCallback,
+         request]() {
+            onQueueOpenCbDispatched(status,
+                                    queueHandle,
+                                    openQueueResponse,
+                                    confirmationCookie,
+                                    responseCallback,
+                                    request);
+        },
         d_dispatcherClient_p);
 }
 
@@ -380,7 +395,9 @@ void QueueSessionManager::onHandleReleased(
             BSLS_ASSERT_SAFE(handle->queue());
 
             handle->queue()->dispatcher()->execute(
-                bdlf::BindUtil::bind(&handleHolderDummy, handle),
+                [handle]() {
+                    handleHolderDummy(handle);
+                },
                 handle->queue());
         }
 
@@ -409,13 +426,13 @@ void QueueSessionManager::onHandleReleased(
     //       reason why this is needed.
 
     d_dispatcherClient_p->dispatcher()->execute(
-        bdlf::BindUtil::bind(&QueueSessionManager::onHandleReleasedDispatched,
-                             this,
-                             handle,
-                             result,
-                             successCallback,
-                             errorCallback,
-                             request),
+        [this, handle, result, successCallback, errorCallback, request]() {
+            onHandleReleasedDispatched(handle,
+                                       result,
+                                       successCallback,
+                                       errorCallback,
+                                       request);
+        },
         d_dispatcherClient_p);
 }
 
@@ -484,7 +501,9 @@ void QueueSessionManager::onHandleReleasedDispatched(
         // dispatcher thread, with the 'handle' as a bound argument.
 
         d_dispatcherClient_p->dispatcher()->execute(
-            bdlf::BindUtil::bind(&handleHolderDummy, handle),
+            [handle]() {
+                handleHolderDummy(handle);
+            },
             handle->queue(),
             mqbi::DispatcherEventType::e_DISPATCHER);
     }
@@ -513,10 +532,9 @@ void QueueSessionManager::dispatchErrorCallback(
     // Send an error,
     // we need to enqueue to send from the client dispatcher thread
     d_dispatcherClient_p->dispatcher()->execute(
-        bdlf::BindUtil::bind(errorCallback,
-                             failureCategory,
-                             errorDescription,
-                             code),
+        [errorCallback, failureCategory, errorDescription, code]() {
+            errorCallback(failureCategory, errorDescription, code);
+        },
         d_dispatcherClient_p);
 }
 
@@ -647,29 +665,41 @@ void QueueSessionManager::processOpenQueue(
     if (d_requesterContext_sp->isFirstHop()) {
         d_domainFactory_p->qualifyDomain(
             uri.qualifiedDomain(),
-            bdlf::BindUtil::bind(&QueueSessionManager::onDomainQualifiedCb,
-                                 this,
-                                 bdlf::PlaceHolders::_1,  // status
-                                 bdlf::PlaceHolders::_2,  // domain
-                                 successCallback,
-                                 errorCallback,
-                                 uri,
-                                 request,
-                                 d_validator_sp));
+            [this,
+             successCallback,
+             errorCallback,
+             uri,
+             request,
+             validator = d_validator_sp](const bmqp_ctrlmsg::Status& status,
+                                         const bsl::string& resolvedDomain) {
+                onDomainQualifiedCb(status,
+                                    resolvedDomain,
+                                    successCallback,
+                                    errorCallback,
+                                    uri,
+                                    request,
+                                    validator);
+            });
     }
     else {
         // Query the domain manager
         d_domainFactory_p->createDomain(
             uri.qualifiedDomain(),
-            bdlf::BindUtil::bind(&QueueSessionManager::onDomainOpenCb,
-                                 this,
-                                 bdlf::PlaceHolders::_1,  // status
-                                 bdlf::PlaceHolders::_2,  // domain
-                                 successCallback,
-                                 errorCallback,
-                                 uri,
-                                 request,
-                                 d_validator_sp));
+            [this,
+             successCallback,
+             errorCallback,
+             uri,
+             request,
+             validator = d_validator_sp](const bmqp_ctrlmsg::Status& status,
+                                         mqbi::Domain*               domain) {
+                onDomainOpenCb(status,
+                               domain,
+                               successCallback,
+                               errorCallback,
+                               uri,
+                               request,
+                               validator);
+            });
     }
 }
 
@@ -755,14 +785,20 @@ void QueueSessionManager::processCloseQueue(
     handle->release(
         req.handleParameters(),
         req.isFinal(),
-        bdlf::BindUtil::bind(&QueueSessionManager::onHandleReleased,
-                             this,
-                             bdlf::PlaceHolders::_1,  // handle
-                             bdlf::PlaceHolders::_2,  // isDeleted
+        [this,
+         successCallback,
+         errorCallback,
+         request,
+         validator = d_validator_sp](
+            const bsl::shared_ptr<mqbi::QueueHandle>& releasedHandle,
+            const mqbi::QueueHandleReleaseResult      result) {
+            onHandleReleased(releasedHandle,
+                             result,
                              successCallback,
                              errorCallback,
                              request,
-                             d_validator_sp));
+                             validator);
+        });
 }
 
 void QueueSessionManager::tearDown()
