@@ -32,8 +32,6 @@
 #include <bmqtsk_alarmlog.h>
 
 // BDE
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bmqp_protocol.h>
 #include <bsl_ostream.h>
 #include <bsl_vector.h>
@@ -90,10 +88,10 @@ ClusterStateManager::ClusterStateManager(
     d_watchdogCtx.d_retriesRemaining = d_watchdogNumRetries;
 
     d_clusterStateLedger_mp->setCommitCb(
-        bdlf::BindUtil::bind(&ClusterStateManager::onCommit,
-                             this,
-                             bdlf::PlaceHolders::_1,    // advisory
-                             bdlf::PlaceHolders::_2));  // status
+        [this](const bmqp_ctrlmsg::ControlMessage&  advisory,
+               ClusterStateLedgerCommitStatus::Enum status) {
+            onCommit(advisory, status);
+        });
 }
 
 ClusterStateManager::~ClusterStateManager()
@@ -137,9 +135,9 @@ void ClusterStateManager::do_startWatchdog(
     d_clusterData_p->scheduler().scheduleEvent(
         &d_watchdogCtx.d_eventHandle,
         d_clusterData_p->scheduler().now() + d_watchdogTimeoutInterval,
-        bdlf::BindUtil::bind(&ClusterStateManager::onWatchdog,
-                             this,
-                             generation));
+        [this, generation]() {
+            onWatchdog(generation);
+        });
 
     d_watchdogCtx.d_active = true;
 }
@@ -431,10 +429,9 @@ void ClusterStateManager::do_sendFollowerLSNRequests(
             .makeFollowerLSNRequest();
 
         request->setResponseCb(
-            bdlf::BindUtil::bind(&ClusterStateManager::onFollowerLSNResponse,
-                                 this,
-                                 follower,
-                                 bdlf::PlaceHolders::_1));
+            [this, follower](const RequestContextSp& requestContext) {
+                onFollowerLSNResponse(follower, requestContext);
+            });
 
         const bmqt::GenericResult::Enum rc = d_cluster_p->sendRequest(
             request,
@@ -623,11 +620,10 @@ void ClusterStateManager::do_sendFollowerClusterStateRequest(
         .choice()
         .makeFollowerClusterStateRequest();
 
-    request->setResponseCb(bdlf::BindUtil::bind(
-        &ClusterStateManager::onFollowerClusterStateResponse,
-        this,
-        metadata.highestLSNNode(),
-        bdlf::PlaceHolders::_1));
+    request->setResponseCb([this, highestLSNNode = metadata.highestLSNNode()](
+                               const RequestContextSp& requestContext) {
+        onFollowerClusterStateResponse(highestLSNNode, requestContext);
+    });
 
     bmqt::GenericResult::Enum rc = d_cluster_p->sendRequest(
         request,
@@ -883,10 +879,9 @@ void ClusterStateManager::do_sendRegistrationRequest(
     BSLS_ASSERT_SAFE(destNode);
 
     request->setResponseCb(
-        bdlf::BindUtil::bind(&ClusterStateManager::onRegistrationResponse,
-                             this,
-                             destNode,
-                             bdlf::PlaceHolders::_1));
+        [this, destNode](const RequestContextSp& requestContext) {
+            onRegistrationResponse(destNode, requestContext);
+        });
 
     bmqt::GenericResult::Enum rc =
         d_cluster_p->sendRequest(request, destNode, k_CFSM_REQUEST_TIMEOUT);
@@ -1403,9 +1398,9 @@ void ClusterStateManager::onWatchdog(int generation)
     // executed by the *SCHEDULER* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&ClusterStateManager::onWatchdogDispatched,
-                             this,
-                             generation),
+        [this, generation]() {
+            onWatchdogDispatched(generation);
+        },
         d_cluster_p);
 }
 

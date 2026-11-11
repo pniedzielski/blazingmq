@@ -40,7 +40,6 @@
 #include <bmqu_time.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bsl_memory.h>
 #include <bslma_managedptr.h>
 #include <bsls_assert.h>
@@ -172,8 +171,12 @@ struct Tester {
 
         bmqu::Time::initialize(
             &bsls::SystemTime::nowRealtimeClock,
-            bdlf::BindUtil::bind(&Tester::nowMonotonicClock, this),
-            bdlf::BindUtil::bind(&Tester::highResolutionTimer, this),
+            [this]() {
+                return nowMonotonicClock();
+            },
+            [this]() {
+                return highResolutionTimer();
+            },
             bmqtst::TestHelperUtil::allocator());
 
         // Create the cluster state ledger
