@@ -37,19 +37,17 @@ bsl::vector<int> TestUtil::intVector(const char* nums)
 {
     bsl::vector<int> ret;
     bdlb::Tokenizer  tokenizer(nums, " ");
-    for (bdlb::TokenizerIterator iter = tokenizer.begin();
-         iter != tokenizer.end();
-         ++iter) {
-        if (*iter == "--") {
+    for (const bslstl::StringRef& token : tokenizer) {
+        if (token == "--") {
             ret.push_back(INT_MIN);
         }
-        else if (*iter == "++") {
+        else if (token == "++") {
             ret.push_back(INT_MAX);
         }
         else {
             char buf[32] = {0};
-            bsl::memcpy(buf, iter->begin(), iter->length());
-            buf[iter->length()] = '\0';
+            bsl::memcpy(buf, token.begin(), token.length());
+            buf[token.length()] = '\0';
 
             ret.push_back(bsl::atoi(buf));
         }
@@ -62,19 +60,17 @@ bsl::vector<bsls::Types::Int64> TestUtil::int64Vector(const char* nums)
 {
     bsl::vector<bsls::Types::Int64> ret;
     bdlb::Tokenizer                 tokenizer(nums, " ");
-    for (bdlb::TokenizerIterator iter = tokenizer.begin();
-         iter != tokenizer.end();
-         ++iter) {
-        if (*iter == "--") {
+    for (const bslstl::StringRef& token : tokenizer) {
+        if (token == "--") {
             ret.push_back(LLONG_MIN);
         }
-        else if (*iter == "++") {
+        else if (token == "++") {
             ret.push_back(LLONG_MAX);
         }
         else {
             char buf[32] = {0};
-            bsl::memcpy(buf, iter->begin(), iter->length());
-            buf[iter->length()] = '\0';
+            bsl::memcpy(buf, token.begin(), token.length());
+            buf[token.length()] = '\0';
 
             ret.push_back(bsl::atol(buf));
         }
@@ -87,14 +83,12 @@ bsl::vector<bsl::string> TestUtil::stringVector(const char* s)
 {
     bsl::vector<bsl::string> ret;
     bdlb::Tokenizer          tokenizer(s, " ");
-    for (bdlb::TokenizerIterator iter = tokenizer.begin();
-         iter != tokenizer.end();
-         ++iter) {
-        if (*iter == "-=") {
+    for (const bslstl::StringRef& token : tokenizer) {
+        if (token == "-=") {
             ret.push_back("");
         }
         else {
-            ret.push_back(*iter);
+            ret.push_back(token);
         }
     }
 
