@@ -25,7 +25,6 @@
 // BDE
 #include <bdlb_guid.h>
 #include <bdlb_guidutil.h>
-#include <bdlf_bind.h>
 #include <bdlt_datetime.h>
 #include <bdlt_epochutil.h>
 #include <bdlt_timeunitratio.h>
@@ -211,10 +210,9 @@ static void test2_multithread()
     threadsData.resize(k_NUM_THREADS);
 
     for (int i = 0; i < k_NUM_THREADS; ++i) {
-        int rc = threadGroup.addThread(bdlf::BindUtil::bind(&threadFunction,
-                                                            &threadsData[i],
-                                                            &barrier,
-                                                            k_NUM_GUIDS));
+        int rc = threadGroup.addThread([out = &threadsData[i], &barrier]() {
+            threadFunction(out, &barrier, k_NUM_GUIDS);
+        });
         BMQTST_ASSERT_EQ_D(i, rc, 0);
     }
 
