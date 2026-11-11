@@ -77,7 +77,7 @@ void defaultIdColumn(Value*                 value,
 
     // 3. Context name
     switch (type) {
-    case StatContext::e_TOTAL_VALUE: BSLA_FALLTHROUGH;
+    case StatContext::e_TOTAL_VALUE: [[fallthrough]];
     case StatContext::e_ACTIVE_CHILDREN_TOTAL_VALUE: {
         if (context.hasName()) {
             storage += context.name();

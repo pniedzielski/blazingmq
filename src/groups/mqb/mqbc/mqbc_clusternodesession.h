@@ -453,17 +453,17 @@ ClusterNodeSession::onDispatcherEvent(const mqbi::DispatcherEvent& event)
     case mqbi::DispatcherEventType::e_ACK: {
         ev.the<mqbevt::AckEvent>()->setClusterNode(d_clusterNode_p);
     } break;
-    case mqbi::DispatcherEventType::e_UNDEFINED: BSLA_FALLTHROUGH;
-    case mqbi::DispatcherEventType::e_DISPATCHER: BSLA_FALLTHROUGH;
-    case mqbi::DispatcherEventType::e_CALLBACK: BSLA_FALLTHROUGH;
-    case mqbi::DispatcherEventType::e_CONTROL_MSG: BSLA_FALLTHROUGH;
-    case mqbi::DispatcherEventType::e_CONFIRM: BSLA_FALLTHROUGH;
-    case mqbi::DispatcherEventType::e_REJECT: BSLA_FALLTHROUGH;
-    case mqbi::DispatcherEventType::e_PUT: BSLA_FALLTHROUGH;
-    case mqbi::DispatcherEventType::e_CLUSTER_STATE: BSLA_FALLTHROUGH;
-    case mqbi::DispatcherEventType::e_STORAGE: BSLA_FALLTHROUGH;
-    case mqbi::DispatcherEventType::e_RECOVERY: BSLA_FALLTHROUGH;
-    case mqbi::DispatcherEventType::e_REPLICATION_RECEIPT: BSLA_FALLTHROUGH;
+    case mqbi::DispatcherEventType::e_UNDEFINED: [[fallthrough]];
+    case mqbi::DispatcherEventType::e_DISPATCHER: [[fallthrough]];
+    case mqbi::DispatcherEventType::e_CALLBACK: [[fallthrough]];
+    case mqbi::DispatcherEventType::e_CONTROL_MSG: [[fallthrough]];
+    case mqbi::DispatcherEventType::e_CONFIRM: [[fallthrough]];
+    case mqbi::DispatcherEventType::e_REJECT: [[fallthrough]];
+    case mqbi::DispatcherEventType::e_PUT: [[fallthrough]];
+    case mqbi::DispatcherEventType::e_CLUSTER_STATE: [[fallthrough]];
+    case mqbi::DispatcherEventType::e_STORAGE: [[fallthrough]];
+    case mqbi::DispatcherEventType::e_RECOVERY: [[fallthrough]];
+    case mqbi::DispatcherEventType::e_REPLICATION_RECEIPT: [[fallthrough]];
     default: {
         BSLS_ASSERT_OPT(false && "Unexpected event type");
     } break;

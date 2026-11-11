@@ -25,7 +25,6 @@
 #include <bdlb_stringrefutil.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_ostream.h>
-#include <bsla_fallthrough.h>
 #include <bsls_assert.h>
 
 namespace BloombergLP {
@@ -127,7 +126,7 @@ struct UriParsingContext {
             }
 
             switch (d_uri[pos]) {
-            case '-': BSLA_FALLTHROUGH;
+            case '-': [[fallthrough]];
             case '_': {
                 continue;
             }
@@ -263,8 +262,8 @@ struct UriParsingContext {
             }
 
             switch (d_uri[pos]) {
-            case '-': BSLA_FALLTHROUGH;
-            case '_': BSLA_FALLTHROUGH;
+            case '-': [[fallthrough]];
+            case '_': [[fallthrough]];
             case '.': {
                 continue;
             }
@@ -372,8 +371,8 @@ struct UriParsingContext {
             // The following code can be generalized to support multiple
             // queries by handling case '&' (set d_hasQuery = true)
             switch (d_uri[pos]) {
-            case '-': BSLA_FALLTHROUGH;
-            case '_': BSLA_FALLTHROUGH;
+            case '-': [[fallthrough]];
+            case '_': [[fallthrough]];
             case '.': {
                 continue;
             }

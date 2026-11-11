@@ -89,7 +89,7 @@ replicaDataRequestName(bmqp_ctrlmsg::ReplicaDataType::Value dataType)
     case bmqp_ctrlmsg::ReplicaDataType::E_PULL: return "Pull";
     case bmqp_ctrlmsg::ReplicaDataType::E_PUSH: return "Push";
     case bmqp_ctrlmsg::ReplicaDataType::E_DROP: return "Drop";
-    case bmqp_ctrlmsg::ReplicaDataType::E_UNKNOWN: BSLA_FALLTHROUGH;
+    case bmqp_ctrlmsg::ReplicaDataType::E_UNKNOWN: [[fallthrough]];
     default: return "Unknown";
     }
 }
@@ -4745,7 +4745,7 @@ void StorageManager::processReplicaDataRequest(
     case bmqp_ctrlmsg::ReplicaDataType::E_DROP: {
         processReplicaDataRequestDrop(message, source);
     } break;  // BREAK
-    case bmqp_ctrlmsg::ReplicaDataType::E_UNKNOWN: BSLA_FALLTHROUGH;
+    case bmqp_ctrlmsg::ReplicaDataType::E_UNKNOWN: [[fallthrough]];
     default: {
         BMQTSK_ALARMLOG_ALARM("CLUSTER")
             << d_clusterData_p->identity().description()

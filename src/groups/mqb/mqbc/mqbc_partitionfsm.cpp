@@ -110,11 +110,11 @@ void PartitionFSM::processEvent(PartitionStateTableEvent::Enum eventType,
 
             break;  // BREAK
         }
-        case State::e_PRIMARY_HEALING_STG1: BSLA_FALLTHROUGH;
-        case State::e_PRIMARY_HEALING_STG2: BSLA_FALLTHROUGH;
-        case State::e_REPLICA_WAITING: BSLA_FALLTHROUGH;
-        case State::e_REPLICA_HEALING: BSLA_FALLTHROUGH;
-        case State::e_STOPPED: BSLA_FALLTHROUGH;
+        case State::e_PRIMARY_HEALING_STG1: [[fallthrough]];
+        case State::e_PRIMARY_HEALING_STG2: [[fallthrough]];
+        case State::e_REPLICA_WAITING: [[fallthrough]];
+        case State::e_REPLICA_HEALING: [[fallthrough]];
+        case State::e_STOPPED: [[fallthrough]];
         default: {
             break;  // BREAK
         }

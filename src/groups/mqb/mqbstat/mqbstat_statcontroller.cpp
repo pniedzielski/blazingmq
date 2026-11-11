@@ -327,7 +327,7 @@ void StatController::captureStatsAndSemaphorePost(
         d_tablePrinter_mp->printStats(os, -1);
         result_p->makeStats() = os.str();
     } break;  // BREAK
-    case mqbcmd::EncodingFormat::JSON_COMPACT: BSLA_FALLTHROUGH;
+    case mqbcmd::EncodingFormat::JSON_COMPACT: [[fallthrough]];
     case mqbcmd::EncodingFormat::JSON_PRETTY: {
         // Make an unscheduled snapshot, but do not notify stats consumers
         // since it's not necessary.  We typically use this code path to get

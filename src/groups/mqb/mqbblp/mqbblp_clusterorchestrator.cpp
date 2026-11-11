@@ -915,14 +915,14 @@ void ClusterOrchestrator::processClusterStateFSMMessage(
     case MsgChoice::SELECTION_ID_FOLLOWER_CLUSTER_STATE_REQUEST: {
         d_stateManager_mp->processFollowerClusterStateRequest(message, source);
     } break;  // BREAK
-    case MsgChoice::SELECTION_ID_FOLLOWER_L_S_N_RESPONSE: BSLA_FALLTHROUGH;
-    case MsgChoice::SELECTION_ID_REGISTRATION_RESPONSE: BSLA_FALLTHROUGH;
+    case MsgChoice::SELECTION_ID_FOLLOWER_L_S_N_RESPONSE: [[fallthrough]];
+    case MsgChoice::SELECTION_ID_REGISTRATION_RESPONSE: [[fallthrough]];
     case MsgChoice::SELECTION_ID_FOLLOWER_CLUSTER_STATE_RESPONSE: {
         BSLS_ASSERT_SAFE(!message.rId().isNull());
 
         d_cluster_p->processResponse(message);
     } break;  // BREAK
-    case MsgChoice::SELECTION_ID_UNDEFINED: BSLA_FALLTHROUGH;
+    case MsgChoice::SELECTION_ID_UNDEFINED: [[fallthrough]];
     default: {
         BMQTSK_ALARMLOG_ALARM("CLUSTER")
             << d_clusterData_p->identity().description()
@@ -971,14 +971,14 @@ void ClusterOrchestrator::processPartitionMessage(
     case MsgChoice::SELECTION_ID_REPLICA_DATA_REQUEST: {
         d_storageManager_p->processReplicaDataRequest(message, source);
     } break;  // BREAK
-    case MsgChoice::SELECTION_ID_REPLICA_STATE_RESPONSE: BSLA_FALLTHROUGH;
-    case MsgChoice::SELECTION_ID_PRIMARY_STATE_RESPONSE: BSLA_FALLTHROUGH;
+    case MsgChoice::SELECTION_ID_REPLICA_STATE_RESPONSE: [[fallthrough]];
+    case MsgChoice::SELECTION_ID_PRIMARY_STATE_RESPONSE: [[fallthrough]];
     case MsgChoice::SELECTION_ID_REPLICA_DATA_RESPONSE: {
         BSLS_ASSERT_SAFE(!message.rId().isNull());
 
         d_cluster_p->processResponse(message);
     } break;  // BREAK
-    case MsgChoice::SELECTION_ID_UNDEFINED: BSLA_FALLTHROUGH;
+    case MsgChoice::SELECTION_ID_UNDEFINED: [[fallthrough]];
     default: {
         BMQTSK_ALARMLOG_ALARM("CLUSTER")
             << d_clusterData_p->identity().description()

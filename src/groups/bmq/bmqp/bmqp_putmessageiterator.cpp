@@ -53,9 +53,9 @@ const bsls::Types::Uint64 k_MAX_DECOMPRESSED_SIZE = 512ULL * 1024 * 1024;
 inline bool isValidWordPaddingByte(char value)
 {
     switch (value) {
-    case 1: BSLA_FALLTHROUGH;
-    case 2: BSLA_FALLTHROUGH;
-    case 3: BSLA_FALLTHROUGH;
+    case 1: [[fallthrough]];
+    case 2: [[fallthrough]];
+    case 3: [[fallthrough]];
     case 4: {
         return true;  // RETURN
     }
