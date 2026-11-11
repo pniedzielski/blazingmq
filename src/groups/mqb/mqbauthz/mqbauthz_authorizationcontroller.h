@@ -76,10 +76,9 @@ class AuthorizationController {
     AuthorizerMp d_authorizer_mp;
 
     // NOT IMPLEMENTED
-    AuthorizationController(const AuthorizationController& other)
-        BSLS_KEYWORD_DELETED;
+    AuthorizationController(const AuthorizationController& other) = delete;
     AuthorizationController&
-    operator=(const AuthorizationController& other) BSLS_KEYWORD_DELETED;
+    operator=(const AuthorizationController& other) = delete;
 
     // PRIVATE STATIC MEMBERS
 

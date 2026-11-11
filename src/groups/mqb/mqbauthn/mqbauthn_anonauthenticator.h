@@ -123,9 +123,8 @@ class AnonAuthenticator : public mqbplug::Authenticator {
 
   private:
     // NOT IMPLEMENTED
-    AnonAuthenticator(const AnonAuthenticator& other) BSLS_KEYWORD_DELETED;
-    AnonAuthenticator&
-    operator=(const AnonAuthenticator& other) BSLS_KEYWORD_DELETED;
+    AnonAuthenticator(const AnonAuthenticator& other)            = delete;
+    AnonAuthenticator& operator=(const AnonAuthenticator& other) = delete;
 
   public:
     // TRAITS

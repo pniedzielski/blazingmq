@@ -702,8 +702,8 @@ class StatContext {
     void applyUpdate(const bmqstm::StatContextUpdate& update);
 
     // NOT IMPLEMENTED
-    StatContext(const StatContext&) BSLS_KEYWORD_DELETED;
-    StatContext& operator=(const StatContext&) BSLS_KEYWORD_DELETED;
+    StatContext(const StatContext&)            = delete;
+    StatContext& operator=(const StatContext&) = delete;
 
     // FRIENDS
     friend class StatContextConfiguration;

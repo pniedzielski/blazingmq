@@ -110,9 +110,8 @@ class ScopedLogObserver : public ball::ObserverAdapter {
 
   private:
     // NOT IMPLEMENTED
-    ScopedLogObserver(const ScopedLogObserver&) BSLS_KEYWORD_DELETED;
-    ScopedLogObserver&
-    operator=(const ScopedLogObserver&) BSLS_KEYWORD_DELETED;
+    ScopedLogObserver(const ScopedLogObserver&)            = delete;
+    ScopedLogObserver& operator=(const ScopedLogObserver&) = delete;
 
   public:
     // CREATORS

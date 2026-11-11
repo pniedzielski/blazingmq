@@ -114,9 +114,8 @@ class NtcChannelFactory : public bmqio::ChannelFactory {
 
   private:
     // NOT IMPLEMENTED
-    NtcChannelFactory(const NtcChannelFactory&) BSLS_KEYWORD_DELETED;
-    NtcChannelFactory&
-    operator=(const NtcChannelFactory&) BSLS_KEYWORD_DELETED;
+    NtcChannelFactory(const NtcChannelFactory&)            = delete;
+    NtcChannelFactory& operator=(const NtcChannelFactory&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

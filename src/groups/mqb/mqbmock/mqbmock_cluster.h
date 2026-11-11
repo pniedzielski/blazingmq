@@ -246,8 +246,8 @@ class Cluster : public mqbi::Cluster {
 
   private:
     // NOT IMPLEMENTED
-    Cluster(const Cluster&) BSLS_KEYWORD_DELETED;
-    Cluster& operator=(const Cluster&) BSLS_KEYWORD_DELETED;
+    Cluster(const Cluster&)            = delete;
+    Cluster& operator=(const Cluster&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

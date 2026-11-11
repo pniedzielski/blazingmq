@@ -114,8 +114,8 @@ class Authenticator : public mqbnet::Authenticator {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator not implemented.
-    Authenticator(const Authenticator&) BSLS_KEYWORD_DELETED;
-    Authenticator& operator=(const Authenticator&) BSLS_KEYWORD_DELETED;
+    Authenticator(const Authenticator&)            = delete;
+    Authenticator& operator=(const Authenticator&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

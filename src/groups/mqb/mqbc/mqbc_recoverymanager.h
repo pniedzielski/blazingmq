@@ -263,8 +263,8 @@ class RecoveryManager {
 
   private:
     // NOT IMPLEMENTED
-    RecoveryManager(const RecoveryManager&) BSLS_KEYWORD_DELETED;
-    RecoveryManager& operator=(const RecoveryManager&) BSLS_KEYWORD_DELETED;
+    RecoveryManager(const RecoveryManager&)            = delete;
+    RecoveryManager& operator=(const RecoveryManager&) = delete;
 
   public:
     // TRAITS

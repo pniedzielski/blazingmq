@@ -63,8 +63,8 @@ namespace mqbmock {
 class QueueEngine : public mqbi::QueueEngine {
   private:
     // NOT IMPLEMENTED
-    QueueEngine(const QueueEngine&) BSLS_KEYWORD_DELETED;
-    QueueEngine& operator=(const QueueEngine&) BSLS_KEYWORD_DELETED;
+    QueueEngine(const QueueEngine&)            = delete;
+    QueueEngine& operator=(const QueueEngine&) = delete;
 
   public:
     // TRAITS

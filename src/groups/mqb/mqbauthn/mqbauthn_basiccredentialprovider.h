@@ -76,10 +76,9 @@ class BasicCredentialProvider : public mqbplug::CredentialProvider {
 
   private:
     // NOT IMPLEMENTED
-    BasicCredentialProvider(const BasicCredentialProvider&)
-        BSLS_KEYWORD_DELETED;
+    BasicCredentialProvider(const BasicCredentialProvider&) = delete;
     BasicCredentialProvider&
-    operator=(const BasicCredentialProvider&) BSLS_KEYWORD_DELETED;
+    operator=(const BasicCredentialProvider&) = delete;
 
   public:
     // TRAITS

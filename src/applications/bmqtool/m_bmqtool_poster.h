@@ -122,8 +122,8 @@ class PostingContext {
 
   private:
     // NOT IMPLEMENTED
-    PostingContext(const PostingContext&) BSLS_KEYWORD_DELETED;
-    PostingContext& operator=(const PostingContext&) BSLS_KEYWORD_DELETED;
+    PostingContext(const PostingContext&)            = delete;
+    PostingContext& operator=(const PostingContext&) = delete;
 };
 
 // ============
@@ -169,8 +169,8 @@ class Poster {
 
   private:
     // NOT IMPLEMENTED
-    Poster(const Poster&) BSLS_KEYWORD_DELETED;
-    Poster& operator=(const Poster&) BSLS_KEYWORD_DELETED;
+    Poster(const Poster&)            = delete;
+    Poster& operator=(const Poster&) = delete;
 };
 
 }  // close package namespace

@@ -707,8 +707,8 @@ struct Tester {
 
   private:
     // NOT IMPLEMENTED
-    Tester(const Tester&) BSLS_KEYWORD_DELETED;
-    Tester& operator=(const Tester&) BSLS_KEYWORD_DELETED;
+    Tester(const Tester&)            = delete;
+    Tester& operator=(const Tester&) = delete;
 };
 
 // ===========

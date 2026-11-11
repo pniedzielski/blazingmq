@@ -274,9 +274,8 @@ class CountingAllocatorStore final {
 
   private:
     // NOT IMPLEMENTED
-    CountingAllocatorStore(const CountingAllocatorStore&) BSLS_KEYWORD_DELETED;
-    CountingAllocatorStore&
-    operator=(const CountingAllocatorStore&) BSLS_KEYWORD_DELETED;
+    CountingAllocatorStore(const CountingAllocatorStore&)            = delete;
+    CountingAllocatorStore& operator=(const CountingAllocatorStore&) = delete;
 
   public:
     // TRAITS

@@ -376,8 +376,8 @@ class MultiQueueThreadPool final {
 
       private:
         // NOT IMPLEMENTED
-        QueueInfo(const QueueInfo&) BSLS_KEYWORD_DELETED;
-        QueueInfo& operator=(const QueueInfo&) BSLS_KEYWORD_DELETED;
+        QueueInfo(const QueueInfo&)            = delete;
+        QueueInfo& operator=(const QueueInfo&) = delete;
     };
 
     /// The thread functor.
@@ -453,9 +453,8 @@ class MultiQueueThreadPool final {
 
   private:
     // NOT IMPLEMENTED
-    MultiQueueThreadPool(const MultiQueueThreadPool&) BSLS_KEYWORD_DELETED;
-    MultiQueueThreadPool&
-    operator=(const MultiQueueThreadPool&) BSLS_KEYWORD_DELETED;
+    MultiQueueThreadPool(const MultiQueueThreadPool&)            = delete;
+    MultiQueueThreadPool& operator=(const MultiQueueThreadPool&) = delete;
 
   public:
     // TRAITS

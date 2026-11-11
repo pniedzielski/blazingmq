@@ -104,11 +104,10 @@ class ConfirmEventBuilder {
 
   private:
     // NOT IMPLEMENTED
-    ConfirmEventBuilder(const ConfirmEventBuilder&) BSLS_KEYWORD_DELETED;
+    ConfirmEventBuilder(const ConfirmEventBuilder&) = delete;
 
     /// Copy constructor and assignment operator not implemented
-    ConfirmEventBuilder&
-    operator=(const ConfirmEventBuilder&) BSLS_KEYWORD_DELETED;
+    ConfirmEventBuilder& operator=(const ConfirmEventBuilder&) = delete;
 
   public:
     // TRAITS

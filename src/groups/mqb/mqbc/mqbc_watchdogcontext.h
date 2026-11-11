@@ -69,8 +69,8 @@ class WatchdogContext {
     WatchdogContext();
 
     // NOT IMPLEMENTED
-    WatchdogContext(const WatchdogContext&) BSLS_KEYWORD_DELETED;
-    WatchdogContext& operator=(const WatchdogContext&) BSLS_KEYWORD_DELETED;
+    WatchdogContext(const WatchdogContext&)            = delete;
+    WatchdogContext& operator=(const WatchdogContext&) = delete;
 };
 
 // ============================================================================

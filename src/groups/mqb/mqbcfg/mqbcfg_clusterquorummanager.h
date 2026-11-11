@@ -63,9 +63,8 @@ class ClusterQuorumManager {
 
   private:
     // NOT IMPLEMENTED
-    ClusterQuorumManager(const ClusterQuorumManager&) BSLS_KEYWORD_DELETED;
-    ClusterQuorumManager&
-    operator=(const ClusterQuorumManager&) BSLS_KEYWORD_DELETED;
+    ClusterQuorumManager(const ClusterQuorumManager&)            = delete;
+    ClusterQuorumManager& operator=(const ClusterQuorumManager&) = delete;
 
   public:
     // CREATORS

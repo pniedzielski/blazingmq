@@ -146,10 +146,10 @@ class ResolvingChannelFactory_Channel : public DecoratingChannelPartialImp {
 
   private:
     // NOT IMPLEMENTED
-    ResolvingChannelFactory_Channel(const ResolvingChannelFactory_Channel&)
-        BSLS_KEYWORD_DELETED;
+    ResolvingChannelFactory_Channel(const ResolvingChannelFactory_Channel&) =
+        delete;
     ResolvingChannelFactory_Channel&
-    operator=(const ResolvingChannelFactory_Channel&) BSLS_KEYWORD_DELETED;
+    operator=(const ResolvingChannelFactory_Channel&) = delete;
 
   public:
     // TRAITS
@@ -208,10 +208,9 @@ class ResolvingChannelFactory : public ChannelFactory {
 
   private:
     // NOT IMPLEMENTED
-    ResolvingChannelFactory(const ResolvingChannelFactory&)
-        BSLS_KEYWORD_DELETED;
+    ResolvingChannelFactory(const ResolvingChannelFactory&) = delete;
     ResolvingChannelFactory&
-    operator=(const ResolvingChannelFactory&) BSLS_KEYWORD_DELETED;
+    operator=(const ResolvingChannelFactory&) = delete;
 
   public:
     // TRAITS

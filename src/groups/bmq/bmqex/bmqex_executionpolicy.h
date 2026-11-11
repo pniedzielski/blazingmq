@@ -146,7 +146,7 @@ class ExecutionPolicy {
 
   private:
     // NOT IMPLEMENTED
-    ExecutionPolicy& operator=(const ExecutionPolicy&) BSLS_KEYWORD_DELETED;
+    ExecutionPolicy& operator=(const ExecutionPolicy&) = delete;
 
   public:
     // CREATORS

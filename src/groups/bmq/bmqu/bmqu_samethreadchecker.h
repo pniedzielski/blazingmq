@@ -86,9 +86,9 @@
 //
 //    private:
 //      // NOT IMPLEMENTED
-//      MessageProcessor(const MessageProcessor&)         BSLS_KEYWORD_DELETED;
+//      MessageProcessor(const MessageProcessor&)         = delete;
 //      MessageProcessor operator=(const MessageProcessor&)
-//                                                        BSLS_KEYWORD_DELETED;
+//                                                        = delete;
 //
 //    public:
 //      // CREATORS
@@ -104,9 +104,9 @@
 //
 //    private:
 //      // NOT IMPLEMENTED
-//      MessageProcessor(const MessageProcessor&) BSLS_KEYWORD_DELETED;
+//      MessageProcessor(const MessageProcessor&) = delete;
 //      MessageProcessor operator=(const MessageProcessor&)
-//      BSLS_KEYWORD_DELETED;
+//      = delete;
 //
 //    public:
 //      // CREATORS
@@ -175,8 +175,8 @@ class SameThreadChecker {
 
   private:
     // NOT IMPLEMENTED
-    SameThreadChecker(const SameThreadChecker&) BSLS_KEYWORD_DELETED;
-    SameThreadChecker operator=(const SameThreadChecker&) BSLS_KEYWORD_DELETED;
+    SameThreadChecker(const SameThreadChecker&)           = delete;
+    SameThreadChecker operator=(const SameThreadChecker&) = delete;
 
   public:
     // CREATORS

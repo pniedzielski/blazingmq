@@ -64,10 +64,9 @@ class MemoryMappedOnDiskLogFactory final : public mqbsi::LogFactory {
 
   private:
     // NOT IMPLEMENTED
-    MemoryMappedOnDiskLogFactory(const MemoryMappedOnDiskLogFactory&)
-        BSLS_KEYWORD_DELETED;
+    MemoryMappedOnDiskLogFactory(const MemoryMappedOnDiskLogFactory&) = delete;
     MemoryMappedOnDiskLogFactory&
-    operator=(const MemoryMappedOnDiskLogFactory&) BSLS_KEYWORD_DELETED;
+    operator=(const MemoryMappedOnDiskLogFactory&) = delete;
 
   public:
     // CREATORS
@@ -132,9 +131,8 @@ class MemoryMappedOnDiskLog final : public OnDiskLog {
 
   private:
     // NOT IMPLEMENTED
-    MemoryMappedOnDiskLog(const MemoryMappedOnDiskLog&) BSLS_KEYWORD_DELETED;
-    MemoryMappedOnDiskLog&
-    operator=(const MemoryMappedOnDiskLog&) BSLS_KEYWORD_DELETED;
+    MemoryMappedOnDiskLog(const MemoryMappedOnDiskLog&)            = delete;
+    MemoryMappedOnDiskLog& operator=(const MemoryMappedOnDiskLog&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

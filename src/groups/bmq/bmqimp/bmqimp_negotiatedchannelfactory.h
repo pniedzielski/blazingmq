@@ -124,10 +124,9 @@ class NegotiatedChannelFactory : public bmqio::ChannelFactory {
     mutable bmqu::SharedResource<NegotiatedChannelFactory> d_self;
 
     // NOT IMPLEMENTED
-    NegotiatedChannelFactory(const NegotiatedChannelFactory&)
-        BSLS_KEYWORD_DELETED;
+    NegotiatedChannelFactory(const NegotiatedChannelFactory&) = delete;
     NegotiatedChannelFactory&
-    operator=(const NegotiatedChannelFactory&) BSLS_KEYWORD_DELETED;
+    operator=(const NegotiatedChannelFactory&) = delete;
 
   public:
     // TRAITS

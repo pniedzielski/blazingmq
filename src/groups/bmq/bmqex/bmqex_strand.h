@@ -167,8 +167,8 @@ class Strand {
 
   private:
     // NOT IMPLEMENTED
-    Strand(const Strand&) BSLS_KEYWORD_DELETED;
-    Strand& operator=(const Strand&) BSLS_KEYWORD_DELETED;
+    Strand(const Strand&)            = delete;
+    Strand& operator=(const Strand&) = delete;
 
   public:
     // CREATORS

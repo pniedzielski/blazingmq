@@ -123,10 +123,9 @@ struct SystemExecutor_ThreadData {
     bslalg::ConstructorProxy<FUNCTION> d_function;
 
     // NOT IMPLEMENTED
-    SystemExecutor_ThreadData(const SystemExecutor_ThreadData&)
-        BSLS_KEYWORD_DELETED;
+    SystemExecutor_ThreadData(const SystemExecutor_ThreadData&) = delete;
     SystemExecutor_ThreadData&
-    operator=(const SystemExecutor_ThreadData&) BSLS_KEYWORD_DELETED;
+    operator=(const SystemExecutor_ThreadData&) = delete;
 
     // CREATORS
 
@@ -190,9 +189,8 @@ class SystemExecutor_Context {
 
   private:
     // NOT IMPLEMENTED
-    SystemExecutor_Context(const SystemExecutor_Context&) BSLS_KEYWORD_DELETED;
-    SystemExecutor_Context&
-    operator&=(const SystemExecutor_Context&) BSLS_KEYWORD_DELETED;
+    SystemExecutor_Context(const SystemExecutor_Context&)             = delete;
+    SystemExecutor_Context& operator&=(const SystemExecutor_Context&) = delete;
 
   public:
     // TRAITS

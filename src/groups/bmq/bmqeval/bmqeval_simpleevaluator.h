@@ -505,9 +505,9 @@ class SimpleEvaluator {
     };
 
   private:
-    // SimpleEvaluator(const SimpleEvaluator& other) BSLS_KEYWORD_DELETED;
+    // SimpleEvaluator(const SimpleEvaluator& other) = delete;
     // SimpleEvaluator& operator=(const SimpleEvaluator& other)
-    // BSLS_KEYWORD_DELETED;
+    // = delete;
 
     // DATA
 

@@ -134,9 +134,9 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
         // NOT IMPLEMENTED
 
         /// Copy construction is not permitted on this object.
-        ChannelBuffer(const ChannelBuffer&) BSLS_KEYWORD_DELETED;
+        ChannelBuffer(const ChannelBuffer&) = delete;
         /// Copy assignment is not permitted on this object.
-        ChannelBuffer& operator=(const ChannelBuffer&) BSLS_KEYWORD_DELETED;
+        ChannelBuffer& operator=(const ChannelBuffer&) = delete;
 
       public:
         // CREATORS

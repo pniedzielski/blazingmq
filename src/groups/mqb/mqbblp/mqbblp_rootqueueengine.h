@@ -140,8 +140,8 @@ class RootQueueEngine final : public mqbi::QueueEngine {
     BALL_LOG_SET_CLASS_CATEGORY("MQBBLP.ROOTQUEUEENGINE");
 
     // NOT IMPLEMENTED
-    RootQueueEngine(const RootQueueEngine&) BSLS_KEYWORD_DELETED;
-    RootQueueEngine& operator=(const RootQueueEngine&) BSLS_KEYWORD_DELETED;
+    RootQueueEngine(const RootQueueEngine&)            = delete;
+    RootQueueEngine& operator=(const RootQueueEngine&) = delete;
 
     // PRIVATE MANIPULATORS
 

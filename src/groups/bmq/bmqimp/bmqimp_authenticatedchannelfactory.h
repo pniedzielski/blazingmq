@@ -125,10 +125,9 @@ class AuthenticatedChannelFactory : public bmqio::ChannelFactory {
     mutable bmqu::SharedResource<AuthenticatedChannelFactory> d_self;
 
     // NOT IMPLEMENTED
-    AuthenticatedChannelFactory(const AuthenticatedChannelFactory&)
-        BSLS_KEYWORD_DELETED;
+    AuthenticatedChannelFactory(const AuthenticatedChannelFactory&) = delete;
     AuthenticatedChannelFactory&
-    operator=(const AuthenticatedChannelFactory&) BSLS_KEYWORD_DELETED;
+    operator=(const AuthenticatedChannelFactory&) = delete;
 
   public:
     // TRAITS

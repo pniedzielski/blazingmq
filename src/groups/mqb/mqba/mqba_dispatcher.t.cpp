@@ -140,9 +140,8 @@ struct TestDispatcherClient : public mqbi::DispatcherClient {
     // NOT IMPLEMENTED
     /// Should not allow copy/assignment because dispatcher clients are
     /// registered in Dispatcher by raw pointers.
-    TestDispatcherClient(const TestDispatcherClient&) BSLS_KEYWORD_DELETED;
-    TestDispatcherClient&
-    operator=(const TestDispatcherClient&) BSLS_KEYWORD_DELETED;
+    TestDispatcherClient(const TestDispatcherClient&)            = delete;
+    TestDispatcherClient& operator=(const TestDispatcherClient&) = delete;
 
   public:
     // CREATORS

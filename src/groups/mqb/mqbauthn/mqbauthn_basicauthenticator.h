@@ -110,9 +110,8 @@ class BasicAuthenticator : public mqbplug::Authenticator {
 
   private:
     // NOT IMPLEMENTED
-    BasicAuthenticator(const BasicAuthenticator& other) BSLS_KEYWORD_DELETED;
-    BasicAuthenticator&
-    operator=(const BasicAuthenticator& other) BSLS_KEYWORD_DELETED;
+    BasicAuthenticator(const BasicAuthenticator& other)            = delete;
+    BasicAuthenticator& operator=(const BasicAuthenticator& other) = delete;
 
   public:
     // TRAITS

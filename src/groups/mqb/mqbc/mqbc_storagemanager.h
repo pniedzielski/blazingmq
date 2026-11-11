@@ -405,8 +405,8 @@ class StorageManager final : public mqbi::StorageManager,
 
   private:
     // NOT IMPLEMENTED
-    StorageManager(const StorageManager&) BSLS_KEYWORD_DELETED;
-    StorageManager& operator=(const StorageManager&) BSLS_KEYWORD_DELETED;
+    StorageManager(const StorageManager&)            = delete;
+    StorageManager& operator=(const StorageManager&) = delete;
 
   private:
     // PRIVATE MANIPULATORS
@@ -1180,9 +1180,8 @@ class StorageManagerIterator : public mqbi::StorageManagerIterator {
 
   private:
     // NOT IMPLEMENTED
-    StorageManagerIterator(const StorageManagerIterator&) BSLS_KEYWORD_DELETED;
-    StorageManagerIterator&
-    operator=(const StorageManagerIterator&) BSLS_KEYWORD_DELETED;
+    StorageManagerIterator(const StorageManagerIterator&)            = delete;
+    StorageManagerIterator& operator=(const StorageManagerIterator&) = delete;
 
   public:
     // CREATORS

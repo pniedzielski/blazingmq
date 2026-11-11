@@ -103,7 +103,7 @@ class PropertyBagValue {
                      bslma::Allocator*       allocator = 0);
 
     // NOT IMPLEMENTED
-    PropertyBagValue& operator=(const PropertyBagValue&) BSLS_KEYWORD_DELETED;
+    PropertyBagValue& operator=(const PropertyBagValue&) = delete;
 
     // FRIENDS
     friend class PropertyBag;

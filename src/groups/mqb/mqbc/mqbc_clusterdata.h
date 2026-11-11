@@ -207,8 +207,8 @@ class ClusterData {
 
   private:
     // NOT IMPLEMENTED
-    ClusterData(const ClusterData&) BSLS_KEYWORD_DELETED;
-    ClusterData& operator=(const ClusterData&) BSLS_KEYWORD_DELETED;
+    ClusterData(const ClusterData&)            = delete;
+    ClusterData& operator=(const ClusterData&) = delete;
 
   public:
     // TRAITS

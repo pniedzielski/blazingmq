@@ -189,9 +189,8 @@ class CountingAllocator final : public bslma::Allocator {
 
   private:
     // NOT IMPLEMENTED
-    CountingAllocator(const CountingAllocator&) BSLS_KEYWORD_DELETED;
-    CountingAllocator&
-    operator=(const CountingAllocator&) BSLS_KEYWORD_DELETED;
+    CountingAllocator(const CountingAllocator&)            = delete;
+    CountingAllocator& operator=(const CountingAllocator&) = delete;
 
   public:
     // CLASS METHODS

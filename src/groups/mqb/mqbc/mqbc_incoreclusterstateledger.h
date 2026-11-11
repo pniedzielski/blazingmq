@@ -212,10 +212,9 @@ class IncoreClusterStateLedger final : public ClusterStateLedger {
 
   private:
     // NOT IMPLEMENTED
-    IncoreClusterStateLedger(const IncoreClusterStateLedger&)
-        BSLS_KEYWORD_DELETED;
+    IncoreClusterStateLedger(const IncoreClusterStateLedger&) = delete;
     IncoreClusterStateLedger&
-    operator=(const IncoreClusterStateLedger&) BSLS_KEYWORD_DELETED;
+    operator=(const IncoreClusterStateLedger&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

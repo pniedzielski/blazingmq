@@ -234,9 +234,8 @@ class ClusterStateQueueInfo {
 
   private:
     // NOT IMPLEMENTED
-    ClusterStateQueueInfo(const ClusterStateQueueInfo&) BSLS_KEYWORD_DELETED;
-    ClusterStateQueueInfo&
-    operator=(const ClusterStateQueueInfo&) BSLS_KEYWORD_DELETED;
+    ClusterStateQueueInfo(const ClusterStateQueueInfo&)            = delete;
+    ClusterStateQueueInfo& operator=(const ClusterStateQueueInfo&) = delete;
 
   public:
     // TRAITS

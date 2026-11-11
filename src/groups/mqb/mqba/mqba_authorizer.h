@@ -54,8 +54,8 @@ class Authorizer : public mqbi::Authorizer {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator not implemented.
-    Authorizer(const Authorizer&) BSLS_KEYWORD_DELETED;
-    Authorizer& operator=(const Authorizer&) BSLS_KEYWORD_DELETED;
+    Authorizer(const Authorizer&)            = delete;
+    Authorizer& operator=(const Authorizer&) = delete;
 
   public:
     // CREATORS

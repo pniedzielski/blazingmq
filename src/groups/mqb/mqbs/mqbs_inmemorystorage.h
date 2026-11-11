@@ -232,10 +232,10 @@ class InMemoryStorage final : public ReplicatedStorage {
 
   private:
     // NOT IMPLEMENTED
-    InMemoryStorage(const InMemoryStorage&) BSLS_KEYWORD_DELETED;
+    InMemoryStorage(const InMemoryStorage&) = delete;
 
     /// Not implemented
-    InMemoryStorage& operator=(const InMemoryStorage&) BSLS_KEYWORD_DELETED;
+    InMemoryStorage& operator=(const InMemoryStorage&) = delete;
 
     // PRIVATE ACCESSORS
 

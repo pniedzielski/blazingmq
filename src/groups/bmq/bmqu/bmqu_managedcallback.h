@@ -221,8 +221,8 @@ class ManagedCallback final {
     /// TODO: use is_trivially_copyable trait to ensure this on a standard
     ///       upgrade.  Alternatively keep copy operators and store the buffer
     ///       under a shared pointer.
-    ManagedCallback(const ManagedCallback&) BSLS_KEYWORD_DELETED;
-    ManagedCallback& operator=(const ManagedCallback&) BSLS_KEYWORD_DELETED;
+    ManagedCallback(const ManagedCallback&)            = delete;
+    ManagedCallback& operator=(const ManagedCallback&) = delete;
 
     // PRIVATE MANIPULATORS
 

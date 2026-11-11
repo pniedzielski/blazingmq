@@ -58,8 +58,8 @@ class MockTime {
 
   private:
     // NOT IMPLEMENTED
-    MockTime(const MockTime&) BSLS_KEYWORD_DELETED;
-    MockTime& operator=(const MockTime&) BSLS_KEYWORD_DELETED;
+    MockTime(const MockTime&)            = delete;
+    MockTime& operator=(const MockTime&) = delete;
     // Copy constructor and assignment operator not implemented (because
     // MockTime, for convenience, registers itself to 'bmqu::Time' in
     // its constructor).

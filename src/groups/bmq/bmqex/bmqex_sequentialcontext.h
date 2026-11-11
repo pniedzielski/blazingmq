@@ -180,9 +180,8 @@ class SequentialContext {
 
   private:
     // NOT IMPLEMENTED
-    SequentialContext(const SequentialContext&) BSLS_KEYWORD_DELETED;
-    SequentialContext&
-    operator=(const SequentialContext&) BSLS_KEYWORD_DELETED;
+    SequentialContext(const SequentialContext&)            = delete;
+    SequentialContext& operator=(const SequentialContext&) = delete;
 
   public:
     // CREATORS

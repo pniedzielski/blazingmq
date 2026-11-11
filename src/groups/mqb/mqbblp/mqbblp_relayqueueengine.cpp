@@ -129,10 +129,10 @@ class LimitedPrinter {
 
   private:
     // NOT IMPLEMENTED
-    LimitedPrinter(const LimitedPrinter&) BSLS_KEYWORD_DELETED;
+    LimitedPrinter(const LimitedPrinter&) = delete;
 
     /// Copy constructor and assignment operator removed.
-    LimitedPrinter& operator=(const LimitedPrinter&) BSLS_KEYWORD_DELETED;
+    LimitedPrinter& operator=(const LimitedPrinter&) = delete;
 };
 
 struct Event {
@@ -292,11 +292,10 @@ class ConfigureNotifier {
 
   private:
     // NOT IMPLEMENTED
-    ConfigureNotifier(const ConfigureNotifier&) BSLS_KEYWORD_DELETED;
+    ConfigureNotifier(const ConfigureNotifier&) = delete;
 
     /// Copy constructor and assignment operator removed.
-    ConfigureNotifier&
-    operator=(const ConfigureNotifier&) BSLS_KEYWORD_DELETED;
+    ConfigureNotifier& operator=(const ConfigureNotifier&) = delete;
 
   public:
     // CREATORS

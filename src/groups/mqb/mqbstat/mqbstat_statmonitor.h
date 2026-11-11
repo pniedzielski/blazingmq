@@ -149,8 +149,8 @@ class StatMonitor {
 
   private:
     // NOT IMPLEMENTED
-    StatMonitor(const StatMonitor& other) BSLS_KEYWORD_DELETED;
-    StatMonitor& operator=(const StatMonitor& other) BSLS_KEYWORD_DELETED;
+    StatMonitor(const StatMonitor& other)            = delete;
+    StatMonitor& operator=(const StatMonitor& other) = delete;
 
   public:
     // TRAITS

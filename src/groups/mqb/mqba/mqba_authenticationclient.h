@@ -100,9 +100,8 @@ class AuthenticationClient : public mqbnet::AuthenticationClient {
 
   private:
     // NOT IMPLEMENTED
-    AuthenticationClient(const AuthenticationClient&) BSLS_KEYWORD_DELETED;
-    AuthenticationClient&
-    operator=(const AuthenticationClient&) BSLS_KEYWORD_DELETED;
+    AuthenticationClient(const AuthenticationClient&)            = delete;
+    AuthenticationClient& operator=(const AuthenticationClient&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

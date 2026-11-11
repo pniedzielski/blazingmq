@@ -101,9 +101,8 @@ class SchedulerLockGuard {
 
   private:
     // NOT IMPLEMENTED
-    SchedulerLockGuard(const SchedulerLockGuard&) BSLS_KEYWORD_DELETED;
-    SchedulerLockGuard&
-    operator=(const SchedulerLockGuard&) BSLS_KEYWORD_DELETED;
+    SchedulerLockGuard(const SchedulerLockGuard&)            = delete;
+    SchedulerLockGuard& operator=(const SchedulerLockGuard&) = delete;
 
   public:
     // CREATORS

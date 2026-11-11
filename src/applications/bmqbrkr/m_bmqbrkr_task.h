@@ -236,10 +236,10 @@ class Task {
 
   private:
     // NOT IMPLEMENTED
-    Task(const Task&) BSLS_KEYWORD_DELETED;
+    Task(const Task&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    Task& operator=(const Task&) BSLS_KEYWORD_DELETED;
+    Task& operator=(const Task&) = delete;
 
   public:
     // CREATORS

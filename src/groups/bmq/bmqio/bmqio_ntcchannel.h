@@ -216,8 +216,8 @@ class NtcChannel : public bmqio::Channel,
 
   private:
     // NOT IMPLEMENTED
-    NtcChannel(const NtcChannel&) BSLS_KEYWORD_DELETED;
-    NtcChannel& operator=(const NtcChannel&) BSLS_KEYWORD_DELETED;
+    NtcChannel(const NtcChannel&)            = delete;
+    NtcChannel& operator=(const NtcChannel&) = delete;
 
   private:
     // PRIVATE MANIPULATORS
@@ -503,8 +503,8 @@ class NtcListener : public bmqio::ChannelFactoryOperationHandle,
 
   private:
     // NOT IMPLEMENTED
-    NtcListener(const NtcListener&) BSLS_KEYWORD_DELETED;
-    NtcListener& operator=(const NtcListener&) BSLS_KEYWORD_DELETED;
+    NtcListener(const NtcListener&)            = delete;
+    NtcListener& operator=(const NtcListener&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

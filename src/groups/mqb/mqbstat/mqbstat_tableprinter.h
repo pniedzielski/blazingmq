@@ -83,8 +83,8 @@ class TablePrinter {
     ContextsMap d_contexts;
 
     // NOT IMPLEMENTED
-    TablePrinter(const TablePrinter& other) BSLS_KEYWORD_DELETED;
-    TablePrinter& operator=(const TablePrinter& other) BSLS_KEYWORD_DELETED;
+    TablePrinter(const TablePrinter& other)            = delete;
+    TablePrinter& operator=(const TablePrinter& other) = delete;
 
     // PRIVATE MANIPULATORS
 

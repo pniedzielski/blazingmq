@@ -70,8 +70,8 @@ class ChannelFactoryPipeline : public bmqio::ChannelFactory {
       private:
         // PRIVATE CONSTRUCTORS
 
-        Config(const Config& other) BSLS_KEYWORD_DELETED;
-        Config& operator=(const Config& other) BSLS_KEYWORD_DELETED;
+        Config(const Config& other)            = delete;
+        Config& operator=(const Config& other) = delete;
 
       public:
         // ACESSORS
@@ -118,8 +118,7 @@ class ChannelFactoryPipeline : public bmqio::ChannelFactory {
   private:
     // PRIVATE CONSTRUCTORS
 
-    ChannelFactoryPipeline(const ChannelFactoryPipeline& other)
-        BSLS_KEYWORD_DELETED;
+    ChannelFactoryPipeline(const ChannelFactoryPipeline& other) = delete;
 
     // PRIVATE ACCESSORS
 

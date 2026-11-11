@@ -57,8 +57,8 @@ class JsonPrinter {
 
   private:
     // NOT IMPLEMENTED
-    JsonPrinter(const JsonPrinter& other) BSLS_KEYWORD_DELETED;
-    JsonPrinter& operator=(const JsonPrinter& other) BSLS_KEYWORD_DELETED;
+    JsonPrinter(const JsonPrinter& other)            = delete;
+    JsonPrinter& operator=(const JsonPrinter& other) = delete;
 
   public:
     // TRAITS

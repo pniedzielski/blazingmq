@@ -289,8 +289,8 @@ class ClusterQueueHelper final : public mqbc::ClusterStateObserver,
         // NOT IMPLEMENTED
         /// QueueContext owns `bsls::AtomicInt` that cannot be
         /// copy-constructed.
-        QueueLiveState(const QueueLiveState&) BSLS_KEYWORD_DELETED;
-        QueueLiveState& operator=(const QueueLiveState&) BSLS_KEYWORD_DELETED;
+        QueueLiveState(const QueueLiveState&)            = delete;
+        QueueLiveState& operator=(const QueueLiveState&) = delete;
 
         // MANIPULATORS
 
@@ -409,8 +409,8 @@ class ClusterQueueHelper final : public mqbc::ClusterStateObserver,
 
         // NOT IMPLEMENTED
         /// QueueContext owns QueueLiveState that cannot be copy-constructed.
-        QueueContext(const QueueContext&) BSLS_KEYWORD_DELETED;
-        QueueContext& operator=(const QueueContext&) BSLS_KEYWORD_DELETED;
+        QueueContext(const QueueContext&)            = delete;
+        QueueContext& operator=(const QueueContext&) = delete;
 
         // ACCESSORS
 

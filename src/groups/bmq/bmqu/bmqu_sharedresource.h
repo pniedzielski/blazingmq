@@ -380,8 +380,8 @@ class SharedResource {
 
   private:
     // NOT IMPLEMENTED
-    SharedResource(const SharedResource&) BSLS_KEYWORD_DELETED;
-    SharedResource& operator=(const SharedResource&) BSLS_KEYWORD_DELETED;
+    SharedResource(const SharedResource&)            = delete;
+    SharedResource& operator=(const SharedResource&) = delete;
 
   public:
     // CREATORS

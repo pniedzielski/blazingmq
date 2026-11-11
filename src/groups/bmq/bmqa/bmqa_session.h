@@ -653,8 +653,8 @@ struct SessionImpl {
 
   private:
     // NOT IMPLEMENTED
-    SessionImpl(const SessionImpl&) BSLS_KEYWORD_DELETED;
-    SessionImpl& operator=(const SessionImpl&) BSLS_KEYWORD_DELETED;
+    SessionImpl(const SessionImpl&)            = delete;
+    SessionImpl& operator=(const SessionImpl&) = delete;
 
   public:
     // TRAITS
@@ -708,10 +708,10 @@ class Session : public AbstractSession {
 
   private:
     // NOT IMPLEMENTED
-    Session(const Session&) BSLS_KEYWORD_DELETED;
+    Session(const Session&) = delete;
 
     /// Copy constructor and assignment operator are not implemented
-    Session& operator=(const Session&) BSLS_KEYWORD_DELETED;
+    Session& operator=(const Session&) = delete;
 
   public:
     // TRAITS

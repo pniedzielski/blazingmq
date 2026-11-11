@@ -109,8 +109,8 @@ class GateKeeper {
 
       private:
         // NOT IMPLEMENTED
-        Status(const Status& other) BSLS_KEYWORD_DELETED;
-        Status& operator=(const Status& other) BSLS_KEYWORD_DELETED;
+        Status(const Status& other)            = delete;
+        Status& operator=(const Status& other) = delete;
 
       public:
         // CREATORS

@@ -72,8 +72,8 @@ struct FileSet final {
 
       private:
         // NOT IMPLEMENTED
-        FileInfo(const FileInfo&) BSLS_KEYWORD_DELETED;
-        FileInfo& operator=(const FileInfo&) BSLS_KEYWORD_DELETED;
+        FileInfo(const FileInfo&)            = delete;
+        FileInfo& operator=(const FileInfo&) = delete;
     };
 
     // PUBLIC DATA
@@ -108,8 +108,8 @@ struct FileSet final {
 
   private:
     // NOT IMPLEMENTED
-    FileSet(const FileSet&) BSLS_KEYWORD_DELETED;
-    FileSet& operator=(const FileSet&) BSLS_KEYWORD_DELETED;
+    FileSet(const FileSet&)            = delete;
+    FileSet& operator=(const FileSet&) = delete;
 
   public:
     // TRAITS

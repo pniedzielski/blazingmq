@@ -104,11 +104,10 @@ class RejectEventBuilder {
 
   private:
     // NOT IMPLEMENTED
-    RejectEventBuilder(const RejectEventBuilder&) BSLS_KEYWORD_DELETED;
+    RejectEventBuilder(const RejectEventBuilder&) = delete;
 
     /// Copy constructor and assignment operator not implemented
-    RejectEventBuilder&
-    operator=(const RejectEventBuilder&) BSLS_KEYWORD_DELETED;
+    RejectEventBuilder& operator=(const RejectEventBuilder&) = delete;
 
   public:
     // TRAITS

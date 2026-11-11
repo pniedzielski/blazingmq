@@ -277,10 +277,9 @@ class OrderedHashMapWithHistory {
 
   private:
     // NOT IMPLEMENTED
-    OrderedHashMapWithHistory(const OrderedHashMapWithHistory&)
-        BSLS_KEYWORD_DELETED;
+    OrderedHashMapWithHistory(const OrderedHashMapWithHistory&) = delete;
     OrderedHashMapWithHistory&
-    operator=(const OrderedHashMapWithHistory&) BSLS_KEYWORD_DELETED;
+    operator=(const OrderedHashMapWithHistory&) = delete;
 
     /// Remove the specified `it` from the list of `live` un-TTL-expired
     /// items accessed by `live` iterators while still keeping the item in

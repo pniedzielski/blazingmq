@@ -101,10 +101,9 @@ class AuthenticationController {
 
   private:
     // NOT IMPLEMENTED
-    AuthenticationController(const AuthenticationController& other)
-        BSLS_KEYWORD_DELETED;
+    AuthenticationController(const AuthenticationController& other) = delete;
     AuthenticationController&
-    operator=(const AuthenticationController& other) BSLS_KEYWORD_DELETED;
+    operator=(const AuthenticationController& other) = delete;
 
     // PRIVATE MANIPULATORS
 

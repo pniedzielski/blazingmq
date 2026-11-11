@@ -72,9 +72,8 @@ class StatsFileLogger {
     bslma::Allocator* d_allocator_p;
 
     // NOT IMPLEMENTED
-    StatsFileLogger(const StatsFileLogger& other) BSLS_KEYWORD_DELETED;
-    StatsFileLogger&
-    operator=(const StatsFileLogger& other) BSLS_KEYWORD_DELETED;
+    StatsFileLogger(const StatsFileLogger& other)            = delete;
+    StatsFileLogger& operator=(const StatsFileLogger& other) = delete;
 
   public:
     // TRAITS

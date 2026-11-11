@@ -92,8 +92,8 @@ class Job_Target : public Job_TargetBase {
 
   private:
     // NOT IMPLEMENTED
-    Job_Target(const Job_Target&) BSLS_KEYWORD_DELETED;
-    Job_Target& operator=(const Job_Target&) BSLS_KEYWORD_DELETED;
+    Job_Target(const Job_Target&)            = delete;
+    Job_Target& operator=(const Job_Target&) = delete;
 
   public:
     // CREATORS
@@ -127,8 +127,8 @@ class Job {
 
   private:
     // NOT IMPLEMENTED
-    Job(const Job&) BSLS_KEYWORD_DELETED;
-    Job& operator=(const Job&) BSLS_KEYWORD_DELETED;
+    Job(const Job&)            = delete;
+    Job& operator=(const Job&) = delete;
 
   public:
     // CREATORS

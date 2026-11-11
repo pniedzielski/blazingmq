@@ -51,8 +51,8 @@ class PluginLibrary : public mqbplug::PluginLibrary {
 
   private:
     // NOT IMPLEMENTED
-    PluginLibrary(const PluginLibrary& other) BSLS_KEYWORD_DELETED;
-    PluginLibrary& operator=(const PluginLibrary& other) BSLS_KEYWORD_DELETED;
+    PluginLibrary(const PluginLibrary& other)            = delete;
+    PluginLibrary& operator=(const PluginLibrary& other) = delete;
 
   public:
     // TRAITS

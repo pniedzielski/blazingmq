@@ -122,7 +122,7 @@ class ReconnectingChannelFactoryConfig {
 
     // NOT IMPLEMENTED
     ReconnectingChannelFactoryConfig&
-    operator=(const ReconnectingChannelFactoryConfig&) BSLS_KEYWORD_DELETED;
+    operator=(const ReconnectingChannelFactoryConfig&) = delete;
 
   public:
     // TRAITS
@@ -208,9 +208,9 @@ struct ReconnectingChannelFactory_ConnectHandle
 
     // NOT IMPLEMENTED
     ReconnectingChannelFactory_ConnectHandle(
-        const ReconnectingChannelFactory_ConnectHandle&) BSLS_KEYWORD_DELETED;
-    ReconnectingChannelFactory_ConnectHandle& operator=(
-        const ReconnectingChannelFactory_ConnectHandle&) BSLS_KEYWORD_DELETED;
+        const ReconnectingChannelFactory_ConnectHandle&) = delete;
+    ReconnectingChannelFactory_ConnectHandle&
+    operator=(const ReconnectingChannelFactory_ConnectHandle&) = delete;
 
   public:
     // TRAITS

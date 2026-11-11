@@ -234,11 +234,11 @@ class Application {
 
   private:
     // NOT IMPLEMENTED
-    Application(const Application& other) BSLS_KEYWORD_DELETED;
+    Application(const Application& other) = delete;
 
     /// Copy constructor and assignment operation are not permitted on this
     /// object.
-    Application& operator=(const Application& other) BSLS_KEYWORD_DELETED;
+    Application& operator=(const Application& other) = delete;
 
   public:
     // TRAITS

@@ -240,9 +240,8 @@ class TestExecutionContext {
 
   private:
     // NOT IMPLEMENTED
-    TestExecutionContext(const TestExecutionContext&) BSLS_KEYWORD_DELETED;
-    TestExecutionContext&
-    operator=(const TestExecutionContext&) BSLS_KEYWORD_DELETED;
+    TestExecutionContext(const TestExecutionContext&)            = delete;
+    TestExecutionContext& operator=(const TestExecutionContext&) = delete;
 
   public:
     // CREATORS

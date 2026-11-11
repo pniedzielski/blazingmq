@@ -80,8 +80,8 @@ class TestQueue : public mqbmock::Queue {
 
   private:
     // NOT IMPLEMENTED
-    TestQueue(const TestQueue&) BSLS_KEYWORD_DELETED;
-    TestQueue& operator=(const TestQueue&) BSLS_KEYWORD_DELETED;
+    TestQueue(const TestQueue&)            = delete;
+    TestQueue& operator=(const TestQueue&) = delete;
 
   public:
     // TRAITS

@@ -214,10 +214,9 @@ class MonitoredQueue {
 
   private:
     // NOT IMPLEMENTED
-    MonitoredQueue(const MonitoredQueue<QUEUE, QUEUE_TRAITS>&)
-        BSLS_KEYWORD_DELETED;
+    MonitoredQueue(const MonitoredQueue<QUEUE, QUEUE_TRAITS>&) = delete;
     MonitoredQueue<QUEUE, QUEUE_TRAITS>&
-    operator=(const MonitoredQueue<QUEUE, QUEUE_TRAITS>&) BSLS_KEYWORD_DELETED;
+    operator=(const MonitoredQueue<QUEUE, QUEUE_TRAITS>&) = delete;
 
   public:
     // TRAITS

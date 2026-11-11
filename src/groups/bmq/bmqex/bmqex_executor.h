@@ -189,8 +189,8 @@ class Executor_Target : public Executor_TargetBase {
 
   private:
     // NOT IMPLEMENTED
-    Executor_Target(const Executor_Target&) BSLS_KEYWORD_DELETED;
-    Executor_Target& operator=(const Executor_Target&) BSLS_KEYWORD_DELETED;
+    Executor_Target(const Executor_Target&)            = delete;
+    Executor_Target& operator=(const Executor_Target&) = delete;
 
   public:
     // CREATORS

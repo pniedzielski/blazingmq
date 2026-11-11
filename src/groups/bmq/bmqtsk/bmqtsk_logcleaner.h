@@ -124,8 +124,8 @@ class LogCleaner {
 
   private:
     // NOT IMPLEMENTED
-    LogCleaner(const LogCleaner&) BSLS_KEYWORD_DELETED;
-    LogCleaner& operator=(const LogCleaner&) BSLS_KEYWORD_DELETED;
+    LogCleaner(const LogCleaner&)            = delete;
+    LogCleaner& operator=(const LogCleaner&) = delete;
 
   public:
     // CREATORS

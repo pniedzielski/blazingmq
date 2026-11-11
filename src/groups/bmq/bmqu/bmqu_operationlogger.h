@@ -114,8 +114,8 @@ class OperationLogger final {
 
     // NOT IMPLEMENTED
     /// Copy and assignment are disabled to prevent misuse of this class.
-    OperationLogger(const OperationLogger&) BSLS_KEYWORD_DELETED;
-    OperationLogger& operator=(const OperationLogger&) BSLS_KEYWORD_DELETED;
+    OperationLogger(const OperationLogger&)            = delete;
+    OperationLogger& operator=(const OperationLogger&) = delete;
 
   public:
     // TRAITS

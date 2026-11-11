@@ -218,10 +218,10 @@ class QueueStatsDomain {
 
   private:
     // NOT IMPLEMENTED
-    QueueStatsDomain(const QueueStatsDomain&) BSLS_KEYWORD_DELETED;
+    QueueStatsDomain(const QueueStatsDomain&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    QueueStatsDomain& operator=(const QueueStatsDomain&) BSLS_KEYWORD_DELETED;
+    QueueStatsDomain& operator=(const QueueStatsDomain&) = delete;
 
     // ACCESSORS
     /// Look for the specified `appId` among the stored appId subcontexts and
@@ -348,10 +348,10 @@ class QueueStatsClient {
 
   private:
     // NOT IMPLEMENTED
-    QueueStatsClient(const QueueStatsClient&) BSLS_KEYWORD_DELETED;
+    QueueStatsClient(const QueueStatsClient&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    QueueStatsClient& operator=(const QueueStatsClient&) BSLS_KEYWORD_DELETED;
+    QueueStatsClient& operator=(const QueueStatsClient&) = delete;
 
   public:
     // CLASS METHODS

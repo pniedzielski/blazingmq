@@ -346,8 +346,8 @@ class OperationChain_Job {
 
       private:
         // NOT IMPLEMENTED
-        Target(const Target&) BSLS_KEYWORD_DELETED;
-        Target& operator=(const Target&) BSLS_KEYWORD_DELETED;
+        Target(const Target&)            = delete;
+        Target& operator=(const Target&) = delete;
 
       public:
         // CREATORS
@@ -380,9 +380,8 @@ class OperationChain_Job {
 
   private:
     // NOT IMPLEMENTED
-    OperationChain_Job(const OperationChain_Job&) BSLS_KEYWORD_DELETED;
-    OperationChain_Job&
-    operator=(const OperationChain_Job&) BSLS_KEYWORD_DELETED;
+    OperationChain_Job(const OperationChain_Job&)            = delete;
+    OperationChain_Job& operator=(const OperationChain_Job&) = delete;
 
   public:
     // CREATORS
@@ -489,8 +488,8 @@ class OperationChain {
 
   private:
     // NOT IMPLEMENTED
-    OperationChain(const OperationChain&) BSLS_KEYWORD_DELETED;
-    OperationChain& operator=(const OperationChain&) BSLS_KEYWORD_DELETED;
+    OperationChain(const OperationChain&)            = delete;
+    OperationChain& operator=(const OperationChain&) = delete;
 
   public:
     // CREATORS
@@ -675,9 +674,8 @@ class OperationChainLink {
 
   private:
     // NOT IMPLEMENTED
-    OperationChainLink(const OperationChainLink&) BSLS_KEYWORD_DELETED;
-    OperationChainLink&
-    operator=(const OperationChainLink&) BSLS_KEYWORD_DELETED;
+    OperationChainLink(const OperationChainLink&)            = delete;
+    OperationChainLink& operator=(const OperationChainLink&) = delete;
 
   public:
     // CREATORS

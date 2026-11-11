@@ -203,9 +203,8 @@ struct TwoKeyHashMap_Node {
     bsls::ObjectBuffer<typename MAP::mapped_type> d_value;
 
     // NOT IMPLEMENTED
-    TwoKeyHashMap_Node(const TwoKeyHashMap_Node&) BSLS_KEYWORD_DELETED;
-    TwoKeyHashMap_Node&
-    operator=(const TwoKeyHashMap_Node&) BSLS_KEYWORD_DELETED;
+    TwoKeyHashMap_Node(const TwoKeyHashMap_Node&)            = delete;
+    TwoKeyHashMap_Node& operator=(const TwoKeyHashMap_Node&) = delete;
 
     // CREATORS
     template <class VALUE_T>
@@ -717,10 +716,9 @@ template <class MAP>
 class TwoKeyHashMapValue : private TwoKeyHashMap_Node<MAP> {
   private:
     // NOT IMPLEMENTED
-    TwoKeyHashMapValue() BSLS_KEYWORD_DELETED;
-    TwoKeyHashMapValue(const TwoKeyHashMapValue&) BSLS_KEYWORD_DELETED;
-    TwoKeyHashMapValue&
-    operator=(const TwoKeyHashMapValue&) BSLS_KEYWORD_DELETED;
+    TwoKeyHashMapValue()                                     = delete;
+    TwoKeyHashMapValue(const TwoKeyHashMapValue&)            = delete;
+    TwoKeyHashMapValue& operator=(const TwoKeyHashMapValue&) = delete;
 
   public:
     // MANIPULATORS

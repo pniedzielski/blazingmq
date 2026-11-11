@@ -488,9 +488,8 @@ class FlatJsonPrinter::FlatJsonPrinterImpl {
 
   private:
     // NOT IMPLEMENTED
-    FlatJsonPrinterImpl(const FlatJsonPrinterImpl& other) BSLS_KEYWORD_DELETED;
-    FlatJsonPrinterImpl&
-    operator=(const FlatJsonPrinterImpl& other) BSLS_KEYWORD_DELETED;
+    FlatJsonPrinterImpl(const FlatJsonPrinterImpl& other)            = delete;
+    FlatJsonPrinterImpl& operator=(const FlatJsonPrinterImpl& other) = delete;
 
   public:
     // TRAITS

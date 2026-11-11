@@ -105,9 +105,8 @@ class TestAuthenticator : public mqbplug::Authenticator {
 
   private:
     // NOT IMPLEMENTED
-    TestAuthenticator(const TestAuthenticator& other) BSLS_KEYWORD_DELETED;
-    TestAuthenticator&
-    operator=(const TestAuthenticator& other) BSLS_KEYWORD_DELETED;
+    TestAuthenticator(const TestAuthenticator& other)            = delete;
+    TestAuthenticator& operator=(const TestAuthenticator& other) = delete;
 
   public:
     // TRAITS

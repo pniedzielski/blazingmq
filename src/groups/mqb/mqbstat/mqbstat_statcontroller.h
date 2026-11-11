@@ -306,9 +306,8 @@ class StatController {
 
   private:
     // NOT IMPLEMENTED
-    StatController(const StatController& other) BSLS_KEYWORD_DELETED;
-    StatController&
-    operator=(const StatController& other) BSLS_KEYWORD_DELETED;
+    StatController(const StatController& other)            = delete;
+    StatController& operator=(const StatController& other) = delete;
 
   public:
     // TRAITS

@@ -219,9 +219,8 @@ class FileBackedStorage final : public ReplicatedStorage {
 
   private:
     // NOT IMPLEMENTED
-    FileBackedStorage(const FileBackedStorage&) BSLS_KEYWORD_DELETED;
-    FileBackedStorage&
-    operator=(const FileBackedStorage&) BSLS_KEYWORD_DELETED;
+    FileBackedStorage(const FileBackedStorage&)            = delete;
+    FileBackedStorage& operator=(const FileBackedStorage&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

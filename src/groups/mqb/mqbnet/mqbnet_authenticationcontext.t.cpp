@@ -71,8 +71,8 @@ struct TestBench {
     TestClock                           d_testClock;
     bslma::Allocator*                   d_allocator_p;
 
-    TestBench(const TestBench&) BSLS_KEYWORD_DELETED;
-    TestBench& operator=(const TestBench&) BSLS_KEYWORD_DELETED;
+    TestBench(const TestBench&)            = delete;
+    TestBench& operator=(const TestBench&) = delete;
 
     explicit TestBench(bslma::Allocator* allocator)
     : d_channel(bsl::allocate_shared<bmqio::TestChannel>(allocator))

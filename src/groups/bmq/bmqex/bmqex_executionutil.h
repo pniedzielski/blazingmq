@@ -230,10 +230,9 @@ class ExecutionUtil_OneOffFunction {
 
   private:
     // NOT IMPLEMENTED
-    ExecutionUtil_OneOffFunction(const ExecutionUtil_OneOffFunction&)
-        BSLS_KEYWORD_DELETED;
+    ExecutionUtil_OneOffFunction(const ExecutionUtil_OneOffFunction&) = delete;
     ExecutionUtil_OneOffFunction&
-    operator=(const ExecutionUtil_OneOffFunction&) BSLS_KEYWORD_DELETED;
+    operator=(const ExecutionUtil_OneOffFunction&) = delete;
 
   public:
     // CREATORS
@@ -294,10 +293,9 @@ class ExecutionUtil_UniqueTask {
 
   private:
     // NOT IMPLEMENTED
-    ExecutionUtil_UniqueTask(const ExecutionUtil_UniqueTask&)
-        BSLS_KEYWORD_DELETED;
+    ExecutionUtil_UniqueTask(const ExecutionUtil_UniqueTask&) = delete;
     ExecutionUtil_UniqueTask&
-    operator=(const ExecutionUtil_UniqueTask&) BSLS_KEYWORD_DELETED;
+    operator=(const ExecutionUtil_UniqueTask&) = delete;
 
   public:
     // CREATORS
