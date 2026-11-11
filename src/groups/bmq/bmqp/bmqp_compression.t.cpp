@@ -872,7 +872,7 @@ static void test4_decompressionSizeLimit()
 //                              PERFORMANCE TESTS
 // ----------------------------------------------------------------------------
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN1_performanceCompressionDecompressionDefault()
 // ------------------------------------------------------------------------
 // PERFORMANCE: Perform compression and decompression.
@@ -969,7 +969,7 @@ static void testN1_performanceCompressionDecompressionDefault()
     printTable(bsl::cout, headerCols, tableRecords);
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN2_calculateThroughput()
 // ------------------------------------------------------------------------
 // BENCHMARK: PERFORM COMPRESSION DECOMPRESSION

@@ -115,7 +115,7 @@ class LegacyHash {
     // MANIPULATORS
     /// Compute the unrolled djb2 hash on the specified `data`. The specified
     /// `numBytes` is not used.
-    void operator()(const void* data, BSLA_MAYBE_UNUSED size_t numBytes)
+    void operator()(const void* data, [[maybe_unused]] size_t numBytes)
     {
         d_result = 5381ULL;
 
@@ -162,7 +162,7 @@ class BaselineHash {
     // MANIPULATORS
     /// Compute the trivial hash of the specified `data`. The specified
     /// `numBytes` is not used.
-    void operator()(const void* data, BSLA_MAYBE_UNUSED size_t numBytes)
+    void operator()(const void* data, [[maybe_unused]] size_t numBytes)
     {
         const bsls::Types::Uint64* start =
             reinterpret_cast<const bsls::Types::Uint64*>(data);
@@ -193,7 +193,7 @@ class Mx3Hash {
     // MANIPULATORS
     /// Compute the hash of the specified `data`. The specified `numBytes` is
     /// not used.
-    void operator()(const void* data, BSLA_MAYBE_UNUSED size_t numBytes)
+    void operator()(const void* data, [[maybe_unused]] size_t numBytes)
     {
         const bsls::Types::Uint64* start =
             reinterpret_cast<const bsls::Types::Uint64*>(data);
@@ -957,7 +957,7 @@ static void test7_customHashUniqueness()
 //                              PERFORMANCE TESTS
 // ----------------------------------------------------------------------------
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN1_decode()
 // ------------------------------------------------------------------------
 // DECODE
@@ -1054,7 +1054,7 @@ static void testN1_decode()
     }
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN2_bmqtPerformance()
 // ------------------------------------------------------------------------
 // PERFORMANCE
@@ -1112,7 +1112,7 @@ static void testN2_bmqtPerformance()
          << endl;
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN2_bdlbPerformance()
 // ------------------------------------------------------------------------
 // PERFORMANCE
@@ -1167,7 +1167,7 @@ static void testN2_bdlbPerformance()
          << " bdlb::Guids per second." << endl;
 }
 
-BSLA_MAYBE_UNUSED static void testN3_defaultHashBenchmark()
+[[maybe_unused]] static void testN3_defaultHashBenchmark()
 // ------------------------------------------------------------------------
 // DEFAULT HASH BENCHMARK
 //
@@ -1190,7 +1190,7 @@ BSLA_MAYBE_UNUSED static void testN3_defaultHashBenchmark()
     benchmarkHash<bsl::hash<bmqt::MessageGUID> >("default");
 }
 
-BSLA_MAYBE_UNUSED static void testN4_customHashBenchmark()
+[[maybe_unused]] static void testN4_customHashBenchmark()
 // ------------------------------------------------------------------------
 // CUSTOM HASH BENCHMARK
 //
@@ -1212,7 +1212,7 @@ BSLA_MAYBE_UNUSED static void testN4_customHashBenchmark()
     benchmarkHash<bslh::Hash<bmqt::MessageGUIDHashAlgo> >("custom");
 }
 
-BSLA_MAYBE_UNUSED static void testN5_hashTableWithDefaultHashBenchmark()
+[[maybe_unused]] static void testN5_hashTableWithDefaultHashBenchmark()
 // ------------------------------------------------------------------------
 // HASH TABLE w/ DEFAULT HASH BENCHMARK
 //
@@ -1262,7 +1262,7 @@ BSLA_MAYBE_UNUSED static void testN5_hashTableWithDefaultHashBenchmark()
          << " insertions per second." << endl;
 }
 
-BSLA_MAYBE_UNUSED static void testN6_hashTableWithCustomHashBenchmark()
+[[maybe_unused]] static void testN6_hashTableWithCustomHashBenchmark()
 // ------------------------------------------------------------------------
 // HASH TABLE w/ CUSTOM HASH BENCHMARK
 //
@@ -1315,7 +1315,7 @@ BSLA_MAYBE_UNUSED static void testN6_hashTableWithCustomHashBenchmark()
          << " insertions per second." << endl;
 }
 
-BSLA_MAYBE_UNUSED static void testN7_orderedMapWithDefaultHashBenchmark()
+[[maybe_unused]] static void testN7_orderedMapWithDefaultHashBenchmark()
 // ------------------------------------------------------------------------
 // ORDERED HASH MAP w/ DEFAULT HASH BENCHMARK
 //
@@ -1366,7 +1366,7 @@ BSLA_MAYBE_UNUSED static void testN7_orderedMapWithDefaultHashBenchmark()
          << " insertions per second." << endl;
 }
 
-BSLA_MAYBE_UNUSED static void testN8_orderedMapWithCustomHashBenchmark()
+[[maybe_unused]] static void testN8_orderedMapWithCustomHashBenchmark()
 // ------------------------------------------------------------------------
 // ORDERED MAP w/ CUSTOM HASH BENCHMARK
 //
@@ -1418,7 +1418,7 @@ BSLA_MAYBE_UNUSED static void testN8_orderedMapWithCustomHashBenchmark()
          << " insertions per second." << endl;
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN9_hashBenchmarkComparison()
 // ------------------------------------------------------------------------
 // HASH BENCHMARK COMPARISON
@@ -1454,7 +1454,7 @@ static void testN9_hashBenchmarkComparison()
     table.print(bsl::cout);
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN10_hashCollisionsComparison()
 // ------------------------------------------------------------------------
 // HASH COLLISIONS COMPARISON

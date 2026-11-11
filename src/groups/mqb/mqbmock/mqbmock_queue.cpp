@@ -103,9 +103,9 @@ void Queue::flush()
 
 // MANIPULATORS
 //   (virtual: mqbi::Queue)
-int Queue::configure(BSLA_MAYBE_UNUSED bsl::ostream* errorDescription_p,
-                     BSLA_MAYBE_UNUSED bool          isReconfigure,
-                     BSLA_MAYBE_UNUSED bool          wait)
+int Queue::configure([[maybe_unused]] bsl::ostream* errorDescription_p,
+                     [[maybe_unused]] bool          isReconfigure,
+                     [[maybe_unused]] bool          wait)
 {
     return 0;
 }
@@ -264,13 +264,13 @@ void Queue::setStopping()
 }
 
 void Queue::onPushMessage(
-    BSLA_MAYBE_UNUSED const bmqt::MessageGUID& msgGUID,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bdlbb::Blob>& appData,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bdlbb::Blob>& options,
-    BSLA_MAYBE_UNUSED const bmqp::MessagePropertiesInfo& hasMessageProperties,
-    BSLA_MAYBE_UNUSED      bmqt::CompressionAlgorithmType::Enum
-                           compressionAlgorithmType,
-    BSLA_MAYBE_UNUSED bool isOutOfOrder)
+    [[maybe_unused]] const bmqt::MessageGUID&            msgGUID,
+    [[maybe_unused]] const bsl::shared_ptr<bdlbb::Blob>& appData,
+    [[maybe_unused]] const bsl::shared_ptr<bdlbb::Blob>& options,
+    [[maybe_unused]] const bmqp::MessagePropertiesInfo&  hasMessageProperties,
+    [[maybe_unused]] bmqt::CompressionAlgorithmType::Enum
+                          compressionAlgorithmType,
+    [[maybe_unused]] bool isOutOfOrder)
 {
     // NOTHING
 }
@@ -347,7 +347,7 @@ int Queue::rejectMessage(const bmqt::MessageGUID& msgGUID,
     return rc;
 }
 
-void Queue::onAckMessage(BSLA_MAYBE_UNUSED const bmqp::AckMessage& ackMessage)
+void Queue::onAckMessage([[maybe_unused]] const bmqp::AckMessage& ackMessage)
 {
     // NOTHING
 }
@@ -357,27 +357,27 @@ void Queue::onLostUpstream()
     // NOTHING
 }
 
-void Queue::onOpenUpstream(BSLA_MAYBE_UNUSED bsls::Types::Uint64 genCount,
-                           BSLA_MAYBE_UNUSED unsigned int        subQueueId,
-                           BSLA_MAYBE_UNUSED bool                isWriterOnly)
+void Queue::onOpenUpstream([[maybe_unused]] bsls::Types::Uint64 genCount,
+                           [[maybe_unused]] unsigned int        subQueueId,
+                           [[maybe_unused]] bool                isWriterOnly)
 {
     // NOTHING
 }
 
-void Queue::onOpenFailure(BSLA_MAYBE_UNUSED unsigned int subQueueId)
+void Queue::onOpenFailure([[maybe_unused]] unsigned int subQueueId)
 {
     // NOTHING
 }
 
-void Queue::onReceipt(BSLA_MAYBE_UNUSED const bmqt::MessageGUID& msgGUID,
-                      BSLA_MAYBE_UNUSED mqbi::QueueHandle* qH)
+void Queue::onReceipt([[maybe_unused]] const bmqt::MessageGUID& msgGUID,
+                      [[maybe_unused]] mqbi::QueueHandle*       qH)
 {
     // NOTHING
 }
 
-void Queue::onRemoval(BSLA_MAYBE_UNUSED const bmqt::MessageGUID& msgGUID,
-                      BSLA_MAYBE_UNUSED mqbi::QueueHandle* qH,
-                      BSLA_MAYBE_UNUSED bmqt::AckResult::Enum result)
+void Queue::onRemoval([[maybe_unused]] const bmqt::MessageGUID& msgGUID,
+                      [[maybe_unused]] mqbi::QueueHandle*       qH,
+                      [[maybe_unused]] bmqt::AckResult::Enum    result)
 {
     // NOTHING
 }
@@ -518,7 +518,7 @@ const bmqp_ctrlmsg::QueueHandleParameters& Queue::handleParameters() const
 
 bool Queue::getUpstreamParameters(
     bmqp_ctrlmsg::StreamParameters* value,
-    BSLA_MAYBE_UNUSED unsigned int  upstreamSubQueueId) const
+    [[maybe_unused]] unsigned int   upstreamSubQueueId) const
 {
     *value = d_streamParameters;
     return true;

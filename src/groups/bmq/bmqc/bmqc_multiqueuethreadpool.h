@@ -823,7 +823,7 @@ inline int MultiQueueThreadPool<TYPE>::start()
     // Set up threads and wait until all have started
     bslmt::Latch latch(d_config.d_numQueues);
     for (size_t i = 0; i < d_queues.size(); ++i) {
-        BSLA_MAYBE_UNUSED const int rc = d_config.d_threadPool_p->enqueueJob(
+        [[maybe_unused]] const int rc = d_config.d_threadPool_p->enqueueJob(
             ThisClass::ProcessQueueJob(&latch, this, d_queues[i]));
         BSLS_ASSERT_SAFE(rc == 0);
     }

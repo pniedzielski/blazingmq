@@ -487,7 +487,7 @@ inline bool operator!=(const OrderedHashMapWithHistory_Iterator<VALUE1>& lhs,
 }
 
 template <class VALUE>
-inline void clean(BSLA_MAYBE_UNUSED VALUE& value)
+inline void clean([[maybe_unused]] VALUE& value)
 {
     // NOTHING
 }

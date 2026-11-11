@@ -547,7 +547,7 @@ void test5_customHashUniqueness()
 //                              PERFORMANCE TESTS
 // ----------------------------------------------------------------------------
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 void testN1_defaultHashBenchmark()
 // ------------------------------------------------------------------------
 // DEFAULT HASH BENCHMARK
@@ -591,7 +591,7 @@ void testN1_defaultHashBenchmark()
          << " hashes per second." << endl;
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 void testN2_customHashBenchmark()
 // ------------------------------------------------------------------------
 // CUSTOM HASH BENCHMARK
@@ -635,7 +635,7 @@ void testN2_customHashBenchmark()
          << " hashes per second." << endl;
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 void testN3_hashTableWithDefaultHashBenchmark()
 // ------------------------------------------------------------------------
 // HASH TABLE w/ DEFAULT HASH BENCHMARK
@@ -681,7 +681,7 @@ void testN3_hashTableWithDefaultHashBenchmark()
          << " insertions per second." << endl;
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 void testN4_hashTableWithCustomHashBenchmark()
 // ------------------------------------------------------------------------
 // HASH TABLE w/ CUSTOM HASH BENCHMARK
@@ -728,7 +728,7 @@ void testN4_hashTableWithCustomHashBenchmark()
          << " insertions per second." << endl;
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 void testN5_orderedMapWithDefaultHashBenchmark()
 // ------------------------------------------------------------------------
 // ORDERED HASH MAP w/ DEFAULT HASH BENCHMARK
@@ -782,7 +782,7 @@ void testN5_orderedMapWithDefaultHashBenchmark()
          << " insertions per second." << endl;
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 void testN6_orderedMapWithCustomHashBenchmark()
 // ------------------------------------------------------------------------
 // ORDERED HASH MAP w/ DEFAULT HASH BENCHMARK

@@ -13,7 +13,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include <bsla_maybeunused.h>
 #include <mqba_adminsession.h>
 
 // MQB
@@ -98,7 +97,7 @@ struct TestAdminRetranslator {
     TestAdminRetranslator() {}
 
     int enqueueCommand(
-        BSLA_MAYBE_UNUSED const bsl::string&            source,
+        [[maybe_unused]] const bsl::string&             source,
         const bsl::string&                              cmd,
         const mqbnet::Session::AdminCommandProcessedCb& onProcessedCb)
     {
@@ -258,7 +257,7 @@ class AsyncAdminExecutor {
     /// Post the completion of the specified `cmd` (with the specified
     /// `onProcessedCb`) to the thread pool.
     void enqueueCommand(
-        BSLA_MAYBE_UNUSED const bsl::string&            source,
+        [[maybe_unused]] const bsl::string&             source,
         const bsl::string&                              cmd,
         const mqbnet::Session::AdminCommandProcessedCb& onProcessedCb)
     {

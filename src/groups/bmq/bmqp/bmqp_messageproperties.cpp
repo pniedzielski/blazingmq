@@ -229,7 +229,7 @@ const MessageProperties::PropertyVariant&
 MessageProperties::getPropertyValue(const Property& property) const
 {
     if (property.d_value.isUnset()) {
-        BSLA_MAYBE_UNUSED bool result = streamInPropertyValue(property);
+        [[maybe_unused]] bool result = streamInPropertyValue(property);
         BSLS_ASSERT_SAFE(result);
         // We assert 'true' result because the length and offset have already
         // been checked.
@@ -241,7 +241,7 @@ const MessageProperties::PropertyVariant&
 MessageProperties::getPropertyValueAsString(const Property& property) const
 {
     if (property.d_value.isUnset()) {
-        BSLA_MAYBE_UNUSED bool result = streamInPropertyValue(property);
+        [[maybe_unused]] bool result = streamInPropertyValue(property);
         BSLS_ASSERT_SAFE(result);
         // We assert 'true' result because the length and offset have already
         // been checked.
@@ -954,7 +954,7 @@ MessageProperties::streamOut(bdlbb::BlobBufferFactory*          bufferFactory,
          ++cit) {
         const Property& p = cit->second;
         if (p.d_value.isUnset() && p.d_isValid) {
-            BSLA_MAYBE_UNUSED bool result = streamInPropertyValue(p);
+            [[maybe_unused]] bool result = streamInPropertyValue(p);
             BSLS_ASSERT(result);
         }
     }

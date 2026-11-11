@@ -206,8 +206,8 @@ int ClusterStateLedger::apply(
     return -1;
 }
 
-int ClusterStateLedger::apply(BSLA_MAYBE_UNUSED const bdlbb::Blob& record,
-                              BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+int ClusterStateLedger::apply([[maybe_unused]] const bdlbb::Blob&   record,
+                              [[maybe_unused]] mqbnet::ClusterNode* source)
 {
     // executed by the *CLUSTER DISPATCHER* thread
 

@@ -171,8 +171,8 @@ StatController::StatContextDetails::StatContextDetails(
 }
 
 StatController::StatContextDetails::StatContextDetails(
-    const StatContextDetails& rhs,
-    BSLA_MAYBE_UNUSED bslma::Allocator* allocator_p)
+    const StatContextDetails&          rhs,
+    [[maybe_unused]] bslma::Allocator* allocator_p)
 : d_statContext_sp(rhs.d_statContext_sp)
 , d_managed(rhs.d_managed)
 {

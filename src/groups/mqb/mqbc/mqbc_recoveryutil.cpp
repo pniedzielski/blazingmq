@@ -86,9 +86,9 @@ int RecoveryUtil::loadFileDescriptors(mqbs::MappedFileDescriptor* journalFd,
 }
 
 void RecoveryUtil::validateArgs(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::PartitionSequenceNumber& beginSeqNum,
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::PartitionSequenceNumber& endSeqNum,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* destination)
+    [[maybe_unused]] const bmqp_ctrlmsg::PartitionSequenceNumber& beginSeqNum,
+    [[maybe_unused]] const bmqp_ctrlmsg::PartitionSequenceNumber& endSeqNum,
+    [[maybe_unused]] mqbnet::ClusterNode*                         destination)
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(beginSeqNum < endSeqNum);

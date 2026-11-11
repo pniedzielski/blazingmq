@@ -211,8 +211,8 @@ struct Iterator<bmqp::PushEventBuilder> : bmqp::PushMessageIterator {
 
 template <>
 struct Iterator<bmqp::AckEventBuilder> : bmqp::AckMessageIterator {
-    Iterator(BSLA_MAYBE_UNUSED bdlbb::BlobBufferFactory* bufferFactory,
-             BSLA_MAYBE_UNUSED bslma::Allocator* allocator)
+    Iterator([[maybe_unused]] bdlbb::BlobBufferFactory* bufferFactory,
+             [[maybe_unused]] bslma::Allocator*         allocator)
     {
         // NOTHING
     }
@@ -225,8 +225,8 @@ struct Iterator<bmqp::AckEventBuilder> : bmqp::AckMessageIterator {
 
 template <>
 struct Iterator<bmqp::ConfirmEventBuilder> : bmqp::ConfirmMessageIterator {
-    Iterator(BSLA_MAYBE_UNUSED bdlbb::BlobBufferFactory* bufferFactory,
-             BSLA_MAYBE_UNUSED bslma::Allocator* allocator)
+    Iterator([[maybe_unused]] bdlbb::BlobBufferFactory* bufferFactory,
+             [[maybe_unused]] bslma::Allocator*         allocator)
     {
         // NOTHING
     }
@@ -239,8 +239,8 @@ struct Iterator<bmqp::ConfirmEventBuilder> : bmqp::ConfirmMessageIterator {
 
 template <>
 struct Iterator<bmqp::RejectEventBuilder> : bmqp::RejectMessageIterator {
-    Iterator(BSLA_MAYBE_UNUSED bdlbb::BlobBufferFactory* bufferFactory,
-             BSLA_MAYBE_UNUSED bslma::Allocator* allocator)
+    Iterator([[maybe_unused]] bdlbb::BlobBufferFactory* bufferFactory,
+             [[maybe_unused]] bslma::Allocator*         allocator)
     {
         // NOTHING
     }
@@ -256,8 +256,8 @@ struct Iterator<PseudoBuilder> {
     const bdlbb::Blob* d_blob;
     int                d_next;
 
-    Iterator(BSLA_MAYBE_UNUSED bdlbb::BlobBufferFactory* bufferFactory,
-             BSLA_MAYBE_UNUSED bslma::Allocator* allocator)
+    Iterator([[maybe_unused]] bdlbb::BlobBufferFactory* bufferFactory,
+             [[maybe_unused]] bslma::Allocator*         allocator)
     : d_blob(0)
     , d_next(0)
     {

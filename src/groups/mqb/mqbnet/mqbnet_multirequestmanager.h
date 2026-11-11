@@ -496,7 +496,7 @@ void MultiRequestManager<TARGET>::sendRequest(const RequestContextSp& context,
             numRequests = --(context->d_numOutstandingRequests);
 
             bmqp_ctrlmsg::Status& failure = it->second.choice().makeStatus();
-            BSLA_MAYBE_UNUSED const int rc =
+            [[maybe_unused]] const int rc =
                 bmqp_ctrlmsg::StatusCategory::fromInt(
                     &failure.category(),
                     static_cast<int>(sendRc));
@@ -549,8 +549,8 @@ inline void MultiRequestManager<TARGET>::setGroupId(
 
 template <class TARGET>
 inline void MultiRequestManager<TARGET>::setGroupId(
-    BSLA_MAYBE_UNUSED RequestSp& context,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<mqbnet::Session>& target) const
+    [[maybe_unused]] RequestSp&                              context,
+    [[maybe_unused]] const bsl::shared_ptr<mqbnet::Session>& target) const
 {
     // NOTHING
 }

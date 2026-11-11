@@ -524,7 +524,7 @@ inline bmqst::StatContext* QueueStatsDomain::statContext()
 
 template <>
 inline void QueueStatsDomain::onEvent<QueueStatsDomain::EventType::e_ACK>(
-    BSLA_MAYBE_UNUSED bsls::Types::Int64 value)
+    [[maybe_unused]] bsls::Types::Int64 value)
 {
     BSLS_ASSERT_SAFE(d_statContext_mp && "initialize was not called");
     d_statContext_mp->adjustValue(DomainQueueStats::e_STAT_ACK, 1);
@@ -540,7 +540,7 @@ inline void QueueStatsDomain::onEvent<QueueStatsDomain::EventType::e_ACK_TIME>(
 
 template <>
 inline void QueueStatsDomain::onEvent<QueueStatsDomain::EventType::e_NACK>(
-    BSLA_MAYBE_UNUSED bsls::Types::Int64 value)
+    [[maybe_unused]] bsls::Types::Int64 value)
 {
     BSLS_ASSERT_SAFE(d_statContext_mp && "initialize was not called");
     // For NACK, we don't care about the bytes value
@@ -549,7 +549,7 @@ inline void QueueStatsDomain::onEvent<QueueStatsDomain::EventType::e_NACK>(
 
 template <>
 inline void QueueStatsDomain::onEvent<QueueStatsDomain::EventType::e_CONFIRM>(
-    BSLA_MAYBE_UNUSED bsls::Types::Int64 value)
+    [[maybe_unused]] bsls::Types::Int64 value)
 {
     BSLS_ASSERT_SAFE(d_statContext_mp && "initialize was not called");
     // For CONFIRM, we don't care about the bytes value
@@ -568,7 +568,7 @@ QueueStatsDomain::onEvent<QueueStatsDomain::EventType::e_CONFIRM_TIME>(
 
 template <>
 inline void QueueStatsDomain::onEvent<QueueStatsDomain::EventType::e_REJECT>(
-    BSLA_MAYBE_UNUSED bsls::Types::Int64 value)
+    [[maybe_unused]] bsls::Types::Int64 value)
 {
     BSLS_ASSERT_SAFE(d_statContext_mp && "initialize was not called");
     // For REJECT, we don't care about the bytes value
@@ -639,7 +639,7 @@ QueueStatsDomain::onEvent<QueueStatsDomain::EventType::e_GC_MESSAGE>(
 
 template <>
 inline void QueueStatsDomain::onEvent<QueueStatsDomain::EventType::e_PURGE>(
-    BSLA_MAYBE_UNUSED bsls::Types::Int64 value)
+    [[maybe_unused]] bsls::Types::Int64 value)
 {
     BSLS_ASSERT_SAFE(d_statContext_mp && "initialize was not called");
     // NOTE: Setting the value like that will cause weird results if using

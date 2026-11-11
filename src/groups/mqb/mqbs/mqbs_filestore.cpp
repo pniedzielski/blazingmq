@@ -3658,8 +3658,8 @@ void FileStore::gc(FileSet* fileSet)
                                  fileSet));
 }
 
-void FileStore::gcDispatched(BSLA_MAYBE_UNUSED int partitionId,
-                             FileSet*              fileSet)
+void FileStore::gcDispatched([[maybe_unused]] int partitionId,
+                             FileSet*             fileSet)
 {
     // executed by the *DISPATCHER* thread
 
@@ -3713,7 +3713,7 @@ void FileStore::gcDispatched(BSLA_MAYBE_UNUSED int partitionId,
     // file set.
     d_fileSets.erase(it);
 
-    BSLA_MAYBE_UNUSED const int rc = d_miscWorkThreadPool_p->enqueueJob(
+    [[maybe_unused]] const int rc = d_miscWorkThreadPool_p->enqueueJob(
         bdlf::BindUtil::bind(&FileStore::gcWorkerDispatched, this, fileSetSp));
     BSLS_ASSERT_SAFE(rc == 0);
 }
@@ -4232,7 +4232,7 @@ void FileStore::alarmHighwatermarkIfNeededDispatched()
     }
 }
 
-void FileStore::issueSyncPointDispatched(BSLA_MAYBE_UNUSED int partitionId)
+void FileStore::issueSyncPointDispatched([[maybe_unused]] int partitionId)
 {
     // executed by the *DISPATCHER* thread
 

@@ -121,20 +121,20 @@ int extractLogIdCallback(mqbu::StorageKey*                      logId,
 }
 
 int validateLogCallback(
-    mqbsi::Log::Offset*     offset,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<mqbsi::Log>& log)
+    mqbsi::Log::Offset*                                 offset,
+    [[maybe_unused]] const bsl::shared_ptr<mqbsi::Log>& log)
 {
     *offset = mqbu::StorageKey::e_KEY_LENGTH_BINARY + k_DUMMY_LOG_MESSAGE_LEN;
     return 0;
 }
 
-int cleanupCallback(BSLA_MAYBE_UNUSED const bsl::string& logPath)
+int cleanupCallback([[maybe_unused]] const bsl::string& logPath)
 {
     return 0;
 }
 
-int onRolloverCallback(BSLA_MAYBE_UNUSED const mqbu::StorageKey& oldLogId,
-                       BSLA_MAYBE_UNUSED const mqbu::StorageKey& newLogId)
+int onRolloverCallback([[maybe_unused]] const mqbu::StorageKey& oldLogId,
+                       [[maybe_unused]] const mqbu::StorageKey& newLogId)
 {
     return 0;
 }

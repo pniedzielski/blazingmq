@@ -582,7 +582,7 @@ inline mqbi::DispatcherClientData& Cluster::dispatcherClientData()
 
 // MANIPULATORS
 inline void Cluster::processResponse(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& response)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& response)
 {
     // NOTHING
 }

@@ -183,8 +183,8 @@ mqbi::QueueHandle* QueueHandleCatalog::createHandle(
         d_allocator_p);
 
     // Insert handle into map
-    BSLA_MAYBE_UNUSED bsl::pair<HandleMap::iterator, HandleMap::InsertResult>
-                      insertResult = d_handles.insert(
+    [[maybe_unused]] bsl::pair<HandleMap::iterator, HandleMap::InsertResult>
+        insertResult = d_handles.insert(
             handle,
             bsl::make_pair(clientContext->requesterId(),
                            handleParameters.qId()),

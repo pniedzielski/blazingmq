@@ -1853,7 +1853,7 @@ static void test11_persistanceFollower()
     BMQTST_ASSERT(!cslIter->isValid());
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void test12_persistanceAcrossRolloverLeader()
 // ------------------------------------------------------------------------
 // PERSISTENCE ACROSS ROLLOVER LEADER

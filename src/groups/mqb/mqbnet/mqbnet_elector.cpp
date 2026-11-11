@@ -438,9 +438,9 @@ void ElectorStateMachine::applyLeadershipCessionEventToFollower(
 }
 
 void ElectorStateMachine::applyLeadershipCessionEventToCandidate(
-    BSLA_MAYBE_UNUSED ElectorStateMachineOutput* out,
-    bsls::Types::Uint64                          term,
-    int                                          sourceNodeId)
+    [[maybe_unused]] ElectorStateMachineOutput* out,
+    bsls::Types::Uint64                         term,
+    int                                         sourceNodeId)
 {
     if (ElectorState::e_CANDIDATE != d_state) {
         return;  // RETURN
@@ -801,9 +801,9 @@ void ElectorStateMachine::applyElectionProposalEventToCandidate(
 }
 
 void ElectorStateMachine::applyElectionProposalEventToLeader(
-    BSLA_MAYBE_UNUSED ElectorStateMachineOutput* out,
-    bsls::Types::Uint64                          term,
-    int                                          sourceNodeId)
+    [[maybe_unused]] ElectorStateMachineOutput* out,
+    bsls::Types::Uint64                         term,
+    int                                         sourceNodeId)
 {
     // Support the notion of sticky leader: since self is a healthy leader (has
     // quorum and has not received any stale heartbeat response from any
@@ -817,9 +817,9 @@ void ElectorStateMachine::applyElectionProposalEventToLeader(
 }
 
 void ElectorStateMachine::applyElectionResponseEventToFollower(
-    BSLA_MAYBE_UNUSED ElectorStateMachineOutput* out,
-    bsls::Types::Uint64                          term,
-    int                                          sourceNodeId)
+    [[maybe_unused]] ElectorStateMachineOutput* out,
+    bsls::Types::Uint64                         term,
+    int                                         sourceNodeId)
 {
     // This could occur as follows:
     // 1) This node initiates election
@@ -1061,9 +1061,9 @@ void ElectorStateMachine::applyNodeStatusEventToFollower(
 }
 
 void ElectorStateMachine::applyNodeStatusEventToCandidate(
-    BSLA_MAYBE_UNUSED ElectorStateMachineOutput* out,
-    ElectorIOEventType::Enum                     event,
-    int                                          sourceNodeId)
+    [[maybe_unused]] ElectorStateMachineOutput* out,
+    ElectorIOEventType::Enum                    event,
+    int                                         sourceNodeId)
 {
     BSLS_ASSERT_SAFE(ElectorIOEventType::e_NODE_UNAVAILABLE == event ||
                      ElectorIOEventType::e_NODE_AVAILABLE == event);
@@ -1320,10 +1320,10 @@ void ElectorStateMachine::applyScoutingRequestEvent(
 }
 
 void ElectorStateMachine::applyScoutingResponseEvent(
-    ElectorStateMachineOutput* out,
-    bool                       willVote,
-    BSLA_MAYBE_UNUSED bsls::Types::Uint64 term,
-    int                                   sourceNodeId)
+    ElectorStateMachineOutput*           out,
+    bool                                 willVote,
+    [[maybe_unused]] bsls::Types::Uint64 term,
+    int                                  sourceNodeId)
 {
     if (!isValidSourceNode(sourceNodeId)) {
         return;  // RETURN

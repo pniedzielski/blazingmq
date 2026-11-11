@@ -54,7 +54,7 @@ MessageIterator MessageEvent::messageIterator() const
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_impl_sp);
 
-    BSLA_MAYBE_UNUSED const bmqp::Event& rawEvent = d_impl_sp->rawEvent();
+    [[maybe_unused]] const bmqp::Event& rawEvent = d_impl_sp->rawEvent();
 
     BSLS_ASSERT(rawEvent.isAckEvent() || rawEvent.isPushEvent() ||
                 rawEvent.isPutEvent());

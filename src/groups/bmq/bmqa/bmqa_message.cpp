@@ -310,7 +310,7 @@ int Message::ackStatus() const
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(isInitialized());
 
-    BSLA_MAYBE_UNUSED const bmqp::Event& rawEvent =
+    [[maybe_unused]] const bmqp::Event& rawEvent =
         d_impl.d_event_p->rawEvent();
 
     BSLS_ASSERT_SAFE(rawEvent.isAckEvent() &&

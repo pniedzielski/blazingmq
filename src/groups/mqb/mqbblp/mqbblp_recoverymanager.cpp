@@ -229,7 +229,7 @@ void RecoveryManager_PrimarySyncContext::clear()
 
 // ACCESSORS
 void RecoveryManager_ChunkDeleter::operator()(
-    BSLA_MAYBE_UNUSED const void* ptr) const
+    [[maybe_unused]] const void* ptr) const
 {
     // executed by *ANY* thread
 

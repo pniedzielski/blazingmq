@@ -805,7 +805,7 @@ template <class TYPE>
 inline void
 BlobObjectProxy<TYPE>::loadEndPosition(bmqu::BlobPosition* pos) const
 {
-    BSLA_MAYBE_UNUSED int ret =
+    [[maybe_unused]] int ret =
         bmqu::BlobUtil::findOffset(pos, *d_blob_p, d_position, d_length);
     // This should never fail since 'isSet()' will only be true if there are
     // 'd_length' bytes in the blob.

@@ -553,7 +553,7 @@ static void test7_configureStatContextTableInfoProvider_part2()
     }
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN1_performance_allocation()
 // ------------------------------------------------------------------------
 // PERFORMANCE - allocation (microbenchmark)

@@ -365,8 +365,8 @@ QueueInfo<VALUE>::insert(const bsl::string& appId,
     iterator itStream(result.first);
 
     for (size_t i = 0; i < subscriptions.size(); ++i) {
-        BSLA_MAYBE_UNUSED bsl::pair<typename SubscriptionsMap::iterator, bool>
-                          insertRC = d_subscriptions.insert(
+        [[maybe_unused]] bsl::pair<typename SubscriptionsMap::iterator, bool>
+            insertRC = d_subscriptions.insert(
                 bsl::make_pair(subscriptions[i], itStream));
         BSLS_ASSERT_SAFE(insertRC.second);
     }
@@ -562,8 +562,8 @@ inline void QueueInfo<VALUE>::addSubscriptions(
     for (Subscriptions::const_iterator it = subscriptions.begin();
          it != subscriptions.end();
          ++it) {
-        BSLA_MAYBE_UNUSED bsl::pair<typename SubscriptionsMap::iterator, bool>
-                          insertRC = d_subscriptions.insert(
+        [[maybe_unused]] bsl::pair<typename SubscriptionsMap::iterator, bool>
+            insertRC = d_subscriptions.insert(
                 bsl::make_pair(it->sId(), itStream));
         BSLS_ASSERT_SAFE(insertRC.second);
     }

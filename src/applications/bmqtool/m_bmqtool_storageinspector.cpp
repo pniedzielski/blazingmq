@@ -399,7 +399,7 @@ void StorageInspector::processCommand(const OpenStorageCommand& command)
 }
 
 void StorageInspector::processCommand(
-    BSLA_MAYBE_UNUSED const CloseStorageCommand& command)
+    [[maybe_unused]] const CloseStorageCommand& command)
 {
     if (!d_isOpen) {
         BALL_LOG_ERROR << "No storage is open";
@@ -427,7 +427,7 @@ void StorageInspector::processCommand(
 }
 
 void StorageInspector::processCommand(
-    BSLA_MAYBE_UNUSED const MetadataCommand& command)
+    [[maybe_unused]] const MetadataCommand& command)
 {
     bool x;
 
@@ -548,7 +548,7 @@ void StorageInspector::processCommand(
 }
 
 void StorageInspector::processCommand(
-    BSLA_MAYBE_UNUSED const ListQueuesCommand& command)
+    [[maybe_unused]] const ListQueuesCommand& command)
 {
     if (!d_qlistFd.isValid()) {
         BALL_LOG_INFO << "Qlist file is not open.";

@@ -538,7 +538,7 @@ class MyQueueEngine : public mqbmock::QueueEngine {
 
     // MANIPULATORS
     void
-    configureHandle(BSLA_MAYBE_UNUSED mqbi::QueueHandle*  handle,
+    configureHandle([[maybe_unused]] mqbi::QueueHandle*   handle,
                     const bmqp_ctrlmsg::StreamParameters& streamParameters,
                     const mqbi::QueueHandle::HandleConfiguredCallback&
                         configuredCb) override
@@ -2184,7 +2184,7 @@ static void test11_initiateShutdown()
         mqbi::StorageMessageAttributes d_messageAttributes;
 
         // CREATORS
-        MockStorageIterator(BSLA_MAYBE_UNUSED bslma::Allocator* allocator = 0)
+        MockStorageIterator([[maybe_unused]] bslma::Allocator* allocator = 0)
         : d_guid(bmqp::MessageGUIDGenerator::testGUID())
         , d_appMessage(bmqp::RdaInfo())
         , d_appData()
@@ -2220,14 +2220,14 @@ static void test11_initiateShutdown()
 
         const bmqt::MessageGUID& guid() const override { return d_guid; }
 
-        const mqbi::AppMessage& appMessageView(
-            BSLA_MAYBE_UNUSED unsigned int appOrdinal) const override
+        const mqbi::AppMessage&
+        appMessageView([[maybe_unused]] unsigned int appOrdinal) const override
         {
             return d_appMessage;
         }
 
         mqbi::AppMessage&
-        appMessageState(BSLA_MAYBE_UNUSED unsigned int appOrdinal) override
+        appMessageState([[maybe_unused]] unsigned int appOrdinal) override
         {
             return d_appMessage;
         }

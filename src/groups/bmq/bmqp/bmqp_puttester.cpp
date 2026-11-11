@@ -159,7 +159,7 @@ void PutTester::populateBlob(bdlbb::Blob*              blob,
                                               0,  // no output cap
                                               &error,
                                               allocator);
-                BSLA_MAYBE_UNUSED int compare =
+                [[maybe_unused]] int compare =
                     bdlbb::BlobUtil::compare(dummy, data.d_appData);
                 BSLS_ASSERT_SAFE(compare == 0);
             }
@@ -278,7 +278,7 @@ void PutTester::populateBlob(bdlbb::Blob*             blob,
                                     &error,
                                     allocator);
         int                   padding = 0;
-        BSLA_MAYBE_UNUSED int numWords =
+        [[maybe_unused]] int  numWords =
             bmqp::ProtocolUtil::calcNumWordsAndPadding(
                 &padding,
                 compressedBlob.length());
@@ -463,7 +463,7 @@ void PutTester::populateBlob(bdlbb::Blob*                   blob,
                                eh->headerWords() *
                                    bmqp::Protocol::k_WORD_SIZE);
 
-    BSLA_MAYBE_UNUSED int rc = bmqu::BlobUtil::findOffsetSafe(
+    [[maybe_unused]] int rc = bmqu::BlobUtil::findOffsetSafe(
         &pos,
         *blob,
         bmqu::BlobPosition(),

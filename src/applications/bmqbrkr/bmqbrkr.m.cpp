@@ -460,8 +460,8 @@ static void shutdownTask(TaskEnvironment* taskEnv)
 /// the specified `errorDescription` with a description of the error
 /// otherwise.
 static int
-initializeApplication(BSLA_MAYBE_UNUSED bsl::ostream& errorDescription,
-                      TaskEnvironment*                taskEnv)
+initializeApplication([[maybe_unused]] bsl::ostream& errorDescription,
+                      TaskEnvironment*               taskEnv)
 {
     m_bmqbrkr::Task& task = taskEnv->d_task.object();
 

@@ -649,8 +649,8 @@ void ClusterStateManager::onLeaderSyncDataQueryResponse(
 // PRIVATE MANIPULATORS
 //   (virtual: mqbc::ElectorInfoObserver)
 void ClusterStateManager::onClusterLeader(
-    mqbnet::ClusterNode* node,
-    BSLA_MAYBE_UNUSED mqbc::ElectorInfoLeaderStatus::Enum status)
+    mqbnet::ClusterNode*                                 node,
+    [[maybe_unused]] mqbc::ElectorInfoLeaderStatus::Enum status)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -1227,22 +1227,22 @@ void ClusterStateManager::processLeaderSyncDataQuery(
 }
 
 void ClusterStateManager::processFollowerLSNRequest(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     BSLS_ASSERT_OPT(false && "This method should only be invoked in CSL mode");
 }
 
 void ClusterStateManager::processFollowerClusterStateRequest(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     BSLS_ASSERT_OPT(false && "This method should only be invoked in CSL mode");
 }
 
 void ClusterStateManager::processRegistrationRequest(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     BSLS_ASSERT_OPT(false && "This method should only be invoked in CSL mode");
 }
@@ -1274,7 +1274,7 @@ void ClusterStateManager::processShutdownEvent()
 }
 
 void ClusterStateManager::onNodeUnavailable(
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* node)
+    [[maybe_unused]] mqbnet::ClusterNode* node)
 {
     BSLS_ASSERT_OPT(false && "This method should only be invoked in CSL mode");
 }

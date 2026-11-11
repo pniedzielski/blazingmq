@@ -221,8 +221,8 @@ struct Start : public Operation {
     /// Applies the actual operation using the specified `model` and
     /// `tester`.
     MaybeError operator()(
-        BSLA_MAYBE_UNUSED ActiveConsumersModel* model,
-        BSLA_MAYBE_UNUSED mqbblp::QueueEngineTester* tester) const override
+        [[maybe_unused]] ActiveConsumersModel*      model,
+        [[maybe_unused]] mqbblp::QueueEngineTester* tester) const override
     {
         return MaybeError();
     }
@@ -392,8 +392,8 @@ struct SetCanDeliver : public ClientOperation {
 
     // MANIPULATORS
     MaybeError operator()(
-        ActiveConsumersModel* model,
-        BSLA_MAYBE_UNUSED mqbblp::QueueEngineTester* tester) const override
+        ActiveConsumersModel*                       model,
+        [[maybe_unused]] mqbblp::QueueEngineTester* tester) const override
     {
         // Applies the actual operation using the specified 'model' and
         // 'tester'.
@@ -484,8 +484,8 @@ struct Post : public Operation {
 };
 
 MaybeError checkReceivedForConsumers(
-    const ActiveConsumersModel& model,
-    BSLA_MAYBE_UNUSED const mqbblp::QueueEngineTester& tester)
+    const ActiveConsumersModel&                       model,
+    [[maybe_unused]] const mqbblp::QueueEngineTester& tester)
 {
     // Check, using the specified model and tester, that everyone who is
     // currently active, has the expected number of messages.  Returns 'null'
@@ -729,7 +729,7 @@ static void test2_broadcastConfirmAssertFails()
     mqbblp::QueueEngineTesterGuard<mqbblp::RootQueueEngine> guard(&tester);
 
     // 1) 1 consumer
-    BSLA_MAYBE_UNUSED mqbmock::QueueHandle* C1 = tester.getHandle(
+    [[maybe_unused]] mqbmock::QueueHandle* C1 = tester.getHandle(
         "C1 readCount=1");
     tester.configureHandle("C1 consumerPriority=-1 consumerPriorityCount=1");
 

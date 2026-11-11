@@ -395,14 +395,14 @@ struct ExecutionUtil {
 // PRIVATE ACCESSORS
 template <class R, class F>
 inline void ExecutionUtil_FunctionRef<R, F>::invoke(
-    BSLA_MAYBE_UNUSED bsl::true_type voidResultTag) const
+    [[maybe_unused]] bsl::true_type voidResultTag) const
 {
     bsl::forward<F> (*d_function_p)();
 }
 
 template <class R, class F>
 inline R ExecutionUtil_FunctionRef<R, F>::invoke(
-    BSLA_MAYBE_UNUSED bsl::false_type voidResultTag) const
+    [[maybe_unused]] bsl::false_type voidResultTag) const
 {
     return bsl::forward<F>(*d_function_p)();
 }
@@ -431,14 +431,14 @@ inline R ExecutionUtil_FunctionRef<R, F>::operator()() const
 // PRIVATE ACCESSORS
 template <class R, class F>
 inline void ExecutionUtil_OneOffFunction<R, F>::invoke(
-    BSLA_MAYBE_UNUSED bsl::true_type voidResultTag)
+    [[maybe_unused]] bsl::true_type voidResultTag)
 {
     bslmf::Util::moveIfSupported(d_functionValue.object().value())();
 }
 
 template <class R, class F>
 inline R ExecutionUtil_OneOffFunction<R, F>::invoke(
-    BSLA_MAYBE_UNUSED bsl::false_type voidResultTag)
+    [[maybe_unused]] bsl::false_type voidResultTag)
 {
     return bslmf::Util::moveIfSupported(d_functionValue.object().value())();
 }

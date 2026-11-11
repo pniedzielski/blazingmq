@@ -1016,8 +1016,8 @@ void TestSession::openQueue(bsl::shared_ptr<bmqimp::Queue> queue,
 }
 
 void TestSession::reopenQueue(
-    bsl::shared_ptr<bmqimp::Queue> queue,
-    BSLA_MAYBE_UNUSED const bsls::TimeInterval& timeout)
+    bsl::shared_ptr<bmqimp::Queue>             queue,
+    [[maybe_unused]] const bsls::TimeInterval& timeout)
 {
     BMQTST_ASSERT(queue);
 
@@ -2224,7 +2224,7 @@ void TestSession::setChannelLowWaterMark(
 void TestSession::clearWriteCalls()
 {
     while (d_testChannel.numWriteCalls() > 0) {
-        BSLA_MAYBE_UNUSED bmqio::TestChannel::WriteCall call =
+        [[maybe_unused]] bmqio::TestChannel::WriteCall call =
             d_testChannel.popWriteCall();
     }
 }

@@ -549,7 +549,7 @@ bsl::shared_ptr<Event> EventQueue::popFront()
 
     // Look in the queue
     QueueItem                   item;
-    BSLA_MAYBE_UNUSED const int rc = d_queue.popFront(&item);
+    [[maybe_unused]] const int  rc = d_queue.popFront(&item);
     BSLS_ASSERT_SAFE(rc == 0);
     event = item.d_event_sp;
     afterEventPopped(item);

@@ -148,8 +148,8 @@ void poolCreateEvent(void*                     address,
     new (address) Event(bufferFactory, allocator);
 }
 
-void callbackAdapter(const bsl::function<void()>& f,
-                     BSLA_MAYBE_UNUSED const bsl::shared_ptr<Event>& eventSp)
+void callbackAdapter(const bsl::function<void()>&                   f,
+                     [[maybe_unused]] const bsl::shared_ptr<Event>& eventSp)
 {
     // See the comment in 'postToFsm'.
     f();
@@ -176,8 +176,8 @@ void applyQueueSuspension(const bsl::shared_ptr<Queue>& queueSp, bool value)
     }
 }
 
-void releaseSemaphore(bslmt::Semaphore*       semaphore,
-                      BSLA_MAYBE_UNUSED const bsl::shared_ptr<Event>& eventSp)
+void releaseSemaphore(bslmt::Semaphore*                              semaphore,
+                      [[maybe_unused]] const bsl::shared_ptr<Event>& eventSp)
 {
     // executed by the FSM thread
 
@@ -194,7 +194,7 @@ void fillDTSpanQueueBaggage(bmqpi::DTSpan::Baggage* baggage,
     baggage->put("bmq.queue.uri", queue.uri().asString());
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 bool isConfigure(const bmqp_ctrlmsg::ControlMessage& request,
                  const bmqp_ctrlmsg::ControlMessage& response)
 {
@@ -205,14 +205,14 @@ bool isConfigure(const bmqp_ctrlmsg::ControlMessage& request,
                : false;
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 bool isConfigure(const bmqp_ctrlmsg::ControlMessage& request)
 {
     return request.choice().isConfigureStreamValue() ||
            request.choice().isConfigureQueueStreamValue();
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 bool isConfigureResponse(const bmqp_ctrlmsg::ControlMessage& response)
 {
     return response.choice().isConfigureStreamResponseValue() ||
@@ -3116,7 +3116,7 @@ BrokerSession::sendRequest(const RequestSp&     context,
 
     BSLS_ASSERT_SAFE(d_fsmThreadChecker.inSameThread());
 
-    BSLA_MAYBE_UNUSED const bool isDisconnect =
+    [[maybe_unused]] const bool isDisconnect =
         context->request().choice().isDisconnectValue();
 
     // For all requests except disconnect the d_acceptRequests should be true
@@ -3195,7 +3195,7 @@ void BrokerSession::fsmThreadLoop()
     while (true) {
         bsl::shared_ptr<Event> event;
 
-        BSLA_MAYBE_UNUSED const int rc = d_fsmEventQueue.popFront(&event);
+        [[maybe_unused]] const int rc = d_fsmEventQueue.popFront(&event);
         BSLS_ASSERT_SAFE(rc == 0);
         if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!event)) {  // PoisonPill
             BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
@@ -4247,7 +4247,7 @@ BrokerSession::sendDeconfigureRequest(const bsl::shared_ptr<Queue>& queue,
 }
 
 void BrokerSession::doHandleStartTimeout(
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<Event>& eventSp)
+    [[maybe_unused]] const bsl::shared_ptr<Event>& eventSp)
 {
     // executed by the FSM thread
     // PRECONDITIONS
@@ -4257,7 +4257,7 @@ void BrokerSession::doHandleStartTimeout(
 }
 
 void BrokerSession::doHandlePendingPutExpirationTimeout(
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<Event>& eventSp)
+    [[maybe_unused]] const bsl::shared_ptr<Event>& eventSp)
 {
     // executed by the FSM thread
     // PRECONDITIONS
@@ -4297,8 +4297,8 @@ void BrokerSession::doHandlePendingPutExpirationTimeout(
 }
 
 void BrokerSession::doHandleChannelWatermark(
-    bmqio::ChannelWatermarkType::Enum type,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<Event>& eventSp)
+    bmqio::ChannelWatermarkType::Enum              type,
+    [[maybe_unused]] const bsl::shared_ptr<Event>& eventSp)
 {
     // executed by the FSM thread
 
@@ -4988,10 +4988,10 @@ BrokerSession::enqueueFsmEvent(bsl::shared_ptr<Event>& event)
 }
 
 void BrokerSession::doStart(
-    bslmt::Semaphore*       semaphore,
-    int*                    status,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<Event>& eventSp,
-    const bsl::shared_ptr<bmqpi::DTSpan>&           span)
+    bslmt::Semaphore*                              semaphore,
+    int*                                           status,
+    [[maybe_unused]] const bsl::shared_ptr<Event>& eventSp,
+    const bsl::shared_ptr<bmqpi::DTSpan>&          span)
 {
     // executed by the FSM thread
     // PRECONDITIONS
@@ -5034,8 +5034,8 @@ void BrokerSession::doStart(
 }
 
 void BrokerSession::doStop(
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<Event>& eventSp,
-    const bsl::shared_ptr<bmqpi::DTSpan>&           span)
+    [[maybe_unused]] const bsl::shared_ptr<Event>& eventSp,
+    const bsl::shared_ptr<bmqpi::DTSpan>&          span)
 {
     // executed by the FSM thread
     // PRECONDITIONS
@@ -5050,11 +5050,11 @@ void BrokerSession::doStop(
 }
 
 void BrokerSession::doOpenQueue(
-    const bsl::shared_ptr<Queue>& queue,
-    const bsls::TimeInterval      timeout,
-    const FsmCallback&            fsmCallback,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<Event>& eventSp,
-    const bsl::shared_ptr<bmqpi::DTSpan>&           span)
+    const bsl::shared_ptr<Queue>&                  queue,
+    const bsls::TimeInterval                       timeout,
+    const FsmCallback&                             fsmCallback,
+    [[maybe_unused]] const bsl::shared_ptr<Event>& eventSp,
+    const bsl::shared_ptr<bmqpi::DTSpan>&          span)
 {
     // executed by the FSM thread
     // PRECONDITIONS
@@ -5091,12 +5091,12 @@ void BrokerSession::doOpenQueue(
 }
 
 void BrokerSession::doConfigureQueue(
-    const bsl::shared_ptr<Queue>& queue,
-    const bmqt::QueueOptions&     options,
-    const bsls::TimeInterval      timeout,
-    const FsmCallback&            fsmCallback,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<Event>& eventSp,
-    const bsl::shared_ptr<bmqpi::DTSpan>&           span)
+    const bsl::shared_ptr<Queue>&                  queue,
+    const bmqt::QueueOptions&                      options,
+    const bsls::TimeInterval                       timeout,
+    const FsmCallback&                             fsmCallback,
+    [[maybe_unused]] const bsl::shared_ptr<Event>& eventSp,
+    const bsl::shared_ptr<bmqpi::DTSpan>&          span)
 {
     // executed by the FSM thread
     // PRECONDITIONS
@@ -5137,11 +5137,11 @@ void BrokerSession::doConfigureQueue(
 }
 
 void BrokerSession::doCloseQueue(
-    const bsl::shared_ptr<Queue>& queue,
-    const bsls::TimeInterval      timeout,
-    const FsmCallback&            fsmCallback,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<Event>& eventSp,
-    const bsl::shared_ptr<bmqpi::DTSpan>&           span)
+    const bsl::shared_ptr<Queue>&                  queue,
+    const bsls::TimeInterval                       timeout,
+    const FsmCallback&                             fsmCallback,
+    [[maybe_unused]] const bsl::shared_ptr<Event>& eventSp,
+    const bsl::shared_ptr<bmqpi::DTSpan>&          span)
 {
     // executed by the FSM thread
     // PRECONDITIONS
@@ -5172,8 +5172,8 @@ void BrokerSession::doCloseQueue(
 }
 
 void BrokerSession::doSetChannel(
-    const bsl::shared_ptr<bmqio::Channel> channel,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<Event>& eventSp)
+    const bsl::shared_ptr<bmqio::Channel>          channel,
+    [[maybe_unused]] const bsl::shared_ptr<Event>& eventSp)
 {
     // executed by the FSM thread
     // PRECONDITIONS
@@ -5510,8 +5510,8 @@ void BrokerSession::onHostHealthStateChange(bmqt::HostHealthState::Enum state)
 }
 
 void BrokerSession::doHandleHostHealthStateChange(
-    bmqt::HostHealthState::Enum state,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<Event>& eventSp)
+    bmqt::HostHealthState::Enum                    state,
+    [[maybe_unused]] const bsl::shared_ptr<Event>& eventSp)
 {
     // executed by the FSM thread
     // PRECONDITIONS
@@ -6270,7 +6270,7 @@ void BrokerSession::onConfigureQueueResponse(
     if (context->isError()) {
         // Ignore cancelled request that has already timed out
         if (context->isLateResponse()) {
-            BSLA_MAYBE_UNUSED const bmqt::GenericResult::Enum res =
+            [[maybe_unused]] const bmqt::GenericResult::Enum res =
                 context->result();
 
             BSLS_ASSERT_SAFE(res == bmqt::GenericResult::e_CANCELED ||
@@ -7158,7 +7158,7 @@ void BrokerSession::removePendingControlMessage(const RequestSp& context)
     // Remove the request from the retransmission buffer
     bmqt::MessageGUID guid;
     guid.fromHex(context->userData().theString().data());
-    BSLA_MAYBE_UNUSED const int rc = d_messageCorrelationIdContainer.remove(
+    [[maybe_unused]] const int rc = d_messageCorrelationIdContainer.remove(
         guid);
 
     BSLS_ASSERT_SAFE(0 == rc);

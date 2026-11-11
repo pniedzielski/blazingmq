@@ -61,17 +61,17 @@ ClusterObserver::~ClusterObserver()
     // NOTHING
 }
 
-void ClusterObserver::onNodeStateChange(BSLA_MAYBE_UNUSED ClusterNode* node,
-                                        BSLA_MAYBE_UNUSED bool isAvailable)
+void ClusterObserver::onNodeStateChange([[maybe_unused]] ClusterNode* node,
+                                        [[maybe_unused]] bool isAvailable)
 {
     // NOTHING: void impl to not require interface clients to define it if they
     //          don't care about this notification
 }
 
 void ClusterObserver::onProxyConnectionUp(
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bmqio::Channel>& channel,
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ClientIdentity& identity,
-    BSLA_MAYBE_UNUSED bsl::string_view description)
+    [[maybe_unused]] const bsl::shared_ptr<bmqio::Channel>& channel,
+    [[maybe_unused]] const bmqp_ctrlmsg::ClientIdentity&    identity,
+    [[maybe_unused]] bsl::string_view                       description)
 {
     // NOTHING: void impl to not require interface clients to define it if they
     //          don't care about this notification

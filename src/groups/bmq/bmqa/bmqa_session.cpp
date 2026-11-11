@@ -668,10 +668,10 @@ SessionUtil::validateAndSetConfigureQueueParameters(
 }
 
 bmqt::CloseQueueResult::Enum SessionUtil::validateAndSetCloseQueueParameters(
-    bmqu::MemOutStream*                  errorDescription,
-    const QueueId*                       queueId,
-    BSLA_MAYBE_UNUSED const SessionImpl* sessionImpl,
-    const bsls::TimeInterval&            timeout)
+    bmqu::MemOutStream*                 errorDescription,
+    const QueueId*                      queueId,
+    [[maybe_unused]] const SessionImpl* sessionImpl,
+    const bsls::TimeInterval&           timeout)
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(sessionImpl && "Must provide 'sessionImpl'");

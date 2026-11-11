@@ -170,8 +170,8 @@ void ClusterOrchestrator::onElectorStateChange(
 }
 
 void ClusterOrchestrator::electorTransitionToDormant(
-    BSLA_MAYBE_UNUSED int leaderNodeId,
-    bsls::Types::Uint64   term)
+    [[maybe_unused]] int leaderNodeId,
+    bsls::Types::Uint64  term)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -276,8 +276,8 @@ void ClusterOrchestrator::electorTransitionToFollower(int leaderNodeId,
 }
 
 void ClusterOrchestrator::electorTransitionToCandidate(
-    BSLA_MAYBE_UNUSED int leaderNodeId,
-    bsls::Types::Uint64   term)
+    [[maybe_unused]] int leaderNodeId,
+    bsls::Types::Uint64  term)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -295,8 +295,8 @@ void ClusterOrchestrator::electorTransitionToCandidate(
 }
 
 void ClusterOrchestrator::electorTransitionToLeader(
-    BSLA_MAYBE_UNUSED int leaderNodeId,
-    bsls::Types::Uint64   term)
+    [[maybe_unused]] int leaderNodeId,
+    bsls::Types::Uint64  term)
 {
     // executed by the *DISPATCHER* thread
 

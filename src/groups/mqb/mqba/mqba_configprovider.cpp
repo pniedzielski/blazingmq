@@ -102,7 +102,7 @@ ConfigProvider::~ConfigProvider()
     stop();
 }
 
-int ConfigProvider::start(BSLA_MAYBE_UNUSED bsl::ostream& errorDescription)
+int ConfigProvider::start([[maybe_unused]] bsl::ostream& errorDescription)
 {
     BALL_LOG_INFO << "Starting ConfigProvider";
 

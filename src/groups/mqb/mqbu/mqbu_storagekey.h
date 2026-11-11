@@ -404,8 +404,8 @@ inline StorageKeyHashAlgo::StorageKeyHashAlgo()
 }
 
 // MANIPULATORS
-inline void StorageKeyHashAlgo::operator()(const void*              data,
-                                           BSLA_MAYBE_UNUSED size_t numBytes)
+inline void StorageKeyHashAlgo::operator()(const void*             data,
+                                           [[maybe_unused]] size_t numBytes)
 {
     // 10K Keys
     // --------

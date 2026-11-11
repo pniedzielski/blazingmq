@@ -78,8 +78,8 @@ ElectorInfoObserver::~ElectorInfoObserver()
 }
 
 void ElectorInfoObserver::onClusterLeader(
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* node,
-    BSLA_MAYBE_UNUSED ElectorInfoLeaderStatus::Enum status)
+    [[maybe_unused]] mqbnet::ClusterNode*          node,
+    [[maybe_unused]] ElectorInfoLeaderStatus::Enum status)
 {
     // NOTHING
 }

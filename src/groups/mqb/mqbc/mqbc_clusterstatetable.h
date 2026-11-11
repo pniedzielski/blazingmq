@@ -861,8 +861,7 @@ ClusterStateTableActions<ARGS>::~ClusterStateTableActions()
 }
 
 template <typename ARGS>
-void ClusterStateTableActions<ARGS>::do_none(
-    BSLA_MAYBE_UNUSED const ARGS& args)
+void ClusterStateTableActions<ARGS>::do_none([[maybe_unused]] const ARGS& args)
 {
     BALL_LOG_INFO << "Cluster FSM: NO ACTION PERFORMED.";
 }

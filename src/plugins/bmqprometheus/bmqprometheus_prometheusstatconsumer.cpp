@@ -176,8 +176,8 @@ PrometheusStatConsumer::~PrometheusStatConsumer()
 }
 
 PrometheusStatConsumer::PrometheusStatConsumer(
-    const StatContextsMap& statContextsMap,
-    BSLA_MAYBE_UNUSED bslma::Allocator* allocator)
+    const StatContextsMap&             statContextsMap,
+    [[maybe_unused]] bslma::Allocator* allocator)
 : d_contextsMap(statContextsMap)
 , d_publishInterval(0)
 , d_snapshotInterval(0)
@@ -199,7 +199,7 @@ PrometheusStatConsumer::PrometheusStatConsumer(
 }
 
 int PrometheusStatConsumer::start(
-    BSLA_MAYBE_UNUSED bsl::ostream& errorDescription)
+    [[maybe_unused]] bsl::ostream& errorDescription)
 {
     d_consumerConfig_p = mqbplug::StatConsumerUtil::findConsumerConfig(name());
     if (!d_consumerConfig_p) {

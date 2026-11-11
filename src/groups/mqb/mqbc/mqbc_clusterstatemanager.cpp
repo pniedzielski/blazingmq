@@ -38,7 +38,6 @@
 #include <bsl_ostream.h>
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
-#include <bsla_maybeunused.h>
 #include <bsls_assert.h>
 
 namespace BloombergLP {
@@ -121,7 +120,7 @@ void ClusterStateManager::do_abort(const EventWithMetadata& event)
 }
 
 void ClusterStateManager::do_startWatchdog(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -146,7 +145,7 @@ void ClusterStateManager::do_startWatchdog(
 }
 
 void ClusterStateManager::do_stopWatchdog(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -169,7 +168,7 @@ void ClusterStateManager::do_stopWatchdog(
 }
 
 void ClusterStateManager::do_triggerWatchdog(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -324,7 +323,7 @@ void ClusterStateManager::do_applyCSLSelf(const EventWithMetadata& event)
 }
 
 void ClusterStateManager::do_initializeQueueKeyInfoMap(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -339,7 +338,7 @@ void ClusterStateManager::do_initializeQueueKeyInfoMap(
 }
 
 void ClusterStateManager::do_stopPFSMs(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -395,7 +394,7 @@ void ClusterStateManager::do_updatePrimaryInPFSMs(
 }
 
 void ClusterStateManager::do_sendFollowerLSNRequests(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -565,7 +564,7 @@ void ClusterStateManager::do_sendFailureFollowerLSNResponse(
 }
 
 void ClusterStateManager::do_findHighestLSN(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -823,7 +822,7 @@ void ClusterStateManager::do_removeFollowerLSN(const EventWithMetadata& event)
 }
 
 void ClusterStateManager::do_checkLSNQuorum(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -855,7 +854,7 @@ void ClusterStateManager::do_checkLSNQuorum(
 }
 
 void ClusterStateManager::do_sendRegistrationRequest(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -964,7 +963,7 @@ void ClusterStateManager::do_sendFailureRegistrationResponse(
 }
 
 void ClusterStateManager::do_logUnexpectedCSLCommit(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -1192,7 +1191,7 @@ void ClusterStateManager::do_reapplyEvent(const EventWithMetadata& event)
 }
 
 void ClusterStateManager::do_reapplySelectLeader(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -1212,7 +1211,7 @@ void ClusterStateManager::do_reapplySelectLeader(
 }
 
 void ClusterStateManager::do_reapplySelectFollower(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -1232,7 +1231,7 @@ void ClusterStateManager::do_reapplySelectFollower(
 }
 
 void ClusterStateManager::do_cleanupLSNs(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -1243,7 +1242,7 @@ void ClusterStateManager::do_cleanupLSNs(
 }
 
 void ClusterStateManager::do_cancelRequests(
-    BSLA_MAYBE_UNUSED const EventWithMetadata& event)
+    [[maybe_unused]] const EventWithMetadata& event)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -1704,8 +1703,8 @@ void ClusterStateManager::setPrimaryStatus(
 }
 
 void ClusterStateManager::markOrphan(
-    const bsl::vector<int>& partitions,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* primary)
+    const bsl::vector<int>&               partitions,
+    [[maybe_unused]] mqbnet::ClusterNode* primary)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -1848,7 +1847,7 @@ ClusterStateManager::updateAppIds(const bsl::vector<bsl::string>& added,
                                            d_allocator_p);
 }
 
-void ClusterStateManager::initiateLeaderSync(BSLA_MAYBE_UNUSED bool wait)
+void ClusterStateManager::initiateLeaderSync([[maybe_unused]] bool wait)
 {
     // While this method could be invoked by ClusterOrchestrator as part of
     // pre-CSL workflow, we can do a no-op here because the Cluster FSM logic
@@ -1858,16 +1857,16 @@ void ClusterStateManager::initiateLeaderSync(BSLA_MAYBE_UNUSED bool wait)
 }
 
 void ClusterStateManager::processLeaderSyncStateQuery(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     BSLS_ASSERT_SAFE(false &&
                      "This method should only be invoked in non-CSL mode");
 }
 
 void ClusterStateManager::processLeaderSyncDataQuery(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     BSLS_ASSERT_SAFE(false &&
                      "This method should only be invoked in non-CSL mode");
@@ -2009,7 +2008,7 @@ void ClusterStateManager::processShutdownEvent()
 }
 
 void ClusterStateManager::onNodeUnavailable(
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* node)
+    [[maybe_unused]] mqbnet::ClusterNode* node)
 {
     BSLS_ASSERT_SAFE(false && "NOT IMPLEMENTED!");
 }
@@ -2027,8 +2026,8 @@ void ClusterStateManager::onNodeStopped()
 // MANIPULATORS
 //   (virtual: mqbc::ElectorInfoObserver)
 void ClusterStateManager::onClusterLeader(
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* node,
-    BSLA_MAYBE_UNUSED ElectorInfoLeaderStatus::Enum status)
+    [[maybe_unused]] mqbnet::ClusterNode*          node,
+    [[maybe_unused]] ElectorInfoLeaderStatus::Enum status)
 {
     // executed by the cluster *DISPATCHER* thread
 

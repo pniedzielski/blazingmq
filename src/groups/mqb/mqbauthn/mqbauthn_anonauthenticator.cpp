@@ -71,7 +71,7 @@ AnonAuthenticationResult::lifetimeMs() const
 
 AnonAuthenticator::AnonAuthenticator(
     const mqbcfg::AuthenticatorPluginConfig* config,
-    BSLA_MAYBE_UNUSED bslma::Allocator* allocator)
+    [[maybe_unused]] bslma::Allocator*       allocator)
 : d_isStarted(false)
 , d_shouldPass(true)
 {
@@ -130,10 +130,10 @@ bsl::string_view AnonAuthenticator::mechanism() const
 }
 
 int AnonAuthenticator::authenticate(
-    bsl::ostream&                                   errorDescription,
-    bsl::shared_ptr<mqbplug::AuthenticationResult>* result,
-    BSLA_MAYBE_UNUSED const mqbplug::AuthenticationData& input,
-    bslma::Allocator*                                    allocator) const
+    bsl::ostream&                                       errorDescription,
+    bsl::shared_ptr<mqbplug::AuthenticationResult>*     result,
+    [[maybe_unused]] const mqbplug::AuthenticationData& input,
+    bslma::Allocator*                                   allocator) const
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(result);

@@ -708,9 +708,9 @@ int Domain::processCommand(mqbcmd::DomainResult*        result,
             options.setEncodingStyle(baljsn::EncoderOptions::e_PRETTY);
             options.setSpacesPerLevel(2);
 
-            BSLA_MAYBE_UNUSED const int rc = encoder.encode(out,
-                                                            *cfgSnapshot,
-                                                            options);
+            [[maybe_unused]] const int rc = encoder.encode(out,
+                                                           *cfgSnapshot,
+                                                           options);
             BSLS_ASSERT_SAFE(rc == 0);
             domainInfo.configJson() = out.str();
         }

@@ -39,36 +39,36 @@ QueueEngine::~QueueEngine()
 }
 
 void QueueEngine::afterAppIdRegistered(
-    BSLA_MAYBE_UNUSED const mqbi::Storage::AppInfos& addedAppIds)
+    [[maybe_unused]] const mqbi::Storage::AppInfos& addedAppIds)
 {
     // NOTHING
 }
 
 void QueueEngine::afterAppIdUnregistered(
-    BSLA_MAYBE_UNUSED const mqbi::Storage::AppInfos& removedAppIds)
+    [[maybe_unused]] const mqbi::Storage::AppInfos& removedAppIds)
 {
     // NOTHING
 }
 
 void QueueEngine::registerStorage(
-    BSLA_MAYBE_UNUSED const bsl::string& appId,
-    BSLA_MAYBE_UNUSED const mqbu::StorageKey& appKey,
-    BSLA_MAYBE_UNUSED unsigned int            appOrdinal)
+    [[maybe_unused]] const bsl::string&      appId,
+    [[maybe_unused]] const mqbu::StorageKey& appKey,
+    [[maybe_unused]] unsigned int            appOrdinal)
 {
     // NOTHING
 }
 
 void QueueEngine::unregisterStorage(
-    BSLA_MAYBE_UNUSED const bsl::string& appId,
-    BSLA_MAYBE_UNUSED const mqbu::StorageKey& appKey,
-    BSLA_MAYBE_UNUSED unsigned int            appOrdinal)
+    [[maybe_unused]] const bsl::string&      appId,
+    [[maybe_unused]] const mqbu::StorageKey& appKey,
+    [[maybe_unused]] unsigned int            appOrdinal)
 {
     // NOTHING
 }
 
 bsl::ostream& QueueEngine::logAppSubscriptionInfo(
-    bsl::ostream&           stream,
-    BSLA_MAYBE_UNUSED const bsl::string& appId) const
+    bsl::ostream&                       stream,
+    [[maybe_unused]] const bsl::string& appId) const
 {
     return stream;
 };

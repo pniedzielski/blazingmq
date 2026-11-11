@@ -302,7 +302,7 @@ static void test3_customHashUniqueness()
         }
     }
 }
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN1_defaultHashBenchmark()
 // ------------------------------------------------------------------------
 // DEFAULT HASH BENCHMARK
@@ -337,7 +337,7 @@ static void testN1_defaultHashBenchmark()
                 (k_NUM_ITERATIONS * 1000000000) / (end - begin)))
          << " hashes per second.\n";
 }
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN2_customHashBenchmark()
 // ------------------------------------------------------------------------
 // CUSTOM HASH BENCHMARK
@@ -370,7 +370,7 @@ static void testN2_customHashBenchmark()
                 (k_NUM_ITERATIONS * 1000000000) / (end - begin)))
          << " hashes per second.\n";
 }
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN3_orderedMapWithDefaultHashBenchmark()
 // ------------------------------------------------------------------------
 // ORDERED HASH MAP w/ DEFAULT HASH BENCHMARK
@@ -412,7 +412,7 @@ static void testN3_orderedMapWithDefaultHashBenchmark()
                 (k_NUM_ELEMS * 1000000000) / (end - begin)))
          << " insertions per second." << endl;
 }
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN4_orderedMapWithCustomHashBenchmark()
 // ------------------------------------------------------------------------
 // ORDERED MAP w/ CUSTOM HASH BENCHMARK

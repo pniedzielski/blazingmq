@@ -281,9 +281,9 @@ CslSummaryResult::CslSummaryResult(
 }
 
 bool CslSummaryResult::processRecord(
-    const mqbc::ClusterStateRecordHeader& header,
-    const bmqp_ctrlmsg::ClusterMessage&   record,
-    BSLA_MAYBE_UNUSED const mqbsi::LedgerRecordId& recordId)
+    const mqbc::ClusterStateRecordHeader&         header,
+    const bmqp_ctrlmsg::ClusterMessage&           record,
+    [[maybe_unused]] const mqbsi::LedgerRecordId& recordId)
 {
     updateRecordCount(&d_recordCount, header.recordType());
 

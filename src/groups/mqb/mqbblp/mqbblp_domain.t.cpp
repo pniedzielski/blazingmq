@@ -106,9 +106,9 @@ class TestQueue : public mqbmock::Queue {
     /// @brief Record the reconfigure and return success.
     ///
     /// @return 0 always.
-    int configure(BSLA_MAYBE_UNUSED bsl::ostream* errorDescription_p,
-                  BSLA_MAYBE_UNUSED bool          isReconfigure,
-                  BSLA_MAYBE_UNUSED bool          wait) override
+    int configure([[maybe_unused]] bsl::ostream* errorDescription_p,
+                  [[maybe_unused]] bool          isReconfigure,
+                  [[maybe_unused]] bool          wait) override
     {
         ++d_configureCalls;
         return 0;
@@ -158,7 +158,7 @@ mqbconfm::Domain makeConfig(const bsl::string& name,
 /// @brief No-op teardown callback for `Domain::teardown`.
 ///
 /// @param domainName The name of the domain being torn down (unused).
-void teardownCb(BSLA_MAYBE_UNUSED const bsl::string& domainName)
+void teardownCb([[maybe_unused]] const bsl::string& domainName)
 {
     // NOTHING
 }

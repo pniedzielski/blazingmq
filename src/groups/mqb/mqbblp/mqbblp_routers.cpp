@@ -417,7 +417,7 @@ unsigned int Routers::AppContext::finalize()
     for (Priorities::iterator itPriority = d_priorities.begin();
          itPriority != d_priorities.end();) {
         Priority&                   level       = itPriority->second;
-        BSLA_MAYBE_UNUSED const int priority    = itPriority->first;
+        [[maybe_unused]] const int  priority    = itPriority->first;
         Subscribers&                subscribers = level.d_subscribers;
         Subscriber::Subscriptions   remove(d_allocator_p);
 

@@ -83,12 +83,12 @@ struct TestClock {
 // helpers
 // =======
 void verifyBroadfcastPut(
-    BSLA_MAYBE_UNUSED const bmqp::PutHeader& putHeader,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bdlbb::Blob>& appData,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bdlbb::Blob>& options,
-    mqbi::QueueHandle*                                    source,
-    mqbi::QueueHandle*                                    origin,
-    size_t*                                               count)
+    [[maybe_unused]] const bmqp::PutHeader&              putHeader,
+    [[maybe_unused]] const bsl::shared_ptr<bdlbb::Blob>& appData,
+    [[maybe_unused]] const bsl::shared_ptr<bdlbb::Blob>& options,
+    mqbi::QueueHandle*                                   source,
+    mqbi::QueueHandle*                                   origin,
+    size_t*                                              count)
 {
     BMQTST_ASSERT_EQ(source, origin);
 

@@ -386,7 +386,7 @@ RequestManager::sendRequest(const RequestSp&          request,
                                  requestId))));
 
     // Insert the request in the map
-    BSLA_MAYBE_UNUSED bsl::pair<RequestMapIter, bool> insertRC =
+    [[maybe_unused]] bsl::pair<RequestMapIter, bool> insertRC =
         d_requests.insert(bsl::make_pair(requestId, request));
     BSLS_ASSERT_SAFE(insertRC.second);
 

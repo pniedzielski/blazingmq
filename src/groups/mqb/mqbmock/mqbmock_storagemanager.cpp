@@ -41,7 +41,7 @@ StorageManager::~StorageManager()
 }
 
 // MANIPULATORS
-int StorageManager::start(BSLA_MAYBE_UNUSED bsl::ostream& errorDescription)
+int StorageManager::start([[maybe_unused]] bsl::ostream& errorDescription)
 {
     return 0;
 }
@@ -52,53 +52,53 @@ void StorageManager::stop()
 }
 
 void StorageManager::initializeQueueKeyInfoMap(
-    BSLA_MAYBE_UNUSED const mqbc::ClusterState& clusterState)
+    [[maybe_unused]] const mqbc::ClusterState& clusterState)
 {
 }
 
 void StorageManager::registerQueue(
-    BSLA_MAYBE_UNUSED const bmqt::Uri& uri,
-    BSLA_MAYBE_UNUSED const mqbu::StorageKey& queueKey,
-    BSLA_MAYBE_UNUSED int                     partitionId,
-    BSLA_MAYBE_UNUSED const AppInfos&         appIdKeyPairs,
-    BSLA_MAYBE_UNUSED mqbi::Domain* domain)
+    [[maybe_unused]] const bmqt::Uri&        uri,
+    [[maybe_unused]] const mqbu::StorageKey& queueKey,
+    [[maybe_unused]] int                     partitionId,
+    [[maybe_unused]] const AppInfos&         appIdKeyPairs,
+    [[maybe_unused]] mqbi::Domain*           domain)
 {
     // NOTHING
 }
 
-void StorageManager::unregisterQueue(BSLA_MAYBE_UNUSED const bmqt::Uri& uri,
-                                     BSLA_MAYBE_UNUSED int partitionId)
+void StorageManager::unregisterQueue([[maybe_unused]] const bmqt::Uri& uri,
+                                     [[maybe_unused]] int partitionId)
 {
     // NOTHING
 }
 
 int StorageManager::updateQueuePrimary(
-    BSLA_MAYBE_UNUSED const bmqt::Uri& uri,
-    BSLA_MAYBE_UNUSED int              partitionId,
-    BSLA_MAYBE_UNUSED const AppInfos&  addedIdKeyPairs,
-    BSLA_MAYBE_UNUSED const AppInfos&  removedIdKeyPairs)
+    [[maybe_unused]] const bmqt::Uri& uri,
+    [[maybe_unused]] int              partitionId,
+    [[maybe_unused]] const AppInfos&  addedIdKeyPairs,
+    [[maybe_unused]] const AppInfos&  removedIdKeyPairs)
 {
     return 0;
 }
 
 void StorageManager::setPrimaryForPartition(
-    BSLA_MAYBE_UNUSED int partitionId,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* primaryNode,
-    BSLA_MAYBE_UNUSED unsigned int         primaryLeaseId)
+    [[maybe_unused]] int                  partitionId,
+    [[maybe_unused]] mqbnet::ClusterNode* primaryNode,
+    [[maybe_unused]] unsigned int         primaryLeaseId)
 {
     // NOTHING
 }
 
 void StorageManager::clearPrimaryForPartition(
-    BSLA_MAYBE_UNUSED int partitionId,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* primary)
+    [[maybe_unused]] int                  partitionId,
+    [[maybe_unused]] mqbnet::ClusterNode* primary)
 {
     // NOTHING
 }
 
 void StorageManager::setPrimaryStatusForPartition(
-    BSLA_MAYBE_UNUSED int partitionId,
-    BSLA_MAYBE_UNUSED bmqp_ctrlmsg::PrimaryStatus::Value value)
+    [[maybe_unused]] int                                partitionId,
+    [[maybe_unused]] bmqp_ctrlmsg::PrimaryStatus::Value value)
 {
     // NOTHING
 }
@@ -108,119 +108,119 @@ void StorageManager::stopPFSMs()
     // NOTHING
 }
 
-void StorageManager::detectPrimaryLossInPFSM(BSLA_MAYBE_UNUSED int partitionId)
+void StorageManager::detectPrimaryLossInPFSM([[maybe_unused]] int partitionId)
 {
     // NOTHING
 }
 
 void StorageManager::detectSelfPrimaryInPFSM(
-    BSLA_MAYBE_UNUSED int partitionId,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* primaryNode,
-    BSLA_MAYBE_UNUSED unsigned int         primaryLeaseId)
+    [[maybe_unused]] int                  partitionId,
+    [[maybe_unused]] mqbnet::ClusterNode* primaryNode,
+    [[maybe_unused]] unsigned int         primaryLeaseId)
 {
     // NOTHING
 }
 
 void StorageManager::detectSelfReplicaInPFSM(
-    BSLA_MAYBE_UNUSED int partitionId,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* primaryNode,
-    BSLA_MAYBE_UNUSED unsigned int         primaryLeaseId)
+    [[maybe_unused]] int                  partitionId,
+    [[maybe_unused]] mqbnet::ClusterNode* primaryNode,
+    [[maybe_unused]] unsigned int         primaryLeaseId)
 {
     // NOTHING
 }
 
 void StorageManager::processPrimaryStateRequest(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     // NOTHING
 }
 
 void StorageManager::processReplicaStateRequest(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     // NOTHING
 }
 
 void StorageManager::processReplicaDataRequest(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     // NOTHING
 }
 
 int StorageManager::configureStorage(
-    BSLA_MAYBE_UNUSED bsl::ostream& errorDescription,
-    BSLA_MAYBE_UNUSED bsl::shared_ptr<mqbi::Storage>* out,
-    BSLA_MAYBE_UNUSED const bmqt::Uri& uri,
-    BSLA_MAYBE_UNUSED const mqbu::StorageKey& queueKey,
-    BSLA_MAYBE_UNUSED int                     partitionId,
-    BSLA_MAYBE_UNUSED const bsls::Types::Int64 messageTtl,
-    BSLA_MAYBE_UNUSED const int                maxDeliveryAttempts,
-    BSLA_MAYBE_UNUSED const mqbconfm::StorageDefinition& storageDef)
+    [[maybe_unused]] bsl::ostream&                      errorDescription,
+    [[maybe_unused]] bsl::shared_ptr<mqbi::Storage>*    out,
+    [[maybe_unused]] const bmqt::Uri&                   uri,
+    [[maybe_unused]] const mqbu::StorageKey&            queueKey,
+    [[maybe_unused]] int                                partitionId,
+    [[maybe_unused]] const bsls::Types::Int64           messageTtl,
+    [[maybe_unused]] const int                          maxDeliveryAttempts,
+    [[maybe_unused]] const mqbconfm::StorageDefinition& storageDef)
 {
     return 0;
 }
 
 void StorageManager::processStorageEvent(
-    BSLA_MAYBE_UNUSED const mqbevt::StorageEvent& event)
+    [[maybe_unused]] const mqbevt::StorageEvent& event)
 {
     // NOTHING
 }
 
 void StorageManager::processStorageSyncRequest(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     // NOTHING
 }
 
 void StorageManager::processPartitionSyncStateRequest(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     // NOTHING
 }
 
 void StorageManager::processPartitionSyncDataRequest(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     // NOTHING
 }
 
 void StorageManager::processPartitionSyncDataRequestStatus(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     // NOTHING
 }
 
 void StorageManager::processRecoveryEvent(
-    BSLA_MAYBE_UNUSED const mqbevt::RecoveryEvent& event)
+    [[maybe_unused]] const mqbevt::RecoveryEvent& event)
 {
     // NOTHING
 }
 
 void StorageManager::processReceiptEvent(
-    BSLA_MAYBE_UNUSED const bmqp::Event& event,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp::Event&   event,
+    [[maybe_unused]] mqbnet::ClusterNode* source)
 {
     // NOTHING
 }
 
 void StorageManager::processPrimaryStatusAdvisory(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::PrimaryStatusAdvisory& advisory,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::PrimaryStatusAdvisory& advisory,
+    [[maybe_unused]] mqbnet::ClusterNode*                       source)
 {
     // NOTHING
 }
 
 void StorageManager::processReplicaStatusAdvisory(
-    BSLA_MAYBE_UNUSED int partitionId,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source,
-    BSLA_MAYBE_UNUSED bmqp_ctrlmsg::NodeStatus::Value status)
+    [[maybe_unused]] int                             partitionId,
+    [[maybe_unused]] mqbnet::ClusterNode*            source,
+    [[maybe_unused]] bmqp_ctrlmsg::NodeStatus::Value status)
 {
     // NOTHING
 }
@@ -231,15 +231,15 @@ void StorageManager::processShutdownEvent()
 }
 
 void StorageManager::applyForEachQueue(
-    BSLA_MAYBE_UNUSED int                 partitionId,
-    BSLA_MAYBE_UNUSED const QueueFunctor& functor) const
+    [[maybe_unused]] int                 partitionId,
+    [[maybe_unused]] const QueueFunctor& functor) const
 {
     // NOTHING
 }
 
 void StorageManager::processCommand(
-    BSLA_MAYBE_UNUSED mqbcmd::StorageResult* result,
-    BSLA_MAYBE_UNUSED const mqbcmd::StorageCommand& command)
+    [[maybe_unused]] mqbcmd::StorageResult*        result,
+    [[maybe_unused]] const mqbcmd::StorageCommand& command)
 {
     return;
 }
@@ -250,33 +250,33 @@ void StorageManager::gcUnrecognizedDomainQueues()
 }
 
 int StorageManager::purgeQueueOnDomain(
-    BSLA_MAYBE_UNUSED mqbcmd::StorageResult* result,
-    BSLA_MAYBE_UNUSED const bsl::string& domainName)
+    [[maybe_unused]] mqbcmd::StorageResult* result,
+    [[maybe_unused]] const bsl::string&     domainName)
 {
     return 0;
 }
 
 // ACCESSORS
 mqbi::Dispatcher::ProcessorHandle
-StorageManager::processorForPartition(BSLA_MAYBE_UNUSED int partitionId) const
+StorageManager::processorForPartition([[maybe_unused]] int partitionId) const
 {
     return mqbi::Dispatcher::k_INVALID_PROCESSOR_HANDLE;
 }
 
-bool StorageManager::isStorageEmpty(BSLA_MAYBE_UNUSED const bmqt::Uri& uri,
-                                    BSLA_MAYBE_UNUSED int partitionId) const
+bool StorageManager::isStorageEmpty([[maybe_unused]] const bmqt::Uri& uri,
+                                    [[maybe_unused]] int partitionId) const
 {
     return true;
 }
 
 mqbs::FileStore&
-StorageManager::fileStore(BSLA_MAYBE_UNUSED int partitionId) const
+StorageManager::fileStore([[maybe_unused]] int partitionId) const
 {
     BSLS_ASSERT_INVOKE_NORETURN("Unimplemented");
 }
 
 bslma::ManagedPtr<mqbi::StorageManagerIterator>
-StorageManager::getIterator(BSLA_MAYBE_UNUSED int partitionId) const
+StorageManager::getIterator([[maybe_unused]] int partitionId) const
 {
     return bslma::ManagedPtr<mqbi::StorageManagerIterator>();
 }

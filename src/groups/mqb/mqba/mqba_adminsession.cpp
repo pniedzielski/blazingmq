@@ -111,7 +111,7 @@ bmqp_ctrlmsg::ClientIdentity* extractClientIdentity(
 /// processed.
 ///
 /// @param session A keep-alive handle to the session being torn down.
-void sessionHolderDummy(BSLA_MAYBE_UNUSED const bsl::shared_ptr<void>& session)
+void sessionHolderDummy([[maybe_unused]] const bsl::shared_ptr<void>& session)
 {
     // NOTHING
 }
@@ -242,7 +242,7 @@ void AdminSession::finalizeAdminCommand(
 
 void AdminSession::onProcessedAdminCommand(
     const bmqp_ctrlmsg::ControlMessage& adminCommandCtrlMsg,
-    BSLA_MAYBE_UNUSED int               rc,
+    [[maybe_unused]] int                rc,
     const bsl::string&                  commandExecResults)
 {
     // executed by the *ANY* thread
@@ -335,8 +335,8 @@ AdminSession::~AdminSession()
 
 // MANIPULATORS
 //   (virtual: mqbnet::Session)
-void AdminSession::processEvent(const bmqp::Event& event,
-                                BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+void AdminSession::processEvent(const bmqp::Event&                    event,
+                                [[maybe_unused]] mqbnet::ClusterNode* source)
 {
     // executed by the *IO* thread
 
@@ -424,7 +424,7 @@ void AdminSession::tearDownImpl(bslmt::Semaphore*            semaphore,
 }
 
 void AdminSession::tearDown(const bsl::shared_ptr<void>& session,
-                            BSLA_MAYBE_UNUSED bool       isBrokerShutdown)
+                            [[maybe_unused]] bool        isBrokerShutdown)
 {
     // executed by the *IO* thread
 

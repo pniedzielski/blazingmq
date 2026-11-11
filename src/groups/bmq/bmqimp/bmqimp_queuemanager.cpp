@@ -175,14 +175,14 @@ void QueueManager::insertQueue(const QueueSp& queue)
 
     BSLS_ASSERT_SAFE(queueInfo.d_subQueueIdsMap.find(queue->uri().id()) ==
                      queueInfo.d_subQueueIdsMap.end());
-    BSLA_MAYBE_UNUSED bsl::pair<SubQueueIdsMap::iterator, bool> insertRet =
+    [[maybe_unused]] bsl::pair<SubQueueIdsMap::iterator, bool> insertRet =
         queueInfo.d_subQueueIdsMap.insert(
             bsl::make_pair(queue->uri().id(), subId));
     BSLS_ASSERT_SAFE(insertRet.second);
 
     // Insert into queues map
     const bmqp::QueueId queueId(queue->id(), subId);
-    BSLA_MAYBE_UNUSED   bsl::pair<QueuesMap::iterator, QueuesMap::InsertResult>
+    [[maybe_unused]] bsl::pair<QueuesMap::iterator, QueuesMap::InsertResult>
         addRet = d_queues.insert(queueId, queue->correlationId(), queue);
     BSLS_ASSERT_SAFE(addRet.second == QueuesMap::e_INSERTED);
 }
@@ -219,7 +219,7 @@ QueueManager::QueueSp QueueManager::removeQueue(const Queue* queue)
     if (subQueueIdsMap.empty()) {
         // No more appIds for this canonical URI, so we can remove it from the
         // URIs map
-        BSLA_MAYBE_UNUSED UrisMap::size_type numErasedUris = d_uris.erase(
+        [[maybe_unused]] UrisMap::size_type numErasedUris = d_uris.erase(
             bsl::string(queue->uri().canonical(), d_allocator_p));
         BSLS_ASSERT_SAFE(numErasedUris == 1);
     }

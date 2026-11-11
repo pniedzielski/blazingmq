@@ -67,10 +67,10 @@ struct Tester {
     }
 
     mqbc::ClusterState::QueueInfoSp createQueueInfoSp(
-        const bsl::string&      uriString,
-        const mqbu::StorageKey& key,
-        int                     partitionId,
-        BSLA_MAYBE_UNUSED const mqbc::ClusterState::AppInfos& appIdInfos)
+        const bsl::string&                                   uriString,
+        const mqbu::StorageKey&                              key,
+        int                                                  partitionId,
+        [[maybe_unused]] const mqbc::ClusterState::AppInfos& appIdInfos)
     {
         bmqp_ctrlmsg::QueueInfo advisory(bmqtst::TestHelperUtil::allocator());
 

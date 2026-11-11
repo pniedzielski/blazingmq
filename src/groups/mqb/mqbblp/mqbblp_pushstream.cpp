@@ -326,7 +326,7 @@ bool VirtualPushStreamIterator::atEnd() const
 }
 
 PushStream::Element* VirtualPushStreamIterator::element(
-    BSLA_MAYBE_UNUSED unsigned int appOrdinal) const
+    [[maybe_unused]] unsigned int appOrdinal) const
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(!atEnd());

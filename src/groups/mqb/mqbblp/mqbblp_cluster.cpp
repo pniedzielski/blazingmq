@@ -1376,12 +1376,12 @@ Cluster::sendConfirmInline(int                         partitionId,
 }
 
 mqbi::InlineResult::Enum Cluster::sendPutInline(
-    int                                 partitionId,
-    const bmqp::PutHeader&              putHeader,
-    const bsl::shared_ptr<bdlbb::Blob>& appData,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bdlbb::Blob>& options,
-    const bsl::shared_ptr<bmqu::AtomicState>&             state,
-    bsls::Types::Uint64                                   genCount)
+    int                                                  partitionId,
+    const bmqp::PutHeader&                               putHeader,
+    const bsl::shared_ptr<bdlbb::Blob>&                  appData,
+    [[maybe_unused]] const bsl::shared_ptr<bdlbb::Blob>& options,
+    const bsl::shared_ptr<bmqu::AtomicState>&            state,
+    bsls::Types::Uint64                                  genCount)
 {
     // executed by *ANY* thread
 
@@ -1964,7 +1964,7 @@ void Cluster::loadNodesInfo(mqbcmd::NodeStatuses* out) const
                 nodeSession.clusterNode()->isAvailable());
         }
 
-        BSLA_MAYBE_UNUSED const int rc = mqbcmd::NodeStatus::fromInt(
+        [[maybe_unused]] const int rc = mqbcmd::NodeStatus::fromInt(
             &node.status(),
             nodeSession.nodeStatus());
         BSLS_ASSERT_SAFE(!rc && "Unsupported node status");
@@ -1984,7 +1984,7 @@ void Cluster::loadElectorInfo(mqbcmd::ElectorInfo* out) const
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(inDispatcherThread());
 
-    BSLA_MAYBE_UNUSED int rc = mqbcmd::ElectorState::fromInt(
+    [[maybe_unused]] int rc = mqbcmd::ElectorState::fromInt(
         &out->electorState(),
         d_clusterData.electorInfo().electorState());
     BSLS_ASSERT_SAFE(!rc && "Unsupported elector state");
@@ -2030,7 +2030,7 @@ void Cluster::loadPartitionsInfo(mqbcmd::PartitionsInfo* out) const
                 pi.primaryNode()->nodeDescription());
         }
         partitions[i].primaryLeaseId() = pi.primaryLeaseId();
-        BSLA_MAYBE_UNUSED const int rc = mqbcmd::PrimaryStatus::fromInt(
+        [[maybe_unused]] const int rc  = mqbcmd::PrimaryStatus::fromInt(
             &partitions[i].primaryStatus(),
             pi.primaryStatus());
         BSLS_ASSERT_SAFE(!rc && "Unsupported primary status");
@@ -2992,7 +2992,7 @@ void Cluster::onNodeHighWatermark(mqbnet::ClusterNode* node)
         << node->nodeDescription() << BMQTSK_ALARMLOG_END;
 }
 
-void Cluster::onNodeLowWatermark(BSLA_MAYBE_UNUSED mqbnet::ClusterNode* node)
+void Cluster::onNodeLowWatermark([[maybe_unused]] mqbnet::ClusterNode* node)
 {
     // executed by the *IO* thread
 

@@ -106,7 +106,7 @@ class PropertyValueStreamOutVisitor {
 
     // MANIPULATORS
     template <class TYPE>
-    void operator()(BSLA_MAYBE_UNUSED const TYPE& value)
+    void operator()([[maybe_unused]] const TYPE& value)
     {
         // This method is partially specialized for each possible type, so its
         // safe to assert here.

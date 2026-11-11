@@ -31,7 +31,6 @@
 #include <bsl_utility.h>
 #include <bsl_variant.h>
 #include <bsl_vector.h>
-#include <bsla_maybeunused.h>
 #include <bsla_nodiscard.h>
 #include <bslma_constructionutil.h>
 
@@ -421,7 +420,7 @@ bool Policy_Permission::isQueueWriteAllowed(bsl::string_view uri) const
 }
 
 bool Policy_Permission::isExecuteAdminCommandAllowed(
-    BSLA_MAYBE_UNUSED bsl::string_view command) const
+    [[maybe_unused]] bsl::string_view command) const
 {
     return d_executeAdminCommand;
 }

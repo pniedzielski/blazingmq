@@ -263,14 +263,14 @@ class ThrowingExecutor {
     }
 
     template <class FUNCTION>
-    BSLA_MAYBE_UNUSED BSLA_NORETURN void dispatch(FUNCTION) const
+    [[maybe_unused]] BSLA_NORETURN void dispatch(FUNCTION) const
     {
         throw ExceptionType();
     }
 
   public:
     // ACCESSORS
-    BSLA_MAYBE_UNUSED bool operator==(const ThrowingExecutor&) const
+    [[maybe_unused]] bool operator==(const ThrowingExecutor&) const
     {
         return true;
     }

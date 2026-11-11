@@ -276,10 +276,10 @@ InMemoryStorage::put(mqbi::StorageMessageAttributes*     attributes,
 }
 
 mqbi::StorageResult::Enum
-InMemoryStorage::confirm(const bmqt::MessageGUID& msgGUID,
-                         const mqbu::StorageKey&  appKey,
-                         BSLA_MAYBE_UNUSED bsls::Types::Int64 timestamp,
-                         BSLA_MAYBE_UNUSED bool               onReject)
+InMemoryStorage::confirm(const bmqt::MessageGUID&            msgGUID,
+                         const mqbu::StorageKey&             appKey,
+                         [[maybe_unused]] bsls::Types::Int64 timestamp,
+                         [[maybe_unused]] bool               onReject)
 {
     ItemsMapIter it = d_items.find(msgGUID);
     if (it == d_items.end()) {
@@ -574,10 +574,10 @@ InMemoryStorage::get(mqbi::StorageMessageAttributes* attributes,
 // MANIPULATORS
 //   (virtual mqbs::ReplicatedStorage)
 void InMemoryStorage::processMessageRecord(
-    BSLA_MAYBE_UNUSED const bmqt::MessageGUID&     guid,
-    BSLA_MAYBE_UNUSED unsigned int                 msgLen,
-    BSLA_MAYBE_UNUSED unsigned int                 refCount,
-    BSLA_MAYBE_UNUSED const DataStoreRecordHandle& handle)
+    [[maybe_unused]] const bmqt::MessageGUID&     guid,
+    [[maybe_unused]] unsigned int                 msgLen,
+    [[maybe_unused]] unsigned int                 refCount,
+    [[maybe_unused]] const DataStoreRecordHandle& handle)
 {
     // Replicated in-memory storage is not yet supported.
 
@@ -585,10 +585,10 @@ void InMemoryStorage::processMessageRecord(
 }
 
 void InMemoryStorage::processConfirmRecord(
-    BSLA_MAYBE_UNUSED const bmqt::MessageGUID& guid,
-    BSLA_MAYBE_UNUSED const mqbu::StorageKey& appKey,
-    BSLA_MAYBE_UNUSED ConfirmReason::Enum          reason,
-    BSLA_MAYBE_UNUSED const DataStoreRecordHandle& handle)
+    [[maybe_unused]] const bmqt::MessageGUID&     guid,
+    [[maybe_unused]] const mqbu::StorageKey&      appKey,
+    [[maybe_unused]] ConfirmReason::Enum          reason,
+    [[maybe_unused]] const DataStoreRecordHandle& handle)
 {
     // Replicated in-memory storage is not yet supported.
 
@@ -596,7 +596,7 @@ void InMemoryStorage::processConfirmRecord(
 }
 
 void InMemoryStorage::processDeletionRecord(
-    BSLA_MAYBE_UNUSED const bmqt::MessageGUID& guid)
+    [[maybe_unused]] const bmqt::MessageGUID& guid)
 {
     // Replicated in-memory storage is not yet supported.
 
@@ -615,7 +615,7 @@ void InMemoryStorage::addQueueOpRecordHandle(
     d_queueOpRecordHandles.push_back(handle);
 }
 
-void InMemoryStorage::purge(BSLA_MAYBE_UNUSED const mqbu::StorageKey& appKey)
+void InMemoryStorage::purge([[maybe_unused]] const mqbu::StorageKey& appKey)
 {
     // Replicated in-memory storage is not yet supported.
 

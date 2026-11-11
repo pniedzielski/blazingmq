@@ -484,7 +484,7 @@ MonitoredQueue<QUEUE, QUEUE_TRAITS>::setWatermarks(
     bsls::Types::Int64 highWatermark,
     bsls::Types::Int64 highWatermark2)
 {
-    BSLA_MAYBE_UNUSED const bsls::Types::Int64 intMax =
+    [[maybe_unused]] const bsls::Types::Int64 intMax =
         bsl::numeric_limits<bsls::Types::Int64>::max();
     BSLS_ASSERT(lowWatermark >= 0);
     BSLS_ASSERT(lowWatermark < highWatermark);

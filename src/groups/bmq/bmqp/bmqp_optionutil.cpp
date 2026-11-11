@@ -243,7 +243,7 @@ bool OptionUtil::loadOptionsPosition(int*                      optionsSize,
 }
 
 bmqt::EventBuilderResult::Enum OptionUtil::isValidMsgGroupId(
-    BSLA_MAYBE_UNUSED const Protocol::MsgGroupId& msgGroupId)
+    [[maybe_unused]] const Protocol::MsgGroupId& msgGroupId)
 {
     return bmqt::EventBuilderResult::e_UNKNOWN;
 }

@@ -1027,7 +1027,7 @@ static void test8_calculateOnBlobWithPreviousCrc()
 // ============================================================================
 //                              PERFORMANCE TESTS
 // ----------------------------------------------------------------------------
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN1_performanceDefaultUserInput()
 // ------------------------------------------------------------------------
 // PERFORMANCE: CALCULATE CRC32-C DEFAULT ON USER INPUT
@@ -1179,7 +1179,7 @@ static void testN2_performanceDefault()
     bmqtst::TestHelperUtil::allocator()->deallocate(buffer);
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN3_defaultCalculateThroughput()
 // ------------------------------------------------------------------------
 // BENCHMARK: CALCULATE CRC32-C THROUGHPUT DEFAULT
@@ -1254,7 +1254,7 @@ static void testN3_defaultCalculateThroughput()
     static_cast<void>(resultDef);
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN3_bdldCalculateThroughput()
 // ------------------------------------------------------------------------
 // BENCHMARK: CALCULATE CRC32-C THROUGHPUT BDE
@@ -1324,7 +1324,7 @@ static void testN3_bdldCalculateThroughput()
     static_cast<void>(resultBde);
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN4_calculateSerialDefault()
 // ------------------------------------------------------------------------
 // PERFORMANCE: CALCULATE CRC32-C DEFAULT SERIAL
@@ -1407,7 +1407,7 @@ static void testN4_calculateSerialDefault()
     bmqtst::TestHelperUtil::allocator()->deallocate(buffer);
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN5_bdldPerformanceSoftware()
 // ------------------------------------------------------------------------
 // PERFORMANCE: CALCULATE CRC32-C ON BUFFER SOFTWARE
@@ -1497,7 +1497,7 @@ static void testN5_bdldPerformanceSoftware()
     bmqtst::TestHelperUtil::allocator()->deallocate(buffer);
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN6_bmqpPerformanceDefault()
 // ------------------------------------------------------------------------
 // PERFORMANCE: CALCULATE CRC32-C ON BUFFER DEFAULT
@@ -1588,7 +1588,7 @@ static void testN6_bmqpPerformanceDefault()
     bmqtst::TestHelperUtil::allocator()->deallocate(buffer);
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN6_bdldPerformanceDefault()
 // ------------------------------------------------------------------------
 // PERFORMANCE: CALCULATE CRC32-C ON BUFFER DEFAULT
@@ -1868,7 +1868,7 @@ testN5_bdldPerformanceSoftware_GoogleBenchmark(benchmark::State& state)
     bmqtst::TestHelperUtil::allocator()->deallocate(buffer);
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void
 testN6_bmqpPerformanceDefault_GoogleBenchmark(benchmark::State& state)
 // ------------------------------------------------------------------------
@@ -1914,7 +1914,7 @@ testN6_bmqpPerformanceDefault_GoogleBenchmark(benchmark::State& state)
     bmqtst::TestHelperUtil::allocator()->deallocate(buffer);
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void
 testN6_bdldPerformanceDefault_GoogleBenchmark(benchmark::State& state)
 {

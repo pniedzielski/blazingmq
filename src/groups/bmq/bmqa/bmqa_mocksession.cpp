@@ -1252,11 +1252,11 @@ MockSession::Call& MockSession::expect_finalizeStop()
 }
 
 MockSession::Call&
-MockSession::expect_openQueue(BSLA_MAYBE_UNUSED QueueId* queueId,
-                              const bmqt::Uri&           uri,
-                              bsls::Types::Uint64        flags,
-                              const bmqt::QueueOptions&  options,
-                              const bsls::TimeInterval&  timeout)
+MockSession::expect_openQueue([[maybe_unused]] QueueId* queueId,
+                              const bmqt::Uri&          uri,
+                              bsls::Types::Uint64       flags,
+                              const bmqt::QueueOptions& options,
+                              const bsls::TimeInterval& timeout)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCKED
 
@@ -1271,11 +1271,11 @@ MockSession::expect_openQueue(BSLA_MAYBE_UNUSED QueueId* queueId,
 }
 
 MockSession::Call&
-MockSession::expect_openQueueSync(BSLA_MAYBE_UNUSED QueueId* queueId,
-                                  const bmqt::Uri&           uri,
-                                  bsls::Types::Uint64        flags,
-                                  const bmqt::QueueOptions&  options,
-                                  const bsls::TimeInterval&  timeout)
+MockSession::expect_openQueueSync([[maybe_unused]] QueueId* queueId,
+                                  const bmqt::Uri&          uri,
+                                  bsls::Types::Uint64       flags,
+                                  const bmqt::QueueOptions& options,
+                                  const bsls::TimeInterval& timeout)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCKED
 
@@ -1291,11 +1291,11 @@ MockSession::expect_openQueueSync(BSLA_MAYBE_UNUSED QueueId* queueId,
 }
 
 MockSession::Call&
-MockSession::expect_openQueueAsync(BSLA_MAYBE_UNUSED QueueId* queueId,
-                                   const bmqt::Uri&           uri,
-                                   bsls::Types::Uint64        flags,
-                                   const bmqt::QueueOptions&  options,
-                                   const bsls::TimeInterval&  timeout)
+MockSession::expect_openQueueAsync([[maybe_unused]] QueueId* queueId,
+                                   const bmqt::Uri&          uri,
+                                   bsls::Types::Uint64       flags,
+                                   const bmqt::QueueOptions& options,
+                                   const bsls::TimeInterval& timeout)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCKED
 
@@ -1310,12 +1310,12 @@ MockSession::expect_openQueueAsync(BSLA_MAYBE_UNUSED QueueId* queueId,
 }
 
 MockSession::Call&
-MockSession::expect_openQueueAsync(BSLA_MAYBE_UNUSED QueueId* queueId,
-                                   const bmqt::Uri&           uri,
-                                   bsls::Types::Uint64        flags,
-                                   const OpenQueueCallback&   callback,
-                                   const bmqt::QueueOptions&  options,
-                                   const bsls::TimeInterval&  timeout)
+MockSession::expect_openQueueAsync([[maybe_unused]] QueueId* queueId,
+                                   const bmqt::Uri&          uri,
+                                   bsls::Types::Uint64       flags,
+                                   const OpenQueueCallback&  callback,
+                                   const bmqt::QueueOptions& options,
+                                   const bsls::TimeInterval& timeout)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);
 
@@ -1332,9 +1332,9 @@ MockSession::expect_openQueueAsync(BSLA_MAYBE_UNUSED QueueId* queueId,
 }
 
 MockSession::Call&
-MockSession::expect_configureQueue(BSLA_MAYBE_UNUSED QueueId* queueId,
-                                   const bmqt::QueueOptions&  options,
-                                   const bsls::TimeInterval&  timeout)
+MockSession::expect_configureQueue([[maybe_unused]] QueueId* queueId,
+                                   const bmqt::QueueOptions& options,
+                                   const bsls::TimeInterval& timeout)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCKED
 
@@ -1347,9 +1347,9 @@ MockSession::expect_configureQueue(BSLA_MAYBE_UNUSED QueueId* queueId,
 }
 
 MockSession::Call&
-MockSession::expect_configureQueueSync(BSLA_MAYBE_UNUSED QueueId* queueId,
-                                       const bmqt::QueueOptions&  options,
-                                       const bsls::TimeInterval&  timeout)
+MockSession::expect_configureQueueSync([[maybe_unused]] QueueId* queueId,
+                                       const bmqt::QueueOptions& options,
+                                       const bsls::TimeInterval& timeout)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCKED
 
@@ -1363,9 +1363,9 @@ MockSession::expect_configureQueueSync(BSLA_MAYBE_UNUSED QueueId* queueId,
 }
 
 MockSession::Call&
-MockSession::expect_configureQueueAsync(BSLA_MAYBE_UNUSED QueueId* queueId,
-                                        const bmqt::QueueOptions&  options,
-                                        const bsls::TimeInterval&  timeout)
+MockSession::expect_configureQueueAsync([[maybe_unused]] QueueId* queueId,
+                                        const bmqt::QueueOptions& options,
+                                        const bsls::TimeInterval& timeout)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCKED
 
@@ -1378,7 +1378,7 @@ MockSession::expect_configureQueueAsync(BSLA_MAYBE_UNUSED QueueId* queueId,
 }
 
 MockSession::Call&
-MockSession::expect_configureQueueAsync(BSLA_MAYBE_UNUSED QueueId*    queueId,
+MockSession::expect_configureQueueAsync([[maybe_unused]] QueueId*     queueId,
                                         const bmqt::QueueOptions&     options,
                                         const ConfigureQueueCallback& callback,
                                         const bsls::TimeInterval&     timeout)
@@ -1396,8 +1396,8 @@ MockSession::expect_configureQueueAsync(BSLA_MAYBE_UNUSED QueueId*    queueId,
 }
 
 MockSession::Call&
-MockSession::expect_closeQueue(BSLA_MAYBE_UNUSED QueueId* queueId,
-                               const bsls::TimeInterval&  timeout)
+MockSession::expect_closeQueue([[maybe_unused]] QueueId* queueId,
+                               const bsls::TimeInterval& timeout)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCKED
 
@@ -1409,8 +1409,8 @@ MockSession::expect_closeQueue(BSLA_MAYBE_UNUSED QueueId* queueId,
 }
 
 MockSession::Call&
-MockSession::expect_closeQueueSync(BSLA_MAYBE_UNUSED QueueId* queueId,
-                                   const bsls::TimeInterval&  timeout)
+MockSession::expect_closeQueueSync([[maybe_unused]] QueueId* queueId,
+                                   const bsls::TimeInterval& timeout)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCKED
 
@@ -1423,8 +1423,8 @@ MockSession::expect_closeQueueSync(BSLA_MAYBE_UNUSED QueueId* queueId,
 }
 
 MockSession::Call&
-MockSession::expect_closeQueueAsync(BSLA_MAYBE_UNUSED QueueId* queueId,
-                                    const bsls::TimeInterval&  timeout)
+MockSession::expect_closeQueueAsync([[maybe_unused]] QueueId* queueId,
+                                    const bsls::TimeInterval& timeout)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCKED
 
@@ -1436,9 +1436,9 @@ MockSession::expect_closeQueueAsync(BSLA_MAYBE_UNUSED QueueId* queueId,
 }
 
 MockSession::Call&
-MockSession::expect_closeQueueAsync(BSLA_MAYBE_UNUSED QueueId* queueId,
-                                    const CloseQueueCallback&  callback,
-                                    const bsls::TimeInterval&  timeout)
+MockSession::expect_closeQueueAsync([[maybe_unused]] QueueId* queueId,
+                                    const CloseQueueCallback& callback,
+                                    const bsls::TimeInterval& timeout)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);
 
@@ -1493,7 +1493,7 @@ MockSession::Call& MockSession::expect_confirmMessage(
 }
 
 MockSession::Call& MockSession::expect_confirmMessages(
-    BSLA_MAYBE_UNUSED ConfirmEventBuilder* builder)
+    [[maybe_unused]] ConfirmEventBuilder* builder)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCKED
 
@@ -1849,12 +1849,12 @@ int MockSession::openQueueAsync(QueueId*                  queueId,
 }
 
 void MockSession::openQueueAsync(
-    BSLA_MAYBE_UNUSED QueueId*                 queueId,
-    const bmqt::Uri&                           uri,
-    bsls::Types::Uint64                        flags,
-    BSLA_MAYBE_UNUSED const OpenQueueCallback& callback,
-    const bmqt::QueueOptions&                  options,
-    const bsls::TimeInterval&                  timeout)
+    [[maybe_unused]] QueueId*                 queueId,
+    const bmqt::Uri&                          uri,
+    bsls::Types::Uint64                       flags,
+    [[maybe_unused]] const OpenQueueCallback& callback,
+    const bmqt::QueueOptions&                 options,
+    const bsls::TimeInterval&                 timeout)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCKED
 
@@ -1894,9 +1894,9 @@ void MockSession::openQueueAsync(
     BMQA_ASSERT_AND_POP_FRONT();
 }
 
-int MockSession::configureQueue(BSLA_MAYBE_UNUSED QueueId* queueId,
-                                const bmqt::QueueOptions&  options,
-                                const bsls::TimeInterval&  timeout)
+int MockSession::configureQueue([[maybe_unused]] QueueId* queueId,
+                                const bmqt::QueueOptions& options,
+                                const bsls::TimeInterval& timeout)
 {
     // PRECONDITIONS
     BSLS_ASSERT(queueId);
@@ -1926,9 +1926,9 @@ int MockSession::configureQueue(BSLA_MAYBE_UNUSED QueueId* queueId,
 }
 
 ConfigureQueueStatus
-MockSession::configureQueueSync(BSLA_MAYBE_UNUSED QueueId* queueId,
-                                const bmqt::QueueOptions&  options,
-                                const bsls::TimeInterval&  timeout)
+MockSession::configureQueueSync([[maybe_unused]] QueueId* queueId,
+                                const bmqt::QueueOptions& options,
+                                const bsls::TimeInterval& timeout)
 {
     // PRECONDITIONS
     BSLS_ASSERT(queueId && "'queueId' not provided");
@@ -1969,9 +1969,9 @@ MockSession::configureQueueSync(BSLA_MAYBE_UNUSED QueueId* queueId,
     return _result;
 }
 
-int MockSession::configureQueueAsync(BSLA_MAYBE_UNUSED QueueId* queueId,
-                                     const bmqt::QueueOptions&  options,
-                                     const bsls::TimeInterval&  timeout)
+int MockSession::configureQueueAsync([[maybe_unused]] QueueId* queueId,
+                                     const bmqt::QueueOptions& options,
+                                     const bsls::TimeInterval& timeout)
 {
     // PRECONDITIONS
     BSLS_ASSERT(queueId);
@@ -2003,10 +2003,10 @@ int MockSession::configureQueueAsync(BSLA_MAYBE_UNUSED QueueId* queueId,
 }
 
 void MockSession::configureQueueAsync(
-    BSLA_MAYBE_UNUSED QueueId*                      queueId,
-    const bmqt::QueueOptions&                       options,
-    BSLA_MAYBE_UNUSED const ConfigureQueueCallback& callback,
-    const bsls::TimeInterval&                       timeout)
+    [[maybe_unused]] QueueId*                      queueId,
+    const bmqt::QueueOptions&                      options,
+    [[maybe_unused]] const ConfigureQueueCallback& callback,
+    const bsls::TimeInterval&                      timeout)
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(queueId && "'queueId' not provided");
@@ -2144,9 +2144,9 @@ int MockSession::closeQueueAsync(QueueId*                  queueId,
 }
 
 void MockSession::closeQueueAsync(
-    BSLA_MAYBE_UNUSED QueueId*                  queueId,
-    BSLA_MAYBE_UNUSED const CloseQueueCallback& callback,
-    const bsls::TimeInterval&                   timeout)
+    [[maybe_unused]] QueueId*                  queueId,
+    [[maybe_unused]] const CloseQueueCallback& callback,
+    const bsls::TimeInterval&                  timeout)
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(queueId && "'queueId' not provided");
@@ -2267,7 +2267,7 @@ int MockSession::confirmMessages(ConfirmEventBuilder* builder)
 }
 
 int MockSession::configureMessageDumping(
-    BSLA_MAYBE_UNUSED const bslstl::StringRef& command)
+    [[maybe_unused]] const bslstl::StringRef& command)
 {
     return 0;
 }

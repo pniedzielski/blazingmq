@@ -129,14 +129,14 @@ void InputUtil::populateProperties(
 
         switch (properties[i].type()) {
         case MessagePropertyType::E_STRING: {
-            BSLA_MAYBE_UNUSED int result = out->setPropertyAsString(name,
-                                                                    value);
+            [[maybe_unused]] int result = out->setPropertyAsString(name,
+                                                                   value);
             BSLS_ASSERT_SAFE(0 == result);
         } break;  // BREAK
 
         case MessagePropertyType::E_INT: {
-            BSLA_MAYBE_UNUSED int result =
-                out->setPropertyAsInt32(name, stoi(value));
+            [[maybe_unused]] int result = out->setPropertyAsInt32(name,
+                                                                  stoi(value));
             BSLS_ASSERT_SAFE(0 == result);
         } break;  // BREAK
         default: BSLS_ASSERT_SAFE(false && "Unsupported type");
@@ -156,7 +156,7 @@ void InputUtil::verifyProperties(
         if (in.hasProperty("pairs_", &type)) {
             BSLS_ASSERT_SAFE(type == bmqt::PropertyType::e_INT32);
 
-            BSLA_MAYBE_UNUSED int numPairs = in.getPropertyAsInt32("pairs_");
+            [[maybe_unused]] int numPairs = in.getPropertyAsInt32("pairs_");
 
             BSLS_ASSERT_SAFE(in.numProperties() == (numPairs * 2 + 1));
 
@@ -174,7 +174,7 @@ void InputUtil::verifyProperties(
                 }
 
                 name += "_value";
-                BSLA_MAYBE_UNUSED bool hasValue = in.hasProperty(name, &type);
+                [[maybe_unused]] bool hasValue = in.hasProperty(name, &type);
 
                 BSLS_ASSERT_SAFE(hasValue);
                 BSLS_ASSERT_SAFE(it.type() == type);
@@ -231,17 +231,17 @@ void InputUtil::verifyProperties(
 
     for (size_t i = 0; i < properties.size(); ++i) {
         const bsl::string&      name               = properties[i].name();
-        BSLA_MAYBE_UNUSED const bsl::string& value = properties[i].value();
+        [[maybe_unused]] const bsl::string& value = properties[i].value();
 
         switch (properties[i].type()) {
         case MessagePropertyType::E_STRING: {
-            BSLA_MAYBE_UNUSED const bsl::string& result =
+            [[maybe_unused]] const bsl::string& result =
                 in.getPropertyAsString(name);
             BSLS_ASSERT_SAFE(value == result);
         } break;  // BREAK
 
         case MessagePropertyType::E_INT: {
-            BSLA_MAYBE_UNUSED int result = in.getPropertyAsInt32(name);
+            [[maybe_unused]] int result = in.getPropertyAsInt32(name);
             BSLS_ASSERT_SAFE(stoi(value) == result);
         } break;  // BREAK
         default: BSLS_ASSERT_SAFE(false && "Unsupported type");

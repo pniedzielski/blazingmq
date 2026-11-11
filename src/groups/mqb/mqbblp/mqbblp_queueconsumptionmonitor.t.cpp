@@ -130,15 +130,15 @@ struct MockStorageIterator : public mqbi::StorageIterator {
     bool advance() override;
 
     // ACCESSORS
-    void reset(BSLA_MAYBE_UNUSED const bmqt::MessageGUID& where) override;
+    void reset([[maybe_unused]] const bmqt::MessageGUID& where) override;
 
     const bmqt::MessageGUID& guid() const override;
 
     const mqbi::AppMessage&
-    appMessageView(BSLA_MAYBE_UNUSED unsigned int appOrdinal) const override;
+    appMessageView([[maybe_unused]] unsigned int appOrdinal) const override;
 
     mqbi::AppMessage&
-    appMessageState(BSLA_MAYBE_UNUSED unsigned int appOrdinal) override;
+    appMessageState([[maybe_unused]] unsigned int appOrdinal) override;
 
     const bsl::shared_ptr<bdlbb::Blob>& appData() const override;
 
@@ -175,7 +175,7 @@ bool MockStorageIterator::advance()
 
 // ACCESSORS
 void MockStorageIterator::reset(
-    BSLA_MAYBE_UNUSED const bmqt::MessageGUID& where)
+    [[maybe_unused]] const bmqt::MessageGUID& where)
 {
 }
 
@@ -185,13 +185,13 @@ const bmqt::MessageGUID& MockStorageIterator::guid() const
 }
 
 const mqbi::AppMessage& MockStorageIterator::appMessageView(
-    BSLA_MAYBE_UNUSED unsigned int appOrdinal) const
+    [[maybe_unused]] unsigned int appOrdinal) const
 {
     return d_appMessage;
 }
 
 mqbi::AppMessage&
-MockStorageIterator::appMessageState(BSLA_MAYBE_UNUSED unsigned int appOrdinal)
+MockStorageIterator::appMessageState([[maybe_unused]] unsigned int appOrdinal)
 {
     return d_appMessage;
 }
@@ -351,9 +351,9 @@ Test::haveUndeliveredCb(bsls::TimeInterval*       alarmTime_p,
 }
 
 void Test::loggingCb(
-    BSLA_MAYBE_UNUSED const bsl::string& id,
-    BSLA_MAYBE_UNUSED const bslma::ManagedPtr<mqbi::StorageIterator>&
-                            oldestMsgIt) const
+    [[maybe_unused]] const bsl::string& id,
+    [[maybe_unused]] const bslma::ManagedPtr<mqbi::StorageIterator>&
+        oldestMsgIt) const
 {
     BALL_LOG_SET_CATEGORY("MQBBLP.QUEUECONSUMPTIONMONITORTEST");
 

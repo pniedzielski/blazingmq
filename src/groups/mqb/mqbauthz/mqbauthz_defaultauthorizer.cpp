@@ -34,7 +34,6 @@
 #include <bdlsb_fixedmeminstreambuf.h>
 #include <bsl_fstream.h>
 #include <bsl_utility.h>
-#include <bsla_maybeunused.h>
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
 
@@ -53,22 +52,22 @@ struct DefaultAuthorizer_PolicyHandler {
     {
     }
 
-    int operator()(BSLA_MAYBE_UNUSED const mqbact::ConnectClient& action,
+    int operator()([[maybe_unused]] const mqbact::ConnectClient& action,
                    const bdlat_SelectionInfo&)
     {
         return d_permission->isConnectClientAllowed() ? k_ALLOW : k_DENY;
     }
-    int operator()(BSLA_MAYBE_UNUSED const mqbact::ConnectProxy& action,
+    int operator()([[maybe_unused]] const mqbact::ConnectProxy& action,
                    const bdlat_SelectionInfo&)
     {
         return d_permission->isConnectProxyAllowed() ? k_ALLOW : k_DENY;
     }
-    int operator()(BSLA_MAYBE_UNUSED const mqbact::ConnectAdmin& action,
+    int operator()([[maybe_unused]] const mqbact::ConnectAdmin& action,
                    const bdlat_SelectionInfo&)
     {
         return d_permission->isConnectAdminAllowed() ? k_ALLOW : k_DENY;
     }
-    int operator()(BSLA_MAYBE_UNUSED const mqbact::ConnectClusterNode& action,
+    int operator()([[maybe_unused]] const mqbact::ConnectClusterNode& action,
                    const bdlat_SelectionInfo&)
     {
         return d_permission->isConnectClusterNodeAllowed() ? k_ALLOW : k_DENY;

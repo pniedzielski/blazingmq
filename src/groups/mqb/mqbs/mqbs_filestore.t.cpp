@@ -358,12 +358,12 @@ class Tester {
         bdls::FilesystemUtil::createDirectories(d_clusterArchiveLocation,
                                                 true);
         {
-            BSLA_MAYBE_UNUSED const int rc = d_scheduler.start();
+            [[maybe_unused]] const int rc = d_scheduler.start();
             BMQTST_ASSERT_EQ(rc, 0);
         }
 
         {
-            BSLA_MAYBE_UNUSED const int rc = d_miscWorkThreadPool.start();
+            [[maybe_unused]] const int rc = d_miscWorkThreadPool.start();
             BMQTST_ASSERT_EQ(rc, 0);
         }
 

@@ -296,7 +296,7 @@ const mqbi::StorageMessageAttributes& StorageIterator::attributes() const
     if (d_attributes.refCount() == 0) {
         // No loaded Attributes for the current message yet.
 
-        BSLA_MAYBE_UNUSED mqbi::StorageResult::Enum rc =
+        [[maybe_unused]] mqbi::StorageResult::Enum rc =
             d_storage_p->get(&d_attributes, d_iterator->first);
         BSLS_ASSERT_SAFE(mqbi::StorageResult::e_SUCCESS == rc);
     }

@@ -844,7 +844,7 @@ struct EventHeader {
     unsigned char d_typeSpecific;
     // Options and flags specific to this event's type
 
-    BSLA_MAYBE_UNUSED unsigned char d_reserved;
+    [[maybe_unused]] unsigned char d_reserved;
     // Reserved.
 
   public:
@@ -1209,7 +1209,7 @@ struct MessagePropertiesHeader {
 
     bdlb::BigEndianUint16 d_msgPropsAreaWordsLower;
 
-    BSLA_MAYBE_UNUSED char d_reserved;
+    [[maybe_unused]] char d_reserved;
 
     unsigned char d_numProperties;
 
@@ -1516,7 +1516,7 @@ struct PutHeader {
 
     SchemaWireId d_schemaId;
 
-    BSLA_MAYBE_UNUSED unsigned char d_reserved[2];
+    [[maybe_unused]] unsigned char d_reserved[2];
     // Reserved.
 
   public:
@@ -1822,7 +1822,7 @@ struct AckHeader {
     unsigned char d_flags;
     // Bitmask of flags.
 
-    BSLA_MAYBE_UNUSED unsigned char d_reserved[2];
+    [[maybe_unused]] unsigned char d_reserved[2];
     // Reserved.
 
   public:
@@ -2121,7 +2121,7 @@ struct PushHeader {
 
     SchemaWireId d_schemaId;
 
-    BSLA_MAYBE_UNUSED unsigned char d_reserved[2];
+    [[maybe_unused]] unsigned char d_reserved[2];
     // Reserved.
   public:
     // PUBLIC CLASS DATA
@@ -2396,7 +2396,7 @@ struct ConfirmHeader {
     // Total size (words) of this header and number of words of
     // each ConfirmMessage in the payload that follows.
 
-    BSLA_MAYBE_UNUSED unsigned char d_reserved[3];
+    [[maybe_unused]] unsigned char d_reserved[3];
     // Reserved
 
   public:
@@ -2572,7 +2572,7 @@ struct RejectHeader {
     // Total size (words) of this header and number of words of
     // each RejectMessage in the payload that follows.
 
-    BSLA_MAYBE_UNUSED unsigned char d_reserved[3];
+    [[maybe_unused]] unsigned char d_reserved[3];
     // Reserved
 
   public:
@@ -3285,7 +3285,7 @@ struct RecoveryHeader {
     // the message (including this header
     // and message payload)
 
-    BSLA_MAYBE_UNUSED char d_reserved;
+    [[maybe_unused]] char d_reserved;
 
     unsigned char d_headerWordsAndFileChunkType;
 

@@ -328,7 +328,7 @@ class BasicTableInfoProvider : public bmqst::TableInfoProvider {
 // ACCESSORS
 template <typename TYPE>
 int BasicTableInfoProvider_ValueSizeVisitor::operator()(
-    BSLA_MAYBE_UNUSED const TYPE& value) const
+    [[maybe_unused]] const TYPE& value) const
 {
     return 1;
 }

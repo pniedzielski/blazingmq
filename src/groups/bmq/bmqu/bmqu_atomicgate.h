@@ -177,7 +177,7 @@ inline bool AtomicGate::tryEnter()
 
 inline void AtomicGate::open()
 {
-    BSLA_MAYBE_UNUSED const int result = d_value.subtract(e_CLOSE);
+    [[maybe_unused]] const int result = d_value.subtract(e_CLOSE);
 
     BSLS_ASSERT_SAFE(result >= e_INIT);
     BSLS_ASSERT_SAFE((result & e_CLOSE) == 0);
@@ -185,7 +185,7 @@ inline void AtomicGate::open()
 
 inline void AtomicGate::leave()
 {
-    BSLA_MAYBE_UNUSED const int result = d_value.subtract(e_ENTER);
+    [[maybe_unused]] const int result = d_value.subtract(e_ENTER);
 
     BSLS_ASSERT_SAFE(result >= e_INIT);
 }

@@ -101,7 +101,7 @@ void PutMessageIterator::initCachedOptionsView() const
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_optionsView.isNull())) {
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         // Load options iterator
-        BSLA_MAYBE_UNUSED int rc = loadOptionsView(&d_optionsView.makeValue());
+        [[maybe_unused]] int rc = loadOptionsView(&d_optionsView.makeValue());
         BSLS_ASSERT_SAFE(rc == 0);
     }
 

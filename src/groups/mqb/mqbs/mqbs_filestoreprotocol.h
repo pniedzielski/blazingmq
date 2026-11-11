@@ -371,11 +371,11 @@ struct FileHeader {
 
     char d_bitnessAndFileType;
 
-    BSLA_MAYBE_UNUSED char d_reserved1[10];
+    [[maybe_unused]] char d_reserved1[10];
 
     bdlb::BigEndianInt32 d_partitionId;
 
-    BSLA_MAYBE_UNUSED char d_reserved2[8];
+    [[maybe_unused]] char d_reserved2[8];
 
   public:
     // CREATORS
@@ -450,11 +450,11 @@ struct DataFileHeader {
     // DATA
     unsigned char d_headerWords;
 
-    BSLA_MAYBE_UNUSED char d_reserved1;
+    [[maybe_unused]] char d_reserved1;
 
     char d_fileKey[FileStoreProtocol::k_KEY_LENGTH];
 
-    BSLA_MAYBE_UNUSED char d_reserved2;
+    [[maybe_unused]] char d_reserved2;
 
   public:
     // CREATORS
@@ -514,7 +514,7 @@ struct JournalFileHeader {
 
     unsigned char d_recordWords;
 
-    BSLA_MAYBE_UNUSED char d_reserved[k_NUM_RESERVED_BYTES];
+    [[maybe_unused]] char d_reserved[k_NUM_RESERVED_BYTES];
 
     bdlb::BigEndianUint32 d_firstSyncPointAfterRolloverOffsetUpperBits;
 
@@ -577,7 +577,7 @@ struct QlistFileHeader {
     // DATA
     unsigned char d_headerWords;
 
-    BSLA_MAYBE_UNUSED char d_reserved[k_NUM_RESERVED_BYTES];
+    [[maybe_unused]] char d_reserved[k_NUM_RESERVED_BYTES];
 
   public:
     // CREATORS
@@ -761,7 +761,7 @@ struct DataHeader {
 
     bmqp::SchemaWireId d_schemaId;
 
-    BSLA_MAYBE_UNUSED unsigned char d_reserved[2];
+    [[maybe_unused]] unsigned char d_reserved[2];
     // Reserved.
   public:
     // CREATORS
@@ -1387,7 +1387,7 @@ struct ConfirmRecord {
     // DATA
     RecordHeader d_header;
 
-    BSLA_MAYBE_UNUSED char d_reserved1[2];
+    [[maybe_unused]] char d_reserved1[2];
 
     char d_queueKey[FileStoreProtocol::k_KEY_LENGTH];
 
@@ -1395,7 +1395,7 @@ struct ConfirmRecord {
 
     unsigned char d_guid[bmqt::MessageGUID::e_SIZE_BINARY];
 
-    BSLA_MAYBE_UNUSED char d_reserved2[8];
+    [[maybe_unused]] char d_reserved2[8];
 
     bdlb::BigEndianUint32 d_magic;
 
@@ -1565,13 +1565,13 @@ struct DeletionRecord {
     // DATA
     RecordHeader d_header;
 
-    BSLA_MAYBE_UNUSED char d_reserved1[3];
+    [[maybe_unused]] char d_reserved1[3];
 
     char d_queueKey[FileStoreProtocol::k_KEY_LENGTH];
 
     unsigned char d_guid[bmqt::MessageGUID::e_SIZE_BINARY];
 
-    BSLA_MAYBE_UNUSED char d_reserved2[12];
+    [[maybe_unused]] char d_reserved2[12];
 
     bdlb::BigEndianUint32 d_magic;
 
@@ -1751,7 +1751,7 @@ struct QueueOpRecord {
     // DATA
     RecordHeader d_header;
 
-    BSLA_MAYBE_UNUSED char d_reserved1[2];
+    [[maybe_unused]] char d_reserved1[2];
 
     char d_queueKey[FileStoreProtocol::k_KEY_LENGTH];
 
@@ -1767,7 +1767,7 @@ struct QueueOpRecord {
 
     bdlb::BigEndianUint32 d_startPrimaryLeaseId;
 
-    BSLA_MAYBE_UNUSED char d_reserved2[4];
+    [[maybe_unused]] char d_reserved2[4];
 
     bdlb::BigEndianUint32 d_magic;
 
@@ -2012,7 +2012,7 @@ struct JournalOpRecord {
     // DATA
     RecordHeader d_header;
 
-    BSLA_MAYBE_UNUSED char d_reserved1[3];
+    [[maybe_unused]] char d_reserved1[3];
 
     unsigned char d_syncPointType;
 
@@ -2030,7 +2030,7 @@ struct JournalOpRecord {
 
     bdlb::BigEndianUint32 d_qlistFileOffsetWords;
 
-    BSLA_MAYBE_UNUSED char d_reserved2[4];
+    [[maybe_unused]] char d_reserved2[4];
 
     bdlb::BigEndianUint32 d_magic;
 

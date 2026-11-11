@@ -207,8 +207,8 @@ class BroadcastNoTrackVisitor : public Routers::Visitor {
         BSLS_ASSERT(d_message_p);
     }
 
-    bool visit(mqbi::QueueHandle* handle,
-               BSLA_MAYBE_UNUSED Routers::Consumer* consumer,
+    bool visit(mqbi::QueueHandle*                  handle,
+               [[maybe_unused]] Routers::Consumer* consumer,
                unsigned int downstreamSubscriptionId) override
     {
         BSLS_ASSERT(handle);
@@ -240,8 +240,8 @@ class FanoutVisitor : public Routers::Visitor {
         BSLS_ASSERT(d_appView_p);
     }
 
-    bool visit(mqbi::QueueHandle* handle,
-               BSLA_MAYBE_UNUSED Routers::Consumer* consumer,
+    bool visit(mqbi::QueueHandle*                  handle,
+               [[maybe_unused]] Routers::Consumer* consumer,
                unsigned int downstreamSubscriptionId) override
     {
         BSLS_ASSERT(handle);
@@ -267,8 +267,8 @@ class BroadcastVisitor : public Routers::Visitor {
         BSLS_ASSERT(d_consumers_p);
     }
 
-    bool visit(mqbi::QueueHandle* handle,
-               BSLA_MAYBE_UNUSED Routers::Consumer* consumer,
+    bool visit(mqbi::QueueHandle*                  handle,
+               [[maybe_unused]] Routers::Consumer* consumer,
                unsigned int downstreamSubscriptionId) override
     {
         BSLS_ASSERT(handle);
@@ -328,9 +328,9 @@ int QueueEngineUtil::validateUri(
 {
     bmqt::Uri       uri;
     bsl::string     error;
-    BSLA_MAYBE_UNUSED int rc = bmqt::UriParser::parse(&uri,
-                                                      &error,
-                                                      handleParameters.uri());
+    [[maybe_unused]] int rc = bmqt::UriParser::parse(&uri,
+                                                     &error,
+                                                     handleParameters.uri());
     if (handle->queue()->uri().canonical() != uri.canonical()) {
         BALL_LOG_ERROR_BLOCK
         {

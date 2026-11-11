@@ -332,7 +332,7 @@ Flattener::EventBuilderResult Flattener::importOptions()
             LSA                        lsa(d_allocator_p);
             bmqp::Protocol::MsgGroupId msgGroupId(&lsa);
 
-            BSLA_MAYBE_UNUSED int rc = d_optionsView.loadMsgGroupIdOption(
+            [[maybe_unused]] int rc = d_optionsView.loadMsgGroupIdOption(
                 &msgGroupId);
             BSLS_ASSERT_SAFE(rc == 0);
             result = d_builder.addMsgGroupIdOption(msgGroupId);

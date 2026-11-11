@@ -72,7 +72,7 @@ bmqt::EventBuilderResult::Enum PushEventBuilder::packMessageImp(
     const MessagePropertiesInfo&         messagePropertiesInfo)
 {
     // PRECONDITIONS
-    BSLA_MAYBE_UNUSED const int optionsCount = d_options.optionsCount();
+    [[maybe_unused]] const int  optionsCount = d_options.optionsCount();
     const int                   optionsSize  = d_options.size();
     BSLS_ASSERT_SAFE((optionsCount > 0 && d_currPushHeader.isSet()) ||
                      (optionsCount == 0 && !d_currPushHeader.isSet()));
@@ -238,7 +238,7 @@ bmqt::EventBuilderResult::Enum PushEventBuilder::addSubQueueIdsOption(
     const Protocol::SubQueueIdsArrayOld& subQueueIds)
 {
     // PRECONDITIONS
-    BSLA_MAYBE_UNUSED const int optionsSize = d_options.size();
+    [[maybe_unused]] const int optionsSize = d_options.size();
     BSLS_ASSERT_SAFE((optionsSize > 0 && d_currPushHeader.isSet()) ||
                      (optionsSize == 0 && !d_currPushHeader.isSet()));
 
@@ -292,7 +292,7 @@ bmqt::EventBuilderResult::Enum PushEventBuilder::addSubQueueInfosOption(
     bool                                packRdaCounter)
 {
     // PRECONDITIONS
-    BSLA_MAYBE_UNUSED const int optionsSize = d_options.size();
+    [[maybe_unused]] const int optionsSize = d_options.size();
     BSLS_ASSERT_SAFE((optionsSize > 0 && d_currPushHeader.isSet()) ||
                      (optionsSize == 0 && !d_currPushHeader.isSet()));
 
@@ -403,7 +403,7 @@ PushEventBuilder::addMsgGroupIdOption(const Protocol::MsgGroupId& msgGroupId)
     // is meant to ensure that both error scenarios are captured by this
     // method.
 
-    BSLA_MAYBE_UNUSED const int optionsSize = d_options.size();
+    [[maybe_unused]] const int optionsSize = d_options.size();
     BSLS_ASSERT_SAFE((optionsSize > 0 && d_currPushHeader.isSet()) ||
                      (optionsSize == 0 && !d_currPushHeader.isSet()));
 

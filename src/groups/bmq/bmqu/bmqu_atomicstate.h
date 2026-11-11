@@ -121,7 +121,7 @@ inline bool AtomicState::tryLock()
 
 inline void AtomicState::unlock()
 {
-    BSLA_MAYBE_UNUSED const int result = d_value.subtract(e_LOCK);
+    [[maybe_unused]] const int result = d_value.subtract(e_LOCK);
     BSLS_ASSERT_SAFE(result >= e_INIT);
 }
 

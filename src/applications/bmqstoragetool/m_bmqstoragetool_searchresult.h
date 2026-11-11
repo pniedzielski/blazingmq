@@ -880,7 +880,7 @@ class SearchOffsetDecorator : public SearchResultDecorator {
     /// List of offsets to search for.
     bsl::vector<bsls::Types::Int64> d_offsets;
     /// If 'true', output detailed result, output short one otherwise.
-    BSLA_MAYBE_UNUSED bool d_withDetails;
+    [[maybe_unused]] bool d_withDetails;
 
   public:
     // CREATORS
@@ -940,7 +940,7 @@ class SearchSequenceNumberDecorator : public SearchResultDecorator {
     /// List of composite sequence numbers to search for.
     bsl::vector<CompositeSequenceNumber> d_seqNums;
     /// If 'true', output detailed result, output short one otherwise.
-    BSLA_MAYBE_UNUSED bool d_withDetails;
+    [[maybe_unused]] bool d_withDetails;
 
   public:
     // CREATORS

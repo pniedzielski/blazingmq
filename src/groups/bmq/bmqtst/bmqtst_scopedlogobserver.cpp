@@ -99,8 +99,8 @@ ScopedLogObserver::setSeverityThreshold(ball::Severity::Level value)
     return *this;
 }
 
-void ScopedLogObserver::publish(const ball::Record&     record,
-                                BSLA_MAYBE_UNUSED const ball::Context& context)
+void ScopedLogObserver::publish(const ball::Record&                   record,
+                                [[maybe_unused]] const ball::Context& context)
 {
     // Check if the record's severity is higher than the severity threshold
     if (record.fixedFields().severity() > d_severityThreshold) {

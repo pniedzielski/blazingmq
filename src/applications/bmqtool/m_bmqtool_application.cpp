@@ -692,7 +692,7 @@ void Application::onMessageEvent(const bmqa::MessageEvent& event)
             d_fileLogger.writePushMessage(message);
 
             if (d_parameters.confirmMsg()) {
-                BSLA_MAYBE_UNUSED bmqt::EventBuilderResult::Enum rc =
+                [[maybe_unused]] bmqt::EventBuilderResult::Enum rc =
                     bmqp::ProtocolUtil::buildEvent(
                         BuildConfirmFunctor(confirmBuilder, message),
                         BuildConfirmOverflowFunctor(*d_session_mp.get(),
@@ -720,7 +720,7 @@ void Application::onMessageEvent(const bmqa::MessageEvent& event)
                 // Extract message post timestamp
                 bdlb::BigEndianInt64 postTime;
 
-                BSLA_MAYBE_UNUSED int rc = bmqu::BlobUtil::readNBytes(
+                [[maybe_unused]] int rc = bmqu::BlobUtil::readNBytes(
                     reinterpret_cast<char*>(&postTime),
                     blob,
                     bmqu::BlobPosition(0, 0),
@@ -781,7 +781,7 @@ void Application::onMessageEvent(const bmqa::MessageEvent& event)
             }
 
             bmqa::MessageProperties in(d_allocator_p);
-            BSLA_MAYBE_UNUSED int   rc = message.loadProperties(&in);
+            [[maybe_unused]] int    rc = message.loadProperties(&in);
             BSLS_ASSERT_SAFE(rc == 0);
             InputUtil::verifyProperties(in, d_parameters.messageProperties());
         }
@@ -919,7 +919,7 @@ int Application::start()
     d_scheduler.start();
 
     if (!d_parameters.logFilePath().empty()) {
-        BSLA_MAYBE_UNUSED bool rc = d_fileLogger.open();
+        [[maybe_unused]] bool rc = d_fileLogger.open();
         BSLS_ASSERT_SAFE(rc);
     }
 

@@ -742,7 +742,7 @@ void RemoteQueue::onHandleReleased(
                     const bsl::string& appId =
                         handleParameters.subIdInfo().value().appId();
                     mqbu::StorageKey             appKey;
-                    BSLA_MAYBE_UNUSED const bool hasVirtualStorage =
+                    [[maybe_unused]] const bool  hasVirtualStorage =
                         d_state_p->storage()->hasVirtualStorage(appId,
                                                                 &appKey);
                     BSLS_ASSERT_SAFE(hasVirtualStorage);

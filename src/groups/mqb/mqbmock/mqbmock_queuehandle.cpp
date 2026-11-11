@@ -86,9 +86,9 @@ QueueHandle::subscription2downstreamSubQueueId(unsigned int sId) const
 QueueHandle::QueueHandle(
     const bsl::shared_ptr<mqbi::Queue>&                       queueSp,
     const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>& clientContext,
-    BSLA_MAYBE_UNUSED mqbstat::QueueStatsDomain* domainStats,
-    const bmqp_ctrlmsg::QueueHandleParameters&   handleParameters,
-    bslma::Allocator*                            allocator)
+    [[maybe_unused]] mqbstat::QueueStatsDomain*               domainStats,
+    const bmqp_ctrlmsg::QueueHandleParameters&                handleParameters,
+    bslma::Allocator*                                         allocator)
 : d_handleParameters(allocator)
 , d_downstreams(allocator)
 , d_subStreamInfos(allocator)
@@ -203,23 +203,23 @@ bool QueueHandle::unregisterSubStream(const bmqp_ctrlmsg::SubQueueIdInfo& info,
 }
 
 mqbi::QueueHandle*
-QueueHandle::setIsClientClusterMember(BSLA_MAYBE_UNUSED bool value)
+QueueHandle::setIsClientClusterMember([[maybe_unused]] bool value)
 {
     return this;
 }
 
 void QueueHandle::postMessage(
-    BSLA_MAYBE_UNUSED const bmqp::PutHeader& putHeader,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bdlbb::Blob>& appData,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bdlbb::Blob>& options)
+    [[maybe_unused]] const bmqp::PutHeader&              putHeader,
+    [[maybe_unused]] const bsl::shared_ptr<bdlbb::Blob>& appData,
+    [[maybe_unused]] const bsl::shared_ptr<bdlbb::Blob>& options)
 {
     // NOTHING
 }
 
 void QueueHandle::confirmMessage(
-    BSLA_MAYBE_UNUSED mqbi::DispatcherEventSource* eventSource_p,
-    const bmqt::MessageGUID&                       msgGUID,
-    unsigned int                                   downstreamSubQueueId)
+    [[maybe_unused]] mqbi::DispatcherEventSource* eventSource_p,
+    const bmqt::MessageGUID&                      msgGUID,
+    unsigned int                                  downstreamSubQueueId)
 {
     // Update unconfirmed messages collection
     Downstreams::iterator mapIter = d_downstreams.find(downstreamSubQueueId);
@@ -289,7 +289,7 @@ void QueueHandle::rejectMessage(const bmqt::MessageGUID& msgGUID,
 }
 
 void QueueHandle::onAckMessage(
-    BSLA_MAYBE_UNUSED const bmqp::AckMessage& ackMessage)
+    [[maybe_unused]] const bmqp::AckMessage& ackMessage)
 {
     // NOTHING
 }
@@ -297,7 +297,7 @@ void QueueHandle::onAckMessage(
 void QueueHandle::deliverMessage(
     const mqbi::StorageIterator&              message,
     const bmqp::Protocol::SubQueueInfosArray& subscriptions,
-    BSLA_MAYBE_UNUSED bool                    isOutOfOrder)
+    [[maybe_unused]] bool                     isOutOfOrder)
 {
     // PRECONDITIONS
     BSLS_ASSERT_OPT(
@@ -317,7 +317,7 @@ void QueueHandle::deliverMessage(
 
         GUIDMap& guids = mapIter->second.d_unconfirmedMessages;
 
-        BSLA_MAYBE_UNUSED bsl::pair<GUIDMap::iterator, bool> insertRC =
+        [[maybe_unused]] bsl::pair<GUIDMap::iterator, bool> insertRC =
             guids.insert(
                 bsl::make_pair(message.guid(),
                                bsl::make_pair(message.appData(), sId)));
@@ -358,10 +358,10 @@ void QueueHandle::deconfigureAll(
 }
 
 void QueueHandle::release(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::QueueHandleParameters&
-                            handleParameters,
-    BSLA_MAYBE_UNUSED bool  isFinal,
-    BSLA_MAYBE_UNUSED const HandleReleasedCallback& releasedCb)
+    [[maybe_unused]] const bmqp_ctrlmsg::QueueHandleParameters&
+                                                   handleParameters,
+    [[maybe_unused]] bool                          isFinal,
+    [[maybe_unused]] const HandleReleasedCallback& releasedCb)
 {
     // NOTHING
 }
@@ -558,7 +558,7 @@ bool QueueHandle::canDeliver(unsigned int downstreamSubscriptionId) const
 
 const bsl::vector<const mqbu::ResourceUsageMonitor*>
 QueueHandle::unconfirmedMonitors(
-    BSLA_MAYBE_UNUSED const bsl::string& appId) const
+    [[maybe_unused]] const bsl::string& appId) const
 {
     bsl::vector<const mqbu::ResourceUsageMonitor*> out(d_allocator_p);
     out.push_back(&d_unconfirmedMessageMonitor);

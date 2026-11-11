@@ -79,19 +79,18 @@ void doFail()
     BMQTST_ASSERT(false && "Must not be invoked");
 }
 
-void executeOnClosedChannelFunc(bmqio::NtcChannel*              channel,
-                                BSLA_MAYBE_UNUSED const Status& status)
+void executeOnClosedChannelFunc(bmqio::NtcChannel*             channel,
+                                [[maybe_unused]] const Status& status)
 {
     // PRECONDITIONS
     BMQTST_ASSERT(channel);
 
-    BSLA_MAYBE_UNUSED bslma::Allocator* alloc     = channel->allocator();
-    BSLA_MAYBE_UNUSED int               id        = channel->channelId();
-    BSLA_MAYBE_UNUSED ntsa::Endpoint peerEndpoint = channel->peerEndpoint();
-    BSLA_MAYBE_UNUSED ntsa::Endpoint sourceEndpoint =
-        channel->sourceEndpoint();
-    BSLA_MAYBE_UNUSED bsl::string peerUri            = channel->peerUri();
-    BSLA_MAYBE_UNUSED bmqvt::PropertyBag& properties = channel->properties();
+    [[maybe_unused]] bslma::Allocator* alloc        = channel->allocator();
+    [[maybe_unused]] int               id           = channel->channelId();
+    [[maybe_unused]] ntsa::Endpoint    peerEndpoint = channel->peerEndpoint();
+    [[maybe_unused]] ntsa::Endpoint sourceEndpoint = channel->sourceEndpoint();
+    [[maybe_unused]] bsl::string    peerUri        = channel->peerUri();
+    [[maybe_unused]] bmqvt::PropertyBag& properties = channel->properties();
 
     channel->setChannelId(id);
     channel->setWriteQueueLowWatermark(k_WRITE_QUEUE_LOW_WM);
@@ -114,10 +113,10 @@ void executeOnClosedChannelFunc(bmqio::NtcChannel*              channel,
 /// @param channel   The channel kept alive while this callback is stored.
 /// @param status    The close status.
 void saveCloseStatus(
-    bslmt::Semaphore*       semaphore,
-    Status*                 result,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<NtcChannel>& channel,
-    const Status&                                        status)
+    bslmt::Semaphore*                                   semaphore,
+    Status*                                             result,
+    [[maybe_unused]] const bsl::shared_ptr<NtcChannel>& channel,
+    const Status&                                       status)
 {
     // PRECONDITIONS
     BMQTST_ASSERT(semaphore);
@@ -167,11 +166,11 @@ class Tester {
 
   public:
     // TRAITS
-    BSLA_MAYBE_UNUSED
+    [[maybe_unused]]
     BSLMF_NESTED_TRAIT_DECLARATION(Tester, bslma::UsesBslmaAllocator)
 
-    // CREATORS
-    explicit Tester(bslma::Allocator* basicAllocator = 0);
+        // CREATORS
+        explicit Tester(bslma::Allocator* basicAllocator = 0);
     ~Tester();
 
     // MANIPULATORS
@@ -232,10 +231,10 @@ void Tester::destroy()
 }
 
 void Tester::onAcceptConnection(
-    bslmt::Semaphore*       semaphore_p,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<ntci::Acceptor>& acceptor,
-    const bsl::shared_ptr<ntci::StreamSocket>&               streamSocket,
-    const ntca::AcceptEvent&                                 event)
+    bslmt::Semaphore*                                       semaphore_p,
+    [[maybe_unused]] const bsl::shared_ptr<ntci::Acceptor>& acceptor,
+    const bsl::shared_ptr<ntci::StreamSocket>&              streamSocket,
+    const ntca::AcceptEvent&                                event)
 {
     // PRECONDITIONS
     BMQTST_ASSERT(semaphore_p);
@@ -254,8 +253,8 @@ void Tester::onAcceptConnection(
 }
 
 void Tester::onChannelResult(bslmt::Semaphore* semaphore_p,
-                             BSLA_MAYBE_UNUSED ChannelFactoryEvent::Enum event,
-                             BSLA_MAYBE_UNUSED const Status& status,
+                             [[maybe_unused]] ChannelFactoryEvent::Enum event,
+                             [[maybe_unused]] const Status&             status,
                              const bsl::shared_ptr<Channel>& channel)
 {
     // PRECONDITIONS

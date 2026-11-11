@@ -155,7 +155,7 @@ void afterAppIdUnregisteredDispatched(
 }
 
 void handleHolderDummy(
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<mqbi::QueueHandle>& handle)
+    [[maybe_unused]] const bsl::shared_ptr<mqbi::QueueHandle>& handle)
 {
     // executed by ONE of the *QUEUE* dispatcher threads
 
@@ -2900,9 +2900,9 @@ void ClusterQueueHelper::notifyQueue(QueueContext*       queueContext,
 }
 
 void ClusterQueueHelper::reconfigureCallback(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::Status& status,
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::StreamParameters& streamParameters,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<PartitionReopenCycle>& cycle)
+    [[maybe_unused]] const bmqp_ctrlmsg::Status&           status,
+    [[maybe_unused]] const bmqp_ctrlmsg::StreamParameters& streamParameters,
+    [[maybe_unused]] const bsl::shared_ptr<PartitionReopenCycle>& cycle)
 {
     // TODO: consider success even before reconfigure response
 }
@@ -4318,7 +4318,7 @@ void ClusterQueueHelper::onQueueAssigned(
         }
         else {
             // Update queue's mapping etc.
-            BSLA_MAYBE_UNUSED mqbc::ClusterState::QueueKeysInsertRc insertRc =
+            [[maybe_unused]] mqbc::ClusterState::QueueKeysInsertRc insertRc =
                 d_clusterState_p->queueKeys().insert(info->key());
             BSLS_ASSERT_SAFE(insertRc.second);
         }
@@ -4326,7 +4326,7 @@ void ClusterQueueHelper::onQueueAssigned(
     else {
         // First time hearing about this queue.  Update 'queueKeys' and
         // ensure that queue key is unique.
-        BSLA_MAYBE_UNUSED mqbc::ClusterState::QueueKeysInsertRc insertRc =
+        [[maybe_unused]] mqbc::ClusterState::QueueKeysInsertRc insertRc =
             d_clusterState_p->queueKeys().insert(info->key());
         BSLS_ASSERT_SAFE(insertRc.second);
 
@@ -4497,10 +4497,10 @@ void ClusterQueueHelper::onQueueUnassigned(
 }
 
 void ClusterQueueHelper::onQueueUpdated(
-    const bmqt::Uri&        uri,
-    BSLA_MAYBE_UNUSED const bsl::string& domain,
-    const AppInfos&                      addedAppIds,
-    const AppInfos&                      removedAppIds)
+    const bmqt::Uri&                    uri,
+    [[maybe_unused]] const bsl::string& domain,
+    const AppInfos&                     addedAppIds,
+    const AppInfos&                     removedAppIds)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -5394,8 +5394,8 @@ void ClusterQueueHelper::requestToStopQueues()
 }
 
 void ClusterQueueHelper::contextHolder(
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<StopContext>& contextSp,
-    const VoidFunctor&                                    action)
+    [[maybe_unused]] const bsl::shared_ptr<StopContext>& contextSp,
+    const VoidFunctor&                                   action)
 {
     if (action) {
         action();

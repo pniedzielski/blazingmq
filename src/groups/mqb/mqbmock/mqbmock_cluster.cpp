@@ -333,7 +333,7 @@ void Cluster::flush()
 
 // MANIPULATORS
 //   (virtual: mqbi::Cluster)
-int Cluster::start(BSLA_MAYBE_UNUSED bsl::ostream& errorDescription)
+int Cluster::start([[maybe_unused]] bsl::ostream& errorDescription)
 {
     // PRECONDITIONS
     BSLS_ASSERT_OPT(!d_isStarted &&
@@ -346,7 +346,7 @@ int Cluster::start(BSLA_MAYBE_UNUSED bsl::ostream& errorDescription)
     return 0;
 }
 
-void Cluster::initiateShutdown(BSLA_MAYBE_UNUSED const VoidFunctor& callback)
+void Cluster::initiateShutdown([[maybe_unused]] const VoidFunctor& callback)
 {
     // PRECONDITIONS
     BSLS_ASSERT_OPT(!d_isStarted &&
@@ -422,21 +422,21 @@ Cluster::sendRequest(const Cluster::RequestManagerType::RequestSp& request,
 }
 
 void Cluster::openQueue(
-    BSLA_MAYBE_UNUSED const bmqt::Uri& uri,
-    BSLA_MAYBE_UNUSED mqbi::Domain* domain,
-    BSLA_MAYBE_UNUSED const         bmqp_ctrlmsg::QueueHandleParameters&
-                                    handleParameters,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>&
-                            clientContext,
-    BSLA_MAYBE_UNUSED const mqbi::Cluster::OpenQueueCallback& callback)
+    [[maybe_unused]] const bmqt::Uri& uri,
+    [[maybe_unused]] mqbi::Domain*    domain,
+    [[maybe_unused]] const bmqp_ctrlmsg::QueueHandleParameters&
+        handleParameters,
+    [[maybe_unused]] const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>&
+                                                             clientContext,
+    [[maybe_unused]] const mqbi::Cluster::OpenQueueCallback& callback)
 {
     // NOTHING
 }
 
 void Cluster::configureQueue(
-    BSLA_MAYBE_UNUSED mqbi::Queue*                     queue,
+    [[maybe_unused]] mqbi::Queue*                      queue,
     const bmqp_ctrlmsg::StreamParameters&              streamParameters,
-    BSLA_MAYBE_UNUSED unsigned int                     upstreamSubQueueId,
+    [[maybe_unused]] unsigned int                      upstreamSubQueueId,
     const mqbi::QueueHandle::HandleConfiguredCallback& callback)
 {
     if (callback) {
@@ -449,10 +449,10 @@ void Cluster::configureQueue(
 }
 
 void Cluster::closeQueue(
-    BSLA_MAYBE_UNUSED mqbi::Queue*         queue,
-    BSLA_MAYBE_UNUSED const                bmqp_ctrlmsg::QueueHandleParameters&
+    [[maybe_unused]] mqbi::Queue* queue,
+    [[maybe_unused]] const bmqp_ctrlmsg::QueueHandleParameters&
                                            handleParameters,
-    BSLA_MAYBE_UNUSED unsigned int         upstreamSubQueueId,
+    [[maybe_unused]] unsigned int          upstreamSubQueueId,
     const Cluster::HandleReleasedCallback& callback)
 {
     if (callback) {
@@ -464,21 +464,21 @@ void Cluster::closeQueue(
     }
 }
 
-void Cluster::onQueueHandleCreated(BSLA_MAYBE_UNUSED mqbi::Queue* queue,
-                                   BSLA_MAYBE_UNUSED const bmqt::Uri& uri,
-                                   BSLA_MAYBE_UNUSED bool handleCreated)
+void Cluster::onQueueHandleCreated([[maybe_unused]] mqbi::Queue*     queue,
+                                   [[maybe_unused]] const bmqt::Uri& uri,
+                                   [[maybe_unused]] bool handleCreated)
 {
 }
 
-void Cluster::onQueueHandleDestroyed(BSLA_MAYBE_UNUSED mqbi::Queue* queue,
-                                     BSLA_MAYBE_UNUSED const bmqt::Uri& uri)
+void Cluster::onQueueHandleDestroyed([[maybe_unused]] mqbi::Queue*     queue,
+                                     [[maybe_unused]] const bmqt::Uri& uri)
 {
 }
 
 void Cluster::onDomainReconfigured(
-    BSLA_MAYBE_UNUSED const mqbi::Domain& domain,
-    BSLA_MAYBE_UNUSED const mqbconfm::Domain& oldDefn,
-    BSLA_MAYBE_UNUSED const mqbconfm::Domain& newDefn)
+    [[maybe_unused]] const mqbi::Domain&     domain,
+    [[maybe_unused]] const mqbconfm::Domain& oldDefn,
+    [[maybe_unused]] const mqbconfm::Domain& newDefn)
 {
 }
 
@@ -497,8 +497,8 @@ void Cluster::loadClusterStatus(mqbcmd::ClusterResult* out)
 }
 
 mqbi::InlineResult::Enum Cluster::sendConfirmInline(
-    BSLA_MAYBE_UNUSED int   partitionId,
-    BSLA_MAYBE_UNUSED const bmqp::ConfirmMessage& message)
+    [[maybe_unused]] int                         partitionId,
+    [[maybe_unused]] const bmqp::ConfirmMessage& message)
 {
     return mqbi::InlineResult::e_UNAVAILABLE;
 }
@@ -522,8 +522,8 @@ Cluster::sendPutInline(int                                       partitionId,
 }
 
 void Cluster::purgeAndGCQueueOnDomain(
-    mqbcmd::ClusterResult*  result,
-    BSLA_MAYBE_UNUSED const bsl::string& domainName)
+    mqbcmd::ClusterResult*              result,
+    [[maybe_unused]] const bsl::string& domainName)
 {
     bmqu::MemOutStream os;
     os << "MockCluster::purgeAndGCQueueOnDomain not implemented!";
@@ -531,7 +531,7 @@ void Cluster::purgeAndGCQueueOnDomain(
 }
 
 void Cluster::processBufferedPrimaryStatusAdvisories(
-    BSLA_MAYBE_UNUSED int partitionId)
+    [[maybe_unused]] int partitionId)
 {
     // NOTHING (mock)
 }
@@ -589,9 +589,9 @@ const mqbnet::Cluster& Cluster::netCluster() const
 }
 
 void Cluster::printClusterStateSummary(
-    bsl::ostream&         out,
-    BSLA_MAYBE_UNUSED int level,
-    BSLA_MAYBE_UNUSED int spacesPerLevel) const
+    bsl::ostream&        out,
+    [[maybe_unused]] int level,
+    [[maybe_unused]] int spacesPerLevel) const
 {
     out << "MockCluster::printClusterStateSummary not implemented";
 }

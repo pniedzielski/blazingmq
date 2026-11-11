@@ -717,14 +717,14 @@ bmqt::GenericResult::Enum MessageProperties::setProperty(bsl::string_view name,
 // PRIVATE ACCESSORS
 template <class TYPE>
 inline int MessageProperties::getPropertyValueSize(
-    BSLA_MAYBE_UNUSED const TYPE& value) const
+    [[maybe_unused]] const TYPE& value) const
 {
     return static_cast<int>(sizeof(TYPE));
 }
 
 template <>
 inline int MessageProperties::getPropertyValueSize(
-    BSLA_MAYBE_UNUSED const bool& value) const
+    [[maybe_unused]] const bool& value) const
 {
     // Partial specialization for type 'bool', to return 1.  sizeof(bool)
     // should be one on all platforms, but just in case.
@@ -791,7 +791,7 @@ inline const TYPE& MessageProperties::getPropertyOr(bsl::string_view name,
     }
     const Property& p = cit->second;
     if (p.d_value.isUnset()) {
-        BSLA_MAYBE_UNUSED bool result = streamInPropertyValue(p);
+        [[maybe_unused]] bool result = streamInPropertyValue(p);
         BSLS_ASSERT(result);
         // We assert 'true' result because the length and offset have already
         // been checked.

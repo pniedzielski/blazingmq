@@ -1822,8 +1822,8 @@ void StorageManager::forceFlushFileStores()
 }
 
 void StorageManager::do_startWatchdog(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -1854,8 +1854,8 @@ void StorageManager::do_startWatchdog(
 }
 
 void StorageManager::do_stopWatchdog(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -1879,8 +1879,8 @@ void StorageManager::do_stopWatchdog(
 }
 
 void StorageManager::do_openRecoveryFileSet(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -1933,8 +1933,8 @@ void StorageManager::do_openRecoveryFileSet(
 }
 
 void StorageManager::do_closeRecoveryFileSet(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -1966,8 +1966,8 @@ void StorageManager::do_closeRecoveryFileSet(
 }
 
 void StorageManager::do_storeSelfSeq(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2014,8 +2014,8 @@ void StorageManager::do_storeSelfSeq(
 }
 
 void StorageManager::do_storePrimarySeq(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2027,7 +2027,7 @@ void StorageManager::do_storePrimarySeq(
     BSLS_ASSERT_SAFE(0 <= partitionId &&
                      partitionId < static_cast<int>(d_fileStores.size()));
 
-    BSLA_MAYBE_UNUSED const PartitionInfo& partitionInfo =
+    [[maybe_unused]] const PartitionInfo& partitionInfo =
         d_partitionInfoVec[partitionId];
     BSLS_ASSERT_SAFE(partitionInfo.primary() == eventData.source());
     BSLS_ASSERT_SAFE(d_partitionFSMVec[partitionId]->isSelfReplica());
@@ -2116,8 +2116,8 @@ void StorageManager::do_storeReplicaSeq(
 }
 
 void StorageManager::do_replicaStateRequest(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2195,8 +2195,8 @@ void StorageManager::do_replicaStateRequest(
 }
 
 void StorageManager::do_replicaStateResponse(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2241,8 +2241,8 @@ void StorageManager::do_replicaStateResponse(
 }
 
 void StorageManager::do_failureReplicaStateResponse(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2293,8 +2293,8 @@ void StorageManager::do_failureReplicaStateResponse(
 }
 
 void StorageManager::do_logFailureReplicaStateResponse(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2312,8 +2312,8 @@ void StorageManager::do_logFailureReplicaStateResponse(
 }
 
 void StorageManager::do_logFailurePrimaryStateResponse(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2333,8 +2333,8 @@ void StorageManager::do_logFailurePrimaryStateResponse(
 }
 
 void StorageManager::do_logUnexpectedPrimaryStateResponse(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2358,8 +2358,8 @@ void StorageManager::do_logUnexpectedPrimaryStateResponse(
 }
 
 void StorageManager::do_logUnexpectedFailurePrimaryStateResponse(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2384,8 +2384,8 @@ void StorageManager::do_logUnexpectedFailurePrimaryStateResponse(
 }
 
 void StorageManager::do_primaryStateRequest(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2452,8 +2452,8 @@ void StorageManager::do_primaryStateRequest(
 }
 
 void StorageManager::do_primaryStateResponse(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2494,8 +2494,8 @@ void StorageManager::do_primaryStateResponse(
 }
 
 void StorageManager::do_failurePrimaryStateResponse(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2528,8 +2528,8 @@ void StorageManager::do_failurePrimaryStateResponse(
 }
 
 void StorageManager::do_replicaDataResponsePush(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2588,8 +2588,8 @@ void StorageManager::do_replicaDataResponsePush(
 }
 
 void StorageManager::do_replicaDataRequestPull(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2652,8 +2652,8 @@ void StorageManager::do_replicaDataRequestPull(
 }
 
 void StorageManager::do_replicaDataResponsePull(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2742,8 +2742,8 @@ void StorageManager::do_failureReplicaDataResponsePull(
 }
 
 void StorageManager::do_failureReplicaDataResponsePush(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    BSLA_MAYBE_UNUSED const PartitionFSMEventData&   eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    [[maybe_unused]] const PartitionFSMEventData&   eventData)
 {
     // TODO: Complete Impl
 }
@@ -2953,8 +2953,8 @@ void StorageManager::do_sendDataToPrimary(
 }
 
 void StorageManager::do_bufferLiveData(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -2987,8 +2987,8 @@ void StorageManager::do_bufferLiveData(
 }
 
 void StorageManager::do_processBufferedLiveData(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3056,8 +3056,8 @@ void StorageManager::do_processBufferedLiveData(
 }
 
 void StorageManager::do_clearBufferedLiveData(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3073,8 +3073,8 @@ void StorageManager::do_clearBufferedLiveData(
 }
 
 void StorageManager::do_processBufferedPrimaryStatusAdvisories(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3108,8 +3108,8 @@ void StorageManager::do_processBufferedPrimaryStatusAdvisories(
 }
 
 void StorageManager::do_processLiveData(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3150,8 +3150,8 @@ void StorageManager::do_processLiveData(
 }
 
 void StorageManager::do_setPrimary(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3178,8 +3178,8 @@ void StorageManager::do_setPrimary(
 }
 
 void StorageManager::do_cleanupMetadata(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3201,8 +3201,8 @@ void StorageManager::do_cleanupMetadata(
 }
 
 void StorageManager::do_clearPrimary(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3222,8 +3222,8 @@ void StorageManager::do_clearPrimary(
 }
 
 void StorageManager::do_cancelRequests(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3312,8 +3312,8 @@ void StorageManager::do_setExpectedDataChunkRange(
 }
 
 void StorageManager::do_resetReceiveDataCtx(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3322,8 +3322,8 @@ void StorageManager::do_resetReceiveDataCtx(
 }
 
 void StorageManager::do_attemptOpenStorage(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3365,8 +3365,8 @@ void StorageManager::do_attemptOpenStorage(
 }
 
 void StorageManager::do_updateStorage(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3499,8 +3499,8 @@ void StorageManager::do_primaryRemoveStorageIfNeeded(
 }
 
 void StorageManager::do_primaryRemoveStorage(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3522,8 +3522,8 @@ void StorageManager::do_primaryRemoveStorage(
 }
 
 void StorageManager::do_removeStorageAndSendReplicaDataDropResponse(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3599,8 +3599,8 @@ void StorageManager::do_removeStorageAndSendReplicaDataDropResponse(
 }
 
 void StorageManager::do_incrementNumRplcaDataRspn(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3628,8 +3628,8 @@ void StorageManager::do_incrementNumRplcaDataRspn(
 }
 
 void StorageManager::do_checkQuorumRplcaDataRspn(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3673,8 +3673,8 @@ void StorageManager::do_reapplyEvent(PartitionStateTableEvent::Enum eventType,
 }
 
 void StorageManager::do_checkQuorumSeq(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3700,8 +3700,8 @@ void StorageManager::do_checkQuorumSeq(
 }
 
 void StorageManager::do_findHighestSeq(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3766,8 +3766,8 @@ void StorageManager::do_findHighestSeq(
 }
 
 void StorageManager::do_flagFailedReplicaSeq(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3786,8 +3786,8 @@ void StorageManager::do_flagFailedReplicaSeq(
 }
 
 void StorageManager::do_transitionToActivePrimary(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3807,8 +3807,8 @@ void StorageManager::do_transitionToActivePrimary(
 }
 
 void StorageManager::do_sendPrimaryStatusAdvisory(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3844,8 +3844,8 @@ void StorageManager::do_sendPrimaryStatusAdvisory(
 }
 
 void StorageManager::do_reapplyDetectSelfPrimary(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -3871,8 +3871,8 @@ void StorageManager::do_reapplyDetectSelfPrimary(
 }
 
 void StorageManager::do_reapplyDetectSelfReplica(
-    BSLA_MAYBE_UNUSED PartitionStateTableEvent::Enum eventType,
-    const PartitionFSMEventData&                     eventData)
+    [[maybe_unused]] PartitionStateTableEvent::Enum eventType,
+    const PartitionFSMEventData&                    eventData)
 {
     // executed by the *QUEUE DISPATCHER* thread associated with the
     // partitionId contained in 'eventData'
@@ -4033,8 +4033,8 @@ StorageManager::~StorageManager()
 // MANIPULATORS
 //   (virtual: mqbc::PartitionFSMObserver)
 void StorageManager::onTransitionToPrimaryHealed(
-    int               partitionId,
-    BSLA_MAYBE_UNUSED PartitionStateTableState::Enum oldState)
+    int                                             partitionId,
+    [[maybe_unused]] PartitionStateTableState::Enum oldState)
 {
     // executed by *QUEUE_DISPATCHER* thread associated with 'partitionId'
 
@@ -4047,8 +4047,8 @@ void StorageManager::onTransitionToPrimaryHealed(
 }
 
 void StorageManager::onTransitionToReplicaHealed(
-    int               partitionId,
-    BSLA_MAYBE_UNUSED mqbc::PartitionStateTableState::Enum oldState)
+    int                                                   partitionId,
+    [[maybe_unused]] mqbc::PartitionStateTableState::Enum oldState)
 {
     // executed by *QUEUE_DISPATCHER* thread associated with 'partitionId'
 
@@ -4061,8 +4061,8 @@ void StorageManager::onTransitionToReplicaHealed(
 }
 
 void StorageManager::onTransitionOutOfHealed(
-    int               partitionId,
-    BSLA_MAYBE_UNUSED PartitionStateTableState::Enum oldState)
+    int                                             partitionId,
+    [[maybe_unused]] PartitionStateTableState::Enum oldState)
 {
     // executed by *QUEUE_DISPATCHER* thread associated with 'partitionId'
 
@@ -4840,39 +4840,39 @@ void StorageManager::processStorageEvent(const mqbevt::StorageEvent& event)
 }
 
 void StorageManager::processStorageSyncRequest(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     BSLS_ASSERT_SAFE(false &&
                      "This method can only be invoked in non-CSL mode");
 }
 
 void StorageManager::processPartitionSyncStateRequest(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     BSLS_ASSERT_SAFE(false &&
                      "This method can only be invoked in non-CSL mode");
 }
 
 void StorageManager::processPartitionSyncDataRequest(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     BSLS_ASSERT_SAFE(false &&
                      "This method can only be invoked in non-CSL mode");
 }
 
 void StorageManager::processPartitionSyncDataRequestStatus(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ControlMessage& message,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::ControlMessage& message,
+    [[maybe_unused]] mqbnet::ClusterNode*                source)
 {
     BSLS_ASSERT_SAFE(false &&
                      "This method can only be invoked in non-CSL mode");
 }
 
 void StorageManager::processRecoveryEvent(
-    BSLA_MAYBE_UNUSED const mqbevt::RecoveryEvent& event)
+    [[maybe_unused]] const mqbevt::RecoveryEvent& event)
 {
     BSLS_ASSERT_SAFE(false &&
                      "This method can only be invoked in non-CSL mode");
@@ -4884,7 +4884,7 @@ void StorageManager::processReceiptEvent(const bmqp::Event&   event,
     // executed by *IO* thread
 
     bmqu::BlobPosition          position;
-    BSLA_MAYBE_UNUSED const int rc = bmqu::BlobUtil::findOffsetSafe(
+    [[maybe_unused]] const int  rc = bmqu::BlobUtil::findOffsetSafe(
         &position,
         *event.blob(),
         sizeof(bmqp::EventHeader));
@@ -4924,8 +4924,8 @@ void StorageManager::processReceiptEvent(const bmqp::Event&   event,
 }
 
 void StorageManager::processPrimaryStatusAdvisory(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::PrimaryStatusAdvisory& advisory,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+    [[maybe_unused]] const bmqp_ctrlmsg::PrimaryStatusAdvisory& advisory,
+    [[maybe_unused]] mqbnet::ClusterNode*                       source)
 {
     // executed by *CLUSTER DISPATCHER* thread
 

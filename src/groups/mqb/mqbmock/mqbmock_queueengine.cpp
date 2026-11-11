@@ -28,7 +28,7 @@ namespace mqbmock {
 // -----------------
 
 // CREATORS
-QueueEngine::QueueEngine(BSLA_MAYBE_UNUSED bslma::Allocator* allocator)
+QueueEngine::QueueEngine([[maybe_unused]] bslma::Allocator* allocator)
 {
     // NOTHING
 }
@@ -39,8 +39,8 @@ QueueEngine::~QueueEngine()
 }
 
 // MANIPULATORS
-int QueueEngine::configure(BSLA_MAYBE_UNUSED bsl::ostream& errorDescription,
-                           BSLA_MAYBE_UNUSED bool          isReconfigure)
+int QueueEngine::configure([[maybe_unused]] bsl::ostream& errorDescription,
+                           [[maybe_unused]] bool          isReconfigure)
 {
     return 0;
 }
@@ -50,52 +50,52 @@ void QueueEngine::close()
     // NOTHING
 }
 
-void QueueEngine::resetState(BSLA_MAYBE_UNUSED bool keepConfirming)
+void QueueEngine::resetState([[maybe_unused]] bool keepConfirming)
 {
     // NOTHING
 }
 
 int QueueEngine::rebuildInternalState(
-    BSLA_MAYBE_UNUSED bsl::ostream& errorDescription)
+    [[maybe_unused]] bsl::ostream& errorDescription)
 {
     return 0;
 }
 
 mqbi::QueueHandle* QueueEngine::getHandle(
-    BSLA_MAYBE_UNUSED const mqbi::OpenQueueConfirmationCookieSp& context,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>&
-                            clientContext,
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::QueueHandleParameters&
-                            handleParameters,
-    BSLA_MAYBE_UNUSED unsigned int upstreamSubQueueId,
-    BSLA_MAYBE_UNUSED const mqbi::QueueHandle::GetHandleCallback& callback)
+    [[maybe_unused]] const mqbi::OpenQueueConfirmationCookieSp& context,
+    [[maybe_unused]] const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>&
+        clientContext,
+    [[maybe_unused]] const bmqp_ctrlmsg::QueueHandleParameters&
+                                  handleParameters,
+    [[maybe_unused]] unsigned int upstreamSubQueueId,
+    [[maybe_unused]] const mqbi::QueueHandle::GetHandleCallback& callback)
 {
     return 0;
 }
 
 void QueueEngine::configureHandle(
-    BSLA_MAYBE_UNUSED mqbi::QueueHandle* handle,
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::StreamParameters& streamParameters,
-    BSLA_MAYBE_UNUSED const mqbi::QueueHandle::HandleConfiguredCallback&
-                            configuredCb)
+    [[maybe_unused]] mqbi::QueueHandle*                    handle,
+    [[maybe_unused]] const bmqp_ctrlmsg::StreamParameters& streamParameters,
+    [[maybe_unused]] const mqbi::QueueHandle::HandleConfiguredCallback&
+        configuredCb)
 {
     // NOTHING
 }
 
 void QueueEngine::releaseHandle(
-    BSLA_MAYBE_UNUSED mqbi::QueueHandle* handle,
-    BSLA_MAYBE_UNUSED const              bmqp_ctrlmsg::QueueHandleParameters&
-                                         handleParameters,
-    BSLA_MAYBE_UNUSED bool               isFinal,
-    BSLA_MAYBE_UNUSED const mqbi::QueueHandle::HandleReleasedCallback&
-                            releasedCb)
+    [[maybe_unused]] mqbi::QueueHandle* handle,
+    [[maybe_unused]] const bmqp_ctrlmsg::QueueHandleParameters&
+                          handleParameters,
+    [[maybe_unused]] bool isFinal,
+    [[maybe_unused]] const mqbi::QueueHandle::HandleReleasedCallback&
+        releasedCb)
 {
     // NOTHING
 }
 
 void QueueEngine::onHandleUsable(
-    BSLA_MAYBE_UNUSED mqbi::QueueHandle* handle,
-    BSLA_MAYBE_UNUSED unsigned int       upstreamSubQueueId)
+    [[maybe_unused]] mqbi::QueueHandle* handle,
+    [[maybe_unused]] unsigned int       upstreamSubQueueId)
 {
     // NOTHING
 }
@@ -106,31 +106,31 @@ void QueueEngine::afterNewMessage()
 }
 
 int QueueEngine::onConfirmMessage(
-    BSLA_MAYBE_UNUSED mqbi::QueueHandle* handle,
-    BSLA_MAYBE_UNUSED const bmqt::MessageGUID& msgGUID,
-    BSLA_MAYBE_UNUSED unsigned int             subQueueId)
+    [[maybe_unused]] mqbi::QueueHandle*       handle,
+    [[maybe_unused]] const bmqt::MessageGUID& msgGUID,
+    [[maybe_unused]] unsigned int             subQueueId)
 {
     return 0;
 }
 
 int QueueEngine::onRejectMessage(
-    BSLA_MAYBE_UNUSED mqbi::QueueHandle* handle,
-    BSLA_MAYBE_UNUSED const bmqt::MessageGUID& msgGUID,
-    BSLA_MAYBE_UNUSED unsigned int             subQueueId)
+    [[maybe_unused]] mqbi::QueueHandle*       handle,
+    [[maybe_unused]] const bmqt::MessageGUID& msgGUID,
+    [[maybe_unused]] unsigned int             subQueueId)
 {
     // TODO: Implement
     return 0;
 }
 
 void QueueEngine::beforeMessageRemoved(
-    BSLA_MAYBE_UNUSED const bmqt::MessageGUID& msgGUID)
+    [[maybe_unused]] const bmqt::MessageGUID& msgGUID)
 {
     // NOTHING
 }
 
 void QueueEngine::afterQueuePurged(
-    BSLA_MAYBE_UNUSED const bsl::string& appId,
-    BSLA_MAYBE_UNUSED const mqbu::StorageKey& appKey)
+    [[maybe_unused]] const bsl::string&      appId,
+    [[maybe_unused]] const mqbu::StorageKey& appKey)
 {
     // NOTHING
 }
@@ -143,9 +143,9 @@ void QueueEngine::afterPostMessage()
 }
 
 void QueueEngine::evaluateAppSubscriptions(
-    BSLA_MAYBE_UNUSED const bmqp::PutHeader& putHeader,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bdlbb::Blob>& appData,
-    BSLA_MAYBE_UNUSED const bmqp::MessagePropertiesInfo& mpi)
+    [[maybe_unused]] const bmqp::PutHeader&              putHeader,
+    [[maybe_unused]] const bsl::shared_ptr<bdlbb::Blob>& appData,
+    [[maybe_unused]] const bmqp::MessagePropertiesInfo&  mpi)
 {
     // executed by the *QUEUE DISPATCHER* thread
 
@@ -159,7 +159,7 @@ unsigned int QueueEngine::messageReferenceCount() const
 }
 
 void QueueEngine::loadInternals(
-    BSLA_MAYBE_UNUSED mqbcmd::QueueEngine* out) const
+    [[maybe_unused]] mqbcmd::QueueEngine* out) const
 {
     // NOTHING
 }

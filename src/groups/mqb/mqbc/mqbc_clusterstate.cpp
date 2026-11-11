@@ -213,45 +213,45 @@ ClusterStateObserver::~ClusterStateObserver()
 }
 
 void ClusterStateObserver::onPartitionPrimaryAssignment(
-    BSLA_MAYBE_UNUSED int partitionId,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* primary,
-    BSLA_MAYBE_UNUSED unsigned int         leaseId,
-    BSLA_MAYBE_UNUSED bmqp_ctrlmsg::PrimaryStatus::Value status,
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* oldPrimary,
-    BSLA_MAYBE_UNUSED unsigned int         oldLeaseId)
+    [[maybe_unused]] int                                partitionId,
+    [[maybe_unused]] mqbnet::ClusterNode*               primary,
+    [[maybe_unused]] unsigned int                       leaseId,
+    [[maybe_unused]] bmqp_ctrlmsg::PrimaryStatus::Value status,
+    [[maybe_unused]] mqbnet::ClusterNode*               oldPrimary,
+    [[maybe_unused]] unsigned int                       oldLeaseId)
 {
     // NOTHING
 }
 
 void ClusterStateObserver::onQueueAssigned(
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<ClusterStateQueueInfo>& info)
+    [[maybe_unused]] const bsl::shared_ptr<ClusterStateQueueInfo>& info)
 {
     // NOTHING
 }
 
 void ClusterStateObserver::onQueueUnassigned(
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<ClusterStateQueueInfo>& info)
+    [[maybe_unused]] const bsl::shared_ptr<ClusterStateQueueInfo>& info)
 {
     // NOTHING
 }
 
 void ClusterStateObserver::onQueueUpdated(
-    BSLA_MAYBE_UNUSED const bmqt::Uri& uri,
-    BSLA_MAYBE_UNUSED const bsl::string& domain,
-    BSLA_MAYBE_UNUSED const AppInfos&    addedAppIds,
-    BSLA_MAYBE_UNUSED const AppInfos&    removedAppIds)
+    [[maybe_unused]] const bmqt::Uri&   uri,
+    [[maybe_unused]] const bsl::string& domain,
+    [[maybe_unused]] const AppInfos&    addedAppIds,
+    [[maybe_unused]] const AppInfos&    removedAppIds)
 {
     // NOTHING
 }
 
 void ClusterStateObserver::onPartitionOrphanThreshold(
-    BSLA_MAYBE_UNUSED size_t partitionId)
+    [[maybe_unused]] size_t partitionId)
 {
     // NOTHING
 }
 
 void ClusterStateObserver::onNodeUnavailableThreshold(
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* node)
+    [[maybe_unused]] mqbnet::ClusterNode* node)
 {
     // NOTHING
 }
@@ -872,7 +872,7 @@ ClusterState::PartitionIdExtractor::PartitionIdExtractor(
     const char                  pattern[] = "^\\S+\\.([0-9]+)\\.\\S+\\.\\S+$";
     bsl::string                 error(d_allocator_p);
     size_t                      errorOffset;
-    BSLA_MAYBE_UNUSED const int rc =
+    [[maybe_unused]] const int  rc =
         d_regex.prepare(&error, &errorOffset, pattern, regexOptions);
     BSLS_ASSERT_SAFE(rc == 0);
     BSLS_ASSERT_SAFE(d_regex.isPrepared() == true);

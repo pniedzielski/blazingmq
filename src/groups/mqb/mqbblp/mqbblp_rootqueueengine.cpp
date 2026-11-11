@@ -820,7 +820,7 @@ mqbi::QueueHandle* RootQueueEngine::getHandle(
 
         bmqt::Uri             uri;
         bsl::string           error;
-        BSLA_MAYBE_UNUSED int rc =
+        [[maybe_unused]] int  rc =
             bmqt::UriParser::parse(&uri, &error, handleParameters.uri());
         BSLS_ASSERT_SAFE(rc == 0);
         BSLS_ASSERT_SAFE(queueHandle->queue()->uri().asString() ==
@@ -1522,7 +1522,7 @@ void RootQueueEngine::afterNewMessage()
         }
 
         // Clear storage status
-        BSLA_MAYBE_UNUSED mqbi::StorageResult::Enum rc =
+        [[maybe_unused]] mqbi::StorageResult::Enum rc =
             queue->storage()->removeAll(mqbu::StorageKey::k_NULL_KEY);
 
         // Intended to be used with 'InMemoryStorage'.  Since 'appKey' isn't
@@ -1603,9 +1603,9 @@ int RootQueueEngine::onConfirmMessage(mqbi::QueueHandle*       handle,
 }
 
 int RootQueueEngine::onRejectMessage(
-    BSLA_MAYBE_UNUSED mqbi::QueueHandle* handle,
-    const bmqt::MessageGUID&             msgGUID,
-    unsigned int                         subQueueId)
+    [[maybe_unused]] mqbi::QueueHandle* handle,
+    const bmqt::MessageGUID&            msgGUID,
+    unsigned int                        subQueueId)
 {
     // executed by the *QUEUE DISPATCHER* thread
 
@@ -2247,9 +2247,9 @@ void RootQueueEngine::registerStorage(const bsl::string&      appId,
 }
 
 void RootQueueEngine::unregisterStorage(
-    const bsl::string&      appId,
-    BSLA_MAYBE_UNUSED const mqbu::StorageKey& appKey,
-    BSLA_MAYBE_UNUSED unsigned int            appOrdinal)
+    const bsl::string&                       appId,
+    [[maybe_unused]] const mqbu::StorageKey& appKey,
+    [[maybe_unused]] unsigned int            appOrdinal)
 {
     // executed by the *QUEUE DISPATCHER* thread
 

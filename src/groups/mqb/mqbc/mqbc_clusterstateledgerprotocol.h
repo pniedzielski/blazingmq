@@ -95,7 +95,7 @@ struct ClusterStateFileHeader {
     char d_fileKey[mqbu::StorageKey::e_KEY_LENGTH_BINARY];
 
     /// Reserved.
-    BSLA_MAYBE_UNUSED unsigned char d_reserved[2];
+    [[maybe_unused]] unsigned char d_reserved[2];
 
   public:
     // CONSTANTS
@@ -292,7 +292,7 @@ struct ClusterStateRecordHeader {
     unsigned char d_headerWordsAndRecordType;
 
     /// Reserved.
-    BSLA_MAYBE_UNUSED unsigned char d_reserved[3];
+    [[maybe_unused]] unsigned char d_reserved[3];
 
     /// Total size (in words) of the leader advisory representing the cluster
     /// state updates.

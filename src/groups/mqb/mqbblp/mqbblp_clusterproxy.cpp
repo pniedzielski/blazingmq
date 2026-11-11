@@ -753,7 +753,7 @@ void ClusterProxy::processPeerStopRequest(
 }
 
 void ClusterProxy::finishStopSequence(
-    BSLA_MAYBE_UNUSED mqbnet::ClusterNode* clusterNode)
+    [[maybe_unused]] mqbnet::ClusterNode* clusterNode)
 {
     // executed by the *DISPATCHER* thread
 
@@ -971,7 +971,7 @@ ClusterProxy::~ClusterProxy()
 
 // MANIPULATORS
 //   (virtual: mqbi::Cluster)
-int ClusterProxy::start(BSLA_MAYBE_UNUSED bsl::ostream& errorDescription)
+int ClusterProxy::start([[maybe_unused]] bsl::ostream& errorDescription)
 {
     dispatcher()->execute(bdlf::BindUtil::bind(&ClusterProxy::startDispatched,
                                                this),
@@ -1102,9 +1102,9 @@ void ClusterProxy::onQueueHandleDestroyed(mqbi::Queue*     queue,
 }
 
 void ClusterProxy::onDomainReconfigured(
-    BSLA_MAYBE_UNUSED const mqbi::Domain& domain,
-    BSLA_MAYBE_UNUSED const mqbconfm::Domain& oldDefn,
-    BSLA_MAYBE_UNUSED const mqbconfm::Domain& newDefn)
+    [[maybe_unused]] const mqbi::Domain&     domain,
+    [[maybe_unused]] const mqbconfm::Domain& oldDefn,
+    [[maybe_unused]] const mqbconfm::Domain& newDefn)
 {
     // NOTHING
     //
@@ -1152,8 +1152,8 @@ void ClusterProxy::loadClusterStatus(mqbcmd::ClusterResult* out)
 }
 
 void ClusterProxy::purgeAndGCQueueOnDomain(
-    mqbcmd::ClusterResult*  result,
-    BSLA_MAYBE_UNUSED const bsl::string& domainName)
+    mqbcmd::ClusterResult*              result,
+    [[maybe_unused]] const bsl::string& domainName)
 {
     bdlma::LocalSequentialAllocator<256> localAllocator(d_allocator_p);
     bmqu::MemOutStream                   os(&localAllocator);
@@ -1162,13 +1162,13 @@ void ClusterProxy::purgeAndGCQueueOnDomain(
 }
 
 void ClusterProxy::processBufferedPrimaryStatusAdvisories(
-    BSLA_MAYBE_UNUSED int partitionId)
+    [[maybe_unused]] int partitionId)
 {
     BSLS_ASSERT_SAFE(false && "Proxy does not buffer advisories");
 }
 
 mqbi::InlineResult::Enum
-ClusterProxy::sendConfirmInline(BSLA_MAYBE_UNUSED int       partitionId,
+ClusterProxy::sendConfirmInline([[maybe_unused]] int        partitionId,
                                 const bmqp::ConfirmMessage& message)
 {
     // executed by the *ANY* thread
@@ -1199,12 +1199,12 @@ ClusterProxy::sendConfirmInline(BSLA_MAYBE_UNUSED int       partitionId,
 }
 
 mqbi::InlineResult::Enum ClusterProxy::sendPutInline(
-    BSLA_MAYBE_UNUSED int               partitionId,
-    const bmqp::PutHeader&              putHeader,
-    const bsl::shared_ptr<bdlbb::Blob>& appData,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bdlbb::Blob>& options,
-    const bsl::shared_ptr<bmqu::AtomicState>&             state,
-    bsls::Types::Uint64                                   genCount)
+    [[maybe_unused]] int                                 partitionId,
+    const bmqp::PutHeader&                               putHeader,
+    const bsl::shared_ptr<bdlbb::Blob>&                  appData,
+    [[maybe_unused]] const bsl::shared_ptr<bdlbb::Blob>& options,
+    const bsl::shared_ptr<bmqu::AtomicState>&            state,
+    bsls::Types::Uint64                                  genCount)
 {
     // This event is invoked as a result of RemoteQueue asking cluster proxy to
     // relay PUT message to cluster on it's behalf.  Note that we don't check

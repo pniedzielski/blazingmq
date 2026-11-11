@@ -665,8 +665,8 @@ int FileSystemUtil::flush(void*               mapping,
     return rc_SUCCESS;
 }
 
-void FileSystemUtil::disableDump(BSLA_MAYBE_UNUSED void* mapping,
-                                 BSLA_MAYBE_UNUSED bsls::Types::Uint64 size)
+void FileSystemUtil::disableDump([[maybe_unused]] void*               mapping,
+                                 [[maybe_unused]] bsls::Types::Uint64 size)
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(mapping);

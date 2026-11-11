@@ -213,7 +213,7 @@ static void test3_allocationLimitCb()
 
     {
         // Expect no alarm: allocated less than the limit
-        BSLA_MAYBE_UNUSED bsl::vector<char> globalVec(
+        [[maybe_unused]] bsl::vector<char> globalVec(
             2048,
             bslma::Default::globalAllocator());
         //  [====....] ~2048/4096 bytes
@@ -225,14 +225,14 @@ static void test3_allocationLimitCb()
     //  [........] ~0/4096 bytes
 
     // Expect no alarm: allocated less than the limit
-    BSLA_MAYBE_UNUSED bsl::vector<char> globalVec(
+    [[maybe_unused]] bsl::vector<char> globalVec(
         2048,
         bslma::Default::globalAllocator());
     //  [====....] ~2048/4096 bytes
     BMQTST_ASSERT_EQ(alarmTriggeredCount, 0);
 
     // Expect no alarm: allocated less than the limit
-    BSLA_MAYBE_UNUSED bsl::vector<char> defaultVec(
+    [[maybe_unused]] bsl::vector<char> defaultVec(
         1024,
         bslma::Default::defaultAllocator());
     //  [======..] ~3072/4096 bytes
@@ -241,12 +241,12 @@ static void test3_allocationLimitCb()
     // Expect 1 alarm: allocated more than the limit
     bslma::Allocator* customAllocator =
         bmqma::CountingAllocatorUtil::topAllocatorStore().get("custom");
-    BSLA_MAYBE_UNUSED bsl::vector<char> customVec(2048, customAllocator);
+    [[maybe_unused]] bsl::vector<char> customVec(2048, customAllocator);
     //  [========]== ~5120/4096 bytes ALARM
     BMQTST_ASSERT_EQ(alarmTriggeredCount, 1);
 
     // Expect 1 alarm: alarm was already triggered once, no more alarms
-    BSLA_MAYBE_UNUSED bsl::vector<char> customVec2(2048, customAllocator);
+    [[maybe_unused]] bsl::vector<char> customVec2(2048, customAllocator);
     //  [========]======= ~7168/4096 bytes
     BMQTST_ASSERT_EQ(alarmTriggeredCount, 1);
 }

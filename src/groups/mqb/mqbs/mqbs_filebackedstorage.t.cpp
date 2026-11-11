@@ -253,12 +253,12 @@ class MockDataStore : public mqbs::DataStore {
     }
 
     int writeMessageRecord(
-        mqbi::StorageMessageAttributes* attributes,
-        mqbs::DataStoreRecordHandle*    handle,
-        BSLA_MAYBE_UNUSED const bmqt::MessageGUID& guid,
-        const bsl::shared_ptr<bdlbb::Blob>&        appData,
-        const bsl::shared_ptr<bdlbb::Blob>&        options,
-        BSLA_MAYBE_UNUSED const mqbu::StorageKey& queueKey) override
+        mqbi::StorageMessageAttributes*           attributes,
+        mqbs::DataStoreRecordHandle*              handle,
+        [[maybe_unused]] const bmqt::MessageGUID& guid,
+        const bsl::shared_ptr<bdlbb::Blob>&       appData,
+        const bsl::shared_ptr<bdlbb::Blob>&       options,
+        [[maybe_unused]] const mqbu::StorageKey&  queueKey) override
     {
         if (d_writeMessageRecordFail) {
             d_writeMessageRecordFail = false;

@@ -56,14 +56,14 @@ DummySession::~DummySession()
 }
 
 void DummySession::tearDown(
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<void>& handle,
-    BSLA_MAYBE_UNUSED bool                         isBrokerShutdown)
+    [[maybe_unused]] const bsl::shared_ptr<void>& handle,
+    [[maybe_unused]] bool                         isBrokerShutdown)
 {
     // NOTHING
 }
 
 void DummySession::initiateShutdown(
-    BSLA_MAYBE_UNUSED const ShutdownCb& callback)
+    [[maybe_unused]] const ShutdownCb& callback)
 {
     // NOTHING
 }
@@ -73,8 +73,8 @@ void DummySession::invalidate()
     // NOTHING
 }
 
-void DummySession::processEvent(BSLA_MAYBE_UNUSED const bmqp::Event& event,
-                                BSLA_MAYBE_UNUSED mqbnet::ClusterNode* source)
+void DummySession::processEvent([[maybe_unused]] const bmqp::Event&   event,
+                                [[maybe_unused]] mqbnet::ClusterNode* source)
 {
     BSLS_ASSERT_OPT(false &&
                     "'processEvent' should never be called on a DummySession");

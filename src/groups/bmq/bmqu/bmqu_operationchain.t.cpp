@@ -321,7 +321,7 @@ static void test1_usageExample()
 }
 
 static void
-test2_chain_creators(BSLA_MAYBE_UNUSED bdlmt::ThreadPool* threadPool)
+test2_chain_creators([[maybe_unused]] bdlmt::ThreadPool* threadPool)
 // ------------------------------------------------------------------------
 // CHAIN CREATORS
 //
@@ -647,8 +647,7 @@ static void test5_chain_append1(bdlmt::ThreadPool* threadPool)
     }
 }
 
-static void
-test6_chain_append2(BSLA_MAYBE_UNUSED bdlmt::ThreadPool* threadPool)
+static void test6_chain_append2([[maybe_unused]] bdlmt::ThreadPool* threadPool)
 // ------------------------------------------------------------------------
 // CHAIN APPEND 2
 //
@@ -750,7 +749,7 @@ test6_chain_append2(BSLA_MAYBE_UNUSED bdlmt::ThreadPool* threadPool)
 }
 
 static void
-test7_chain_appendInplace(BSLA_MAYBE_UNUSED bdlmt::ThreadPool* threadPool)
+test7_chain_appendInplace([[maybe_unused]] bdlmt::ThreadPool* threadPool)
 // ------------------------------------------------------------------------
 // CHAIN APPEND INPLACE
 //
@@ -1113,7 +1112,7 @@ static void test10_chain_serialization(bdlmt::ThreadPool* threadPool)
 }
 
 static void
-test11_chain_exceptionHandling(BSLA_MAYBE_UNUSED bdlmt::ThreadPool* threadPool)
+test11_chain_exceptionHandling([[maybe_unused]] bdlmt::ThreadPool* threadPool)
 // ------------------------------------------------------------------------
 // CHAIN EXCEPTION HANDLING
 //

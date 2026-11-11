@@ -69,13 +69,13 @@ struct AdvisoryType {
 };
 
 // FUNCTIONS
-int cleanupCallback(BSLA_MAYBE_UNUSED const bsl::string& logPath)
+int cleanupCallback([[maybe_unused]] const bsl::string& logPath)
 {
     return 0;
 }
 
-int onRolloverCallback(BSLA_MAYBE_UNUSED const mqbu::StorageKey& oldLogId,
-                       BSLA_MAYBE_UNUSED const mqbu::StorageKey& newLogId)
+int onRolloverCallback([[maybe_unused]] const mqbu::StorageKey& oldLogId,
+                       [[maybe_unused]] const mqbu::StorageKey& newLogId)
 {
     return 0;
 }

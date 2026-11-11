@@ -174,8 +174,8 @@ int calculateInitialMissedHbCounter(const mqbcfg::TcpInterfaceConfig& config)
 /// `SessionNegotiator` can extract and leverage).
 void ntcChannelPreCreation(
     const bsl::shared_ptr<bmqio::NtcChannel>& channel,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bmqio::ChannelFactory::OpHandle>&
-                            operationHandle)
+    [[maybe_unused]] const bsl::shared_ptr<bmqio::ChannelFactory::OpHandle>&
+        operationHandle)
 {
     ntsa::Endpoint peerEndpoint   = channel->peerEndpoint();
     ntsa::Endpoint sourceEndpoint = channel->sourceEndpoint();
@@ -1768,7 +1768,7 @@ void TCPSessionFactory::ChannelRegistry::addStarting(
     BSLS_ASSERT_SAFE(context);
     BSLS_ASSERT_SAFE(d_channels.find(channel) == d_channels.end());
 
-    BSLA_MAYBE_UNUSED const bool inserted =
+    [[maybe_unused]] const bool inserted =
         d_startingChannels.emplace(channel, context).second;
     BSLS_ASSERT_SAFE(inserted);
 }
@@ -1789,11 +1789,11 @@ void TCPSessionFactory::ChannelRegistry::promote(const bmqio::Channel* channel,
     BSLS_ASSERT_SAFE(channel);
     BSLS_ASSERT_SAFE(info);
 
-    BSLA_MAYBE_UNUSED const bsl::size_t erased = d_startingChannels.erase(
+    [[maybe_unused]] const bsl::size_t erased = d_startingChannels.erase(
         channel);
     BSLS_ASSERT_SAFE(erased == 1);
 
-    BSLA_MAYBE_UNUSED const bool inserted =
+    [[maybe_unused]] const bool inserted =
         d_channels.emplace(channel, info).second;
     BSLS_ASSERT_SAFE(inserted);
 }

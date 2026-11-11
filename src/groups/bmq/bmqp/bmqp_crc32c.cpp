@@ -20,7 +20,6 @@
 // BDE
 #include <ball_log.h>
 #include <bdlde_crc32c.h>
-#include <bsla_maybeunused.h>
 #include <bsls_performancehint.h>
 
 namespace BloombergLP {
@@ -28,7 +27,7 @@ namespace bmqp {
 
 namespace {
 
-BSLA_MAYBE_UNUSED const char k_LOG_CATEGORY[] = "BMQP.CRC32C";
+[[maybe_unused]] const char k_LOG_CATEGORY[] = "BMQP.CRC32C";
 
 }  // close unnamed namespace
 

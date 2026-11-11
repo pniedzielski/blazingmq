@@ -260,11 +260,11 @@ static void appendDatum1(bsl::vector<Data1>*       data,
 
 /// Add to the event being built by the specified `PushEventBuilder`
 /// messages using the specified `data`.
-static void appendMessages1(bmqp::EventHeader*        eh,
-                            bdlbb::Blob*              blob,
-                            const bsl::vector<Data1>& data,
-                            bdlbb::BlobBufferFactory* bufferFactory,
-                            BSLA_MAYBE_UNUSED bslma::Allocator* allocator)
+static void appendMessages1(bmqp::EventHeader*                 eh,
+                            bdlbb::Blob*                       blob,
+                            const bsl::vector<Data1>&          data,
+                            bdlbb::BlobBufferFactory*          bufferFactory,
+                            [[maybe_unused]] bslma::Allocator* allocator)
 {
     // PRECONDITIONS
     BSLS_ASSERT_OPT(eh);

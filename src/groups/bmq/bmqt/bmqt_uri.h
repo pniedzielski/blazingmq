@@ -118,7 +118,6 @@
 #include <bsl_cstddef.h>
 #include <bsl_ostream.h>
 #include <bsl_string.h>
-#include <bsla_maybeunused.h>
 #include <bslh_hash.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
@@ -315,7 +314,7 @@ struct UriParser {
 
     /// DEPRECATED: Not needed anymore (no-op).  This method will be marked
     ///             as `BSLA_DEPRECATED` in future release of libbmq.
-    static void initialize(BSLA_MAYBE_UNUSED bslma::Allocator* allocator = 0)
+    static void initialize([[maybe_unused]] bslma::Allocator* allocator = 0)
     {
         // NOTHING
     }

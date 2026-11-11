@@ -54,9 +54,9 @@ const char k_PLUGIN_ENTRY_POINT[] = "instantiatePluginLibrary";
 typedef void (*PluginEntryFnPtr)(bslma::ManagedPtr<mqbplug::PluginLibrary>*,
                                  bslma::Allocator*);
 
-void dlcloseDeleter(void* dlopenHandle, BSLA_MAYBE_UNUSED void*)
+void dlcloseDeleter(void* dlopenHandle, [[maybe_unused]] void*)
 {
-    BSLA_MAYBE_UNUSED int rc = dlclose(dlopenHandle);
+    [[maybe_unused]] int rc = dlclose(dlopenHandle);
     BSLS_ASSERT_SAFE(rc == 0);
 }
 

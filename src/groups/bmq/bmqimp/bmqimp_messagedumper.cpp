@@ -447,7 +447,7 @@ void MessageDumper::dumpPutEvent(bsl::ostream&             out,
     bmqt::CorrelationId correlationId;
     int                 msgNum = 0;
     while (iter.next() == 1) {
-        BSLA_MAYBE_UNUSED int rc = d_messageCorrelationIdContainer_p->find(
+        [[maybe_unused]] int rc = d_messageCorrelationIdContainer_p->find(
             &correlationId,
             iter.header().messageGUID());
         BSLS_ASSERT_SAFE((rc == 0) && "correlationId not found");

@@ -1200,14 +1200,14 @@ unsigned int StorageUtil::extractPartitionId<true>(const bmqp::Event& event)
 }
 
 bool StorageUtil::validateStorageEvent(
-    BSLA_MAYBE_UNUSED const bmqp::Event& event,
-    int                                  partitionId,
-    const mqbnet::ClusterNode*           source,
-    const mqbnet::ClusterNode*           primary,
-    bmqp_ctrlmsg::PrimaryStatus::Value   status,
-    const bsl::string&                   clusterDescription,
-    bool                                 skipAlarm,
-    bool                                 isFSMWorkflow)
+    [[maybe_unused]] const bmqp::Event& event,
+    int                                 partitionId,
+    const mqbnet::ClusterNode*          source,
+    const mqbnet::ClusterNode*          primary,
+    bmqp_ctrlmsg::PrimaryStatus::Value  status,
+    const bsl::string&                  clusterDescription,
+    bool                                skipAlarm,
+    bool                                isFSMWorkflow)
 {
     // executed by *QUEUE_DISPATCHER* thread associated with 'partitionId' or
     // by the *CLUSTER DISPATCHER* thread
@@ -1802,8 +1802,8 @@ void StorageUtil::recoveredQueuesCb(
                      appIdKeyPairs.cbegin();
                  ait != appIdKeyPairs.cend();
                  ++ait) {
-                BSLA_MAYBE_UNUSED const bsl::string& appId       = ait->second;
-                BSLA_MAYBE_UNUSED const mqbu::StorageKey& appKey = ait->first;
+                [[maybe_unused]] const bsl::string&      appId  = ait->second;
+                [[maybe_unused]] const mqbu::StorageKey& appKey = ait->first;
 
                 BSLS_ASSERT_SAFE(!appKey.isNull());
                 BSLS_ASSERT_SAFE(!appId.empty());
@@ -3152,7 +3152,7 @@ int StorageUtil::configureStorage(
     bslmt::Mutex*                      storagesLock,
     const bmqt::Uri&                   uri,
     const mqbu::StorageKey&            queueKey,
-    BSLA_MAYBE_UNUSED int              partitionId,
+    [[maybe_unused]] int               partitionId,
     const bsls::Types::Int64           messageTtl,
     const int                          maxDeliveryAttempts,
     const mqbconfm::StorageDefinition& storageDef)

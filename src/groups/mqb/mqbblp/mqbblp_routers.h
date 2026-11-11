@@ -249,7 +249,7 @@ class Routers {
             void release()
             {
                 if (isValid()) {
-                    BSLA_MAYBE_UNUSED size_t n = d_owner.erase(d_key);
+                    [[maybe_unused]] size_t n = d_owner.erase(d_key);
                     BSLS_ASSERT_SAFE(n == 1);
                 }
             }

@@ -65,8 +65,8 @@ void SyslogObserver::disableLogging()
     closelog();
 }
 
-void SyslogObserver::publish(const ball::Record&     record,
-                             BSLA_MAYBE_UNUSED const ball::Context& context)
+void SyslogObserver::publish(const ball::Record&                   record,
+                             [[maybe_unused]] const ball::Context& context)
 {
     // Check if the record's severity is higher than the severity threshold
     if (record.fixedFields().severity() > d_severityThreshold) {

@@ -105,10 +105,10 @@ static void eventCb(bsl::map<int, bsl::vector<int> >* queueContextMap,
 }
 
 static MQTP::EventFn
-eventCbCreator(bsl::map<int, bsl::vector<int> >* queueContextMap,
-               int                               queueId,
-               BSLA_MAYBE_UNUSED bsls::AtomicInt64* lastProcessingStartTime,
-               bslma::Allocator*                    allocator)
+eventCbCreator(bsl::map<int, bsl::vector<int> >*   queueContextMap,
+               int                                 queueId,
+               [[maybe_unused]] bsls::AtomicInt64* lastProcessingStartTime,
+               bslma::Allocator*                   allocator)
 {
     return bdlf::BindUtil::bindS(allocator,
                                  &eventCb,
@@ -117,22 +117,22 @@ eventCbCreator(bsl::map<int, bsl::vector<int> >* queueContextMap,
                                  bdlf::PlaceHolders::_1);
 }
 
-static MQTP::Queue* performanceTestQueueCreator(BSLA_MAYBE_UNUSED int queueId,
-                                                bslma::Allocator* allocator,
+static MQTP::Queue* performanceTestQueueCreator([[maybe_unused]] int queueId,
+                                                bslma::Allocator*    allocator,
                                                 int fixedQueueSize)
 {
     return new (*allocator) MQTP::Queue(fixedQueueSize, allocator);
 }
 
-void performanceTestEventCb(BSLA_MAYBE_UNUSED const MQTP::EventSp&)
+void performanceTestEventCb([[maybe_unused]] const MQTP::EventSp&)
 {
     // NOTHING
 }
 
 static MQTP::EventFn performanceTestEventCbCreator(
-    BSLA_MAYBE_UNUSED int queueId,
-    BSLA_MAYBE_UNUSED bsls::AtomicInt64* lastProcessingStartTime,
-    bslma::Allocator*                    allocator)
+    [[maybe_unused]] int                queueId,
+    [[maybe_unused]] bsls::AtomicInt64* lastProcessingStartTime,
+    bslma::Allocator*                   allocator)
 {
     return bdlf::BindUtil::bindS(allocator,
                                  &performanceTestEventCb,
@@ -282,7 +282,7 @@ static void test1_breathingTest()
     threadPool.stop();
 }
 
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN1_performance()
 // ------------------------------------------------------------------------
 // PERFORMANCE TEST

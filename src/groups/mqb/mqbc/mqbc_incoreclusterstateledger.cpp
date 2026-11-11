@@ -739,7 +739,7 @@ int IncoreClusterStateLedger::applyRecordInternal(
     ClusterStateRecordType::Enum               recordType)
 {
     bmqu::BlobPosition          recordPosition;
-    BSLA_MAYBE_UNUSED const int rc =
+    [[maybe_unused]] const int  rc =
         bmqu::BlobUtil::findOffsetSafe(&recordPosition, record, recordOffset);
     BSLS_ASSERT_SAFE(rc == 0);
 
@@ -759,7 +759,7 @@ int IncoreClusterStateLedger::applyRecordInternal(
     ClusterStateRecordType::Enum               recordType)
 {
     int                         recordOffset = 0;
-    BSLA_MAYBE_UNUSED const int rc = bmqu::BlobUtil::positionToOffsetSafe(
+    [[maybe_unused]] const int  rc = bmqu::BlobUtil::positionToOffsetSafe(
         &recordOffset,
         record,
         recordPosition);

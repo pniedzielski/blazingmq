@@ -47,7 +47,7 @@ const unsigned int k_MAGIC = 0xabcdabcd;
 // FUNCTIONS
 bool statFilter(const bmqst::StatContext*     context,
                 bmqst::StatContext::ValueType valueType,
-                BSLA_MAYBE_UNUSED int         level)
+                [[maybe_unused]] int          level)
 {
     return (context->isDeleted() &&
             valueType == bmqst::StatContext::e_TOTAL_VALUE) ||

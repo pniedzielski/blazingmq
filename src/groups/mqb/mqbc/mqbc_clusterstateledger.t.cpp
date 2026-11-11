@@ -99,7 +99,7 @@ struct ClusterStateLedgerTestImp
         return markDone();
     }
 
-    void setCommitCb(BSLA_MAYBE_UNUSED const CommitCb& value) override
+    void setCommitCb([[maybe_unused]] const CommitCb& value) override
     {
         markDone();
     }

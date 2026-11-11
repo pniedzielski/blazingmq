@@ -132,9 +132,9 @@ CommandRouter::ClusterWideRoutingMode::ClusterWideRoutingMode()
 }
 
 int CommandRouter::ClusterWideRoutingMode::getRouteTargets(
-    BSLA_MAYBE_UNUSED bsl::ostream& errorDescription,
-    RouteTargets*                   routeTargets,
-    mqbi::Cluster*                  cluster)
+    [[maybe_unused]] bsl::ostream& errorDescription,
+    RouteTargets*                  routeTargets,
+    mqbi::Cluster*                 cluster)
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(routeTargets);

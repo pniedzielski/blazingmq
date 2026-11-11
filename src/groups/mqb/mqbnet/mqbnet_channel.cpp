@@ -126,7 +126,7 @@ void Channel::stop()
         BALL_LOG_INFO << "Stopped " << d_description;
     }
 
-    BSLA_MAYBE_UNUSED const int rc = bslmt::ThreadUtil::join(d_threadHandle);
+    [[maybe_unused]] const int rc = bslmt::ThreadUtil::join(d_threadHandle);
     BSLS_ASSERT_SAFE(rc == 0);
 }
 

@@ -98,7 +98,7 @@ MonitoredQueueTraits<bdlcc::SingleConsumerQueue<ELEMENT> >::isPushBackDisabled(
 template <typename ELEMENT>
 inline int
 MonitoredQueueTraits<bdlcc::SingleConsumerQueue<ELEMENT> >::capacity(
-    BSLA_MAYBE_UNUSED const QueueType& queue)
+    [[maybe_unused]] const QueueType& queue)
 {
     return bsl::numeric_limits<int>::max();
 }

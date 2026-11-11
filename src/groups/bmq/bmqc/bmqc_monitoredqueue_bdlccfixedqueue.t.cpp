@@ -281,7 +281,7 @@ static void test1_MonitoredQueue_breathingTest()
         //
         // Verify timed popFront is undefined
         // // int                      item    = -1;
-        // BSLA_MAYBE_UNUSED const bsls::TimeInterval timeout =
+        // [[maybe_unused]] const bsls::TimeInterval timeout =
         // bsls::TimeInterval(
         //     0, 5 * bdlt::TimeUnitRatio::k_NANOSECONDS_PER_MILLISECOND);
         // BMQTST_ASSERT_SAFE_FAIL(queue.timedPopFront(&item, timeout));

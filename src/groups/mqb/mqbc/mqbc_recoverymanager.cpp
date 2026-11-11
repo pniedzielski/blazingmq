@@ -83,7 +83,7 @@ partitionSequenceNumber(const mqbs::RecordHeader& header)
 }  // close unnamed namespace
 
 void RecoveryManager::ChunkDeleter::operator()(
-    BSLA_MAYBE_UNUSED const void* ptr) const
+    [[maybe_unused]] const void* ptr) const
 {
     // executed by *ANY* thread
     // PRECONDITIONS
@@ -151,7 +151,7 @@ RecoveryManager::~RecoveryManager()
 }
 
 // MANIPULATORS
-int RecoveryManager::start(BSLA_MAYBE_UNUSED bsl::ostream& errorDescription)
+int RecoveryManager::start([[maybe_unused]] bsl::ostream& errorDescription)
 {
     // NOTHING
     return 0;

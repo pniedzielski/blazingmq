@@ -202,7 +202,7 @@ static void test3_customInitializeShutdown()
 // ============================================================================
 //                              PERFORMANCE TESTS
 // ----------------------------------------------------------------------------
-BSLA_MAYBE_UNUSED
+[[maybe_unused]]
 static void testN1_performance()
 // ------------------------------------------------------------------------
 // PERFORMANCE (micro-benchmark)

@@ -44,13 +44,13 @@ namespace m_bmqstoragetool {
 namespace {
 
 // Ledger config stubs
-int onRolloverCallback(BSLA_MAYBE_UNUSED const mqbu::StorageKey& oldLogId,
-                       BSLA_MAYBE_UNUSED const mqbu::StorageKey& newLogId)
+int onRolloverCallback([[maybe_unused]] const mqbu::StorageKey& oldLogId,
+                       [[maybe_unused]] const mqbu::StorageKey& newLogId)
 {
     return 0;  // RETURN
 }
 
-int cleanupCallback(BSLA_MAYBE_UNUSED const bsl::string& logPath)
+int cleanupCallback([[maybe_unused]] const bsl::string& logPath)
 {
     return 0;  // RETURN
 }
@@ -209,7 +209,7 @@ FileManagerImpl::CslFileHandler::CslFileHandler(const bsl::string& path,
 FileManagerImpl::CslFileHandler::~CslFileHandler()
 {
     if (d_ledger_p) {
-        BSLA_MAYBE_UNUSED const int rc = d_ledger_p->close();
+        [[maybe_unused]] const int rc = d_ledger_p->close();
         BSLS_ASSERT(rc == 0);
     }
 }

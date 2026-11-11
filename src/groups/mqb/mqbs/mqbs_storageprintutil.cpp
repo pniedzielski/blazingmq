@@ -96,7 +96,7 @@ int StoragePrintUtil::listMessages(mqbcmd::QueueContents* queueContents,
         appKey = mqbu::StorageKey::k_NULL_KEY;
     }
     else {
-        BSLA_MAYBE_UNUSED bool hasTheStorage =
+        [[maybe_unused]] bool hasTheStorage =
             storage->hasVirtualStorage(appId, &appKey);
         BSLS_ASSERT_SAFE(hasTheStorage);
     }
@@ -131,7 +131,7 @@ int StoragePrintUtil::listMessages(mqbcmd::QueueContents* queueContents,
     for (; listed < count && !it->atEnd(); ++i, ++listed, it->advance()) {
         queueContents->messages().resize(queueContents->messages().size() + 1);
         mqbcmd::Message&            message = queueContents->messages().back();
-        BSLA_MAYBE_UNUSED const int rc = listMessage(&message, storage, *it);
+        [[maybe_unused]] const int  rc = listMessage(&message, storage, *it);
         BSLS_ASSERT_SAFE(rc == 0);
     }
 

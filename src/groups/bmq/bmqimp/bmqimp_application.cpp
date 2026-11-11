@@ -462,8 +462,8 @@ void Application::channelStateCallback(
 }
 
 bslma::ManagedPtr<bmqst::StatContext> Application::channelStatContextCreator(
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bmqio::Channel>& channel,
-    const bsl::shared_ptr<bmqio::StatChannelFactoryHandle>&  handle)
+    [[maybe_unused]] const bsl::shared_ptr<bmqio::Channel>& channel,
+    const bsl::shared_ptr<bmqio::StatChannelFactoryHandle>& handle)
 {
     // The SDK only connects
     BSLS_ASSERT_SAFE(handle->options().is<bmqio::ConnectOptions>());

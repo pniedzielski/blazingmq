@@ -87,7 +87,7 @@ void PushMessageIterator::initCachedOptionsView() const
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_optionsView.isNull())) {
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         // Load options iterator
-        BSLA_MAYBE_UNUSED int rc = loadOptionsView(&d_optionsView.makeValue());
+        [[maybe_unused]] int rc = loadOptionsView(&d_optionsView.makeValue());
         BSLS_ASSERT_SAFE(rc == 0);
     }
 
@@ -459,7 +459,7 @@ void PushMessageIterator::extractQueueInfo(int*          queueId,
     // Load SubQueueInfos
     Protocol::SubQueueInfosArray subQueueInfos;
 
-    BSLA_MAYBE_UNUSED int rc = optionsView.loadSubQueueInfosOption(
+    [[maybe_unused]] int rc = optionsView.loadSubQueueInfosOption(
         &subQueueInfos);
     BSLS_ASSERT_SAFE(rc == 0);
     BSLS_ASSERT_SAFE(subQueueInfos.size() == 1);
@@ -495,7 +495,7 @@ void PushMessageIterator::extractMsgGroupId(
     }
 
     // Load Group Id
-    BSLA_MAYBE_UNUSED int rc = optionsView.loadMsgGroupIdOption(msgGroupId);
+    [[maybe_unused]] int rc = optionsView.loadMsgGroupIdOption(msgGroupId);
     BSLS_ASSERT_SAFE(rc == 0);
 }
 

@@ -264,9 +264,9 @@ void MockCluster::enableRead()
 }
 
 void MockCluster::onProxyConnectionUp(
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<bmqio::Channel>& channel,
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ClientIdentity& identity,
-    BSLA_MAYBE_UNUSED bsl::string_view description)
+    [[maybe_unused]] const bsl::shared_ptr<bmqio::Channel>& channel,
+    [[maybe_unused]] const bmqp_ctrlmsg::ClientIdentity&    identity,
+    [[maybe_unused]] bsl::string_view                       description)
 {
     // NOTHING
 }

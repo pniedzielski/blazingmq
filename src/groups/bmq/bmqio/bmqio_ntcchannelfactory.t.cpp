@@ -70,9 +70,9 @@ using namespace bmqio;
 
 /// Return `true` if the specified `messageSubstring` is a substring of the
 /// message of the specified `record`.
-static bool ballFilter(const bsl::string&      messageSubstring,
-                       const ball::Record&     record,
-                       BSLA_MAYBE_UNUSED const ball::Context& context)
+static bool ballFilter(const bsl::string&                    messageSubstring,
+                       const ball::Record&                   record,
+                       [[maybe_unused]] const ball::Context& context)
 {
     return !bdlb::StringRefUtil::strstr(record.fixedFields().messageRef(),
                                         messageSubstring)
@@ -486,8 +486,8 @@ void Tester::resultCb(const bsl::string&              handleName,
 }
 
 void Tester::preCreationCb(
-    const bsl::shared_ptr<NtcChannel>& channel,
-    BSLA_MAYBE_UNUSED const bsl::shared_ptr<ChannelFactory::OpHandle>& handle)
+    const bsl::shared_ptr<NtcChannel>&                                channel,
+    [[maybe_unused]] const bsl::shared_ptr<ChannelFactory::OpHandle>& handle)
 {
     d_preCreateCbCalls.push_back(channel);
 }
@@ -1096,9 +1096,9 @@ static void test7_checkMultithreadListen()
 
     struct LocalFuncs {
         static void
-        resultCb(BSLA_MAYBE_UNUSED ChannelFactoryEvent::Enum event,
-                 BSLA_MAYBE_UNUSED const bmqio::Status& status,
-                 BSLA_MAYBE_UNUSED const bsl::shared_ptr<Channel>& channel)
+        resultCb([[maybe_unused]] ChannelFactoryEvent::Enum       event,
+                 [[maybe_unused]] const bmqio::Status&            status,
+                 [[maybe_unused]] const bsl::shared_ptr<Channel>& channel)
         {
             // NOTHING
         }

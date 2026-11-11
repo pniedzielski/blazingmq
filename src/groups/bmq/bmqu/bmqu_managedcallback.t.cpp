@@ -76,12 +76,12 @@ struct IncrementCallback : public bmqu::ManagedCallback::CallbackFunctor {
     void operator()() const override { ++(*d_calls_p); }
 };
 
-void complexFunction(size_t*           calls,
-                     BSLA_MAYBE_UNUSED bsls::Types::Uint64 arg1,
-                     BSLA_MAYBE_UNUSED bsls::Types::Uint64 arg2,
-                     BSLA_MAYBE_UNUSED bsls::Types::Uint64 arg3,
-                     BSLA_MAYBE_UNUSED bsls::Types::Uint64 arg4,
-                     BSLA_MAYBE_UNUSED bsls::Types::Uint64 arg5)
+void complexFunction(size_t*                              calls,
+                     [[maybe_unused]] bsls::Types::Uint64 arg1,
+                     [[maybe_unused]] bsls::Types::Uint64 arg2,
+                     [[maybe_unused]] bsls::Types::Uint64 arg3,
+                     [[maybe_unused]] bsls::Types::Uint64 arg4,
+                     [[maybe_unused]] bsls::Types::Uint64 arg5)
 {
     ++(*calls);
 }
@@ -167,12 +167,12 @@ class ManagedCallbackBuffer final {
 
   public:
     // TRAITS
-    BSLA_MAYBE_UNUSED
+    [[maybe_unused]]
     BSLMF_NESTED_TRAIT_DECLARATION(ManagedCallbackBuffer,
                                    bslma::UsesBslmaAllocator)
 
-    // CREATORS
-    inline ManagedCallbackBuffer()
+        // CREATORS
+        inline ManagedCallbackBuffer()
     : d_callbackBuffer()
     , d_empty(true)
     {
@@ -219,8 +219,11 @@ class ManagedCallbackBuffer final {
 
     // ACCESSORS
 
-    BSLA_MAYBE_UNUSED
-    inline bool empty() const { return d_empty; }
+    [[maybe_unused]]
+    inline bool empty() const
+    {
+        return d_empty;
+    }
 
     inline void operator()() const
     {

@@ -223,7 +223,7 @@ bmqp_ctrlmsg::QueueHandleParameters QueueUtil::createHandleParameters(
 
         bmqt::UriBuilder uriBuilder(uri);
         uriBuilder.setId(subStreamInfo.appId());
-        BSLA_MAYBE_UNUSED int rc = uriBuilder.uri(&uri, 0);
+        [[maybe_unused]] int rc = uriBuilder.uri(&uri, 0);
         BSLS_ASSERT_SAFE(rc == 0);
 
         result.uri() = uri.asString();

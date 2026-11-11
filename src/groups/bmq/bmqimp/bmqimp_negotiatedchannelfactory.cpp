@@ -370,10 +370,10 @@ NegotiatedChannelFactory::~NegotiatedChannelFactory()
 
 // MANIPULATORS
 void NegotiatedChannelFactory::listen(
-    BSLA_MAYBE_UNUSED bmqio::Status* status,
-    BSLA_MAYBE_UNUSED bslma::ManagedPtr<OpHandle>* handle,
-    BSLA_MAYBE_UNUSED const bmqio::ListenOptions& options,
-    BSLA_MAYBE_UNUSED const ResultCallback&       cb)
+    [[maybe_unused]] bmqio::Status*               status,
+    [[maybe_unused]] bslma::ManagedPtr<OpHandle>* handle,
+    [[maybe_unused]] const bmqio::ListenOptions&  options,
+    [[maybe_unused]] const ResultCallback&        cb)
 {
     // PRECONDITIONS
     BSLS_ASSERT_OPT(false && "SDK should not be listening");

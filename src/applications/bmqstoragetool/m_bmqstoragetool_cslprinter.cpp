@@ -256,9 +256,9 @@ HumanReadableCslPrinter::~HumanReadableCslPrinter()
 
 // ACCESSORS
 void HumanReadableCslPrinter::printShortResult(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ClusterMessage& record,
-    const mqbc::ClusterStateRecordHeader&                 header,
-    const mqbsi::LedgerRecordId&                          recordId) const
+    [[maybe_unused]] const bmqp_ctrlmsg::ClusterMessage& record,
+    const mqbc::ClusterStateRecordHeader&                header,
+    const mqbsi::LedgerRecordId&                         recordId) const
 {
     bslim::Printer printer(&d_ostream, 0, -1);
     printer.start();
@@ -457,8 +457,8 @@ class JsonCslPrinter : public CslPrinter {
 
     void printCompositesNotFound(const CompositesVec& seqNums) const override;
 
-    void printFooter(const CslRecordCount&   recordCount,
-                     BSLA_MAYBE_UNUSED const Parameters::ProcessCslRecordTypes&
+    void printFooter(const CslRecordCount& recordCount,
+                     [[maybe_unused]] const Parameters::ProcessCslRecordTypes&
                          processCslRecordTypes) const override;
 };
 
@@ -544,9 +544,9 @@ void JsonCslPrinter::printCompositesNotFound(
 }
 
 void JsonCslPrinter::printFooter(
-    const CslRecordCount&   recordCount,
-    BSLA_MAYBE_UNUSED const Parameters::ProcessCslRecordTypes&
-                            processCslRecordTypes) const
+    const CslRecordCount& recordCount,
+    [[maybe_unused]] const Parameters::ProcessCslRecordTypes&
+        processCslRecordTypes) const
 {
     closeBraceIfOpen();
     d_ostream << "  \"SnapshotRecords\": \"" << recordCount.d_snapshotCount
@@ -585,9 +585,9 @@ class JsonPrettyCslPrinter : public JsonCslPrinter {
         const CslRecordCount&     recordCount,
         const CslUpdateChoiceMap& updateChoiceMap,
         const QueueMap&           queueMap,
-        BSLA_MAYBE_UNUSED const   Parameters::ProcessCslRecordTypes&
-                                  processCslRecordTypes,
-        unsigned int              queuesLimit) const override;
+        [[maybe_unused]] const Parameters::ProcessCslRecordTypes&
+                     processCslRecordTypes,
+        unsigned int queuesLimit) const override;
 };
 
 // CREATORS
@@ -607,9 +607,9 @@ JsonPrettyCslPrinter::~JsonPrettyCslPrinter()
 // PUBLIC METHODS
 
 void JsonPrettyCslPrinter::printShortResult(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ClusterMessage& record,
-    const mqbc::ClusterStateRecordHeader&                 header,
-    const mqbsi::LedgerRecordId&                          recordId) const
+    [[maybe_unused]] const bmqp_ctrlmsg::ClusterMessage& record,
+    const mqbc::ClusterStateRecordHeader&                header,
+    const mqbsi::LedgerRecordId&                         recordId) const
 {
     openBraceIfNotOpen("Records");
 
@@ -639,9 +639,9 @@ void JsonPrettyCslPrinter::printSummaryResult(
     const CslRecordCount&     recordCount,
     const CslUpdateChoiceMap& updateChoiceMap,
     const QueueMap&           queueMap,
-    BSLA_MAYBE_UNUSED const   Parameters::ProcessCslRecordTypes&
-                              processCslRecordTypes,
-    unsigned int              queuesLimit) const
+    [[maybe_unused]] const Parameters::ProcessCslRecordTypes&
+                 processCslRecordTypes,
+    unsigned int queuesLimit) const
 {
     d_ostream << "    \"Summary\":\n";
 
@@ -680,9 +680,9 @@ class JsonLineCslPrinter : public JsonCslPrinter {
         const CslRecordCount&     recordCount,
         const CslUpdateChoiceMap& updateChoiceMap,
         const QueueMap&           queueMap,
-        BSLA_MAYBE_UNUSED const   Parameters::ProcessCslRecordTypes&
-                                  processCslRecordTypes,
-        unsigned int              queuesLimit) const override;
+        [[maybe_unused]] const Parameters::ProcessCslRecordTypes&
+                     processCslRecordTypes,
+        unsigned int queuesLimit) const override;
 };
 
 // CREATORS
@@ -699,9 +699,9 @@ JsonLineCslPrinter::~JsonLineCslPrinter()
 
 // PUBLIC METHODS
 void JsonLineCslPrinter::printShortResult(
-    BSLA_MAYBE_UNUSED const bmqp_ctrlmsg::ClusterMessage& record,
-    const mqbc::ClusterStateRecordHeader&                 header,
-    const mqbsi::LedgerRecordId&                          recordId) const
+    [[maybe_unused]] const bmqp_ctrlmsg::ClusterMessage& record,
+    const mqbc::ClusterStateRecordHeader&                header,
+    const mqbsi::LedgerRecordId&                         recordId) const
 {
     openBraceIfNotOpen("Records");
 
@@ -731,9 +731,9 @@ void JsonLineCslPrinter::printSummaryResult(
     const CslRecordCount&     recordCount,
     const CslUpdateChoiceMap& updateChoiceMap,
     const QueueMap&           queueMap,
-    BSLA_MAYBE_UNUSED const   Parameters::ProcessCslRecordTypes&
-                              processCslRecordTypes,
-    unsigned int              queuesLimit) const
+    [[maybe_unused]] const Parameters::ProcessCslRecordTypes&
+                 processCslRecordTypes,
+    unsigned int queuesLimit) const
 {
     d_ostream << "    \"Summary\": ";
 

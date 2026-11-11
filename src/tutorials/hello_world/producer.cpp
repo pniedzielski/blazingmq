@@ -129,7 +129,7 @@ static void produce(bmqa::Session* session)
 //                              MAIN PROGRAM
 //-----------------------------------------------------------------------------
 
-int main(BSLA_MAYBE_UNUSED int argc, BSLA_MAYBE_UNUSED const char* argv[])
+int main([[maybe_unused]] int argc, [[maybe_unused]] const char* argv[])
 {
     // Start the session with the BlazingMQ broker
     bmqa::Session session;
