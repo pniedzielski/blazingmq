@@ -180,11 +180,9 @@ int AuthenticationController::collectAvailablePluginFactories(
     d_pluginManager_p->get(pluginFactories, type);
 
     // Add built-in plugin factories
-    bsl::vector<mqbplug::PluginInfo>::const_iterator it =
-        d_builtInPluginLibrary->plugins().cbegin();
-    for (; it != d_builtInPluginLibrary->plugins().cend(); ++it) {
-        if (it->type() == type) {
-            pluginFactories->insert(it->factory().get());
+    for (const auto& pluginInfo : d_builtInPluginLibrary->plugins()) {
+        if (pluginInfo.type() == type) {
+            pluginFactories->insert(pluginInfo.factory().get());
         }
     }
 
@@ -217,21 +215,16 @@ int AuthenticationController::createConfiguredAuthenticators(
     BALL_LOG_INFO << "Creating " << authenticators.size()
                   << " explicitly configured authenticator(s)";
 
-    bsl::vector<mqbcfg::AuthenticatorPluginConfig>::const_iterator configIt =
-        authenticators.cbegin();
-    for (; configIt != authenticators.cend(); ++configIt) {
-        const bsl::string& pluginName = configIt->name();
+    for (const auto& authenticatorPluginConfig : authenticators) {
+        const bsl::string& pluginName = authenticatorPluginConfig.name();
         BALL_LOG_INFO << "Attempting to create authenticator plugin '"
                       << pluginName << "'";
 
         // Try to create the authenticator for this plugin name
         AuthenticatorMp authenticator;
-        for (PluginFactories::const_iterator factoryIt =
-                 pluginFactories.cbegin();
-             factoryIt != pluginFactories.cend();
-             ++factoryIt) {
+        for (mqbplug::PluginFactory* factory : pluginFactories) {
             mqbplug::AuthenticatorPluginFactory* candidateFactory =
-                dynamic_cast<mqbplug::AuthenticatorPluginFactory*>(*factoryIt);
+                dynamic_cast<mqbplug::AuthenticatorPluginFactory*>(factory);
             if (!candidateFactory) {
                 continue;
             }
@@ -416,11 +409,9 @@ int AuthenticationController::initializeCredentialProvider(
         return rc * 10 + rc_COLLECT_FAILED;  // RETURN
     }
 
-    for (PluginFactories::const_iterator it = factories.cbegin();
-         it != factories.cend();
-         ++it) {
+    for (mqbplug::PluginFactory* factory : factories) {
         mqbplug::CredentialProviderPluginFactory* candidate =
-            dynamic_cast<mqbplug::CredentialProviderPluginFactory*>(*it);
+            dynamic_cast<mqbplug::CredentialProviderPluginFactory*>(factory);
         if (!candidate) {
             continue;  // CONTINUE
         }
@@ -528,10 +519,8 @@ void AuthenticationController::stop()
     }
 
     // Stop all authenticators
-    for (AuthenticatorMap::iterator it = d_authenticators.begin();
-         it != d_authenticators.end();
-         ++it) {
-        it->second->stop();
+    for (const auto& [mechanism, authenticator] : d_authenticators) {
+        authenticator->stop();
     }
 
     d_authenticators.clear();
