@@ -25,7 +25,6 @@
 
 // BDE
 #include <ball_severity.h>
-#include <bdlf_bind.h>
 #include <bsl_iostream.h>
 #include <bsl_sstream.h>
 #include <bslma_default.h>
@@ -275,9 +274,9 @@ static void test4_allocationLimit()
         bmqma::CountingAllocator obj("Test",
                                      bmqtst::TestHelperUtil::allocator());
 
-        obj.setAllocationLimit(10,
-                               bdlf::BindUtil::bind(local::incrementInteger,
-                                                    &cbInvocationCount));
+        obj.setAllocationLimit(10, [&cbInvocationCount]() {
+            local::incrementInteger(&cbInvocationCount);
+        });
         void* alloc = obj.allocate(20);
         BMQTST_ASSERT_EQ(cbInvocationCount, 0);
         obj.deallocate(alloc);
@@ -302,9 +301,9 @@ static void test4_allocationLimit()
         // we don't here that the callback is invoked when exactly reaching the
         // allocation limit, but ensure that once reached, it doesn't get
         // invoked again).
-        obj.setAllocationLimit(1024,
-                               bdlf::BindUtil::bind(local::incrementInteger,
-                                                    &cbInvocationCount));
+        obj.setAllocationLimit(1024, [&cbInvocationCount]() {
+            local::incrementInteger(&cbInvocationCount);
+        });
 
         BMQTST_ASSERT_EQ(cbInvocationCount, 0);
 
@@ -344,10 +343,9 @@ static void test4_allocationLimit()
                                          &statContext,
                                          bmqtst::TestHelperUtil::allocator());
 
-            obj.setAllocationLimit(
-                1024,
-                bdlf::BindUtil::bind(local::incrementInteger,
-                                     &cbInvocationCount));
+            obj.setAllocationLimit(1024, [&cbInvocationCount]() {
+                local::incrementInteger(&cbInvocationCount);
+            });
 
             void* alloc1 = obj.allocate(400);
             void* alloc2 = obj.allocate(400);
@@ -374,10 +372,9 @@ static void test4_allocationLimit()
                                          &statContext,
                                          bmqtst::TestHelperUtil::allocator());
 
-            obj.setAllocationLimit(
-                1024,
-                bdlf::BindUtil::bind(local::incrementInteger,
-                                     &cbInvocationCount));
+            obj.setAllocationLimit(1024, [&cbInvocationCount]() {
+                local::incrementInteger(&cbInvocationCount);
+            });
 
             void* alloc1 = obj.allocate(400);
             void* alloc2 = obj.allocate(400);
@@ -427,9 +424,9 @@ static void test5_allocationLimitHierarchical()
     // tracked) is a bit bigger than requested, so we don't check here that the
     // callback is invoked when exactly reaching the allocation limit, but
     // just ensure that once reached, it doesn't get invoked again.
-    topAlloc.setAllocationLimit(1024,
-                                bdlf::BindUtil::bind(local::incrementInteger,
-                                                     &cbInvocationCount));
+    topAlloc.setAllocationLimit(1024, [&cbInvocationCount]() {
+        local::incrementInteger(&cbInvocationCount);
+    });
 
     // Create the 'bottom1' allocator, children of 'topAlloc'
     bmqma::CountingAllocator bottomAlloc1("bottom1", &topAlloc);
