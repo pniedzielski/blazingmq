@@ -237,9 +237,9 @@ class StatContextTableInfoProvider : public bmqst::TableInfoProvider {
     bslma::Allocator* d_allocator_p;
 
     // NOT IMPLEMENTED
-    StatContextTableInfoProvider(const StatContextTableInfoProvider&);
+    StatContextTableInfoProvider(const StatContextTableInfoProvider&) = delete;
     StatContextTableInfoProvider&
-    operator=(const StatContextTableInfoProvider&);
+    operator=(const StatContextTableInfoProvider&) = delete;
 
     // PRIVATE MANIPULATORS
     void addContext(const StatContext* context, int level, bool isFilteredOut);

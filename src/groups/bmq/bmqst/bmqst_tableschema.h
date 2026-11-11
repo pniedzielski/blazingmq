@@ -107,7 +107,7 @@ class TableSchema {
     bslma::Allocator* d_allocator_p;
 
     // NOT IMPLEMENTED
-    TableSchema& operator=(const TableSchema&);
+    TableSchema& operator=(const TableSchema&) = delete;
 
   public:
     // CREATORS

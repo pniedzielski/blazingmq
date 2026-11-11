@@ -207,8 +207,8 @@ class Table : public bmqst::BaseTable {
     TableRecords d_records;
 
     // NOT IMPLEMENTED
-    Table(const Table&);
-    Table& operator=(const Table&);
+    Table(const Table&)            = delete;
+    Table& operator=(const Table&) = delete;
 
   public:
     // CREATORS

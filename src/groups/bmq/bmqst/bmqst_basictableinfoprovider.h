@@ -161,9 +161,9 @@ class BasicTableInfoProvider_ValueSizeVisitor {
 
     // NOT IMPLEMENTED
     BasicTableInfoProvider_ValueSizeVisitor(
-        const BasicTableInfoProvider_ValueSizeVisitor&);
+        const BasicTableInfoProvider_ValueSizeVisitor&) = delete;
     BasicTableInfoProvider_ValueSizeVisitor&
-    operator=(const BasicTableInfoProvider_ValueSizeVisitor&);
+    operator=(const BasicTableInfoProvider_ValueSizeVisitor&) = delete;
 
   public:
     // CREATORS
@@ -208,9 +208,9 @@ class BasicTableInfoProvider_ValuePrintVisitor {
 
     // NOT IMPLEMENTED
     BasicTableInfoProvider_ValuePrintVisitor(
-        const BasicTableInfoProvider_ValuePrintVisitor&);
+        const BasicTableInfoProvider_ValuePrintVisitor&) = delete;
     BasicTableInfoProvider_ValuePrintVisitor&
-    operator=(const BasicTableInfoProvider_ValuePrintVisitor&);
+    operator=(const BasicTableInfoProvider_ValuePrintVisitor&) = delete;
 
   public:
     // CREATORS
@@ -260,8 +260,8 @@ class BasicTableInfoProvider : public bmqst::TableInfoProvider {
     mutable ValuePrintVisitor d_valuePrintVisitor;
 
     // NOT IMPLEMENTED
-    BasicTableInfoProvider(const BasicTableInfoProvider&);
-    BasicTableInfoProvider& operator=(const BasicTableInfoProvider&);
+    BasicTableInfoProvider(const BasicTableInfoProvider&)            = delete;
+    BasicTableInfoProvider& operator=(const BasicTableInfoProvider&) = delete;
 
   public:
     // CREATORS

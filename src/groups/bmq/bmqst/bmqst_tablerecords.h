@@ -119,8 +119,8 @@ class TableRecords {
     void addContext(const StatContext* context, int level, bool isFilteredOut);
 
     // NOT IMPLEMENTED
-    TableRecords(const TableRecords&);
-    TableRecords& operator=(const TableRecords&);
+    TableRecords(const TableRecords&)            = delete;
+    TableRecords& operator=(const TableRecords&) = delete;
 
   public:
     // CREATORS
