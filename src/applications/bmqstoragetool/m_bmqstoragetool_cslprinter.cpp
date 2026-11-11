@@ -68,8 +68,8 @@ bsl::string base64ToHex(const bsl::string& base64, bslma::Allocator* allocator)
     static const char HEX[] = "0123456789ABCDEF";
     bsl::string       result(allocator);
     result.reserve(bin.size() * 2);
-    for (bsl::size_t i = 0; i < bin.size(); ++i) {
-        unsigned char c = static_cast<unsigned char>(bin[i]);
+    for (const char ch : bin) {
+        unsigned char c = static_cast<unsigned char>(ch);
         result.push_back(HEX[c >> 4]);
         result.push_back(HEX[c & 0x0F]);
     }
@@ -297,10 +297,8 @@ void HumanReadableCslPrinter::printOffsetsNotFound(
     if (!offsets.empty()) {
         d_ostream << "\nThe following " << offsets.size()
                   << " offset(s) not found:\n";
-        for (OffsetsVec::const_iterator it = offsets.cbegin();
-             it != offsets.cend();
-             ++it) {
-            d_ostream << *it << '\n';
+        for (const bsls::Types::Int64 offset : offsets) {
+            d_ostream << offset << '\n';
         }
     }
 }
@@ -311,9 +309,8 @@ void HumanReadableCslPrinter::printCompositesNotFound(
     if (!seqNums.empty()) {
         d_ostream << "\nThe following " << seqNums.size()
                   << " sequence number(s) not found:\n";
-        CompositesVec::const_iterator it = seqNums.cbegin();
-        for (; it != seqNums.cend(); ++it) {
-            d_ostream << *it << '\n';
+        for (const CompositeSequenceNumber& seqNum : seqNums) {
+            d_ostream << seqNum << '\n';
         }
     }
 }
@@ -340,19 +337,13 @@ void HumanReadableCslPrinter::printSummaryResult(
             bsl::vector<bsl::string>           fields(d_allocator_p);
             bmqp_ctrlmsg::ClusterMessageChoice clusterMessageChoice(
                 d_allocator_p);
-            for (CslUpdateChoiceMap::const_iterator it =
-                     updateChoiceMap.begin();
-                 it != updateChoiceMap.end();
-                 ++it) {
-                clusterMessageChoice.makeSelection(it->first);
+            for (const auto& [choice, count] : updateChoiceMap) {
+                clusterMessageChoice.makeSelection(choice);
                 fields.push_back(clusterMessageChoice.selectionName());
             }
             bmqu::AlignedPrinter printer(d_ostream, fields);
-            for (CslUpdateChoiceMap::const_iterator it =
-                     updateChoiceMap.begin();
-                 it != updateChoiceMap.end();
-                 ++it) {
-                printer << it->second;
+            for (const auto& [choice, count] : updateChoiceMap) {
+                printer << count;
             }
         }
         else {
