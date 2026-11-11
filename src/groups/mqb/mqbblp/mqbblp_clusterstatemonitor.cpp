@@ -26,8 +26,6 @@
 #include <bmqu_time.h>
 
 // BDE
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bsl_functional.h>
 #include <bsl_utility.h>
 #include <bsls_assert.h>
@@ -134,10 +132,9 @@ void ClusterStateMonitor::notifyObserversIfNeeded()
     for (size_t i = 0; i != d_partitionStates.size(); ++i) {
         State* state = &d_partitionStates[i];
         bsl::function<void(mqbc::ClusterStateObserver*)> notificationCb =
-            bdlf::BindUtil::bind(
-                &mqbc::ClusterStateObserver::onPartitionOrphanThreshold,
-                bdlf::PlaceHolders::_1,  // observer
-                i);                      // partitionId
+            [i](mqbc::ClusterStateObserver* observer) {
+                observer->onPartitionOrphanThreshold(i);
+            };
 
         const bool shouldAlarm = notifyObserversIfNeededHelper(
             state,
@@ -159,10 +156,9 @@ void ClusterStateMonitor::notifyObserversIfNeeded()
          ++cit) {
         State* state = &d_nodeStates[cit->first->nodeId()];
         bsl::function<void(mqbc::ClusterStateObserver*)> notificationCb =
-            bdlf::BindUtil::bind(
-                &mqbc::ClusterStateObserver::onNodeUnavailableThreshold,
-                bdlf::PlaceHolders::_1,  // observer
-                cit->first);             // node
+            [node = cit->first](mqbc::ClusterStateObserver* observer) {
+                observer->onNodeUnavailableThreshold(node);
+            };
 
         const bool shouldAlarm = notifyObserversIfNeededHelper(
             state,
@@ -180,9 +176,9 @@ void ClusterStateMonitor::notifyObserversIfNeeded()
     // [1.3] Cluster leader state
     {
         bsl::function<void(mqbc::ClusterStateObserver*)> notificationCb =
-            bdlf::BindUtil::bind(
-                &mqbc::ClusterStateObserver::onLeaderPassiveThreshold,
-                bdlf::PlaceHolders::_1);  // observer
+            [](mqbc::ClusterStateObserver* observer) {
+                observer->onLeaderPassiveThreshold();
+            };
 
         const bool shouldAlarm = notifyObserversIfNeededHelper(
             &d_leaderState,
@@ -199,9 +195,9 @@ void ClusterStateMonitor::notifyObserversIfNeeded()
     // [1.4] State of the failover process
     {
         bsl::function<void(mqbc::ClusterStateObserver*)> notificationCb =
-            bdlf::BindUtil::bind(
-                &mqbc::ClusterStateObserver::onFailoverThreshold,
-                bdlf::PlaceHolders::_1);  // observer
+            [](mqbc::ClusterStateObserver* observer) {
+                observer->onFailoverThreshold();
+            };
 
         const bool shouldAlarm = notifyObserversIfNeededHelper(
             &d_failoverState,
@@ -283,8 +279,9 @@ void ClusterStateMonitor::verifyAllStates()
     // invoked in *ANY* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&ClusterStateMonitor::verifyAllStatesDispatched,
-                             this),
+        [this]() {
+            verifyAllStatesDispatched();
+        },
         dispatcherClient());
 }
 
@@ -532,7 +529,9 @@ void ClusterStateMonitor::start()
     d_scheduler_p->scheduleRecurringEvent(
         &d_eventHandle,
         bsls::TimeInterval(k_CHECK_INTERVAL, 0),
-        bdlf::BindUtil::bind(&ClusterStateMonitor::verifyAllStates, this),
+        [this]() {
+            verifyAllStates();
+        },
         bsls::TimeInterval(0));
 
     d_isStarted = true;

@@ -38,8 +38,6 @@
 #include <ball_log.h>
 #include <ball_severity.h>
 #include <bdlb_nullablevalue.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bsl_iostream.h>
 #include <bsl_memory.h>
 #include <bsl_utility.h>
@@ -187,12 +185,15 @@ struct TestHelper {
         d_cluster_mp->setThreadId(mqbi::DispatcherClient::k_ANY_THREAD_ID);
 
         bmqu::Time::initialize(
-            bdlf::BindUtil::bind(&mqbmock::Cluster::getTime,
-                                 d_cluster_mp.get()),
-            bdlf::BindUtil::bind(&mqbmock::Cluster::getTime,
-                                 d_cluster_mp.get()),
-            bdlf::BindUtil::bind(&mqbmock::Cluster::getTimeInt64,
-                                 d_cluster_mp.get()));
+            [cluster = d_cluster_mp.get()]() {
+                return cluster->getTime();
+            },
+            [cluster = d_cluster_mp.get()]() {
+                return cluster->getTime();
+            },
+            [cluster = d_cluster_mp.get()]() {
+                return cluster->getTimeInt64();
+            });
 
         for (mqbnet::Cluster::NodesList::iterator iter =
                  d_cluster_mp->netCluster().nodes().begin();
