@@ -48,7 +48,7 @@ bsl::string Table::pad(bsl::string_view text, size_t width) const
 Table::ColumnView Table::column(bsl::string_view columnTitle)
 {
     bsl::string str(columnTitle, d_allocator_p);
-    if (d_views.find(str) == d_views.end()) {
+    if (!d_views.contains(str)) {
         d_columns.resize(d_columns.size() + 1);
         d_columns.back().push_back(str);
         d_views.insert(
