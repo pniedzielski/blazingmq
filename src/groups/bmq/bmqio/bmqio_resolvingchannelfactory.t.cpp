@@ -15,7 +15,6 @@
 
 #include <bmqio_resolvingchannelfactory.h>
 
-#include <bdlf_bind.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsla_annotations.h>
 
@@ -126,13 +125,14 @@ static void test1_defaultResolutionFn()
     bsl::vector<ntsa::IpAddress> expectedAddresses(
         bmqtst::TestHelperUtil::allocator());
 
-    using namespace bdlf::PlaceHolders;
-    ResolvingChannelFactoryUtil::ResolveFn resolveFn = bdlf::BindUtil::bind(
-        &testResolveFn,
-        _1,
-        _2,
-        &retHosts,
-        &expectedAddresses);
+    ResolvingChannelFactoryUtil::ResolveFn resolveFn =
+        [&retHosts, &expectedAddresses](bsl::string*           domainName,
+                                        const ntsa::IpAddress& address) {
+            return testResolveFn(domainName,
+                                 address,
+                                 &retHosts,
+                                 &expectedAddresses);
+        };
 
     bmqio::TestChannel base(bmqtst::TestHelperUtil::allocator());
     bsl::string        ret(bmqtst::TestHelperUtil::allocator());
@@ -194,13 +194,14 @@ static void test2_channelFactory()
     bsl::vector<ntsa::IpAddress> expectedAddresses(
         bmqtst::TestHelperUtil::allocator());
 
-    using namespace bdlf::PlaceHolders;
-    ResolvingChannelFactoryUtil::ResolveFn resolveFn = bdlf::BindUtil::bind(
-        &testResolveFn,
-        _1,
-        _2,
-        &retHosts,
-        &expectedAddresses);
+    ResolvingChannelFactoryUtil::ResolveFn resolveFn =
+        [&retHosts, &expectedAddresses](bsl::string*           domainName,
+                                        const ntsa::IpAddress& address) {
+            return testResolveFn(domainName,
+                                 address,
+                                 &retHosts,
+                                 &expectedAddresses);
+        };
 
     TestExecutor::Store execStore(bmqtst::TestHelperUtil::allocator());
 
@@ -210,11 +211,12 @@ static void test2_channelFactory()
             TestExecutor(&execStore)),
         bmqtst::TestHelperUtil::allocator());
     cfg.resolutionFn(
-        bdlf::BindUtil::bind(&ResolvingChannelFactoryUtil::defaultResolutionFn,
-                             _1,
-                             _2,
-                             resolveFn,
-                             false));
+        [resolveFn](bsl::string* resolvedUri, const Channel& baseChannel) {
+            ResolvingChannelFactoryUtil::defaultResolutionFn(resolvedUri,
+                                                             baseChannel,
+                                                             resolveFn,
+                                                             false);
+        });
     bsl::shared_ptr<ResolvingChannelFactory> obj;
     obj.createInplace(bmqtst::TestHelperUtil::allocator(),
                       cfg,
@@ -222,11 +224,14 @@ static void test2_channelFactory()
 
     bsl::deque<bsl::shared_ptr<Channel> > channels;
 
-    obj->listen(
-        0,
-        0,
-        ListenOptions(),
-        bdlf::BindUtil::bind(&testResultCallback, &channels, _1, _2, _3));
+    obj->listen(0,
+                0,
+                ListenOptions(),
+                [&channels](ChannelFactoryEvent::Enum       event,
+                            const Status&                   status,
+                            const bsl::shared_ptr<Channel>& channel) {
+                    testResultCallback(&channels, event, status, channel);
+                });
 
     bsl::shared_ptr<TestChannel> channel;
     channel.createInplace(bmqtst::TestHelperUtil::allocator(),
