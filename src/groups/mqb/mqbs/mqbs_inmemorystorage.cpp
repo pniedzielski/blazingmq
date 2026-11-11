@@ -65,10 +65,9 @@ InMemoryStorage::InMemoryStorage(DataStore*              dataStore_p,
 , d_capacityMeter(
       bsl::string("queue [", d_allocator_p) + uri.asString() + "]",
       parentCapacityMeter,
-      bdlf::BindUtil::bindS(d_allocator_p,
-                            &InMemoryStorage::logAppsSubscriptionInfoCb,
-                            this,
-                            bdlf::PlaceHolders::_1),  // stream
+      [this](bsl::ostream& stream) -> bsl::ostream& {
+          return logAppsSubscriptionInfoCb(stream);
+      },
       d_allocator_p)
 , d_items(bsls::TimeInterval()
               .addMilliseconds(config.deduplicationTimeMs())
