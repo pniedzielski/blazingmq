@@ -710,9 +710,9 @@ void ClientSession::tearDownImpl(bslmt::Semaphore*            semaphore,
 
     BALL_LOG_INFO << description() << ": tearDownImpl";
 
-    bdlb::ScopeExitAny guard(bdlf::BindUtil::bind(
-        static_cast<void (bslmt::Semaphore::*)()>(&bslmt::Semaphore::post),
-        semaphore));
+    bdlb::ScopeExitAny guard([semaphore]() {
+        semaphore->post();
+    });
 
     if (d_operationState == e_DEAD) {
         // Cannot do any work anymore
@@ -779,9 +779,9 @@ void ClientSession::tearDownImpl(bslmt::Semaphore*            semaphore,
     dispatcher()->executeOnAllQueues(
         mqbi::Dispatcher::VoidFunction(),  // empty
         mqbi::DispatcherClientType::e_QUEUE,
-        bdlf::BindUtil::bind(&ClientSession::tearDownAllQueuesDone,
-                             this,
-                             session));
+        [this, session]() {
+            tearDownAllQueuesDone(session);
+        });
 }
 
 void ClientSession::tearDownAllQueuesDone(const bsl::shared_ptr<void>& session)
@@ -799,9 +799,12 @@ void ClientSession::tearDownAllQueuesDone(const bsl::shared_ptr<void>& session)
     // by having the 'handle' go out of scope.  This dispatcher event must be
     // of type 'e_DISPATCHER' to make sure this client will not be added to the
     // dispatcher's flush list, since it is being destroyed.
-    dispatcher()->execute(bdlf::BindUtil::bind(&sessionHolderDummy, session),
-                          this,
-                          mqbi::DispatcherEventType::e_DISPATCHER);
+    dispatcher()->execute(
+        [session]() {
+            sessionHolderDummy(session);
+        },
+        this,
+        mqbi::DispatcherEventType::e_DISPATCHER);
 }
 
 void ClientSession::onHandleConfigured(
@@ -813,12 +816,12 @@ void ClientSession::onHandleConfigured(
     // executed by the *ANY* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&ClientSession::onHandleConfiguredDispatched,
-                             this,
-                             status,
-                             streamParameters,
-                             streamParamsCtrlMsg,
-                             opLogger),
+        [this, status, streamParameters, streamParamsCtrlMsg, opLogger]() {
+            onHandleConfiguredDispatched(status,
+                                         streamParameters,
+                                         streamParamsCtrlMsg,
+                                         opLogger);
+        },
         this);
 }
 
@@ -1136,19 +1139,25 @@ void ClientSession::processOpenQueue(
 
     d_queueSessionManager.processOpenQueue(
         handleParamsCtrlMsg,
-        bdlf::BindUtil::bind(&ClientSession::openQueueCb,
-                             this,
-                             bdlf::PlaceHolders::_1,  // status
-                             bdlf::PlaceHolders::_2,  // handle
-                             bdlf::PlaceHolders::_3,  // response
-                             handleParamsCtrlMsg,
-                             opLogger),
-        bdlf::BindUtil::bind(&ClientSession::sendErrorResponse,
-                             this,
-                             bdlf::PlaceHolders::_1,  // failureCategory
-                             bdlf::PlaceHolders::_2,  // errorDescription
-                             bdlf::PlaceHolders::_3,  // code
-                             handleParamsCtrlMsg));
+        [this, handleParamsCtrlMsg, opLogger](
+            const bmqp_ctrlmsg::Status&            status,
+            mqbi::QueueHandle*                     handle,
+            const bmqp_ctrlmsg::OpenQueueResponse& response) {
+            openQueueCb(status,
+                        handle,
+                        response,
+                        handleParamsCtrlMsg,
+                        opLogger);
+        },
+        [this, handleParamsCtrlMsg](
+            bmqp_ctrlmsg::StatusCategory::Value failureCategory,
+            const bslstl::StringRef&            errorDescription,
+            const int                           code) {
+            sendErrorResponse(failureCategory,
+                              errorDescription,
+                              code,
+                              handleParamsCtrlMsg);
+        });
 }
 
 void ClientSession::openQueueCb(
@@ -1221,17 +1230,19 @@ void ClientSession::processCloseQueue(
 
     d_queueSessionManager.processCloseQueue(
         handleParamsCtrlMsg,
-        bdlf::BindUtil::bind(&ClientSession::closeQueueCb,
-                             this,
-                             bdlf::PlaceHolders::_1,  // handle
-                             handleParamsCtrlMsg,
-                             opLogger),
-        bdlf::BindUtil::bind(&ClientSession::sendErrorResponse,
-                             this,
-                             bdlf::PlaceHolders::_1,  // failureCategory
-                             bdlf::PlaceHolders::_2,  // errorDescription
-                             bdlf::PlaceHolders::_3,  // code
-                             handleParamsCtrlMsg));
+        [this, handleParamsCtrlMsg, opLogger](
+            const bsl::shared_ptr<mqbi::QueueHandle>& handle) {
+            closeQueueCb(handle, handleParamsCtrlMsg, opLogger);
+        },
+        [this, handleParamsCtrlMsg](
+            bmqp_ctrlmsg::StatusCategory::Value failureCategory,
+            const bslstl::StringRef&            errorDescription,
+            const int                           code) {
+            sendErrorResponse(failureCategory,
+                              errorDescription,
+                              code,
+                              handleParamsCtrlMsg);
+        });
 }
 
 void ClientSession::closeQueueCb(
@@ -1290,9 +1301,9 @@ void ClientSession::closeQueueCb(
     //       and the process of this event by the dispatcher should not add it
     //       to the flush list.
     handle->queue()->dispatcher()->execute(
-        bdlf::BindUtil::bind(&finalizeClosedHandle,
-                             bsl::string(description(), d_state.d_allocator_p),
-                             handle),
+        [sessionDescription = bsl::string(description()), handle]() {
+            finalizeClosedHandle(sessionDescription, handle);
+        },
         handle->queue(),
         mqbi::DispatcherEventType::e_DISPATCHER);
 }
@@ -2481,10 +2492,9 @@ ClientSession::ClientSession(
     // Observe the Channel for High/Low watermark notification.  We don't need
     // to unregister from the channel, because this Session has a longer
     // lifecycle than the Channel itself.
-    channel->onWatermark(
-        bdlf::BindUtil::bind(&ClientSession::onWatermark,
-                             this,
-                             bdlf::PlaceHolders::_1));  // type
+    channel->onWatermark([this](bmqio::ChannelWatermarkType::Enum type) {
+        onWatermark(type);
+    });
 
     mqbstat::BrokerStats::instance()
         .onEvent<mqbstat::BrokerStats::EventType::e_CLIENT_CREATED>();
@@ -2581,11 +2591,9 @@ void ClientSession::processEvent(const bmqp::Event&                    event,
             opLogger->start() << description() << ": disconnect";
 
             d_isDisconnecting = true;
-            eventCallback     = bdlf::BindUtil::bind(
-                &ClientSession::processDisconnectAllQueues,
-                this,
-                controlMessage,
-                opLogger);
+            eventCallback     = [this, controlMessage, opLogger]() {
+                processDisconnectAllQueues(controlMessage, opLogger);
+            };
         } break;
         case MsgChoice::SELECTION_ID_OPEN_QUEUE: {
             // The URI is not validated at this point (it is parsed later, in
@@ -2605,11 +2613,9 @@ void ClientSession::processEvent(const bmqp::Event&                    event,
             opLogger->start() << description() << ": open queue [queue: '"
                               << queueUri << "']";
 
-            eventCallback = bdlf::BindUtil::bind(
-                &ClientSession::processOpenQueue,
-                this,
-                controlMessage,
-                opLogger);
+            eventCallback = [this, controlMessage, opLogger]() {
+                processOpenQueue(controlMessage, opLogger);
+            };
         } break;
         case MsgChoice::SELECTION_ID_CLOSE_QUEUE: {
             // The closeQueue URI is never parsed (the queue is looked up by
@@ -2629,11 +2635,9 @@ void ClientSession::processEvent(const bmqp::Event&                    event,
             opLogger->start() << description() << ": close queue [queue: '"
                               << queueUri << "']";
 
-            eventCallback = bdlf::BindUtil::bind(
-                &ClientSession::processCloseQueue,
-                this,
-                controlMessage,
-                opLogger);
+            eventCallback = [this, controlMessage, opLogger]() {
+                processCloseQueue(controlMessage, opLogger);
+            };
         } break;
         case MsgChoice::SELECTION_ID_CONFIGURE_QUEUE_STREAM:
         case MsgChoice::SELECTION_ID_CONFIGURE_STREAM: {
@@ -2642,11 +2646,9 @@ void ClientSession::processEvent(const bmqp::Event&                    event,
                     d_state.d_allocator_p);
             opLogger->start() << description() << ": configure queue";
 
-            eventCallback = bdlf::BindUtil::bind(
-                &ClientSession::processConfigureStream,
-                this,
-                controlMessage,
-                opLogger);
+            eventCallback = [this, controlMessage, opLogger]() {
+                processConfigureStream(controlMessage, opLogger);
+            };
         } break;
         case MsgChoice::SELECTION_ID_DISCONNECT_RESPONSE:
         case MsgChoice::SELECTION_ID_OPEN_QUEUE_RESPONSE:
@@ -2661,10 +2663,9 @@ void ClientSession::processEvent(const bmqp::Event&                    event,
             return;  // RETURN
         }
         case MsgChoice::SELECTION_ID_CLUSTER_MESSAGE: {
-            eventCallback = bdlf::BindUtil::bind(
-                &ClientSession::processClusterMessage,
-                this,
-                controlMessage);
+            eventCallback = [this, controlMessage]() {
+                processClusterMessage(controlMessage);
+            };
         } break;
         case MsgChoice::SELECTION_ID_UNDEFINED:
         case MsgChoice::SELECTION_ID_STATUS:
@@ -2740,13 +2741,12 @@ void ClientSession::tearDown(const bsl::shared_ptr<void>& session,
     // NOTE: We use the e_DISPATCHER type because this Client is dying, and the
     //       process of this event by the dispatcher should not add it to the
     //       flush list.
-    dispatcher()->execute(bdlf::BindUtil::bind(&ClientSession::tearDownImpl,
-                                               this,
-                                               &semaphore,
-                                               session,
-                                               isBrokerShutdown),
-                          this,
-                          mqbi::DispatcherEventType::e_DISPATCHER);
+    dispatcher()->execute(
+        [this, &semaphore, session, isBrokerShutdown]() {
+            tearDownImpl(&semaphore, session, isBrokerShutdown);
+        },
+        this,
+        mqbi::DispatcherEventType::e_DISPATCHER);
     semaphore.wait();
 
     // At this point, we are sure the client dispatcher thread has no pending
@@ -2776,10 +2776,9 @@ void ClientSession::initiateShutdown(const ShutdownCb& callback)
         // tearDownImpl's d_self.invalidate() when both events are queued
         // on the same client dispatcher thread.
         dispatcher()->execute(
-            bdlf::BindUtil::bindS(d_state.d_allocator_p,
-                                  &ClientSession::initiateShutdownSafe,
-                                  d_self.acquireWeak(),
-                                  callback),
+            [self = d_self.acquireWeak(), callback]() {
+                initiateShutdownSafe(self, callback);
+            },
             this,
             mqbi::DispatcherEventType::e_DISPATCHER);
         // Use 'mqbi::DispatcherEventType::e_DISPATCHER' to avoid (re)enabling
@@ -2808,7 +2807,9 @@ void ClientSession::invalidate()
     BSLS_ASSERT_SAFE(!inDispatcherThread());
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&ClientSession::invalidateDispatched, this),
+        [this]() {
+            invalidateDispatched();
+        },
         this);
     dispatcher()->synchronize(this);
 }
@@ -2861,7 +2862,9 @@ void ClientSession::onLowWatermark()
     // Enqueue an event to be processed in the client's DISPATCHER thread to
     // resume flushing data from the channelBufferQueue.
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&ClientSession::flushChannelBufferQueue, this),
+        [this]() {
+            flushChannelBufferQueue();
+        },
         this);
 }
 
@@ -3062,10 +3065,9 @@ void ClientSession::processStopRequest(ShutdownContextSp& contextSp)
          cit != d_queueSessionManager.queues().end();
          ++cit) {
         if (!cit->second.d_hasReceivedFinalCloseQueue) {
-            cit->second.d_handle_p->deconfigureAll(
-                bdlf::BindUtil::bind(&ClientSession::onDeconfiguredHandle,
-                                     this,
-                                     contextSp));
+            cit->second.d_handle_p->deconfigureAll([this, contextSp]() {
+                onDeconfiguredHandle(contextSp);
+            });
         }
     }
 }

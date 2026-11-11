@@ -61,7 +61,6 @@
 #include <bdlbb_pooledblobbufferfactory.h>
 #include <bdlcc_objectpool.h>
 #include <bdlcc_sharedobjectpool.h>
-#include <bdlf_bind.h>
 #include <bsl_memory.h>
 #include <bsl_string.h>
 #include <bsl_vector.h>
@@ -699,12 +698,12 @@ class TestBench {
               const bool                              atMostOnce,
               bslma::Allocator*                       allocator)
     : d_bufferFactory(256, allocator)
-    , d_blobSpPool(bdlf::BindUtil::bind(&createBlob,
-                                        &d_bufferFactory,
-                                        bdlf::PlaceHolders::_1,   // arena
-                                        bdlf::PlaceHolders::_2),  // alloc
-                   1024,  // blob pool growth strategy
-                   allocator)
+    , d_blobSpPool(
+          [this](void* arena, bslma::Allocator* alloc) {
+              createBlob(&d_bufferFactory, arena, alloc);
+          },
+          1024,  // blob pool growth strategy
+          allocator)
     , d_channel_sp(new bmqio::TestChannel(allocator))
     , d_cluster(allocator)
     , d_mockDispatcher(allocator)
@@ -769,9 +768,15 @@ class TestBench {
         // Setup test time source
         bmqu::Time::shutdown();
         bmqu::Time::initialize(
-            bdlf::BindUtil::bind(&TestClock::realtimeClock, &d_testClock),
-            bdlf::BindUtil::bind(&TestClock::monotonicClock, &d_testClock),
-            bdlf::BindUtil::bind(&TestClock::highResTimer, &d_testClock),
+            [this]() {
+                return d_testClock.realtimeClock();
+            },
+            [this]() {
+                return d_testClock.monotonicClock();
+            },
+            [this]() {
+                return d_testClock.highResTimer();
+            },
             d_allocator_p);
 
         int rc = d_scheduler.start();
@@ -2272,9 +2277,9 @@ static void test11_initiateShutdown()
         BMQTST_ASSERT_EQ(0, tb.d_domain.d_queueHandle->countUnconfirmed());
 
         // Initiate client session shutdown
-        tb.d_cs.initiateShutdown(bdlf::BindUtil::bind(&onShutdownComplete,
-                                                      &callbackCounter,
-                                                      &semaphore));
+        tb.d_cs.initiateShutdown([&callbackCounter, &semaphore]() {
+            onShutdownComplete(&callbackCounter, &semaphore);
+        });
 
         // Verify that the shutdown callback gets called
         semaphore.wait();
