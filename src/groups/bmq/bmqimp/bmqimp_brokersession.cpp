@@ -396,10 +396,9 @@ BrokerSession::SessionFsm::setState(State::Enum value, FsmEvent::Enum event)
     BALL_LOG_INFO << id() << "::: STATE TRANSITION: " << oldState << " -> ["
                   << event << "] -> " << value << " :::";
 
-    for (size_t i = 0; i < d_transitionTable.size(); ++i) {
-        if (d_transitionTable[i].d_currentState == oldState &&
-            d_transitionTable[i].d_event == event &&
-            d_transitionTable[i].d_newState == value) {
+    for (const auto& transition : d_transitionTable) {
+        if (transition.d_currentState == oldState &&
+            transition.d_event == event && transition.d_newState == value) {
             isValidTransition = true;
             break;  // BREAK
         }
@@ -995,10 +994,9 @@ void BrokerSession::QueueFsm::setQueueState(
                   << "]: " << oldState << " -> [" << event << "] -> " << value
                   << " :::";
 
-    for (size_t i = 0; i < d_transitionTable.size(); ++i) {
-        if (d_transitionTable[i].d_currentState == oldState &&
-            d_transitionTable[i].d_event == event &&
-            d_transitionTable[i].d_newState == value) {
+    for (const auto& transition : d_transitionTable) {
+        if (transition.d_currentState == oldState &&
+            transition.d_event == event && transition.d_newState == value) {
             isValidTransition = true;
             break;  // BREAK
         }
@@ -3690,11 +3688,8 @@ void BrokerSession::processPushEvent(const bmqp::Event& event)
         }
         // Insert queues in event
         const bmqp::EventUtilEventInfo::Ids& sIds = currEventInfo.d_ids;
-        for (bmqp::EventUtilEventInfo::Ids::const_iterator citer =
-                 sIds.begin();
-             citer != sIds.end();
-             ++citer) {
-            d_queueManager.observePushEvent(queueEvent.get(), *citer);
+        for (const auto& queueInfo : sIds) {
+            d_queueManager.observePushEvent(queueEvent.get(), queueInfo);
         }
 
         // Update event bytes
@@ -5360,12 +5355,8 @@ BrokerSession::createConfigureQueueContext(const bsl::shared_ptr<Queue>& queue,
         bmqt::QueueOptions::SubscriptionsSnapshot snapshot(d_allocator_p);
         options.loadSubscriptions(&snapshot);
 
-        for (bmqt::QueueOptions::SubscriptionsSnapshot::const_iterator cit =
-                 snapshot.begin();
-             cit != snapshot.end();
-             ++cit) {
+        for (const auto& [handle, from] : snapshot) {
             bmqp_ctrlmsg::ConsumerInfo ci;
-            const bmqt::Subscription&  from = cit->second;
             if (from.hasMaxUnconfirmedMessages()) {
                 ci.maxUnconfirmedMessages() = from.maxUnconfirmedMessages();
             }
@@ -5416,8 +5407,8 @@ BrokerSession::createConfigureQueueContext(const bsl::shared_ptr<Queue>& queue,
 
             streamParams.subscriptions().emplace_back(subscription);
             queue->registerInternalSubscriptionId(internalSubscriptionId,
-                                                  cit->first.id(),
-                                                  cit->first.correlationId());
+                                                  handle.id(),
+                                                  handle.correlationId());
         }
         return context;  // RETURN
     }
@@ -5560,12 +5551,10 @@ void BrokerSession::actionSuspendHealthSensitiveQueues()
     }
 
     // Attempt to suspend each queue.
-    for (bsl::vector<bsl::shared_ptr<Queue> >::size_type idx = 0;
-         idx != allQueues.size();
-         ++idx) {
-        const bmqt::QueueOptions& options = allQueues[idx]->options();
+    for (const bsl::shared_ptr<Queue>& queueSp : allQueues) {
+        const bmqt::QueueOptions& options = queueSp->options();
         if (options.suspendsOnBadHostHealth()) {
-            d_queueFsm.handleQueueSuspend(allQueues[idx]);
+            d_queueFsm.handleQueueSuspend(queueSp);
         }
     }
 }
@@ -5589,12 +5578,10 @@ void BrokerSession::actionResumeHealthSensitiveQueues()
     d_numPendingHostHealthRequests++;
 
     // Attempt to resume each queue.
-    for (bsl::vector<bsl::shared_ptr<Queue> >::size_type idx = 0;
-         idx != allQueues.size();
-         ++idx) {
-        const bmqt::QueueOptions& options = allQueues[idx]->options();
+    for (const bsl::shared_ptr<Queue>& queueSp : allQueues) {
+        const bmqt::QueueOptions& options = queueSp->options();
         if (options.suspendsOnBadHostHealth()) {
-            d_queueFsm.handleQueueResume(allQueues[idx]);
+            d_queueFsm.handleQueueResume(queueSp);
         }
     }
 
@@ -6361,17 +6348,16 @@ void BrokerSession::onConfigureQueueResponse(
 
         Subscriptions subscriptions;
 
-        for (size_t i = 0; i < out.subscriptions().size(); ++i) {
-            BSLS_ASSERT_SAFE(subscriptions
-                                 .emplace(out.subscriptions()[i].sId(),
-                                          out.subscriptions()[i])
-                                 .second);
+        for (const auto& subscription : out.subscriptions()) {
+            BSLS_ASSERT_SAFE(
+                subscriptions.emplace(subscription.sId(), subscription)
+                    .second);
         }
-        for (size_t i = 0; i < in.subscriptions().size(); ++i) {
+        for (const auto& subscription : in.subscriptions()) {
             Subscriptions::const_iterator cit = subscriptions.find(
-                in.subscriptions()[i].sId());
+                subscription.sId());
             BSLS_ASSERT_SAFE(cit != subscriptions.end());
-            BSLS_ASSERT_SAFE(cit->second == in.subscriptions()[i]);
+            BSLS_ASSERT_SAFE(cit->second == subscription);
         }
 #endif  // BSLS_ASSERT_SAFE_IS_ACTIVE
 
@@ -6558,20 +6544,14 @@ void BrokerSession::reopenQueues()
                   << d_numPendingReopenQueues;
 
     // Reset the subStreamCount before initiating reopen logic
-    for (bsl::vector<bsl::shared_ptr<Queue> >::size_type idx = 0;
-         idx != pendingQueues.size();
-         ++idx) {
-        const bsl::shared_ptr<Queue>& queueSp = pendingQueues[idx];
+    for (const bsl::shared_ptr<Queue>& queueSp : pendingQueues) {
         d_queueManager.resetSubStreamCount(queueSp->uri().canonical());
     }
 
-    for (bsl::vector<bsl::shared_ptr<Queue> >::size_type idx = 0;
-         idx != pendingQueues.size();
-         ++idx) {
+    for (const bsl::shared_ptr<Queue>& queueSp : pendingQueues) {
         const FsmCallback fsmCallback =
-            [this,
-             correlationId = pendingQueues[idx]->correlationId(),
-             queue         = pendingQueues[idx]](const RequestSp& request) {
+            [this, correlationId = queueSp->correlationId(), queue = queueSp](
+                const RequestSp& request) {
                 asyncRequestNotifier(
                     request,
                     bmqt::SessionEventType::e_QUEUE_REOPEN_RESULT,
@@ -6580,10 +6560,10 @@ void BrokerSession::reopenQueues()
                     EventCallback());
             };
 
-        RequestSp context = createOpenQueueContext(pendingQueues[idx],
+        RequestSp context = createOpenQueueContext(queueSp,
                                                    fsmCallback,
                                                    false);  // isBuffered
-        d_queueFsm.handleReopenRequest(pendingQueues[idx],
+        d_queueFsm.handleReopenRequest(queueSp,
                                        d_sessionOptions.openQueueTimeout(),
                                        context);
     }
@@ -6599,10 +6579,8 @@ void BrokerSession::notifyQueuesChannelDown()
     bsl::vector<bsl::shared_ptr<Queue> >       allQueues(&localAllocator);
     d_queueManager.getAllQueues(&allQueues);
 
-    for (bsl::vector<bsl::shared_ptr<Queue> >::size_type idx = 0;
-         idx != allQueues.size();
-         ++idx) {
-        d_queueFsm.handleChannelDown(allQueues[idx]);
+    for (const bsl::shared_ptr<Queue>& queueSp : allQueues) {
+        d_queueFsm.handleChannelDown(queueSp);
     }
 }
 
