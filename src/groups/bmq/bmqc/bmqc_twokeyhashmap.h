@@ -1089,8 +1089,8 @@ inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::TwoKeyHashMap(
 
     // copy elements from 'original' to '*this'
     d_nodeAllocator->reserveCapacity(static_cast<int>(original.size()));
-    for (const_iterator it = original.cbegin(); it != original.cend(); ++it) {
-        insert(*it);
+    for (const value_type& element : original) {
+        insert(element);
     }
 
     // success
@@ -1346,8 +1346,8 @@ inline void TwoKeyHashMap<K1, K2, VALUE, H1, H2>::clear() noexcept
 #endif
 
     // erase all nodes
-    for (K1MapIter it = d_k1Map.begin(); it != d_k1Map.end(); ++it) {
-        d_nodeAllocator->deleteObject(it->second);
+    for (const auto& entry : d_k1Map) {
+        d_nodeAllocator->deleteObject(entry.second);
     }
 
     // clear key-to-node maps
@@ -1528,15 +1528,15 @@ inline bool TwoKeyHashMap<K1, K2, VALUE, H1, H2>::assertInvariants() const
 {
     BSLS_ASSERT_SAFE(d_k1Map.size() == d_k2Map.size());
 
-    for (K1MapConstIter it = d_k1Map.begin(); it != d_k1Map.end(); ++it) {
-        const Node* p = it->second;
+    for (const auto& entry : d_k1Map) {
+        const Node* p = entry.second;
         BSLS_ASSERT_SAFE(p);
         BSLS_ASSERT_SAFE(p->d_k1MapIter->second == p);
         BSLS_ASSERT_SAFE(p->d_k2MapIter->second == p);
     }
 
-    for (K2MapConstIter it = d_k2Map.begin(); it != d_k2Map.end(); ++it) {
-        const Node* p = it->second;
+    for (const auto& entry : d_k2Map) {
+        const Node* p = entry.second;
         BSLS_ASSERT_SAFE(p);
         BSLS_ASSERT_SAFE(p->d_k1MapIter->second == p);
         BSLS_ASSERT_SAFE(p->d_k2MapIter->second == p);

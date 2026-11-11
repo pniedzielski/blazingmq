@@ -1925,9 +1925,9 @@ static void test13_equality()
     map1.insert(2, "second", "value2");
     map1.insert(3, "third", "value3");
 
-    for (Map::const_iterator it = map1.cbegin(); it != map1.cend(); ++it) {
+    for (const Map::value_type& element : map1) {
         BMQTST_ASSERT(map1 != map2);
-        map2.insert(it->key1(), it->key2(), it->value());
+        map2.insert(element.key1(), element.key2(), element.value());
     }
     BMQTST_ASSERT(map1 == map2);
     while (!map1.empty()) {
