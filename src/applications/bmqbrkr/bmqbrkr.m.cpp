@@ -38,8 +38,6 @@
 #include <balst_stacktraceprintutil.h>
 #include <bdlb_string.h>
 #include <bdld_datum.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdls_filesystemutil.h>
 #include <bdls_pathutil.h>
 #include <bdls_processutil.h>
@@ -363,14 +361,10 @@ struct MTrapHandler {
             d_taskEnv_p->d_app.object().enqueueCommand(
                 "MTRAP",
                 cmd,
-                bdlf::BindUtil::bind(
-                    onProcessedAdminCommand,
-                    prefix,
-                    cmd,
-                    start,
-                    bdlf::PlaceHolders::_1,    // rc
-                    bdlf::PlaceHolders::_2));  // commandExecResults
-            return;                            // RETURN
+                [prefix, cmd, start](int rc, const bsl::string& results) {
+                    onProcessedAdminCommand(prefix, cmd, start, rc, results);
+                });
+            return;  // RETURN
         }
 
         BALL_LOG_ERROR << "Unknown command '" << prefix << "'\n"

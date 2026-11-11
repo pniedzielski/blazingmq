@@ -28,8 +28,6 @@
 
 // BDE
 #include <bdlb_string.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdls_pipeutil.h>
 #include <bsl_c_stdlib.h>
@@ -143,7 +141,9 @@ Task_AllocatorManager::Task_AllocatorManager(
             "task",
             "allocators",
             allocationLimit,
-            bdlf::BindUtil::bind(&onAllocationLimit, allocationLimit));
+            [allocationLimit]() {
+                onAllocationLimit(allocationLimit);
+            });
 
         d_statContext_p = bmqma::CountingAllocatorUtil::globalStatContext();
         d_store_p       = &bmqma::CountingAllocatorUtil::topAllocatorStore();
@@ -243,10 +243,11 @@ Task::Task(const bsl::string&           bmqPrefix,
               d_allocatorManager.store().get("EventScheduler"))
 , d_logController(&d_scheduler, d_allocatorManager.store().get("Task"))
 , d_controlManager(d_allocatorManager.store().get("Task"))
-, d_controlChannel(bdlf::BindUtil::bind(&Task::onControlMessage,
-                                        this,
-                                        bdlf::PlaceHolders::_1),  // message
-                   d_allocatorManager.store().get("Task"))
+, d_controlChannel(
+      [this](const bslstl::StringRef& message) {
+          onControlMessage(message);
+      },
+      d_allocatorManager.store().get("Task"))
 {
     // NOTHING
 }
@@ -285,10 +286,11 @@ int Task::initialize(bsl::ostream&             errorDescription,
         return rc_SCHEDULER_START_FAILED;  // RETURN
     }
 
-    d_scheduler.scheduleEvent(
-        bsls::TimeInterval(0, 0),  // now
-        bdlf::BindUtil::bind(&bslmt::ThreadUtil::setThreadName,
-                             "bmqSchedTask"));
+    d_scheduler.scheduleEvent(bsls::TimeInterval(0, 0),  // now
+                              []() {
+                                  bslmt::ThreadUtil::setThreadName(
+                                      "bmqSchedTask");
+                              });
 
     // -------------
     // LogController
@@ -344,20 +346,19 @@ int Task::initialize(bsl::ostream&             errorDescription,
         "HELP",
         "",
         "Display this message",
-        bdlf::BindUtil::bind(
-            &balb::ControlManager::printUsageHelper,
-            &d_controlManager,
-            &bsl::cout,
-            "This process responds to the following messages:"));
+        [this](const bsl::string&, bsl::istream&) {
+            d_controlManager.printUsageHelper(
+                &bsl::cout,
+                "This process responds to the following messages:");
+        });
 
-    registerMTrapHandler(
-        "LOG",
-        "",
-        "Log controlling commands",
-        bdlf::BindUtil::bind(&Task::onLogCommand,
-                             this,
-                             bdlf::PlaceHolders::_1,    // prefix
-                             bdlf::PlaceHolders::_2));  // istream
+    registerMTrapHandler("LOG",
+                         "",
+                         "Log controlling commands",
+                         [this](const bsl::string& prefix,
+                                bsl::istream&      input) {
+                             onLogCommand(prefix, input);
+                         });
 
     d_isInitialized = true;
     return rc_SUCCESS;
