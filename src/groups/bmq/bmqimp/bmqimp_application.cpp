@@ -46,9 +46,6 @@
 // BDE
 #include <ball_log.h>
 #include <bdlb_scopeexit.h>
-#include <bdlf_bind.h>
-#include <bdlf_memfn.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdlt_currenttime.h>
 #include <bsl_algorithm.h>
@@ -232,35 +229,40 @@ bslma::ManagedPtr<bmqio::ChannelFactoryPipeline> makeChannelFactoryPipeline(
             blobBufferFactory,
             allocator);
 
-    using bdlf::PlaceHolders::_1;
     bmqio::ChannelFactoryPipeline::Config builder(channelFactory, allocator);
     builder
-        .addWith(bdlf::BindUtil::bind(Builders::resolvingChannelFactory,
-                                      allocator,
-                                      _1))
-        .addWith(bdlf::BindUtil::bind(Builders::reconnectingChannelFactory,
-                                      allocator,
-                                      _1,
-                                      scheduler))
-        .addWith(bdlf::BindUtil::bind(Builders::statChannelFactory,
-                                      allocator,
-                                      _1,
-                                      bsl::cref(statContextCreator)))
-        .addWith(
-            bdlf::BindUtil::bind(Builders::authenticatedChannelFactory,
-                                 allocator,
-                                 _1,
-                                 scheduler,
-                                 bsl::cref(sessionOptions.authnCredentialCb()),
-                                 bsl::cref(sessionOptions.connectTimeout()),
-                                 blobSpPool))
-        .addWith(
-            bdlf::BindUtil::bind(Builders::negotiatedChannelFactory,
-                                 allocator,
-                                 _1,
-                                 bsl::cref(negotiationMessage),
-                                 bsl::cref(sessionOptions.connectTimeout()),
-                                 blobSpPool));
+        .addWith([allocator](ChannelFactorySP& prev) {
+            return Builders::resolvingChannelFactory(allocator, prev);
+        })
+        .addWith([allocator, scheduler](ChannelFactorySP& prev) {
+            return Builders::reconnectingChannelFactory(allocator,
+                                                        prev,
+                                                        scheduler);
+        })
+        .addWith([allocator, &statContextCreator](ChannelFactorySP& prev) {
+            return Builders::statChannelFactory(allocator,
+                                                prev,
+                                                statContextCreator);
+        })
+        .addWith([allocator, scheduler, &sessionOptions, blobSpPool](
+                     ChannelFactorySP& prev) {
+            return Builders::authenticatedChannelFactory(
+                allocator,
+                prev,
+                scheduler,
+                sessionOptions.authnCredentialCb(),
+                sessionOptions.connectTimeout(),
+                blobSpPool);
+        })
+        .addWith([allocator, &negotiationMessage, &sessionOptions, blobSpPool](
+                     ChannelFactorySP& prev) {
+            return Builders::negotiatedChannelFactory(
+                allocator,
+                prev,
+                negotiationMessage,
+                sessionOptions.connectTimeout(),
+                blobSpPool);
+        });
     return bslma::ManagedPtrUtil::allocateManaged<
         bmqio::ChannelFactoryPipeline>(allocator, bsl::move(builder));
 }
@@ -362,13 +364,15 @@ void Application::readCb(
 
             authenticatedChannelFactory_p->processAuthenticationEvent(
                 event,
-                bdlf::BindUtil::bindS(&d_allocator,
-                                      &Application::channelStateCallback,
-                                      this,
-                                      channel->peerUri(),
-                                      bdlf::PlaceHolders::_1,   // event
-                                      bdlf::PlaceHolders::_2,   // status
-                                      bdlf::PlaceHolders::_3),  // channel
+                [this, peerUri = channel->peerUri()](
+                    bmqio::ChannelFactoryEvent::Enum       factoryEvent,
+                    const bmqio::Status&                   factoryStatus,
+                    const bsl::shared_ptr<bmqio::Channel>& factoryChannel) {
+                    channelStateCallback(peerUri,
+                                         factoryEvent,
+                                         factoryStatus,
+                                         factoryChannel);
+                },
                 channel);
         }
         else {
@@ -395,21 +399,19 @@ void Application::channelStateCallback(
         BALL_LOG_INFO << id() << "Session with '" << channel->peerUri()
                       << "' is now UP";
 
-        channel->onWatermark(
-            bdlf::BindUtil::bind(&Application::onChannelWatermark,
-                                 this,
-                                 channel->peerUri(),
-                                 bdlf::PlaceHolders::_1));  // type
+        channel->onWatermark([this, peerUri = channel->peerUri()](
+                                 bmqio::ChannelWatermarkType::Enum type) {
+            onChannelWatermark(peerUri, type);
+        });
 
         d_brokerSession.setChannel(channel);
 
         // Done after 'setChannel', since 'onChannelDown' may be invoked
         // immediately.
-        channel->onClose(
-            bdlf::BindUtil::bind(&Application::onChannelDown,
-                                 this,
-                                 channel->peerUri(),
-                                 bdlf::PlaceHolders::_1));  // status
+        channel->onClose([this, peerUri = channel->peerUri()](
+                             const bmqio::Status& closeStatus) {
+            onChannelDown(peerUri, closeStatus);
+        });
 
         bsl::shared_ptr<bmqp::HeartbeatMonitor> monitor = createMonitor(
             channel);
@@ -419,13 +421,11 @@ void Application::channelStateCallback(
         channel->read(
             &st,
             bmqp::Protocol::k_PACKET_MIN_SIZE,
-            bdlf::BindUtil::bind(&Application::readCb,
-                                 this,
-                                 bdlf::PlaceHolders::_1,  // status
-                                 bdlf::PlaceHolders::_2,  // numNeeded
-                                 bdlf::PlaceHolders::_3,  // blob
-                                 channel,
-                                 monitor));
+            [this, channel, monitor](const bmqio::Status& readStatus,
+                                     int*                 numNeeded,
+                                     bdlbb::Blob*         blob) {
+                readCb(readStatus, numNeeded, blob, channel, monitor);
+            });
         if (!st) {
             BALL_LOG_ERROR << id() << "Could not read from channel:"
                            << " [peer: " << channel->peerUri()
@@ -535,8 +535,9 @@ bmqt::GenericResult::Enum Application::startChannel()
     }
 
     bdlb::ScopeExitAny pipelineScopeGuard(
-        bdlf::BindUtil::bind(&bmqio::ChannelFactoryPipeline::stop,
-                             d_channelFactoryPipeline_mp.get()));
+        [pipeline = d_channelFactoryPipeline_mp.get()]() {
+            pipeline->stop();
+        });
 
     // 3. Connect to the broker
     bmqio::Status status(&d_allocator);
@@ -544,13 +545,15 @@ bmqt::GenericResult::Enum Application::startChannel()
         &status,
         &d_connectHandle_mp,
         options,
-        bdlf::BindUtil::bindS(&d_allocator,
-                              &Application::channelStateCallback,
-                              this,
-                              options.endpoint(),
-                              bdlf::PlaceHolders::_1,    // event
-                              bdlf::PlaceHolders::_2,    // status
-                              bdlf::PlaceHolders::_3));  // channel
+        [this, connectEndpoint = options.endpoint()](
+            bmqio::ChannelFactoryEvent::Enum       factoryEvent,
+            const bmqio::Status&                   factoryStatus,
+            const bsl::shared_ptr<bmqio::Channel>& factoryChannel) {
+            channelStateCallback(connectEndpoint,
+                                 factoryEvent,
+                                 factoryStatus,
+                                 factoryChannel);
+        });
     if (!status) {
         BALL_LOG_ERROR << id() << "Failed to connect to broker at '"
                        << d_sessionOptions.brokerUri()
@@ -568,10 +571,11 @@ bmqt::GenericResult::Enum Application::startChannel()
     // Schedule a stats snapshot every seconds, if configured for
     if (d_sessionOptions.statsDumpInterval() != bsls::TimeInterval()) {
         d_nextStatDump = d_sessionOptions.statsDumpInterval().seconds();
-        d_scheduler.scheduleRecurringEvent(
-            &d_statSnaphotTimerHandle,
-            bsls::TimeInterval(1.0),
-            bdlf::MemFnUtil::memFn(&Application::snapshotStats, this));
+        d_scheduler.scheduleRecurringEvent(&d_statSnaphotTimerHandle,
+                                           bsls::TimeInterval(1.0),
+                                           [this]() {
+                                               snapshotStats();
+                                           });
     }
 
     pipelineScopeGuard.release();
@@ -735,20 +739,25 @@ Application::Application(
       &d_scheduler,
       d_blobSpPool_sp.get(),
       sessionOptions,
-      bdlf::BindUtil::bind(&Application::channelStatContextCreator,
-                           this,
-                           bdlf::PlaceHolders::_1,   // channel
-                           bdlf::PlaceHolders::_2),  // handle
+      [this](const bsl::shared_ptr<bmqio::Channel>&                  channel,
+             const bsl::shared_ptr<bmqio::StatChannelFactoryHandle>& handle) {
+          return channelStatContextCreator(channel, handle);
+      },
       negotiationMessage))
 , d_connectHandle_mp()
-, d_brokerSession(&d_scheduler,
-                  &d_blobBufferFactory,
-                  d_blobSpPool_sp.get(),
-                  d_sessionOptions,
-                  eventHandlerCB,
-                  bdlf::MemFnUtil::memFn(&Application::stateCb, this),
-                  SessionId(negotiationMessage),
-                  d_allocators.get("Session"))
+, d_brokerSession(
+      &d_scheduler,
+      &d_blobBufferFactory,
+      d_blobSpPool_sp.get(),
+      d_sessionOptions,
+      eventHandlerCB,
+      [this](bmqimp::BrokerSession::State::Enum    oldState,
+             bmqimp::BrokerSession::State::Enum    newState,
+             bmqimp::BrokerSession::FsmEvent::Enum event) {
+          return stateCb(oldState, newState, event);
+      },
+      SessionId(negotiationMessage),
+      d_allocators.get("Session"))
 , d_startTimeoutHandle()
 , d_statSnaphotTimerHandle()
 , d_nextStatDump(-1)
@@ -860,10 +869,11 @@ int Application::startAsync(const bsls::TimeInterval& timeout)
     }
 
     // Schedule a timeout
-    d_scheduler.scheduleEvent(
-        &d_startTimeoutHandle,
-        bmqu::Time::nowMonotonicClock() + timeout,
-        bdlf::MemFnUtil::memFn(&Application::onStartTimeout, this));
+    d_scheduler.scheduleEvent(&d_startTimeoutHandle,
+                              bmqu::Time::nowMonotonicClock() + timeout,
+                              [this]() {
+                                  onStartTimeout();
+                              });
 
     return bmqt::GenericResult::e_SUCCESS;
 }
@@ -927,13 +937,12 @@ void Application::startHeartbeat(
     bsls::TimeInterval interval;
     interval.addMilliseconds(heartbeatIntervalMs);
 
-    d_scheduler.scheduleRecurringEvent(
-        &d_heartbeatSchedulerHandle,
-        interval,
-        bdlf::BindUtil::bind(&Application::onHeartbeatSchedulerEvent,
-                             this,
-                             channel,
-                             monitor));
+    d_scheduler.scheduleRecurringEvent(&d_heartbeatSchedulerHandle,
+                                       interval,
+                                       [this, channel, monitor]() {
+                                           onHeartbeatSchedulerEvent(channel,
+                                                                     monitor);
+                                       });
 }
 void Application::stopHeartbeat()
 {
