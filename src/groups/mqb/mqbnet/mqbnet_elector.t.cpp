@@ -24,7 +24,6 @@
 
 // BDE
 #include <bdlb_nullablevalue.h>
-#include <bdlf_bind.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_iostream.h>
 #include <bslim_printer.h>

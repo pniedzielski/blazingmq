@@ -24,7 +24,6 @@
 #include <bmqu_time.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bsl_cstdlib.h>
 #include <bsl_list.h>
 #include <bsl_memory.h>

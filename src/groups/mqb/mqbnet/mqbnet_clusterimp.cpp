@@ -21,8 +21,6 @@
 #include <bmqu_memoutstream.h>
 
 // BDE
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_iostream.h>
 #include <bsl_limits.h>
