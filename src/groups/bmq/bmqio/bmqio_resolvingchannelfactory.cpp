@@ -47,14 +47,15 @@ ResolvingChannelFactoryConfig::ResolvingChannelFactoryConfig(
     const ExecutionPolicy& executionPolicy,
     bslma::Allocator*      basicAllocator)
 : d_baseFactory_p(baseFactory)
-, d_resolutionFn(
-      bsl::allocator_arg,
-      basicAllocator,
-      bdlf::BindUtil::bind(&ResolvingChannelFactoryUtil::defaultResolutionFn,
-                           bdlf::PlaceHolders::_1,
-                           bdlf::PlaceHolders::_2,
-                           &bmqio::ResolveUtil::getDomainName,
-                           true))
+, d_resolutionFn(bsl::allocator_arg,
+                 basicAllocator,
+                 [](bsl::string* resolvedUri, const Channel& baseChannel) {
+                     ResolvingChannelFactoryUtil::defaultResolutionFn(
+                         resolvedUri,
+                         baseChannel,
+                         &bmqio::ResolveUtil::getDomainName,
+                         true);  // verbose
+                 })
 , d_executionPolicy(executionPolicy)
 , d_allocator_p(bslma::Default::allocator(basicAllocator))
 {
