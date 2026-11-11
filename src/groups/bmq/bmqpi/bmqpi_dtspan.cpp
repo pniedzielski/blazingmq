@@ -55,7 +55,7 @@ DTSpan::Baggage::const_iterator DTSpan::Baggage::end() const
 
 bool DTSpan::Baggage::has(const bsl::string& key) const
 {
-    return d_data.find(key) != d_data.end();
+    return d_data.contains(key);
 }
 
 bsl::string_view DTSpan::Baggage::get(const bsl::string&      key,
