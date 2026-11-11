@@ -185,9 +185,8 @@ static void test3_humanReadableNotFoundTest()
         bmqu::MemOutStream expectedStream(bmqtst::TestHelperUtil::allocator());
         expectedStream << "\nThe following " << offsets.size()
                        << " offset(s) not found:\n";
-        bsl::vector<bsls::Types::Int64>::const_iterator it = offsets.cbegin();
-        for (; it != offsets.cend(); ++it) {
-            expectedStream << *it << '\n';
+        for (const bsls::Types::Int64 offset : offsets) {
+            expectedStream << offset << '\n';
         }
 
         BMQTST_ASSERT_EQ(expectedStream.str(), resultStream.str());
@@ -206,10 +205,8 @@ static void test3_humanReadableNotFoundTest()
         bmqu::MemOutStream expectedStream(bmqtst::TestHelperUtil::allocator());
         expectedStream << "\nThe following " << seqNums.size()
                        << " sequence number(s) not found:\n";
-        bsl::vector<CompositeSequenceNumber>::const_iterator it =
-            seqNums.cbegin();
-        for (; it != seqNums.cend(); ++it) {
-            expectedStream << *it << '\n';
+        for (const CompositeSequenceNumber& seqNum : seqNums) {
+            expectedStream << seqNum << '\n';
         }
 
         BMQTST_ASSERT_EQ(expectedStream.str(), resultStream.str());
