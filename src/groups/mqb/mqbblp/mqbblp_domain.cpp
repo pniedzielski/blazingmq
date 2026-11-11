@@ -40,8 +40,6 @@
 #include <baljsn_encoder.h>
 #include <baljsn_encoderoptions.h>
 #include <bdlb_string.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_algorithm.h>
 #include <bsl_cstddef.h>
@@ -547,13 +545,17 @@ void Domain::openQueue(
         this,
         handleParameters,
         clientContext,
-        bdlf::BindUtil::bind(&Domain::onOpenQueueResponse,
-                             this,
-                             bdlf::PlaceHolders::_1,  // status
-                             bdlf::PlaceHolders::_2,  // queue
-                             bdlf::PlaceHolders::_3,  // openQueueResponse
-                             bdlf::PlaceHolders::_4,  // confirmationCookie
-                             callback));
+        [this, callback](
+            const bmqp_ctrlmsg::Status&                status,
+            mqbi::QueueHandle*                         queueHandle,
+            const bmqp_ctrlmsg::OpenQueueResponse&     openQueueResponse,
+            const mqbi::OpenQueueConfirmationCookieSp& confirmationCookie) {
+            onOpenQueueResponse(status,
+                                queueHandle,
+                                openQueueResponse,
+                                confirmationCookie,
+                                callback);
+        });
 }
 
 int Domain::registerQueue(const bsl::shared_ptr<mqbi::Queue>& queueSp)
@@ -645,8 +647,9 @@ void Domain::unregisterQueue(mqbi::Queue* queue)
 
     BSLS_ASSERT_SAFE(queueSp);
 
-    queueSp->close(
-        bdlf::BindUtil::bind(&Domain::onQueueClosed, this, queueSp));
+    queueSp->close([this, queueSp]() {
+        onQueueClosed(queueSp);
+    });
 
     BALL_LOG_INFO << "Unregistered queue from domain '" << d_name
                   << "' [canonicalURI: " << queueSp->uri().canonical() << "]. "
@@ -841,8 +844,9 @@ void Domain::closeAllQueues(const QueueMap& queues)
     for (QueueMap::const_iterator cit = queues.begin(); cit != queues.end();
          ++cit) {
         const bsl::shared_ptr<mqbi::Queue>& queueSp = cit->second;
-        queueSp->close(
-            bdlf::BindUtil::bind(&Domain::onQueueClosed, this, queueSp));
+        queueSp->close([this, queueSp]() {
+            onQueueClosed(queueSp);
+        });
     }
 }
 

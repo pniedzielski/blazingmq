@@ -39,7 +39,6 @@
 
 // BDE
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 #include <bsl_memory.h>
 #include <bsl_string.h>
 #include <bsl_string_view.h>
@@ -387,12 +386,14 @@ static void test2_concurrentConfigureAndRegisterQueue()
     bsls::AtomicBool stop(false);
 
     bslmt::ThreadUtil::Handle handle;
-    rc = bslmt::ThreadUtil::create(&handle,
-                                   bdlf::BindUtil::bind(&reconfigureThread,
-                                                        &tester.domain(),
-                                                        &barrier,
-                                                        &stop,
-                                                        alloc));
+    rc = bslmt::ThreadUtil::create(
+        &handle,
+        [domain   = &tester.domain(),
+         barrierP = &barrier,
+         stopP    = &stop,
+         alloc]() {
+            reconfigureThread(domain, barrierP, stopP, alloc);
+        });
     BMQTST_ASSERT_EQ(rc, 0);
 
     // Start both threads roughly simultaneously, then hammer registrations.
@@ -580,12 +581,14 @@ static void test4_concurrentProcessCommandAndRegisterQueue()
     bsls::AtomicBool stop(false);
 
     bslmt::ThreadUtil::Handle handle;
-    rc = bslmt::ThreadUtil::create(&handle,
-                                   bdlf::BindUtil::bind(&processInfoThread,
-                                                        &tester.domain(),
-                                                        &barrier,
-                                                        &stop,
-                                                        alloc));
+    rc = bslmt::ThreadUtil::create(
+        &handle,
+        [domain   = &tester.domain(),
+         barrierP = &barrier,
+         stopP    = &stop,
+         alloc]() {
+            processInfoThread(domain, barrierP, stopP, alloc);
+        });
     BMQTST_ASSERT_EQ(rc, 0);
 
     // Start both threads roughly simultaneously, then hammer registrations.
