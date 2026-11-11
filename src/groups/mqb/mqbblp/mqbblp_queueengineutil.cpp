@@ -706,12 +706,16 @@ void QueueEngineUtil_ReleaseHandleProctor::invokeCallback()
             d_queueState_p->queue()->dispatcher()->executeOnAllQueues(
                 mqbi::Dispatcher::VoidFunction(),
                 mqbi::DispatcherClientType::e_SESSION,
-                bdlf::BindUtil::bind(&queueHandleHolderDummy, d_handleSp));
+                [handleSp = d_handleSp]() {
+                    queueHandleHolderDummy(handleSp);
+                });
 
             d_queueState_p->queue()->dispatcher()->executeOnAllQueues(
                 mqbi::Dispatcher::VoidFunction(),
                 mqbi::DispatcherClientType::e_CLUSTER,
-                bdlf::BindUtil::bind(&queueHandleHolderDummy, d_handleSp));
+                [handleSp = d_handleSp]() {
+                    queueHandleHolderDummy(handleSp);
+                });
         }
     }
 }
@@ -1254,13 +1258,12 @@ void QueueEngineUtil_AppState::scheduleThrottle(
     }
 
     if (shouldSchedule != 0) {
-        d_scheduler_p->scheduleEvent(
-            &d_throttleEventHandle,
-            executionTime,
-            bdlf::BindUtil::bind(
-                &QueueEngineUtil_AppState::executeInQueueDispatcher,
-                this,
-                deliverMessageFn));
+        d_scheduler_p->scheduleEvent(&d_throttleEventHandle,
+                                     executionTime,
+                                     [this, deliverMessageFn]() {
+                                         executeInQueueDispatcher(
+                                             deliverMessageFn);
+                                     });
     }
 }
 
@@ -1270,10 +1273,13 @@ void QueueEngineUtil_AppState::executeInQueueDispatcher(
     // executed by the *SCHEDULER DISPATCHER* thread
     if (d_isScheduled.load()) {
         d_queue_p->dispatcher()->execute(
-            bdlf::BindUtil::bind(&releaseHandleAndInvoke,
-                                 &d_throttleEventHandle,
-                                 &d_isScheduled,
-                                 deliverMessageFn),
+            [eventHandle = &d_throttleEventHandle,
+             isScheduled = &d_isScheduled,
+             deliverMessageFn]() {
+                releaseHandleAndInvoke(eventHandle,
+                                       isScheduled,
+                                       deliverMessageFn);
+            },
             d_queue_p);
     }
 }
@@ -1310,15 +1316,14 @@ void QueueEngineUtil_AppState::rebuildConsumers(
     d_routing_sp                                  = replacement;
 
     queueState->handleCatalog().iterateConsumers(
-        bdlf::BindUtil::bind(&Routers::AppContext::loadApp,
-                             d_routing_sp.get(),
-                             appId,
-                             bdlf::PlaceHolders::_1,
-                             // handle
-                             errorStream,
-                             bdlf::PlaceHolders::_2,
-                             // info
-                             previous.get()));
+        [routing = d_routing_sp.get(),
+         appId,
+         errorStream,
+         previousApp = previous.get()](
+            mqbi::QueueHandle*                   handle,
+            const mqbi::QueueHandle::StreamInfo& info) {
+            routing->loadApp(appId, handle, errorStream, info, previousApp);
+        });
 
     d_priorityCount = d_routing_sp->finalize();
 
@@ -1334,9 +1339,9 @@ bool QueueEngineUtil_AppState::transferUnconfirmedMessages(
     // the redelivery list.
 
     int numMsgs = handle->transferUnconfirmedMessageGUID(
-        bdlf::BindUtil::bind(&RedeliveryList::add,
-                             &d_redeliveryList,
-                             bdlf::PlaceHolders::_1),
+        [redeliveryList = &d_redeliveryList](const bmqt::MessageGUID& guid) {
+            redeliveryList->add(guid);
+        },
         subQueue.subId());
 
     // We lost a reader, try to redeliver any potential messages
