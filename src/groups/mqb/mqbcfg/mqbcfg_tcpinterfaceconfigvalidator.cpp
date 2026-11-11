@@ -45,8 +45,7 @@ bool uniqueWith(It begin, It end, F f)
 
     bsl::transform(begin, end, bsl::back_inserter(sorted), f);
     bsl::sort(sorted.begin(), sorted.end());
-    typename bsl::vector<Result>::iterator newEnd = bsl::unique(sorted.begin(),
-                                                                sorted.end());
+    auto newEnd = bsl::unique(sorted.begin(), sorted.end());
     return sorted.end() == newEnd;
 }
 
