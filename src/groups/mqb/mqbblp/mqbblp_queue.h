@@ -126,13 +126,13 @@ class Queue final : public mqbi::Queue {
         const bmqp_ctrlmsg::StreamParameters& streamParameters,
         mqbi::QueueHandle*                    handle);
 
-    void configureDispatchedAndPost(int*              result,
-                                    bsl::ostream*     errorDescription,
-                                    bool              isReconfigure,
-                                    bslmt::Semaphore* sync);
-    void configureDispatched(bool isReconfigure);
+    void configureAndPost(int*              result,
+                          bsl::ostream*     errorDescription,
+                          bool              isReconfigure,
+                          bslmt::Semaphore* sync);
+    void configureImpl(bool isReconfigure);
 
-    void getHandleDispatched(
+    void getHandleImpl(
         const mqbi::OpenQueueConfirmationCookieSp& confirmationCookie,
         const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>&
                                                     clientContext,
@@ -140,24 +140,24 @@ class Queue final : public mqbi::Queue {
         unsigned int                                upstreamSubQueueId,
         const mqbi::QueueHandle::GetHandleCallback& callback);
 
-    void releaseHandleDispatched(
+    void releaseHandleImpl(
         mqbi::QueueHandle*                               handle,
         const bmqp_ctrlmsg::QueueHandleParameters&       handleParameters,
         bool                                             isFinal,
         const mqbi::QueueHandle::HandleReleasedCallback& releasedCb);
 
-    void dropHandleDispatched(mqbi::QueueHandle* handle, bool doDeconfigure);
+    void dropHandleImpl(mqbi::QueueHandle* handle, bool doDeconfigure);
 
-    void closeDispatched(const bsl::function<void(void)>& callback);
+    void closeImpl(const bsl::function<void(void)>& callback);
 
-    void convertToLocalDispatched();
+    void convertToLocalImpl();
 
     void updateStats();
 
-    void listMessagesDispatched(mqbcmd::QueueResult* result,
-                                const bsl::string&   appId,
-                                bsls::Types::Int64   offset,
-                                bsls::Types::Int64   count);
+    void listMessagesImpl(mqbcmd::QueueResult* result,
+                          const bsl::string&   appId,
+                          bsls::Types::Int64   offset,
+                          bsls::Types::Int64   count);
 
     /// Load into the specified `out` object the internal details about this
     /// queue.

@@ -896,7 +896,7 @@ inline Routers::QueueRoutingContext::~QueueRoutingContext()
     // - 'AppContext' is created as part of 'RelayQueueEngine::configureHandle'
     // - that context is bound to the configure request waiting response
     // - that context contains items 'registered' in this 'QueueRoutingContext'
-    // - before the response, 'Queue::convertToLocalDispatched' happens
+    // - before the response, 'Queue::convertToLocalImpl' happens
     // - and the 'RemoteQueue' destructs, including this 'QueueRoutingContext'
     // - but the functor still keeps (obsolete) 'AppContext'
 

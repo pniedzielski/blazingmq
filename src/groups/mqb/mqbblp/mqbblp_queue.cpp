@@ -100,7 +100,7 @@ void Queue::onHandleDeconfigured(
     bmqp_ctrlmsg::SubQueueIdInfo subStreamInfo;
     subStreamInfo.appId() = appId;
     subStreamInfo.subId() = info.d_downstreamSubQueueId;
-    releaseHandleDispatched(
+    releaseHandleImpl(
         handle,
         bmqp::QueueUtil::createHandleParameters(handle->handleParameters(),
                                                 subStreamInfo,
@@ -109,10 +109,10 @@ void Queue::onHandleDeconfigured(
         mqbi::QueueHandle::HandleReleasedCallback());
 }
 
-void Queue::configureDispatchedAndPost(int*              result,
-                                       bsl::ostream*     errorDescription,
-                                       bool              isReconfigure,
-                                       bslmt::Semaphore* sync)
+void Queue::configureAndPost(int*              result,
+                             bsl::ostream*     errorDescription,
+                             bool              isReconfigure,
+                             bslmt::Semaphore* sync)
 {
     // executed by the *QUEUE* dispatcher thread
 
@@ -137,7 +137,7 @@ void Queue::configureDispatchedAndPost(int*              result,
     sync->post();
 }
 
-void Queue::configureDispatched(bool isReconfigure)
+void Queue::configureImpl(bool isReconfigure)
 {
     // executed by the *QUEUE* dispatcher thread
 
@@ -157,7 +157,7 @@ void Queue::configureDispatched(bool isReconfigure)
     }
 }
 
-void Queue::getHandleDispatched(
+void Queue::getHandleImpl(
     const mqbi::OpenQueueConfirmationCookieSp&                context,
     const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>& clientContext,
     const bmqp_ctrlmsg::QueueHandleParameters&                handleParameters,
@@ -193,7 +193,7 @@ void Queue::getHandleDispatched(
     updateStats();
 }
 
-void Queue::releaseHandleDispatched(
+void Queue::releaseHandleImpl(
     mqbi::QueueHandle*                               handle,
     const bmqp_ctrlmsg::QueueHandleParameters&       handleParameters,
     bool                                             isFinal,
@@ -223,7 +223,7 @@ void Queue::releaseHandleDispatched(
     updateStats();
 }
 
-void Queue::dropHandleDispatched(mqbi::QueueHandle* handle, bool doDeconfigure)
+void Queue::dropHandleImpl(mqbi::QueueHandle* handle, bool doDeconfigure)
 {
     // executed by the *QUEUE* dispatcher thread
 
@@ -322,19 +322,18 @@ void Queue::dropHandleDispatched(mqbi::QueueHandle* handle, bool doDeconfigure)
         else {
             // 'releaseHandle' erases from 'handle->subStreamInfos()'
             // invalidating the iterator.
-            releaseHandleDispatched(
-                handle,
-                bmqp::QueueUtil::createHandleParameters(
-                    handle->handleParameters(),
-                    subStreamInfo,
-                    info.d_counts.d_readCount),
-                isFinal,  // isFinal flag
-                mqbi::QueueHandle::HandleReleasedCallback());
+            releaseHandleImpl(handle,
+                              bmqp::QueueUtil::createHandleParameters(
+                                  handle->handleParameters(),
+                                  subStreamInfo,
+                                  info.d_counts.d_readCount),
+                              isFinal,  // isFinal flag
+                              mqbi::QueueHandle::HandleReleasedCallback());
         }
     }
 }
 
-void Queue::closeDispatched(const bsl::function<void(void)>& callback)
+void Queue::closeImpl(const bsl::function<void(void)>& callback)
 {
     // executed by the *QUEUE* dispatcher thread
 
@@ -374,7 +373,7 @@ void Queue::closeDispatched(const bsl::function<void(void)>& callback)
     }
 }
 
-void Queue::convertToLocalDispatched()
+void Queue::convertToLocalImpl()
 {
     // executed by the *QUEUE* dispatcher thread
 
@@ -470,10 +469,10 @@ void Queue::updateStats()
     d_state.updateStats();
 }
 
-void Queue::listMessagesDispatched(mqbcmd::QueueResult* result,
-                                   const bsl::string&   appId,
-                                   bsls::Types::Int64   offset,
-                                   bsls::Types::Int64   count)
+void Queue::listMessagesImpl(mqbcmd::QueueResult* result,
+                             const bsl::string&   appId,
+                             bsls::Types::Int64   offset,
+                             bsls::Types::Int64   count)
 {
     // executed by the *QUEUE* dispatcher thread
 
@@ -603,7 +602,7 @@ void Queue::convertToLocal()
 
     dispatcher()->execute(
         [this]() {
-            convertToLocalDispatched();
+            convertToLocalImpl();
         },
         this);
 }
@@ -708,10 +707,10 @@ int Queue::configure(bsl::ostream* errorDescription_p,
              errorDescription_p,
              isReconfigure,
              syncP = &sync]() {
-                configureDispatchedAndPost(resultP,
-                                           errorDescription_p,
-                                           isReconfigure,
-                                           syncP);
+                configureAndPost(resultP,
+                                 errorDescription_p,
+                                 isReconfigure,
+                                 syncP);
             },
             this,
             mqbi::DispatcherEventType::e_DISPATCHER);
@@ -721,7 +720,7 @@ int Queue::configure(bsl::ostream* errorDescription_p,
     else {
         dispatcher()->execute(
             [this, isReconfigure]() {
-                configureDispatched(isReconfigure);
+                configureImpl(isReconfigure);
             },
             this);
     }
@@ -748,11 +747,11 @@ void Queue::getHandle(
          handleParameters,
          upstreamSubQueueId,
          callback]() {
-            getHandleDispatched(context,
-                                clientContext,
-                                handleParameters,
-                                upstreamSubQueueId,
-                                callback);
+            getHandleImpl(context,
+                          clientContext,
+                          handleParameters,
+                          upstreamSubQueueId,
+                          callback);
         },
         this);
 }
@@ -792,10 +791,7 @@ void Queue::releaseHandle(
 
     dispatcher()->execute(
         [this, handle, handleParameters, isFinal, releasedCb]() {
-            releaseHandleDispatched(handle,
-                                    handleParameters,
-                                    isFinal,
-                                    releasedCb);
+            releaseHandleImpl(handle, handleParameters, isFinal, releasedCb);
         },
         this);
 }
@@ -806,7 +802,7 @@ void Queue::dropHandle(mqbi::QueueHandle* handle, bool doDeconfigure)
 
     dispatcher()->execute(
         [this, handle, doDeconfigure]() {
-            dropHandleDispatched(handle, doDeconfigure);
+            dropHandleImpl(handle, doDeconfigure);
         },
         this);
 }
@@ -817,7 +813,7 @@ void Queue::close(const bsl::function<void(void)>& callback)
 
     dispatcher()->execute(
         [this, callback]() {
-            closeDispatched(callback);
+            closeImpl(callback);
         },
         this);
 }
@@ -949,7 +945,7 @@ int Queue::processCommand(mqbcmd::QueueResult*        result,
              appId  = command.messages().appId().valueOr(""),
              offset = command.messages().offset(),
              count  = command.messages().count()]() {
-                listMessagesDispatched(result, appId, offset, count);
+                listMessagesImpl(result, appId, offset, count);
             },
             this);
         dispatcher()->synchronize(this);
