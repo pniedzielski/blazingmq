@@ -106,8 +106,8 @@ class VirtualStorage {
 
   private:
     // NOT IMPLEMENTED
-    VirtualStorage(const VirtualStorage&);             // = delete
-    VirtualStorage& operator=(const VirtualStorage&);  // = delete
+    VirtualStorage(const VirtualStorage&)            = delete;
+    VirtualStorage& operator=(const VirtualStorage&) = delete;
 
   public:
     // TRAITS
@@ -219,8 +219,8 @@ class StorageIterator : public mqbi::StorageIterator {
 
   private:
     // NOT IMPLEMENTED
-    StorageIterator(const StorageIterator&);             // = delete
-    StorageIterator& operator=(const StorageIterator&);  // = delete
+    StorageIterator(const StorageIterator&)            = delete;
+    StorageIterator& operator=(const StorageIterator&) = delete;
 
   private:
     // PRIVATE ACCESSORS
@@ -320,9 +320,8 @@ class VirtualStorageIterator : public StorageIterator {
 
   private:
     // NOT IMPLEMENTED
-    VirtualStorageIterator(const VirtualStorageIterator&);  // = delete
-    VirtualStorageIterator&
-    operator=(const VirtualStorageIterator&);  // = delete
+    VirtualStorageIterator(const VirtualStorageIterator&)            = delete;
+    VirtualStorageIterator& operator=(const VirtualStorageIterator&) = delete;
 
   public:
     // CREATORS
