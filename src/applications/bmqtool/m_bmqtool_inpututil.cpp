@@ -169,7 +169,7 @@ void InputUtil::verifyProperties(
             while (it.hasNext()) {
                 bsl::string name = it.name();
 
-                if (pairs.find(name) != pairs.end()) {
+                if (pairs.contains(name)) {
                     continue;  // CONTINUE
                 }
 

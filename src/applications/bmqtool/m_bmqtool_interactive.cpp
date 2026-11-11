@@ -964,7 +964,7 @@ int Interactive::mainLoop()
                             PostCommand::ATTRIBUTE_ID_MESSAGE_PROPERTIES);
                     bool hasMPs = false;
                     if (mps) {
-                        hasMPs = keys.find(mps->name()) != keys.cend();
+                        hasMPs = keys.contains(mps->name());
                     }
                     processCommand(command, hasMPs);
                 }
