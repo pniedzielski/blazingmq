@@ -311,14 +311,12 @@ int IncoreClusterStateLedger::onLogRolloverCb(const mqbu::StorageKey& oldLogId,
     d_clusterData_p->stats().addCslOffsetBytes(snapshotRecord->length());
 
     // Write uncommitted advisories into ledger
-    for (AdvisoriesMapIter advisoryIt = d_uncommittedAdvisories.begin();
-         advisoryIt != d_uncommittedAdvisories.end();
-         ++advisoryIt) {
+    for (auto& advisory : d_uncommittedAdvisories) {
         BSLS_ASSERT_SAFE(
-            advisoryIt->first <=
+            advisory.first <=
             d_clusterData_p->electorInfo().leaderMessageSequence());
 
-        ClusterMessageInfo& info = advisoryIt->second;
+        ClusterMessageInfo& info = advisory.second;
 
         bsl::shared_ptr<bdlbb::Blob> record = d_blobSpPool_p->getObject();
         ClusterStateRecordType::Enum recordType =
@@ -327,7 +325,7 @@ int IncoreClusterStateLedger::onLogRolloverCb(const mqbu::StorageKey& oldLogId,
                 : ClusterStateRecordType::e_UPDATE;
         rc = ClusterStateLedgerUtil::appendRecord(record.get(),
                                                   info.d_clusterMessage,
-                                                  advisoryIt->first,
+                                                  advisory.first,
                                                   currentTime(),
                                                   recordType);
         if (rc != 0) {
@@ -1582,10 +1580,8 @@ void IncoreClusterStateLedger::uncommittedAdvisories(
 
     out->clear();
     out->reserve(d_uncommittedAdvisories.size());
-    for (AdvisoriesMapCIter it = d_uncommittedAdvisories.cbegin();
-         it != d_uncommittedAdvisories.cend();
-         ++it) {
-        out->emplace_back(bsl::cref(it->second.d_clusterMessage));
+    for (const auto& advisory : d_uncommittedAdvisories) {
+        out->emplace_back(bsl::cref(advisory.second.d_clusterMessage));
     }
 }
 
