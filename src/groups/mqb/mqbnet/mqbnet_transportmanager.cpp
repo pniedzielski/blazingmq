@@ -35,8 +35,6 @@
 
 // BDE
 #include <bdlb_stringviewutil.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bsl_functional.h>
 #include <bsl_iostream.h>
 #include <bsl_list.h>
@@ -159,10 +157,10 @@ bool TransportManager::processSession(
         // goes down, and eventually initiate a reconnection).  Done without
         // holding 'd_mutex', since 'onClose' may be invoked immediately.
         session->channel()->onClose(
-            bdlf::BindUtil::bind(&TransportManager::onClose,
-                                 this,
-                                 session->channel(),
-                                 state));
+            [this, channel = session->channel(), state](
+                const bmqio::Status& /* status */) {
+                onClose(channel, state);
+            });
 
         return true;  // RETURN
     }
@@ -259,15 +257,20 @@ int TransportManager::connectLocked(ConnectionState* state)
 
     return d_tcpSessionFactory_mp->connect(
         state->d_endpoint,
-        bdlf::BindUtil::bind(&TransportManager::sessionResult,
-                             this,
-                             bdlf::PlaceHolders::_1,  // event
-                             bdlf::PlaceHolders::_2,  // status
-                             bdlf::PlaceHolders::_3,  // session
-                             bdlf::PlaceHolders::_4,  // cluster
-                             bdlf::PlaceHolders::_5,  // resultState
-                             bdlf::PlaceHolders::_6,  // readCb
-                             false),                  // isListen
+        [this](bmqio::ChannelFactoryEvent::Enum    event,
+               const bmqio::Status&                status,
+               const bsl::shared_ptr<Session>&     session,
+               Cluster*                            cluster,
+               void*                               resultState,
+               const bmqio::Channel::ReadCallback& readCb) {
+            return sessionResult(event,
+                                 status,
+                                 session,
+                                 cluster,
+                                 resultState,
+                                 readCb,
+                                 false);  // isListen
+        },
         state->d_userData_sp,
         state,
         true);  // shouldAutoReconnect
@@ -402,15 +405,20 @@ int TransportManager::startListening(bsl::ostream& errorDescription)
 
         rc = d_tcpSessionFactory_mp->startListening(
             errorDescription,
-            bdlf::BindUtil::bind(&TransportManager::sessionResult,
-                                 this,
-                                 bdlf::PlaceHolders::_1,  // event
-                                 bdlf::PlaceHolders::_2,  // status
-                                 bdlf::PlaceHolders::_3,  // session
-                                 bdlf::PlaceHolders::_4,  // cluster
-                                 bdlf::PlaceHolders::_5,  // resultState
-                                 bdlf::PlaceHolders::_6,  // readCb
-                                 true));                  // isListen
+            [this](bmqio::ChannelFactoryEvent::Enum    event,
+                   const bmqio::Status&                status,
+                   const bsl::shared_ptr<Session>&     session,
+                   Cluster*                            cluster,
+                   void*                               resultState,
+                   const bmqio::Channel::ReadCallback& readCb) {
+                return sessionResult(event,
+                                     status,
+                                     session,
+                                     cluster,
+                                     resultState,
+                                     readCb,
+                                     true);  // isListen
+            });
         if (rc != 0) {
             return rc;  // RETURN
         }
