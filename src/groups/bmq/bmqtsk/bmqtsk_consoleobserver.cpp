@@ -165,12 +165,10 @@ ConsoleObserver::getColorCodeForRecord(const ball::Record& record) const
     // which may not necessarily be best match (for example, if "A*" was
     // registered before "A.B", then the color associated to "A*" will be used
     // for an "A.B" category).
-    for (CategoryColorVec::const_iterator it = d_categoryColorVec.begin();
-         it != d_categoryColorVec.end();
-         ++it) {
+    for (const auto& [categoryPattern, color] : d_categoryColorVec) {
         if (bmqu::StringUtil::match(record.fixedFields().category(),
-                                    it->first)) {
-            return it->second;  // RETURN
+                                    categoryPattern)) {
+            return color;  // RETURN
         }
     }
 
