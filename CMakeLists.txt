@@ -25,6 +25,18 @@ setup_package_provider()
 #                                INITIALIZATION
 # -----------------------------------------------------------------------------
 
+# BlazingMQ requires C++20 or later.  Default to C++20 if no standard was
+# requested, and reject older standards explicitly so the failure is reported
+# at configure time instead of as a cascade of compilation errors.
+if( NOT DEFINED CMAKE_CXX_STANDARD )
+  set( CMAKE_CXX_STANDARD 20 )
+elseif( CMAKE_CXX_STANDARD STREQUAL "98" OR CMAKE_CXX_STANDARD LESS 20 )
+  message( FATAL_ERROR
+           "BlazingMQ requires C++20 or later, but CMAKE_CXX_STANDARD is "
+           "'${CMAKE_CXX_STANDARD}'" )
+endif()
+set( CMAKE_CXX_STANDARD_REQUIRED ON )
+
 enable_testing()
 # Configure tests to be part of the 'all' target
 add_custom_target(all.t ALL)
