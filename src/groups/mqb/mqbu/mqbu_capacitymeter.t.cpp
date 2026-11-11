@@ -288,12 +288,9 @@ static void test3_enhancedLog()
 
     bmqtst::ScopedLogObserver observer(ball::Severity::e_WARN,
                                        bmqtst::TestHelperUtil::allocator());
-    mqbu::CapacityMeter       capacityMeter(
-        "dummy",
-        bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                              &logEnhancedStorageInfoCb,
-                              bdlf::PlaceHolders::_1),  // stream
-        bmqtst::TestHelperUtil::allocator());
+    mqbu::CapacityMeter capacityMeter("dummy",
+                                      &logEnhancedStorageInfoCb,
+                                      bmqtst::TestHelperUtil::allocator());
     capacityMeter.setLimits(k_MSGS_LIMIT, k_BYTES_LIMIT);
     capacityMeter.setWatermarkThresholds(k_MSGS_THRESHOLD, k_BYTES_THRESHOLD);
 
