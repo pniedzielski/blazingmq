@@ -25,7 +25,6 @@
 // BDE
 #include <ball_log.h>
 #include <bdlb_stringrefutil.h>
-#include <bdlf_bind.h>
 #include <bdls_filesystemutil.h>
 #include <bdls_pathutil.h>
 #include <bdls_processutil.h>
@@ -108,12 +107,12 @@ void PluginManager::enableRequiredPlugins(
     //
     RequiredPluginsRecord::iterator requirementIt = requiredPlugins->begin();
     for (; requirementIt != requiredPlugins->end(); ++requirementIt) {
-        // Bound function used with STL algorithms to find plugins provided by
+        // Function used with STL algorithms to find plugins provided by
         // 'pluginLibrary' matching the name required for this 'requirementIt'.
         bsl::function<bool(const PluginInfo&)> findPluginFn =
-            bdlf::BindUtil::bind(findPluginPredicate,
-                                 requirementIt->first,
-                                 bdlf::PlaceHolders::_1);
+            [target = requirementIt->first](const PluginInfo& pluginInfo) {
+                return findPluginPredicate(target, pluginInfo);
+            };
 
         // Search for a plugin from 'pluginLibrary' matching 'requirementIt'.
         bsl::vector<PluginInfo>::const_iterator pluginInfoIt = bsl::find_if(
@@ -338,12 +337,13 @@ int PluginManager::start(const mqbcfg::Plugins& pluginsConfig,
         }
         else if (!bdls::FilesystemUtil::visitPaths(
                      pattern,
-                     bdlf::BindUtil::bind(&PluginManager::loadPluginLibrary,
-                                          this,
-                                          bdlf::PlaceHolders::_1,
-                                          &requiredPlugins,
-                                          bsl::ref(errorDescription),
-                                          &rc))) {
+                     [this, &requiredPlugins, &errorDescription, &rc](
+                         const char* path) {
+                         loadPluginLibrary(path,
+                                           &requiredPlugins,
+                                           errorDescription,
+                                           &rc);
+                     })) {
             BALL_LOG_INFO << "Found no shared-object files in plugin library "
                              "path [path: '"
                           << *libraryIt << "']";
