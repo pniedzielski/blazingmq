@@ -285,15 +285,14 @@ int DataHeaderFlagUtil::fromString(bsl::ostream&      errorDescription,
     *out   = 0;
 
     bdlb::Tokenizer tokenizer(str, ",");
-    for (bdlb::TokenizerIterator it = tokenizer.begin(); it != tokenizer.end();
-         ++it) {
+    for (const bslstl::StringRef& token : tokenizer) {
         DataHeaderFlags::Enum value;
-        if (DataHeaderFlags::fromAscii(&value, *it) == false) {
+        if (DataHeaderFlags::fromAscii(&value, token) == false) {
             if (rc == 0) {  // First wrong flag
-                errorDescription << "Invalid flag(s) '" << *it << "'";
+                errorDescription << "Invalid flag(s) '" << token << "'";
             }
             else {
-                errorDescription << ",'" << *it << "'";
+                errorDescription << ",'" << token << "'";
             }
             rc = -1;
         }
