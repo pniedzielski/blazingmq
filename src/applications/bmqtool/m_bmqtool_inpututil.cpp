@@ -123,11 +123,11 @@ void InputUtil::populateProperties(
 {
     BSLS_ASSERT_SAFE(out);
 
-    for (size_t i = 0; i < properties.size(); ++i) {
-        const bsl::string& name  = properties[i].name();
-        const bsl::string& value = properties[i].value();
+    for (const MessageProperty& property : properties) {
+        const bsl::string& name  = property.name();
+        const bsl::string& value = property.value();
 
-        switch (properties[i].type()) {
+        switch (property.type()) {
         case MessagePropertyType::E_STRING: {
             [[maybe_unused]] int result = out->setPropertyAsString(name,
                                                                    value);
@@ -229,11 +229,11 @@ void InputUtil::verifyProperties(
     }
     BSLS_ASSERT_SAFE(size_t(in.numProperties()) >= properties.size());
 
-    for (size_t i = 0; i < properties.size(); ++i) {
-        const bsl::string&      name               = properties[i].name();
-        [[maybe_unused]] const bsl::string& value = properties[i].value();
+    for (const MessageProperty& property : properties) {
+        const bsl::string&                  name  = property.name();
+        [[maybe_unused]] const bsl::string& value = property.value();
 
-        switch (properties[i].type()) {
+        switch (property.type()) {
         case MessagePropertyType::E_STRING: {
             [[maybe_unused]] const bsl::string& result =
                 in.getPropertyAsString(name);
@@ -256,9 +256,8 @@ bool InputUtil::populateSubscriptions(bmqt::QueueOptions*              out,
     BSLS_ASSERT_SAFE(out);
 
     bool failed = false;
-    for (size_t i = 0; i < in.size(); ++i) {
+    for (const Subscription& from : in) {
         bmqt::Subscription             to;
-        const Subscription&            from = in[i];
         const bmqt::SubscriptionHandle handle(
             from.correlationId().has_value()
                 ? bmqt::CorrelationId(from.correlationId().value())
