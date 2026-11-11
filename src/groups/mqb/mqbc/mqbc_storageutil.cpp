@@ -53,8 +53,6 @@
 #include <bdlb_print.h>
 #include <bdlb_scopeexit.h>
 #include <bdlb_stringrefutil.h>
-#include <bdlf_bind.h>
-#include <bdlf_memfn.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdlmt_fixedthreadpool.h>
 #include <bdls_filesystemutil.h>
@@ -606,12 +604,14 @@ void StorageUtil::loadStorages(bsl::vector<mqbcmd::StorageQueueInfo>* storages,
 
     storageLists.resize(fileStores.size());
     executeForEachPartitions(
-        bdlf::BindUtil::bind(&getStoragesDispatched,
-                             &storageLists,
-                             bdlf::PlaceHolders::_2,  // latch
-                             fileStores,
-                             bdlf::PlaceHolders::_1,  // partitionId
-                             filters),
+        [&storageLists, fileStores, filters](int           partitionId,
+                                             bslmt::Latch* latch) {
+            getStoragesDispatched(&storageLists,
+                                  latch,
+                                  fileStores,
+                                  partitionId,
+                                  filters);
+        },
         fileStores);
 
     // Merge vector of vectors into a single vector
@@ -661,11 +661,12 @@ void StorageUtil::doRollover(mqbcmd::StorageResult* result,
 
         for (unsigned int i = 0; i < fileStores->size(); ++i) {
             mqbs::FileStore* fs = fileStores->at(i).get();
-            fs->execute(bdlf::BindUtil::bind(&doRolloverDispatched,
-                                             &rcs[i],
-                                             &latch,
-                                             fileStores,
-                                             i));
+            fs->execute([rc = &rcs[i],
+                         &latch,
+                         fileStores,
+                         pid = static_cast<int>(i)]() {
+                doRolloverDispatched(rc, &latch, fileStores, pid);
+            });
         }
 
         // Wait
@@ -695,11 +696,9 @@ void StorageUtil::doRollover(mqbcmd::StorageResult* result,
         bslmt::Latch latch(1);
 
         mqbs::FileStore* fs = fileStores->at(partitionId).get();
-        fs->execute(bdlf::BindUtil::bind(&doRolloverDispatched,
-                                         &rc,
-                                         &latch,
-                                         fileStores,
-                                         partitionId));
+        fs->execute([&rc, &latch, fileStores, partitionId]() {
+            doRolloverDispatched(&rc, &latch, fileStores, partitionId);
+        });
 
         // Wait
         latch.wait();
@@ -764,11 +763,12 @@ void StorageUtil::loadPartitionStorageSummary(
 
     bslmt::Latch latch(1);
     fileStores.at(partitionId)
-        ->execute(bdlf::BindUtil::bind(&loadStorageSummaryDispatched,
-                                       &summary,
-                                       &latch,
-                                       partitionId,
-                                       fileStores));
+        ->execute([&summary, &latch, partitionId, fileStores]() {
+            loadStorageSummaryDispatched(&summary,
+                                         &latch,
+                                         partitionId,
+                                         fileStores);
+        });
     // Wait
     latch.wait();
 
@@ -797,11 +797,12 @@ void StorageUtil::loadStorageSummary(mqbcmd::StorageResult*  result,
     summary.fileStores().resize(fileStores.size());
 
     executeForEachPartitions(
-        bdlf::BindUtil::bind(&loadStorageSummaryDispatched,
-                             &summary,
-                             bdlf::PlaceHolders::_2,  // latch
-                             bdlf::PlaceHolders::_1,  // partitionId
-                             fileStores),
+        [&summary, fileStores](int partitionId, bslmt::Latch* latch) {
+            loadStorageSummaryDispatched(&summary,
+                                         latch,
+                                         partitionId,
+                                         fileStores);
+        },
         fileStores);
 }
 
@@ -834,7 +835,10 @@ void StorageUtil::executeForEachPartitions(const PerPartitionFunctor& job,
     bslmt::Latch latch(fileStores.size());
 
     for (unsigned int i = 0; i < fileStores.size(); ++i) {
-        fileStores[i]->execute(bdlf::BindUtil::bind(job, i, &latch));
+        fileStores[i]->execute(
+            [job, partitionId = static_cast<int>(i), &latch]() {
+                job(partitionId, &latch);
+            });
     }
 
     // Wait
@@ -864,8 +868,9 @@ void StorageUtil::executeForValidPartitions(const PerPartitionFunctor& job,
 
     for (unsigned int i = 0; i < validPartitionIds.size(); ++i) {
         int partitionId = validPartitionIds[i];
-        fileStores[partitionId]->execute(
-            bdlf::BindUtil::bind(job, partitionId, &latch));
+        fileStores[partitionId]->execute([job, partitionId, &latch]() {
+            job(partitionId, &latch);
+        });
     }
 
     // Wait
@@ -908,10 +913,11 @@ int StorageUtil::processReplicationCommand(
             for (FileStores::iterator it = fileStores->begin();
                  it != fileStores->end();
                  ++it) {
-                (*it)->execute(bdlf::BindUtil::bind(
-                    &mqbs::FileStore::setReplicationFactor,
-                    *it,
-                    tunable.value().theInteger()));  // partitionId
+                (*it)->execute(
+                    [fs                   = *it,
+                     newReplicationFactor = tunable.value().theInteger()]() {
+                        fs->setReplicationFactor(newReplicationFactor);
+                    });
             }
             tunableConfirmation.newValue().makeTheInteger(*replicationFactor);
             return 0;  // RETURN
@@ -1700,13 +1706,11 @@ void StorageUtil::recoveredQueuesCb(
 
         domainFactory->createDomain(
             dit->first,
-            bdlf::BindUtil::bind(&onDomain,
-                                 bdlf::PlaceHolders::_1,  // status
-                                 bdlf::PlaceHolders::_2,  // domain*
-                                 &(dit->second),
-                                 &latch,
-                                 fs,
-                                 dit->first));
+            [out = &(dit->second), &latch, fs, domainName = dit->first](
+                const bmqp_ctrlmsg::Status& status,
+                mqbi::Domain*               domain) {
+                onDomain(status, domain, out, &latch, fs, domainName);
+            });
     }
 
     BALL_LOG_INFO << clusterDescription << ": Partition [" << partitionId
@@ -1749,10 +1753,9 @@ void StorageUtil::recoveredQueuesCb(
     // metrics almost immediately after recovery.
     if (!recognizedDomains.empty()) {
         clusterState->cluster()->dispatcher()->execute(
-            bdlf::BindUtil::bindS(allocator,
-                                  &ClusterState::onDomainsCreated,
-                                  clusterState,
-                                  recognizedDomains),
+            [clusterState, recognizedDomains]() {
+                clusterState->onDomainsCreated(recognizedDomains);
+            },
             clusterState->cluster());
     }
 
@@ -2239,9 +2242,9 @@ void StorageUtil::dumpUnknownRecoveredDomains(
         if (static_cast<size_t>(
                 bsl::count_if(unrecognizedDomains.cbegin(),
                               unrecognizedDomains.cend(),
-                              bdlf::MemFnUtil::memFn(
-                                  &DomainQueueMessagesCountMap::empty))) ==
-            unrecognizedDomains.size()) {
+                              [](const DomainQueueMessagesCountMap& map) {
+                                  return map.empty();
+                              })) == unrecognizedDomains.size()) {
             return;  // RETURN
         }
 
@@ -2352,7 +2355,9 @@ void StorageUtil::gcUnrecognizedDomainQueues(
             BSLS_ASSERT_SAFE(fs);
             BSLS_ASSERT_SAFE(fs->isOpen());
 
-            fs->execute(bdlf::BindUtil::bind(&mqbs::FileStore::rollover, fs));
+            fs->execute([fs]() {
+                fs->rollover();
+            });
         }
     }
 }
@@ -2379,9 +2384,9 @@ void StorageUtil::stop(FileStores*        fileStores,
         // broker start up (incorrect location, other errors)
         if (fs) {
             fs->execute(
-                bdlf::BindUtil::bind(&shutdownCb,
-                                     static_cast<int>(i),  // partitionId
-                                     &latch));
+                [&shutdownCb, partitionId = static_cast<int>(i), &latch]() {
+                    shutdownCb(partitionId, &latch);
+                });
         }
         else {
             latch.arrive();
@@ -2541,13 +2546,16 @@ void StorageUtil::registerQueueAsPrimary(const mqbi::Cluster*    cluster,
 
             bsl::shared_ptr<mqbevt::DispatcherEvent> event_sp =
                 cluster->getEvent<mqbevt::DispatcherEvent>();
-            (*event_sp).setCallback(
-                bdlf::BindUtil::bind(updateQueuePrimaryDispatched,
-                                     storageSp.get(),
+            (*event_sp).setCallback([storage = storageSp.get(),
                                      storagesLock,
                                      fs,
-                                     appIdKeyPairs,
-                                     true /* isFanout */));
+                                     appIdKeyPairs]() {
+                updateQueuePrimaryDispatched(storage,
+                                             storagesLock,
+                                             fs,
+                                             appIdKeyPairs,
+                                             true /* isFanout */);
+            });
 
             dispatcher->dispatchEvent(bsl::move(event_sp), fs);
 
@@ -2576,14 +2584,21 @@ void StorageUtil::registerQueueAsPrimary(const mqbi::Cluster*    cluster,
     bsl::shared_ptr<mqbevt::DispatcherEvent> event_sp =
         cluster->getEvent<mqbevt::DispatcherEvent>();
 
-    (*event_sp).setCallback(bdlf::BindUtil::bind(&createQueueStorageAsPrimary,
-                                                 storageMap,
-                                                 storagesLock,
-                                                 fs,
-                                                 uri,
-                                                 queueKey,
-                                                 appIdKeyPairs,
-                                                 domain));
+    (*event_sp).setCallback([storageMap,
+                             storagesLock,
+                             fs,
+                             uri,
+                             queueKey,
+                             appIdKeyPairs,
+                             domain]() {
+        createQueueStorageAsPrimary(storageMap,
+                                    storagesLock,
+                                    fs,
+                                    uri,
+                                    queueKey,
+                                    appIdKeyPairs,
+                                    domain);
+    });
 
     fs->dispatchEvent(bsl::move(event_sp));
 
@@ -2884,13 +2899,11 @@ void StorageUtil::createQueueStorageAsReplica(
 
         domainFactory->createDomain(
             uri.qualifiedDomain(),
-            bdlf::BindUtil::bind(&onDomain,
-                                 bdlf::PlaceHolders::_1,  // status
-                                 bdlf::PlaceHolders::_2,  // domain*
-                                 &domain,
-                                 &latch,
-                                 fs,
-                                 uri.qualifiedDomain()));
+            [out = &domain, &latch, fs, domainName = uri.qualifiedDomain()](
+                const bmqp_ctrlmsg::Status& status,
+                mqbi::Domain*               createdDomain) {
+                onDomain(status, createdDomain, out, &latch, fs, domainName);
+            });
         latch.wait();
 
         if (0 == domain) {
@@ -3346,9 +3359,9 @@ void StorageUtil::forceFlushFileStores(FileStores* fileStores)
             continue;  // CONTINUE
         }
 
-        fs->execute(
-            bdlf::BindUtil::bind(&mqbs::FileStore::scheduledCleanupStorages,
-                                 fs));
+        fs->execute([fs]() {
+            fs->scheduledCleanupStorages();
+        });
     }
 }
 
@@ -3430,8 +3443,9 @@ void StorageUtil::purgeQueueDispatched(
                      storage->partitionId());
 
     // RAII to ensure we will post on the semaphore no matter how we return
-    bdlb::ScopeExitAny semaphorePost(
-        bdlf::BindUtil::bind(&optionalSemaphorePost, purgeFinishedSemaphore));
+    bdlb::ScopeExitAny semaphorePost([purgeFinishedSemaphore]() {
+        optionalSemaphorePost(purgeFinishedSemaphore);
+    });
 
     if (!fileStore->primaryNode()) {
         bmqu::MemOutStream errorMsg;
@@ -3576,10 +3590,9 @@ void StorageUtil::processCommand(
         mqbs::FileStore* const fs = (*fileStores)[partitionId].get();
         BSLS_ASSERT_SAFE(fs);
 
-        fs->execute(
-            bdlf::BindUtil::bind(&mqbs::FileStore::setAvailabilityStatus,
-                                 fs,
-                                 isAvailable));
+        fs->execute([fs, isAvailable]() {
+            fs->setAvailabilityStatus(isAvailable);
+        });
         // We don't need to wait for the completion of above command.
         result->makeSuccess();
         return;  // RETURN
@@ -3611,14 +3624,20 @@ void StorageUtil::processCommand(
             // We need to wait here, using `latch`, until the command completes
             // in all threads.
             executeForEachPartitions(
-                bdlf::BindUtil::bind(&purgeDomainDispatched,
-                                     &purgedQueuesVec,
-                                     bdlf::PlaceHolders::_2,  // latch
-                                     bdlf::PlaceHolders::_1,  // partitionId
-                                     storageMapVec,
-                                     storageLockVec,
-                                     fileStores,
-                                     command.domain().name()),
+                [&purgedQueuesVec,
+                 storageMapVec,
+                 storageLockVec,
+                 fileStores,
+                 domainName = command.domain().name()](int partitionId,
+                                                       bslmt::Latch* latch) {
+                    purgeDomainDispatched(&purgedQueuesVec,
+                                          latch,
+                                          partitionId,
+                                          storageMapVec,
+                                          storageLockVec,
+                                          fileStores,
+                                          domainName);
+                },
                 *fileStores);
 
             mqbcmd::PurgedQueues& purgedQueues = result->makePurgedQueues();
@@ -3671,12 +3690,17 @@ void StorageUtil::processCommand(
 
         mqbcmd::PurgeQueueResult purgedQueueResult;
         bslmt::Semaphore         purgeFinishedSemaphore;
-        fileStore->execute(bdlf::BindUtil::bind(&purgeQueueDispatched,
-                                                &purgedQueueResult,
-                                                &purgeFinishedSemaphore,
-                                                queueStorage,
-                                                fileStore.get(),
-                                                appId));
+        fileStore->execute([&purgedQueueResult,
+                            &purgeFinishedSemaphore,
+                            queueStorage,
+                            fs = fileStore.get(),
+                            appId]() {
+            purgeQueueDispatched(&purgedQueueResult,
+                                 &purgeFinishedSemaphore,
+                                 queueStorage,
+                                 fs,
+                                 appId);
+        });
 
         purgeFinishedSemaphore.wait();
 
@@ -3774,14 +3798,19 @@ void StorageUtil::purgeQueueOnDomain(
     // We need to wait here, using `latch`, until the command completes
     // in all valid threads.
     executeForValidPartitions(
-        bdlf::BindUtil::bind(&purgeDomainDispatched,
-                             &purgedQueuesVec,
-                             bdlf::PlaceHolders::_2,  // latch
-                             bdlf::PlaceHolders::_1,  // partitionId
-                             storageMapVec,
-                             storageLockVec,
-                             fileStores,
-                             domainName),
+        [&purgedQueuesVec,
+         storageMapVec,
+         storageLockVec,
+         fileStores,
+         domainName](int partitionId, bslmt::Latch* latch) {
+            purgeDomainDispatched(&purgedQueuesVec,
+                                  latch,
+                                  partitionId,
+                                  storageMapVec,
+                                  storageLockVec,
+                                  fileStores,
+                                  domainName);
+        },
         *fileStores);
 
     mqbcmd::PurgedQueues& purgedQueues = result->makePurgedQueues();
