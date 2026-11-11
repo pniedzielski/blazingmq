@@ -294,8 +294,8 @@ class BlobObjectProxy {
                   bool                      raw);
 
     // NOT IMPLEMENTED
-    BlobObjectProxy(const BlobObjectProxy&);
-    BlobObjectProxy& operator=(const BlobObjectProxy&);
+    BlobObjectProxy(const BlobObjectProxy&)            = delete;
+    BlobObjectProxy& operator=(const BlobObjectProxy&) = delete;
 
   public:
     // CREATORS

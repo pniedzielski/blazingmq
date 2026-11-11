@@ -75,8 +75,8 @@ class TempDirectory {
 
   private:
     // NOT IMPLEMENTED
-    TempDirectory(const TempDirectory&);
-    TempDirectory& operator=(const TempDirectory&);
+    TempDirectory(const TempDirectory&)            = delete;
+    TempDirectory& operator=(const TempDirectory&) = delete;
 
   public:
     // TRAITS

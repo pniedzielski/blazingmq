@@ -76,8 +76,8 @@ class AlignedPrinter {
 
   private:
     // NOT IMPLEMENTED
-    AlignedPrinter(const AlignedPrinter&);
-    AlignedPrinter& operator=(const AlignedPrinter&);
+    AlignedPrinter(const AlignedPrinter&)            = delete;
+    AlignedPrinter& operator=(const AlignedPrinter&) = delete;
 
   public:
     // CREATORS

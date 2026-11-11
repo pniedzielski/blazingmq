@@ -100,8 +100,8 @@ class JsonPrinter {
     unsigned int                    d_counter;
 
     // NOT IMPLEMENTED
-    JsonPrinter(const JsonPrinter&);
-    JsonPrinter& operator=(const JsonPrinter&);
+    JsonPrinter(const JsonPrinter&)            = delete;
+    JsonPrinter& operator=(const JsonPrinter&) = delete;
 
   public:
     // CREATORS
