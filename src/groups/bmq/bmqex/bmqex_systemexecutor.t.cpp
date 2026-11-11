@@ -19,8 +19,6 @@
 #include <bmqtst_testhelper.h>
 
 // BDE
-#include <bdlf_bind.h>
-#include <bsl_functional.h>  // bsl::cref
 #include <bsl_iostream.h>
 #include <bsl_ostream.h>
 #include <bslma_testallocator.h>
@@ -123,9 +121,10 @@ static void test1_context_creators()
 
         for (int i = 0; i < k_NUM_JOBS; ++i) {
             context.executeAsync(
-                bdlf::BindUtil::bind(bslmt::ThreadUtil::setSpecific,
-                                     bsl::cref(tlsKey),
-                                     &threadsCompleted),
+                [&tlsKey, &threadsCompleted]() {
+                    return bslmt::ThreadUtil::setSpecific(tlsKey,
+                                                          &threadsCompleted);
+                },
                 bslmt::ThreadAttributes());
         }
     }
@@ -203,11 +202,9 @@ static void test3_executor_post()
 
     for (int i = 0; i < k_NUM_JOBS; ++i) {
         // schedule function object execution
-        ex.post(bdlf::BindUtil::bindR<void>(AsyncTestCallback(),
-                                            &sem1,
-                                            &jobNo,
-                                            &threadId,
-                                            &sem2));
+        ex.post([&sem1, &jobNo, &threadId, &sem2]() {
+            AsyncTestCallback()(&sem1, &jobNo, &threadId, &sem2);
+        });
 
         // function object not executed yet
         BMQTST_ASSERT_EQ(jobNo, i);
@@ -248,9 +245,9 @@ static void test4_executor_dispatch()
 
     for (int i = 0; i < k_NUM_JOBS; ++i) {
         // execute function object
-        ex.dispatch(bdlf::BindUtil::bindR<void>(InPlaceTestCallback(),
-                                                &jobNo,
-                                                &threadId));
+        ex.dispatch([&jobNo, &threadId]() {
+            InPlaceTestCallback()(&jobNo, &threadId);
+        });
 
         // function object executed in this thread
         BMQTST_ASSERT_EQ(jobNo, i + 1);
