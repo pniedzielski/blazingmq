@@ -136,20 +136,21 @@
 //  // receive data from 10 clients
 //  bmqu::OperationChainLink link(chain.allocator());
 //  for (int i = 0; i < 10; ++i) {
-//      link.insert(&createNewLink,
-//                  bdlf::BindUtil::bind(&UsageExample::receive,
-//                                       bdlf::PlaceHolders::_1),
-//                  &UsageExample::onDataReceived);
+//      link.insert(
+//          [](const UsageExample::ReceiveCallback& callback) {
+//              UsageExample::receive(callback);
+//          },
+//          &UsageExample::onDataReceived);
 //  }
 //
 //  chain.append(&link);
 //
 //  // send data to another client
-//  chain.appendInplace(bdlf::BindUtil::bind(&UsageExample::send,
-//                                           k_MY_CLIENT_ID,
-//                                           k_MY_PAYLOAD,
-//                                           bdlf::PlaceHolders::_1),
-//                      &UsageExample::onDataSent);
+//  chain.appendInplace(
+//      [](const UsageExample::SendCallback& callback) {
+//          UsageExample::send(k_MY_CLIENT_ID, k_MY_PAYLOAD, callback);
+//      },
+//      &UsageExample::onDataSent);
 //
 //  // execute operations in the chain
 //  chain.start();
