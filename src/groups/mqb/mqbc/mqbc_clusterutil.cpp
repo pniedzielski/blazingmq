@@ -52,7 +52,6 @@
 #include <bdlb_print.h>
 #include <bdlbb_blob.h>
 #include <bdlde_md5.h>
-#include <bdlf_bind.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_iostream.h>
 #include <bsl_limits.h>
@@ -913,10 +912,11 @@ bool ClusterUtil::assignQueue(ClusterState*         clusterState,
         BSLS_ASSERT_SAFE(clusterData->domainFactory());
         clusterData->domainFactory()->createDomain(
             uri.qualifiedDomain(),
-            bdlf::BindUtil::bind(&createDomainCb,
-                                 bdlf::PlaceHolders::_1,  // status
-                                 bdlf::PlaceHolders::_2,  // domain
-                                 domIt->second));
+            [domainState = domIt->second](
+                const bmqp_ctrlmsg::Status& createStatus,
+                mqbi::Domain*               domain) {
+                createDomainCb(createStatus, domain, domainState);
+            });
 
         if (domIt->second->domain() == 0) {
             BALL_LOG_ERROR << cluster->description()
