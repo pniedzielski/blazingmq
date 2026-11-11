@@ -364,10 +364,10 @@ QueueInfo<VALUE>::insert(const bsl::string& appId,
     // Point extracted Subscriptions to the new entry
     iterator itStream(result.first);
 
-    for (size_t i = 0; i < subscriptions.size(); ++i) {
+    for (const bsls::Types::Uint64 subscriptionId : subscriptions) {
         [[maybe_unused]] bsl::pair<typename SubscriptionsMap::iterator, bool>
             insertRC = d_subscriptions.insert(
-                bsl::make_pair(subscriptions[i], itStream));
+                bsl::make_pair(subscriptionId, itStream));
         BSLS_ASSERT_SAFE(insertRC.second);
     }
     return itStream;
