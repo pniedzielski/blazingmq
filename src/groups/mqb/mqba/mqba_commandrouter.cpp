@@ -150,11 +150,9 @@ int CommandRouter::ClusterWideRoutingMode::getRouteTargets(
     // Collect all nodes in cluster
     const NodesList& allNodes = cluster->netCluster().nodes();
 
-    for (NodesList::const_iterator nit = allNodes.begin();
-         nit != allNodes.end();
-         nit++) {
-        if (cluster->netCluster().selfNode() != *nit) {
-            routeTargets->d_nodes.push_back(*nit);
+    for (mqbnet::ClusterNode* node : allNodes) {
+        if (cluster->netCluster().selfNode() != node) {
+            routeTargets->d_nodes.push_back(node);
         }
     }
 
@@ -248,12 +246,8 @@ void CommandRouter::onRouteCommandResponse(
 
     NodePairsVector responsePairs = requestContext->response();
 
-    for (NodePairsVector::const_iterator pairIt = responsePairs.begin();
-         pairIt != responsePairs.end();
-         pairIt++) {
-        NodePair pair = *pairIt;
-
-        bmqp_ctrlmsg::ControlMessage& message = pair.second;
+    for (const NodePair& pair : responsePairs) {
+        const bmqp_ctrlmsg::ControlMessage& message = pair.second;
 
         mqbcmd::RouteResponse routeResponse;
         routeResponse.sourceNodeDescription() = pair.first->hostName();
