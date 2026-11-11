@@ -86,47 +86,6 @@ static mqbcfg::DispatcherConfig makeConfig()
     return config;
 }
 
-// ==================
-// struct Synchronize
-// ==================
-
-/// Provides a functor to synchronize with. First calls `post()` on the
-/// specified `startedSignal` semaphore and then, calls `wait()` on the
-/// specified `continueSignal` semaphore.
-struct Synchronize {
-    // TYPES
-
-    /// Defines the result type of the call operator.
-    typedef void ResultType;
-
-    // ACCESSORS
-    void operator()(bslmt::Semaphore* startedSignal,
-                    bslmt::Semaphore* continueSignal) const
-    {
-        startedSignal->post();
-        continueSignal->wait();
-    }
-};
-
-// =======================
-// struct LoadSelfThreadId
-// =======================
-
-/// Provides a functor that loads the id of the current thread into the
-/// specified output value.
-struct LoadSelfThreadId {
-    // TYPES
-
-    /// Defines the result type of the call operator.
-    typedef void ResultType;
-
-    // ACCESSORS
-    void operator()(bslmt::ThreadUtil::Id* threadId) const
-    {
-        *threadId = bslmt::ThreadUtil::selfId();
-    }
-};
-
 struct TestDispatcherClient : public mqbi::DispatcherClient {
   private:
     // DATA
@@ -387,7 +346,8 @@ static void test3_executorsSupport()
         // submit a functor on a processor using the executor's 'post'
         // function, check that 'post' does not block the calling thread
         executor1.post([&startedSignal, &continueSignal]() {
-            Synchronize()(&startedSignal, &continueSignal);
+            startedSignal.post();
+            continueSignal.wait();
         });
 
         startedSignal.wait();   // wait for the job to start executing
@@ -404,7 +364,7 @@ static void test3_executorsSupport()
                 .useExecutor(executor1)
                 .useAllocator(bmqtst::TestHelperUtil::allocator()),
             [&threadId1]() {
-                LoadSelfThreadId()(&threadId1);
+                threadId1 = bslmt::ThreadUtil::selfId();
             });
 
         bmqex::ExecutionUtil::execute(
@@ -412,7 +372,7 @@ static void test3_executorsSupport()
                 .useExecutor(executor1)
                 .useAllocator(bmqtst::TestHelperUtil::allocator()),
             [&threadId2]() {
-                LoadSelfThreadId()(&threadId2);
+                threadId2 = bslmt::ThreadUtil::selfId();
             });
 
         // both functors were invoked in the same thread that is not this
@@ -423,7 +383,8 @@ static void test3_executorsSupport()
         // submit a functor on a processor using the executor's 'dispatch'
         // function, check that 'dispatch' does not block the calling thread
         executor2.dispatch([&startedSignal, &continueSignal]() {
-            Synchronize()(&startedSignal, &continueSignal);
+            startedSignal.post();
+            continueSignal.wait();
         });
 
         startedSignal.wait();   // wait for the job to start executing
@@ -441,7 +402,7 @@ static void test3_executorsSupport()
                 .useExecutor(executor2)
                 .useAllocator(bmqtst::TestHelperUtil::allocator()),
             [&threadId1]() {
-                LoadSelfThreadId()(&threadId1);
+                threadId1 = bslmt::ThreadUtil::selfId();
             });
 
         bmqex::ExecutionUtil::execute(
@@ -449,7 +410,7 @@ static void test3_executorsSupport()
                 .useExecutor(executor2)
                 .useAllocator(bmqtst::TestHelperUtil::allocator()),
             [&threadId2]() {
-                LoadSelfThreadId()(&threadId2);
+                threadId2 = bslmt::ThreadUtil::selfId();
             });
 
         // both functors were invoked in the same thread that is not this
@@ -480,10 +441,11 @@ static void test3_executorsSupport()
                 .useExecutor(executor1)
                 .useAllocator(bmqtst::TestHelperUtil::allocator()),
             [&executor3, &threadId1]() {
-                Local::executeBlocking(&executor3,
-                                       bsl::function<void()>([&threadId1]() {
-                                           LoadSelfThreadId()(&threadId1);
-                                       }));
+                Local::executeBlocking(
+                    &executor3,
+                    bsl::function<void()>([&threadId1]() {
+                        threadId1 = bslmt::ThreadUtil::selfId();
+                    }));
             });
 
         // the nested functor was invoked in-place (we know that because
