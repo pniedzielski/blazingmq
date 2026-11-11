@@ -103,7 +103,7 @@ bool isZero(const bmqp_ctrlmsg::LeaderMessageSequence& lsn)
            lsn.sequenceNumber() == 0;
 }
 
-void processPrimaryStatusAdvisoryDispatched(
+void applyPrimaryStatusAdvisory(
     mqbs::FileStore*                           fs,
     mqbi::StorageManager_PartitionInfo*        pinfo,
     const bmqp_ctrlmsg::PrimaryStatusAdvisory& advisory,
@@ -586,7 +586,7 @@ void StorageManager::applyForEachQueue(int                 partitionId,
     fs.applyForEachQueue(functor);
 }
 
-void StorageManager::setPrimaryForPartitionDispatched(
+void StorageManager::updatePrimaryForPartition(
     int                  partitionId,
     mqbnet::ClusterNode* primaryNode,
     unsigned int         primaryLeaseId,
@@ -700,9 +700,8 @@ void StorageManager::setPrimaryForPartitionDispatched(
         });
 }
 
-void StorageManager::clearPrimaryForPartitionDispatched(
-    int                  partitionId,
-    mqbnet::ClusterNode* primary)
+void StorageManager::clearPrimaryIfMatches(int                  partitionId,
+                                           mqbnet::ClusterNode* primary)
 {
     // executed by *QUEUE_DISPATCHER* thread associated with 'partitionId'
 
@@ -732,7 +731,7 @@ void StorageManager::clearPrimaryForPartitionDispatched(
         partitionId);
 }
 
-void StorageManager::processStorageEventDispatched(
+void StorageManager::applyStorageEvent(
     int                                 partitionId,
     const bsl::shared_ptr<bdlbb::Blob>& blob,
     mqbnet::ClusterNode*                source)
@@ -840,11 +839,11 @@ void StorageManager::processPartitionSyncEvent(
     BSLS_ASSERT_SAFE(fs);
 
     fs->execute([this, pid, blob = event.blob(), source]() {
-        processPartitionSyncEventDispatched(pid, blob, source);
+        applyPartitionSyncEvent(pid, blob, source);
     });
 }
 
-void StorageManager::processPartitionSyncEventDispatched(
+void StorageManager::applyPartitionSyncEvent(
     int                                 partitionId,
     const bsl::shared_ptr<bdlbb::Blob>& blob,
     mqbnet::ClusterNode*                source)
@@ -936,25 +935,7 @@ void StorageManager::processPartitionSyncEventDispatched(
     fs->processStorageEvent(blob, true /* isPartitionSyncEvent */, source);
 }
 
-void StorageManager::processStorageSyncRequestDispatched(
-    int                                 partitionId,
-    const bmqp_ctrlmsg::ControlMessage& message,
-    mqbnet::ClusterNode*                source)
-{
-    // executed by *DISPATCHER* thread
-
-    BSLS_ASSERT_SAFE(0 <= partitionId);
-    BSLS_ASSERT_SAFE(d_fileStores.size() >
-                     static_cast<unsigned int>(partitionId));
-
-    mqbs::FileStore* fs =
-        d_fileStores[static_cast<unsigned int>(partitionId)].get();
-    BSLS_ASSERT_SAFE(fs);
-
-    d_recoveryManager_mp->processStorageSyncRequest(message, source, fs);
-}
-
-void StorageManager::processPartitionSyncStateRequestDispatched(
+void StorageManager::servePartitionSyncStateRequest(
     int                                 partitionId,
     const bmqp_ctrlmsg::ControlMessage& message,
     mqbnet::ClusterNode*                source)
@@ -988,7 +969,7 @@ void StorageManager::processPartitionSyncStateRequestDispatched(
     //      the original syncstate request?  When it has received partition-
     //      primary advisory from the leader, AND self node is AVAILABLE, AND
     //      self (replica) receives a message from the new primary which it
-    //      will reject in StorageMgr.processStorageEventDispatched() if
+    //      will reject in StorageMgr.applyStorageEvent() if
     //      PartitionInfo.d_isPrimaryActive flag is set to false.  How to
     //      recover though?  Close fs and initiate recovery?  Keep fs open,
     //      start buffering and then same as recovery?
@@ -999,31 +980,7 @@ void StorageManager::processPartitionSyncStateRequestDispatched(
         d_fileStores[partitionId].get());
 }
 
-void StorageManager::processPartitionSyncDataRequestDispatched(
-    int                                 partitionId,
-    const bmqp_ctrlmsg::ControlMessage& message,
-    mqbnet::ClusterNode*                source)
-{
-    // executed by *DISPATCHER* thread
-
-    d_recoveryManager_mp->processPartitionSyncDataRequest(
-        message,
-        source,
-        d_fileStores[partitionId].get());
-}
-
-void StorageManager::processPartitionSyncDataRequestStatusDispatched(
-    [[maybe_unused]] int                partitionId,
-    const bmqp_ctrlmsg::ControlMessage& message,
-    mqbnet::ClusterNode*                source)
-{
-    // executed by *DISPATCHER* thread
-
-    d_recoveryManager_mp->processPartitionSyncDataRequestStatus(message,
-                                                                source);
-}
-
-void StorageManager::processShutdownEventDispatched(int partitionId)
+void StorageManager::processShutdownEventForPartition(int partitionId)
 {
     // executed by *QUEUE_DISPATCHER* thread with the specified 'partitionId'
 
@@ -1480,10 +1437,10 @@ void StorageManager::setPrimaryForPartition(int                  partitionId,
     }
 
     fs->execute([this, partitionId, primaryNode, primaryLeaseId, peers]() {
-        setPrimaryForPartitionDispatched(partitionId,
-                                         primaryNode,
-                                         primaryLeaseId,
-                                         peers);
+        updatePrimaryForPartition(partitionId,
+                                  primaryNode,
+                                  primaryLeaseId,
+                                  peers);
     });
 }
 
@@ -1503,7 +1460,7 @@ void StorageManager::clearPrimaryForPartition(int                  partitionId,
     BSLS_ASSERT_SAFE(fs);
 
     fs->execute([this, partitionId, primary]() {
-        clearPrimaryForPartitionDispatched(partitionId, primary);
+        clearPrimaryIfMatches(partitionId, primary);
     });
 }
 
@@ -1677,7 +1634,7 @@ void StorageManager::processStorageEvent(const mqbevt::StorageEvent& event)
     BSLS_ASSERT_SAFE(fs);
 
     fs->execute([this, pid, blob = event.blob(), source]() {
-        processStorageEventDispatched(pid, blob, source);
+        applyStorageEvent(pid, blob, source);
     });
 }
 
@@ -1716,7 +1673,17 @@ void StorageManager::processStorageSyncRequest(
     BSLS_ASSERT_SAFE(d_recoveryManager_mp->isStarted());
 
     d_fileStores[partitionId]->execute([this, partitionId, message, source]() {
-        processStorageSyncRequestDispatched(partitionId, message, source);
+        // executed by *DISPATCHER* thread
+
+        BSLS_ASSERT_SAFE(0 <= partitionId);
+        BSLS_ASSERT_SAFE(d_fileStores.size() >
+                         static_cast<unsigned int>(partitionId));
+
+        mqbs::FileStore* fs =
+            d_fileStores[static_cast<unsigned int>(partitionId)].get();
+        BSLS_ASSERT_SAFE(fs);
+
+        d_recoveryManager_mp->processStorageSyncRequest(message, source, fs);
     });
 }
 
@@ -1756,9 +1723,7 @@ void StorageManager::processPartitionSyncStateRequest(
     }
 
     d_fileStores[partitionId]->execute([this, partitionId, message, source]() {
-        processPartitionSyncStateRequestDispatched(partitionId,
-                                                   message,
-                                                   source);
+        servePartitionSyncStateRequest(partitionId, message, source);
     });
 }
 
@@ -1798,9 +1763,12 @@ void StorageManager::processPartitionSyncDataRequest(
     }
 
     d_fileStores[partitionId]->execute([this, partitionId, message, source]() {
-        processPartitionSyncDataRequestDispatched(partitionId,
-                                                  message,
-                                                  source);
+        // executed by *DISPATCHER* thread
+
+        d_recoveryManager_mp->processPartitionSyncDataRequest(
+            message,
+            source,
+            d_fileStores[partitionId].get());
     });
 }
 
@@ -1839,10 +1807,11 @@ void StorageManager::processPartitionSyncDataRequestStatus(
         return;  // RETURN
     }
 
-    d_fileStores[partitionId]->execute([this, partitionId, message, source]() {
-        processPartitionSyncDataRequestStatusDispatched(partitionId,
-                                                        message,
-                                                        source);
+    d_fileStores[partitionId]->execute([this, message, source]() {
+        // executed by *DISPATCHER* thread
+
+        d_recoveryManager_mp->processPartitionSyncDataRequestStatus(message,
+                                                                    source);
     });
 }
 
@@ -1990,12 +1959,12 @@ void StorageManager::processPrimaryStatusAdvisory(
          advisory,
          clusterDescription = d_clusterData_p->identity().description(),
          source]() {
-            processPrimaryStatusAdvisoryDispatched(fs,
-                                                   pinfo,
-                                                   advisory,
-                                                   clusterDescription,
-                                                   source,
-                                                   false);  // isFSMWorkflow
+            applyPrimaryStatusAdvisory(fs,
+                                       pinfo,
+                                       advisory,
+                                       clusterDescription,
+                                       source,
+                                       false);  // isFSMWorkflow
         });
 }
 
@@ -2040,7 +2009,7 @@ void StorageManager::processShutdownEvent()
         mqbs::FileStore* fs = d_fileStores[i].get();
 
         fs->execute([this, partitionId = static_cast<int>(i)]() {
-            processShutdownEventDispatched(partitionId);
+            processShutdownEventForPartition(partitionId);
         });
     }
 }

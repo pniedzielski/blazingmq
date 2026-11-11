@@ -333,55 +333,35 @@ class StorageManager final : public mqbi::StorageManager {
                            const QueueKeyInfoMap* queueKeyInfoMap);
 
     /// Executed by queue/file-store dispatcher thread.
-    void setPrimaryForPartitionDispatched(int                  partitionId,
-                                          mqbnet::ClusterNode* primaryNode,
-                                          unsigned int         primaryLeaseId,
-                                          const ClusterNodes&  peers);
+    void updatePrimaryForPartition(int                  partitionId,
+                                   mqbnet::ClusterNode* primaryNode,
+                                   unsigned int         primaryLeaseId,
+                                   const ClusterNodes&  peers);
 
     /// Executed by queue/file-store dispatcher thread.
-    void clearPrimaryForPartitionDispatched(int                  partitionId,
-                                            mqbnet::ClusterNode* primary);
+    void clearPrimaryIfMatches(int partitionId, mqbnet::ClusterNode* primary);
 
     /// Executed by queue/file-store dispatcher thread.
-    void
-    processStorageEventDispatched(int partitionId,
-                                  const bsl::shared_ptr<bdlbb::Blob>& blob,
-                                  mqbnet::ClusterNode*                source);
+    void applyStorageEvent(int                                 partitionId,
+                           const bsl::shared_ptr<bdlbb::Blob>& blob,
+                           mqbnet::ClusterNode*                source);
 
     /// Executed in cluster dispatcher thread.
     void processPartitionSyncEvent(const mqbevt::StorageEvent& event);
 
     /// Executed by queue/file-store dispatcher thread.
-    void processPartitionSyncEventDispatched(
-        int                                 partitionId,
-        const bsl::shared_ptr<bdlbb::Blob>& blob,
-        mqbnet::ClusterNode*                source);
+    void applyPartitionSyncEvent(int partitionId,
+                                 const bsl::shared_ptr<bdlbb::Blob>& blob,
+                                 mqbnet::ClusterNode*                source);
 
     /// Executed by queue/file-store dispatcher thread.
-    void processStorageSyncRequestDispatched(
-        int                                 partitionId,
-        const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source);
+    void
+    servePartitionSyncStateRequest(int partitionId,
+                                   const bmqp_ctrlmsg::ControlMessage& message,
+                                   mqbnet::ClusterNode*                source);
 
     /// Executed by queue/file-store dispatcher thread.
-    void processPartitionSyncStateRequestDispatched(
-        int                                 partitionId,
-        const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source);
-
-    /// Executed by queue/file-store dispatcher thread.
-    void processPartitionSyncDataRequestDispatched(
-        int                                 partitionId,
-        const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source);
-
-    /// Executed by queue/file-store dispatcher thread.
-    void processPartitionSyncDataRequestStatusDispatched(
-        int                                 partitionId,
-        const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source);
-
-    void processShutdownEventDispatched(int partitionId);
+    void processShutdownEventForPartition(int partitionId);
 
     /// Explicitly call `flush` on all FileStores to enforce their GC.
     void forceFlushFileStores();

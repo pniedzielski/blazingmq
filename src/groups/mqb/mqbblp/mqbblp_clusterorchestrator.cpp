@@ -1662,7 +1662,7 @@ void ClusterOrchestrator::processPrimaryStatusAdvisoryImpl(
         // TBD: Since we are updating cluster state based on a message from the
         // non-leader node, we are breaking the contract that only leader
         // issues writes to the cluster state.  This needs to be reviewed.  See
-        // 'StorageMgr::processPrimaryStatusAdvisoryDispatched' as well.
+        // 'StorageMgr::applyPrimaryStatusAdvisory' as well.
 
         if (pinfo.primaryNode()) {
             if (pinfo.primaryLeaseId() > primaryAdv.primaryLeaseId()) {
