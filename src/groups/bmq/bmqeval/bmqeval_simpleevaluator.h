@@ -1000,8 +1000,7 @@ inline bsl::string CompilationContext::lastErrorMessage() const
 inline int CompilationContext::getPropertyIndex(const bsl::string& property,
                                                 Type               type)
 {
-    bsl::unordered_map<bsl::string, PropertyInfo>::iterator iter =
-        d_properties.find(property);
+    auto iter = d_properties.find(property);
     if (iter == d_properties.end()) {
         PropertyInfo info = {type, d_properties.size()};
         d_properties.insert(iter, bsl::make_pair(property, info));
