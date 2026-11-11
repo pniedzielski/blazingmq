@@ -166,9 +166,8 @@ class VirtualStorageCatalog final {
 
   private:
     // NOT IMPLEMENTED
-    VirtualStorageCatalog(const VirtualStorageCatalog&);  // = delete
-    VirtualStorageCatalog&
-    operator=(const VirtualStorageCatalog&);  // = delete
+    VirtualStorageCatalog(const VirtualStorageCatalog&)            = delete;
+    VirtualStorageCatalog& operator=(const VirtualStorageCatalog&) = delete;
 
     mqbi::StorageResult::Enum purgeImpl(VirtualStorage*     vs,
                                         DataStreamIterator& itData,
