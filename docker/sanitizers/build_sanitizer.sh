@@ -181,7 +181,7 @@ export PATH
 
 # Build BDE + NTF
 pushd "${DIR_SRCS_EXT}/bde"
-eval "$(bbs_build_env  -p clang -u dbg_64_safe_cpp17 -b "${DIR_BUILD_EXT}/bde")"
+eval "$(bbs_build_env  -p clang -u dbg_64_safe_cpp20 -b "${DIR_BUILD_EXT}/bde")"
 bbs_build configure --toolchain "${TOOLCHAIN_PATH}"
 bbs_build build -j"${PARALLELISM}"
 bbs_build --install=/opt/bb --prefix=/ install
@@ -206,7 +206,7 @@ sed -i 's/fcoroutines-ts/fcoroutines/g' 'repository.cmake'
             --without-zstd \
             --without-lz4 \
             --without-openssl \
-            --ufid 'dbg_64_safe_cpp17' \
+            --ufid 'dbg_64_safe_cpp20' \
             --toolchain "${TOOLCHAIN_PATH}"
 make -j"${PARALLELISM}"
 make install
