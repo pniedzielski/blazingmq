@@ -524,8 +524,8 @@ inline void OptionsView::clear()
 {
     // We already allocated the maximum memory we are going to need at
     // construction, so we simply set each BlobPosition to "null"
-    for (unsigned int i = 0; i < d_optionPositions.size(); ++i) {
-        d_optionPositions[i] = d_NullBlobPosition;
+    for (bmqu::BlobPosition& position : d_optionPositions) {
+        position = d_NullBlobPosition;
     }
 
     d_blob_p  = 0;
