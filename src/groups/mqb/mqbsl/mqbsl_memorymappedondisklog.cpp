@@ -24,7 +24,6 @@
 // BDE
 #include <bdlb_scopeexit.h>
 #include <bdlbb_blobutil.h>
-#include <bdlf_bind.h>
 #include <bdls_filesystemutil.h>
 #include <bsl_algorithm.h>  // for bsl::max
 #include <bsl_cstring.h>    // for bsl::memcpy
@@ -158,8 +157,9 @@ int MemoryMappedOnDiskLog::open(int flags)
     d_totalNumBytes = bdls::FilesystemUtil::getFileSize(d_config.location());
     d_outstandingNumBytes = d_totalNumBytes;
 
-    bdlb::ScopeExitAny guard(
-        bdlf::BindUtil::bind(openFailureCleanup, &d_mfd, &d_isOpened));
+    bdlb::ScopeExitAny guard([this]() {
+        openFailureCleanup(&d_mfd, &d_isOpened);
+    });
 
     // If log is writable
     if (!openReadOnly) {
