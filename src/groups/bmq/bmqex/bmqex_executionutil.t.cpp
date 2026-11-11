@@ -22,7 +22,6 @@
 #include <bmqex_executionproperty.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bdlmt_threadpool.h>
 #include <bsl_functional.h>
 #include <bsl_iostream.h>
@@ -196,9 +195,9 @@ class TestExecutionContext {
             ++d_context_p->d_statistics.d_postCount;
 
             int rc = d_context_p->d_threadPool.enqueueJob(
-                bdlf::BindUtil::bind(&TestExecutionContext::doInvoke,
-                                     d_context_p,
-                                     f));
+                [context = d_context_p, f]() {
+                    context->doInvoke(f);
+                });
             BSLS_ASSERT_OPT(rc == 0);
         }
 
@@ -208,9 +207,9 @@ class TestExecutionContext {
             ++d_context_p->d_statistics.d_dispatchCount;
 
             int rc = d_context_p->d_threadPool.enqueueJob(
-                bdlf::BindUtil::bind(&TestExecutionContext::doInvoke,
-                                     d_context_p,
-                                     f));
+                [context = d_context_p, f]() {
+                    context->doInvoke(f);
+                });
             BSLS_ASSERT_OPT(rc == 0);
         }
     };
@@ -386,10 +385,9 @@ static void test2_execute_never_blocking()
             bmqex::ExecutionPolicyUtil::neverBlocking()
                 .useExecutor(context.executor())
                 .useAllocator(&alloc),
-            bdlf::BindUtil::bind(SynchronizeCallable(),
-                                 &sem1,
-                                 &sem2,
-                                 toBeExecuted));
+            [&sem1, &sem2, toBeExecuted]() {
+                SynchronizeCallable()(&sem1, &sem2, toBeExecuted);
+            });
 
         // function object was submitted for execution via a call to 'post()'
         // on the specified executor
@@ -469,10 +467,9 @@ static void test3_execute_possibly_blocking()
             bmqex::ExecutionPolicyUtil::possiblyBlocking()
                 .useExecutor(context.executor())
                 .useAllocator(&alloc),
-            bdlf::BindUtil::bind(SynchronizeCallable(),
-                                 &sem1,
-                                 &sem2,
-                                 toBeExecuted));
+            [&sem1, &sem2, toBeExecuted]() {
+                SynchronizeCallable()(&sem1, &sem2, toBeExecuted);
+            });
 
         // function object was submitted for execution via a call to
         // 'dispatch()' on the specified executor
