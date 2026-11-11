@@ -224,9 +224,15 @@ TestContext::TestContext(bool lateResponseMode, bslma::Allocator* allocator)
 {
     bmqu::Time::shutdown();
     bmqu::Time::initialize(
-        bdlf::BindUtil::bind(&TestClock::realtimeClock, &d_testClock),
-        bdlf::BindUtil::bind(&TestClock::monotonicClock, &d_testClock),
-        bdlf::BindUtil::bind(&TestClock::highResTimer, &d_testClock),
+        [this]() {
+            return d_testClock.realtimeClock();
+        },
+        [this]() {
+            return d_testClock.monotonicClock();
+        },
+        [this]() {
+            return d_testClock.highResTimer();
+        },
         d_allocator_p);
 
     int rc = d_scheduler.start();
@@ -590,10 +596,9 @@ static void test4_sendRequestTest()
 
         context.sendCallbackRequest(
             request,
-            bdlf::BindUtil::bind(Caller::sendFn,
-                                 &called,
-                                 bdlf::PlaceHolders::_1,
-                                 request));
+            [&called, request](const bsl::shared_ptr<bdlbb::Blob>& blob_sp) {
+                return Caller::sendFn(&called, blob_sp, request);
+            });
         BMQTST_ASSERT(called);
     }
 
@@ -643,11 +648,11 @@ static void test4_sendRequestTest()
                 requestsWithoutId.emplace(req->request().choice());
             }
 
-            int rc = threadGroup.addThread(
-                bdlf::BindUtil::bind(&Caller::requestSenderJob,
-                                     requestsGroup,
-                                     &barrier,
-                                     &context));
+            int rc = threadGroup.addThread([requestsGroup,
+                                            &barrier,
+                                            &context]() {
+                Caller::requestSenderJob(requestsGroup, &barrier, &context);
+            });
             BMQTST_ASSERT_EQ(0, rc);
         }
 
@@ -723,10 +728,9 @@ static void test5_processResponseTest()
         context.populateRequest(request);
 
         bool called = false;
-        request->setResponseCb(bdlf::BindUtil::bind(&Caller::callback,
-                                                    &called,
-                                                    bdlf::PlaceHolders::_1,
-                                                    &request));
+        request->setResponseCb([&called, &request](const ReqSp& req) {
+            Caller::callback(&called, req, &request);
+        });
         context.sendChannelRequest(request);
         Mes response = context.createResponse(
             request->request().rId().value());
@@ -744,10 +748,9 @@ static void test5_processResponseTest()
         context.populateRequest(request);
 
         bool called = false;
-        request->setResponseCb(bdlf::BindUtil::bind(&Caller::callback,
-                                                    &called,
-                                                    bdlf::PlaceHolders::_1,
-                                                    &request));
+        request->setResponseCb([&called, &request](const ReqSp& req) {
+            Caller::callback(&called, req, &request);
+        });
 
         context.sendChannelRequest(request);
         context.advanceTime(SEND_REQUEST_TIMEOUT);
@@ -767,10 +770,9 @@ static void test5_processResponseTest()
         context.populateRequest(request);
 
         bool called = false;
-        request->setResponseCb(bdlf::BindUtil::bind(&Caller::callback,
-                                                    &called,
-                                                    bdlf::PlaceHolders::_1,
-                                                    &request));
+        request->setResponseCb([&called, &request](const ReqSp& req) {
+            Caller::callback(&called, req, &request);
+        });
 
         context.sendChannelRequest(request);
         context.advanceTime(SEND_REQUEST_TIMEOUT);
@@ -855,11 +857,9 @@ static void test5_processResponseTest()
                                     i + 4);
 
             request->setResponseCb(
-                bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                      &ConcurrentCaller::callback,
-                                      &callsCounter,
-                                      bdlf::PlaceHolders::_1,
-                                      &request));
+                [&callsCounter, expected = &request](const ReqSp& req) {
+                    ConcurrentCaller::callback(&callsCounter, req, expected);
+                });
             context.sendChannelRequest(request);
             Mes response = context.createResponse(
                 request->request().rId().value());
@@ -869,11 +869,12 @@ static void test5_processResponseTest()
         // Start the threads to process responses from queue
         for (bsl::size_t i = 0; i < numThreads; ++i) {
             int rc = threadGroup.addThread(
-                bdlf::BindUtil::bind(&ConcurrentCaller::processResponsesJob,
-                                     &responses,
-                                     &responsesLock,
-                                     &barrier,
-                                     &context));
+                [&responses, &responsesLock, &barrier, &context]() {
+                    ConcurrentCaller::processResponsesJob(&responses,
+                                                          &responsesLock,
+                                                          &barrier,
+                                                          &context);
+                });
             BMQTST_ASSERT_EQ(0, rc);
         }
 
@@ -1058,12 +1059,9 @@ static void test7_requestBreathingTest()
         request.createInplace(bmqtst::TestHelperUtil::allocator(),
                               bmqtst::TestHelperUtil::allocator());
         bool called = false;
-        request->setResponseCb(
-            bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                  &Caller::callback,
-                                  &called,
-                                  bdlf::PlaceHolders::_1,
-                                  &request));
+        request->setResponseCb([&called, &request](const ReqSp& req) {
+            Caller::callback(&called, req, &request);
+        });
         request->responseCb()(request);
 
         BMQTST_ASSERT(called);
@@ -1074,12 +1072,9 @@ static void test7_requestBreathingTest()
         TestContext context(false, bmqtst::TestHelperUtil::allocator());
         ReqSp       request = context.createRequest();
         bool        called  = false;
-        request->setAsyncNotifierCb(
-            bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                  &Caller::callback,
-                                  &called,
-                                  bdlf::PlaceHolders::_1,
-                                  &request));
+        request->setAsyncNotifierCb([&called, &request](const ReqSp& req) {
+            Caller::callback(&called, req, &request);
+        });
         request->signal();
         BMQTST_ASSERT(called);
     }
@@ -1154,10 +1149,9 @@ static void test8_requestSignalWaitTest()
 
         int rc = bslmt::ThreadUtil::createWithAllocator(
             &handle,
-            bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                  &RequestKeeper::waiter,
-                                  &worked,
-                                  &request),
+            [&worked, &request]() {
+                RequestKeeper::waiter(&worked, &request);
+            },
             bmqtst::TestHelperUtil::allocator());
         BMQTST_ASSERT_EQ(rc, 0);
         bslmt::ThreadUtil::yield();
