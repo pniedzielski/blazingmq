@@ -303,14 +303,12 @@ void QueueHandle::deliverMessage(
     BSLS_ASSERT_OPT(
         bmqt::QueueFlagsUtil::isReader(handleParameters().flags()));
 
-    for (size_t i = 0; i < subscriptions.size(); ++i) {
-        BSLS_ASSERT_OPT(canDeliver(subscriptions[i].id()));
+    for (const auto& subscription : subscriptions) {
+        BSLS_ASSERT_OPT(canDeliver(subscription.id()));
     }
 
-    for (bmqp::Protocol::SubQueueInfosArray::size_type i = 0;
-         i < subscriptions.size();
-         ++i) {
-        unsigned int sId              = subscriptions[i].id();
+    for (const auto& subscription : subscriptions) {
+        unsigned int sId              = subscription.id();
         unsigned int downstreamSubId  = subscription2downstreamSubQueueId(sId);
         Downstreams::iterator mapIter = d_downstreams.find(downstreamSubId);
         BSLS_ASSERT_OPT(mapIter != d_downstreams.end());
@@ -569,10 +567,7 @@ bsls::Types::Int64 QueueHandle::countUnconfirmed() const
 {
     bsls::Types::Int64 result = 0;
 
-    for (Downstreams::const_iterator itStream = d_downstreams.begin();
-         itStream != d_downstreams.end();
-         ++itStream) {
-        const Downstream& downstream = itStream->second;
+    for (const auto& [subQueueId, downstream] : d_downstreams) {
         result += downstream.d_unconfirmedMessages.size();
     }
     return result;
@@ -586,13 +581,10 @@ void QueueHandle::loadInternals(mqbcmd::QueueHandle* out) const
 
     bsl::vector<mqbcmd::QueueHandleSubStream>& subStreams = out->subStreams();
     subStreams.reserve(d_subStreamInfos.size());
-    for (SubStreams::const_iterator infoCiter = d_subStreamInfos.begin();
-         infoCiter != d_subStreamInfos.end();
-         ++infoCiter) {
+    for (const auto& [appId, subStreamContext] : d_subStreamInfos) {
         subStreams.resize(subStreams.size() + 1);
         mqbcmd::QueueHandleSubStream& subStream = subStreams.back();
-        unsigned int       subId = infoCiter->second.d_downstreamSubQueueId;
-        const bsl::string& appId = infoCiter->first;
+        unsigned int subId = subStreamContext.d_downstreamSubQueueId;
         bmqp_ctrlmsg::SubQueueIdInfo subStreamInfo;
 
         subStreamInfo.appId() = appId;
@@ -602,7 +594,7 @@ void QueueHandle::loadInternals(mqbcmd::QueueHandle* out) const
         subStream.appId().makeValue(appId);
 
         os.reset();
-        os << infoCiter->second.d_streamParameters;
+        os << subStreamContext.d_streamParameters;
         subStream.parametersJson() = os.str();
 
         Downstreams::const_iterator cit = d_downstreams.find(subId);
@@ -683,10 +675,8 @@ const bsl::string QueueHandle::_appIds() const
     bmqu::MemOutStream       out(d_allocator_p);
     bsl::vector<bsl::string> appIds(d_allocator_p);
 
-    for (SubStreams::const_iterator citer = d_subStreamInfos.begin();
-         citer != d_subStreamInfos.end();
-         ++citer) {
-        appIds.emplace_back(citer->first);
+    for (const auto& [appId, subStreamContext] : d_subStreamInfos) {
+        appIds.emplace_back(appId);
     }
 
     bsl::sort(appIds.begin(), appIds.end());
