@@ -319,12 +319,9 @@ bool Policy_Permission::matchUri(bsl::string_view    uriStr,
         return false;
     }
 
-    for (ResourceList::const_iterator it  = resources.cbegin(),
-                                      end = resources.cend();
-         it != end;
-         ++it) {
+    for (const auto& resource : resources) {
         Policy_UriResource uriResource;
-        rc = Policy_UriResource::parse(&uriResource, it->id());
+        rc = Policy_UriResource::parse(&uriResource, resource.id());
 
         if (rc != 0) {
             // TODO(tfoxhall): Maybe we should parse the resource as a URI
@@ -356,21 +353,19 @@ int Policy_Permission::parse(Policy_Permission*     result,
     // Validate uniqueness of actions
     bsl::set<bsl::string> actions;
 
-    for (bsl::vector<mqbpoly::Permission>::const_iterator
-             it  = role.permissions().cbegin(),
-             end = role.permissions().cend();
-         it != end;
-         ++it) {
+    for (const mqbpoly::Permission& permission : role.permissions()) {
         // Validate action uniqueness
         bsl::set<bsl::string>::const_iterator pos        = actions.cend();
         bool                                  isInserted = false;
-        bdlb::PairUtil::tie(pos, isInserted) = actions.emplace(it->action());
+        bdlb::PairUtil::tie(pos,
+                            isInserted) = actions.emplace(permission.action());
         if (!isInserted) {
             return k_NON_UNIQUE_ACTIONS;  // RETURN
         }
 
         // Parse the action
-        int rc = result->updateAction(it->action(), it->resources());
+        int rc = result->updateAction(permission.action(),
+                                      permission.resources());
         if (rc != 0) {
             return rc;  // RETURN
         }
@@ -494,14 +489,10 @@ int Policy::parse(Policy*                 result,
     // 2. each resource within a permission has a unique action
     // 3. resource identifiers are valid
     RoleMap roles(allocator);
-    for (bsl::vector<mqbpoly::Role>::const_iterator
-             it  = policy.roles().cbegin(),
-             end = policy.roles().cend();
-         it != end;
-         ++it) {
+    for (const mqbpoly::Role& role : policy.roles()) {
         // Validate the permission
         Permission permission;
-        int        rc = Permission::parse(&permission, *it, allocator);
+        int        rc = Permission::parse(&permission, role, allocator);
         if (rc != 0) {
             return k_INVALID_PERMISSION;
         }
@@ -510,7 +501,7 @@ int Policy::parse(Policy*                 result,
         RoleMap::const_iterator position   = roles.cend();
         bool                    isInserted = false;
         bdlb::PairUtil::tie(position,
-                            isInserted) = roles.emplace(it->id(),
+                            isInserted) = roles.emplace(role.id(),
                                                         bsl::move(permission));
         if (!isInserted) {
             return k_NON_UNQIUE_IDENTITIES;  // RETURN
