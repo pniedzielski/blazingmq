@@ -267,9 +267,9 @@ bool StorageUtil::loadUpdatedAppInfos(AppInfos*       addedAppInfos,
     return true;
 }
 
-int StorageUtil::registerQueueDispatched(mqbs::FileStore*         fs,
-                                         mqbs::ReplicatedStorage* storage,
-                                         const AppInfos& appIdKeyPairs)
+int StorageUtil::registerQueueStorage(mqbs::FileStore*         fs,
+                                      mqbs::ReplicatedStorage* storage,
+                                      const AppInfos&          appIdKeyPairs)
 {
     // executed by *QUEUE_DISPATCHER* thread with the specified 'partitionId'
 
@@ -308,7 +308,7 @@ int StorageUtil::registerQueueDispatched(mqbs::FileStore*         fs,
     storage->addQueueOpRecordHandle(handle);
     fs->registerStorage(storage);
 
-    // Flush the partition.  This routine ('registerQueue[Dispatched]') is
+    // Flush the partition.  This routine ('registerQueueStorage') is
     // invoked only at the primary (we can assert that using
     // 'd_partitionInfoVec'), when a LocalQueue is being created.  If this
     // storage belongs to the first instance of LocalQueue mapped to this
@@ -324,12 +324,11 @@ int StorageUtil::registerQueueDispatched(mqbs::FileStore*         fs,
     return 0;
 }
 
-void StorageUtil::updateQueuePrimaryDispatched(
-    mqbs::ReplicatedStorage* storage,
-    bslmt::Mutex*            storagesLock,
-    mqbs::FileStore*         fs,
-    const AppInfos&          appIdKeyPairs,
-    bool                     isFanout)
+void StorageUtil::updateQueuePrimaryAppInfos(mqbs::ReplicatedStorage* storage,
+                                             bslmt::Mutex*    storagesLock,
+                                             mqbs::FileStore* fs,
+                                             const AppInfos&  appIdKeyPairs,
+                                             bool             isFanout)
 {
     // executed by *QUEUE_DISPATCHER* thread with the specified 'partitionId'
 
@@ -562,31 +561,6 @@ int StorageUtil::removeVirtualStorageInternal(mqbs::ReplicatedStorage* storage,
     return rc_SUCCESS;
 }
 
-void StorageUtil::getStoragesDispatched(StorageLists*         storageLists,
-                                        bslmt::Latch*         latch,
-                                        const FileStores&     fileStores,
-                                        int                   partitionId,
-                                        const StorageFilters& filters)
-{
-    // executed by *QUEUE_DISPATCHER* thread with the specified 'partitionId'
-
-    // PRECONDITIONS
-    BSLS_ASSERT_SAFE(storageLists);
-    BSLS_ASSERT_SAFE(latch);
-    BSLS_ASSERT_SAFE(0 <= partitionId);
-    BSLS_ASSERT_SAFE(fileStores.size() >
-                     static_cast<unsigned int>(partitionId));
-    BSLS_ASSERT_SAFE(storageLists->size() == fileStores.size());
-
-    const mqbs::FileStore& fs =
-        *fileStores[static_cast<unsigned int>(partitionId)];
-    BSLS_ASSERT_SAFE(fs.inDispatcherThread());
-
-    fs.getStorages(&((*storageLists)[partitionId]), filters);
-
-    latch->arrive();
-}
-
 void StorageUtil::loadStorages(bsl::vector<mqbcmd::StorageQueueInfo>* storages,
                                const bsl::string& domainName,
                                const FileStores&  fileStores)
@@ -606,11 +580,25 @@ void StorageUtil::loadStorages(bsl::vector<mqbcmd::StorageQueueInfo>* storages,
     executeForEachPartitions(
         [&storageLists, fileStores, filters](int           partitionId,
                                              bslmt::Latch* latch) {
-            getStoragesDispatched(&storageLists,
-                                  latch,
-                                  fileStores,
-                                  partitionId,
-                                  filters);
+            // executed by *QUEUE_DISPATCHER* thread with the specified
+            // 'partitionId'
+
+            // PRECONDITIONS
+            BSLS_ASSERT_SAFE(latch);
+            BSLS_ASSERT_SAFE(0 <= partitionId);
+            BSLS_ASSERT_SAFE(fileStores.size() >
+                             static_cast<unsigned int>(partitionId));
+            BSLS_ASSERT_SAFE(storageLists.size() == fileStores.size());
+
+            // Load the list of queue storages on the partition, filtered
+            // out by 'filters'.
+            const mqbs::FileStore& fs =
+                *fileStores[static_cast<unsigned int>(partitionId)];
+            BSLS_ASSERT_SAFE(fs.inDispatcherThread());
+
+            fs.getStorages(&storageLists[partitionId], filters);
+
+            latch->arrive();
         },
         fileStores);
 
@@ -665,7 +653,7 @@ void StorageUtil::doRollover(mqbcmd::StorageResult* result,
                          &latch,
                          fileStores,
                          pid = static_cast<int>(i)]() {
-                doRolloverDispatched(rc, &latch, fileStores, pid);
+                rolloverPartition(rc, &latch, fileStores, pid);
             });
         }
 
@@ -697,7 +685,7 @@ void StorageUtil::doRollover(mqbcmd::StorageResult* result,
 
         mqbs::FileStore* fs = fileStores->at(partitionId).get();
         fs->execute([&rc, &latch, fileStores, partitionId]() {
-            doRolloverDispatched(&rc, &latch, fileStores, partitionId);
+            rolloverPartition(&rc, &latch, fileStores, partitionId);
         });
 
         // Wait
@@ -716,10 +704,10 @@ void StorageUtil::doRollover(mqbcmd::StorageResult* result,
     }
 }
 
-void StorageUtil::doRolloverDispatched(int*          rc,
-                                       bslmt::Latch* latch,
-                                       FileStores*   fileStores,
-                                       int           partitionId)
+void StorageUtil::rolloverPartition(int*          rc,
+                                    bslmt::Latch* latch,
+                                    FileStores*   fileStores,
+                                    int           partitionId)
 {
     // executed by *QUEUE_DISPATCHER* thread with the specified 'partitionId'
 
@@ -764,10 +752,7 @@ void StorageUtil::loadPartitionStorageSummary(
     bslmt::Latch latch(1);
     fileStores.at(partitionId)
         ->execute([&summary, &latch, partitionId, fileStores]() {
-            loadStorageSummaryDispatched(&summary,
-                                         &latch,
-                                         partitionId,
-                                         fileStores);
+            loadFileStoreSummary(&summary, &latch, partitionId, fileStores);
         });
     // Wait
     latch.wait();
@@ -798,19 +783,15 @@ void StorageUtil::loadStorageSummary(mqbcmd::StorageResult*  result,
 
     executeForEachPartitions(
         [&summary, fileStores](int partitionId, bslmt::Latch* latch) {
-            loadStorageSummaryDispatched(&summary,
-                                         latch,
-                                         partitionId,
-                                         fileStores);
+            loadFileStoreSummary(&summary, latch, partitionId, fileStores);
         },
         fileStores);
 }
 
-void StorageUtil::loadStorageSummaryDispatched(
-    mqbcmd::ClusterStorageSummary* summary,
-    bslmt::Latch*                  latch,
-    int                            partitionId,
-    const FileStores&              fileStores)
+void StorageUtil::loadFileStoreSummary(mqbcmd::ClusterStorageSummary* summary,
+                                       bslmt::Latch*                  latch,
+                                       int               partitionId,
+                                       const FileStores& fileStores)
 {
     // executed by *QUEUE_DISPATCHER* thread with the specified 'partitionId'
 
@@ -2541,7 +2522,7 @@ void StorageUtil::registerQueueAsPrimary(const mqbi::Cluster*    cluster,
             // routine for explanation).
 
             // Invoke
-            // 'updateQueuePrimaryDispatched' in the right thread to carry out
+            // 'updateQueuePrimaryAppInfos' in the right thread to carry out
             // the addition/removal of those pairs.
 
             bsl::shared_ptr<mqbevt::DispatcherEvent> event_sp =
@@ -2550,17 +2531,17 @@ void StorageUtil::registerQueueAsPrimary(const mqbi::Cluster*    cluster,
                                      storagesLock,
                                      fs,
                                      appIdKeyPairs]() {
-                updateQueuePrimaryDispatched(storage,
-                                             storagesLock,
-                                             fs,
-                                             appIdKeyPairs,
-                                             true /* isFanout */);
+                updateQueuePrimaryAppInfos(storage,
+                                           storagesLock,
+                                           fs,
+                                           appIdKeyPairs,
+                                           true /* isFanout */);
             });
 
             dispatcher->dispatchEvent(bsl::move(event_sp), fs);
 
-            // Wait for 'updateQueuePrimaryDispatched' operation to complete.
-            // We need to wait because 'updateQueuePrimaryDispatched' creates
+            // Wait for 'updateQueuePrimaryAppInfos' operation to complete.
+            // We need to wait because 'updateQueuePrimaryAppInfos' creates
             // virtual storages corresponding to 'addedAppInfos' (if any),
             // and the caller of 'registerQueue' expects these virtual storages
             // to be created this routine or its caller returns.  Before
@@ -2649,7 +2630,7 @@ void StorageUtil::createQueueStorageAsPrimary(StorageSpMap*    storageMap,
         createQueueStorageImpl(fs, uri, queueKey, appIdKeyPairs, domain);
 
     if (storageSp) {
-        if (0 == registerQueueDispatched(fs, storageSp.get(), appIdKeyPairs)) {
+        if (0 == registerQueueStorage(fs, storageSp.get(), appIdKeyPairs)) {
             // Only after everything succeeds, insert the storage
             BSLS_ASSERT_SAFE(storageMap->end() == storageMap->find(uri));
             storageMap->insert(bsl::make_pair(uri, storageSp));
@@ -3365,7 +3346,7 @@ void StorageUtil::forceFlushFileStores(FileStores* fileStores)
     }
 }
 
-void StorageUtil::purgeDomainDispatched(
+void StorageUtil::purgeDomainInPartition(
     bsl::vector<bsl::vector<mqbcmd::PurgeQueueResult> >*
                                                  purgedQueuesResultsVec,
     bslmt::Latch*                                latch,
@@ -3620,7 +3601,7 @@ void StorageUtil::processCommand(
 
             // To purge a domain, we have to purge queues in each partition
             // from the correct thread.  This is achieved by parallel launch
-            // of `purgeDomainDispatched` across all FileStore's threads.
+            // of `purgeDomainInPartition` across all FileStore's threads.
             // We need to wait here, using `latch`, until the command completes
             // in all threads.
             executeForEachPartitions(
@@ -3630,13 +3611,13 @@ void StorageUtil::processCommand(
                  fileStores,
                  domainName = command.domain().name()](int partitionId,
                                                        bslmt::Latch* latch) {
-                    purgeDomainDispatched(&purgedQueuesVec,
-                                          latch,
-                                          partitionId,
-                                          storageMapVec,
-                                          storageLockVec,
-                                          fileStores,
-                                          domainName);
+                    purgeDomainInPartition(&purgedQueuesVec,
+                                           latch,
+                                           partitionId,
+                                           storageMapVec,
+                                           storageLockVec,
+                                           fileStores,
+                                           domainName);
                 },
                 *fileStores);
 
@@ -3794,7 +3775,7 @@ void StorageUtil::purgeQueueOnDomain(
     // To purge a domain, we have to purge queues in each partition
     // where the current node is the primary
     // from the correct thread.  This is achieved by parallel launch
-    // of `purgeDomainDispatched` across all valid FileStore's threads.
+    // of `purgeDomainInPartition` across all valid FileStore's threads.
     // We need to wait here, using `latch`, until the command completes
     // in all valid threads.
     executeForValidPartitions(
@@ -3803,13 +3784,13 @@ void StorageUtil::purgeQueueOnDomain(
          storageLockVec,
          fileStores,
          domainName](int partitionId, bslmt::Latch* latch) {
-            purgeDomainDispatched(&purgedQueuesVec,
-                                  latch,
-                                  partitionId,
-                                  storageMapVec,
-                                  storageLockVec,
-                                  fileStores,
-                                  domainName);
+            purgeDomainInPartition(&purgedQueuesVec,
+                                   latch,
+                                   partitionId,
+                                   storageMapVec,
+                                   storageLockVec,
+                                   fileStores,
+                                   domainName);
         },
         *fileStores);
 

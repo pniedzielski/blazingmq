@@ -214,16 +214,16 @@ struct StorageUtil {
                                     const AppInfos& newAppInfos);
 
     /// THREAD: Executed by the Queue's dispatcher thread.
-    static int registerQueueDispatched(mqbs::FileStore*         fs,
-                                       mqbs::ReplicatedStorage* storage,
-                                       const AppInfos&          appIdKeyPairs);
+    static int registerQueueStorage(mqbs::FileStore*         fs,
+                                    mqbs::ReplicatedStorage* storage,
+                                    const AppInfos&          appIdKeyPairs);
 
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    static void updateQueuePrimaryDispatched(mqbs::ReplicatedStorage* storage,
-                                             bslmt::Mutex*    storagesLock,
-                                             mqbs::FileStore* fs,
-                                             const AppInfos&  appIdKeyPairs,
-                                             bool             isFanout);
+    static void updateQueuePrimaryAppInfos(mqbs::ReplicatedStorage* storage,
+                                           bslmt::Mutex*    storagesLock,
+                                           mqbs::FileStore* fs,
+                                           const AppInfos&  appIdKeyPairs,
+                                           bool             isFanout);
 
     /// StorageManager's storages lock must be locked before calling this
     /// method.
@@ -258,23 +258,6 @@ struct StorageUtil {
                            const mqbu::StorageKey& queueKey,
                            const AppInfos&         appIdKeyPairs,
                            mqbi::Domain*           domain);
-
-    /// Load the list of queue storages on the partition from the specified
-    /// `fileStores` having the specified `partitionId` into the
-    /// corresponding element of the specified `storageLists`, and arrive on
-    /// the specified `latch` upon completion.  All queues for which any
-    /// filter in the specified `filters` returns false will be filtered out
-    /// from the list.  The size of `storageLists` must be equal to the
-    /// number of partitions in the storage manager before calling this
-    /// function.
-    ///
-    /// THREAD: Executed by the Queue's dispatcher thread for the specified
-    ///         `partitionId`.
-    static void getStoragesDispatched(StorageLists*         storageLists,
-                                      bslmt::Latch*         latch,
-                                      const FileStores&     fileStores,
-                                      int                   partitionId,
-                                      const StorageFilters& filters);
 
     /// Load the status of the queue storages from the specified
     /// `fileStores` belonging to the specified `domainName` into the
@@ -316,10 +299,10 @@ struct StorageUtil {
     ///
     /// THREAD: Executed by the Queue's dispatcher thread for the specified
     ///         `partitionId`.
-    static void doRolloverDispatched(int*          rc,
-                                     bslmt::Latch* latch,
-                                     FileStores*   fileStores,
-                                     int           partitionId);
+    static void rolloverPartition(int*          rc,
+                                  bslmt::Latch* latch,
+                                  FileStores*   fileStores,
+                                  int           partitionId);
 
     /// Load the summary of the partitions of the spcified `fileStores` at
     /// the specified `location` to the specified `result` object.
@@ -336,13 +319,12 @@ struct StorageUtil {
     ///
     /// THREAD: Executed by the Queue's dispatcher thread for the specified
     ///         `partitionId`.
-    static void
-    loadStorageSummaryDispatched(mqbcmd::ClusterStorageSummary* summary,
-                                 bslmt::Latch*                  latch,
-                                 int                            partitionId,
-                                 const FileStores&              fileStores);
+    static void loadFileStoreSummary(mqbcmd::ClusterStorageSummary* summary,
+                                     bslmt::Latch*                  latch,
+                                     int               partitionId,
+                                     const FileStores& fileStores);
 
-    static void purgeDomainDispatched(
+    static void purgeDomainInPartition(
         bsl::vector<bsl::vector<mqbcmd::PurgeQueueResult> >*
                                                      purgedQueuesResultsVec,
         bslmt::Latch*                                latch,
