@@ -43,7 +43,6 @@
 // BDE
 #include <ball_logthrottle.h>
 #include <bdlb_print.h>
-#include <bdlf_bind.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_cmath.h>
 #include <bsl_functional.h>
@@ -921,10 +920,9 @@ void QueueHandle::rejectMessage(const bmqt::MessageGUID& msgGUID,
 
     // Enqueue an event to process the confirm on the queue thread
     d_queue_sp->dispatcher()->execute(
-        bdlf::BindUtil::bind(&QueueHandle::rejectMessageDispatched,
-                             this,
-                             msgGUID,
-                             downstreamSubQueueId),
+        [this, msgGUID, downstreamSubQueueId]() {
+            rejectMessageDispatched(msgGUID, downstreamSubQueueId);
+        },
         d_queue_sp.get());
 }
 
@@ -1090,10 +1088,9 @@ void QueueHandle::configure(
     // executed by *ANY* thread
 
     d_queue_sp->dispatcher()->execute(
-        bdlf::BindUtil::bind(&QueueHandle::configureDispatched,
-                             this,
-                             streamParameters,
-                             configuredCb),
+        [this, streamParameters, configuredCb]() {
+            configureDispatched(streamParameters, configuredCb);
+        },
         d_queue_sp.get());
 }
 
@@ -1138,9 +1135,9 @@ void QueueHandle::deconfigureAll(
     // executed by *ANY* thread
 
     d_queue_sp->dispatcher()->execute(
-        bdlf::BindUtil::bind(&QueueHandle::deconfigureDispatched,
-                             this,
-                             deconfiguredCb),
+        [this, deconfiguredCb]() {
+            deconfigureDispatched(deconfiguredCb);
+        },
         d_queue_sp.get(),
         mqbi::DispatcherEventType::e_DISPATCHER);
 
@@ -1169,10 +1166,10 @@ void QueueHandle::deconfigureDispatched(
         // Not tracking the results.
         QueueHandle::configureDispatched(
             nullStreamParameters,
-            bdlf::BindUtil::bind(onHandleDeconfigured,
-                                 bdlf::PlaceHolders::_1,
-                                 bdlf::PlaceHolders::_2,
-                                 context));
+            [context](const bmqp_ctrlmsg::Status&           status,
+                      const bmqp_ctrlmsg::StreamParameters& streamParameters) {
+                onHandleDeconfigured(status, streamParameters, context);
+            });
     }
 }
 
@@ -1202,9 +1199,9 @@ void QueueHandle::clearClient(bool hasLostClient)
     // Enqueue an event to process this event in the queue thread.
 
     d_queue_sp->dispatcher()->execute(
-        bdlf::BindUtil::bind(&QueueHandle::clearClientDispatched,
-                             this,
-                             hasLostClient),
+        [this, hasLostClient]() {
+            clearClientDispatched(hasLostClient);
+        },
         d_queue_sp.get());
 }
 
