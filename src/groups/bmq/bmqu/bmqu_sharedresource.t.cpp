@@ -22,8 +22,6 @@
 #include <bmqu_weakmemfn.h>
 
 // BDE
-#include <bdlf_bind.h>
-#include <bdlf_memfn.h>
 #include <bdlmt_threadpool.h>
 #include <bsl_cstddef.h>
 #include <bsl_iostream.h>
@@ -304,9 +302,9 @@ static void test2_resource_acquire()
         bsl::shared_ptr<int> resourceSP = sharedResource.acquire();
 
         // invalidate the resource from another thread
-        context.executor().post(
-            bdlf::MemFnUtil::memFn(&bmqu::SharedResource<int>::invalidate,
-                                   &sharedResource));
+        context.executor().post([&sharedResource]() {
+            sharedResource.invalidate();
+        });
 
         // wait till 'invalidate' starts executing
         bslmt::ThreadUtil::sleep(bsls::TimeInterval(0.2));
@@ -393,10 +391,9 @@ static void test3_resource_invalidate()
         bsl::weak_ptr<Sleep> resourceWP = sharedResource.acquireWeak();
 
         // acquire a shared pointer and use it in another thread
-        context.executor().post(
-            bdlf::BindUtil::bindR<void>(&Sleep::sleep,
-                                        sharedResource.acquire(),
-                                        bsls::TimeInterval(0.2)));
+        context.executor().post([resource = sharedResource.acquire()]() {
+            resource->sleep(bsls::TimeInterval(0.2));
+        });
 
         // invalidate the resource, shall block until the shared pointer is
         // alive
