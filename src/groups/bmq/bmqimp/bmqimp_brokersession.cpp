@@ -47,8 +47,6 @@
 
 // BDE
 #include <bdld_datum.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_algorithm.h>
 #include <bsl_cstring.h>  // for bsl::memcpy
@@ -3130,12 +3128,13 @@ BrokerSession::sendRequest(const RequestSp&     context,
 
     bmqt::GenericResult::Enum rc = d_requestManager.sendRequest(
         context,
-        bdlf::BindUtil::bind(&BrokerSession::requestWriterCb,
-                             this,
-                             context,
-                             queueId,
-                             bdlf::PlaceHolders::_1,  // blob
-                             d_sessionOptions.channelHighWatermark()),
+        [this,
+         context,
+         queueId,
+         highWatermark = d_sessionOptions.channelHighWatermark()](
+            const bsl::shared_ptr<bdlbb::Blob>& blob) {
+            return requestWriterCb(context, queueId, blob, highWatermark);
+        },
         nodeDescription,
         timeout);
 
@@ -3865,12 +3864,10 @@ BrokerSession::sendOpenQueueRequest(const RequestSp&              context,
     const bsls::TimeInterval absTimeout = bmqu::Time::nowMonotonicClock() +
                                           timeout;
 
-    bmqp::RequestManagerRequest::ResponseCb response = bdlf::BindUtil::bind(
-        &BrokerSession::onOpenQueueResponse,
-        this,
-        bdlf::PlaceHolders::_1,  // context
-        queue,
-        absTimeout);
+    bmqp::RequestManagerRequest::ResponseCb response =
+        [this, queue, absTimeout](const RequestSp& responseContext) {
+            onOpenQueueResponse(responseContext, queue, absTimeout);
+        };
     context->setResponseCb(response);
 
     bmqt::GenericResult::Enum rc = sendRequest(
@@ -3933,13 +3930,14 @@ BrokerSession::configureQueueImp(const RequestSp&              context,
     queue->setOptions(newClientOptions);
 
     // Set the response callback
-    bmqp::RequestManagerRequest::ResponseCb response = bdlf::BindUtil::bind(
-        &BrokerSession::onConfigureQueueResponse,
-        this,
-        bdlf::PlaceHolders::_1,  // context
-        queue,
-        previousOptions,
-        configuredCb);
+    bmqp::RequestManagerRequest::ResponseCb response =
+        [this, queue, previousOptions, configuredCb](
+            const RequestSp& responseContext) {
+            onConfigureQueueResponse(responseContext,
+                                     queue,
+                                     previousOptions,
+                                     configuredCb);
+        };
     context->setResponseCb(response);
 
     bmqt::GenericResult::Enum rc = sendRequest(
@@ -3994,11 +3992,11 @@ BrokerSession::sendConfigureRequest(const bsl::shared_ptr<Queue>& queue,
         return bmqt::ConfigureQueueResult::e_SUCCESS;  // RETURN
     }
 
-    const ConfiguredCallback configuredCb = bdlf::BindUtil::bind(
-        &BrokerSession::onConfigureQueueConfigured,
-        this,
-        bdlf::PlaceHolders::_1,   // context
-        bdlf::PlaceHolders::_2);  // queue
+    const ConfiguredCallback configuredCb =
+        [this](const RequestSp&              configureContext,
+               const bsl::shared_ptr<Queue>& configuredQueue) {
+            onConfigureQueueConfigured(configureContext, configuredQueue);
+        };
 
     return configureQueueImp(context, queue, options, timeout, configuredCb);
 }
@@ -4019,11 +4017,11 @@ BrokerSession::sendReconfigureRequest(const bsl::shared_ptr<Queue>& queue)
         return bmqt::ConfigureQueueResult::e_SUCCESS;  // RETURN
     }
 
-    const ConfiguredCallback configuredCb = bdlf::BindUtil::bind(
-        &BrokerSession::onConfigureQueueConfigured,
-        this,
-        bdlf::PlaceHolders::_1,   // context
-        bdlf::PlaceHolders::_2);  // queue
+    const ConfiguredCallback configuredCb =
+        [this](const RequestSp&              configureContext,
+               const bsl::shared_ptr<Queue>& configuredQueue) {
+            onConfigureQueueConfigured(configureContext, configuredQueue);
+        };
 
     return configureQueueImp(context,
                              queue,
@@ -4069,11 +4067,10 @@ BrokerSession::sendSuspendRequest(const bsl::shared_ptr<Queue>& queueSp,
         queueSp,
         options,
         timeout,
-        bdlf::BindUtil::bind(&BrokerSession::onSuspendQueueConfigured,
-                             this,
-                             bdlf::PlaceHolders::_1,  // context
-                             bdlf::PlaceHolders::_2,  // queue
-                             false));
+        [this](const RequestSp&              configureContext,
+               const bsl::shared_ptr<Queue>& configuredQueue) {
+            onSuspendQueueConfigured(configureContext, configuredQueue, false);
+        });
 
     if (rc != bmqt::ConfigureQueueResult::e_SUCCESS) {
         // If the request failed, inject an 'e_UNKNOWN' into the response, and
@@ -4127,11 +4124,10 @@ BrokerSession::sendResumeRequest(const bsl::shared_ptr<Queue>& queueSp,
         queueSp,
         options,
         timeout,
-        bdlf::BindUtil::bind(&BrokerSession::onResumeQueueConfigured,
-                             this,
-                             bdlf::PlaceHolders::_1,  // context
-                             bdlf::PlaceHolders::_2,  // queue
-                             false));
+        [this](const RequestSp&              configureContext,
+               const bsl::shared_ptr<Queue>& configuredQueue) {
+            onResumeQueueConfigured(configureContext, configuredQueue, false);
+        });
 
     if (rc != bmqt::ConfigureQueueResult::e_SUCCESS) {
         // If the request failed, inject an 'e_UNKNOWN' into the response, and
@@ -4170,14 +4166,16 @@ BrokerSession::sendDeconfigureRequest(const bsl::shared_ptr<Queue>& queue)
     const bsls::TimeInterval absTimeout =
         bmqu::Time::nowMonotonicClock() +
         d_sessionOptions.configureQueueTimeout();
-    const ConfiguredCallback configuredCb = bdlf::BindUtil::bind(
-        &BrokerSession::onCloseQueueConfigured,
-        this,
-        bdlf::PlaceHolders::_1,  // configureQueue request
-        bdlf::PlaceHolders::_2,  // queue
-        closeQueueContext,       // closeQueue request
-        absTimeout,
-        true);  // isFinal
+    const ConfiguredCallback configuredCb =
+        [this, closeQueueContext, absTimeout](
+            const RequestSp&              configureQueueContext,
+            const bsl::shared_ptr<Queue>& configuredQueue) {
+            onCloseQueueConfigured(configureQueueContext,
+                                   configuredQueue,
+                                   closeQueueContext,
+                                   absTimeout,
+                                   true);  // isFinal
+        };
 
     RequestSp configureQueueContext = createConfigureQueueContext(
         queue,
@@ -4211,14 +4209,16 @@ BrokerSession::sendDeconfigureRequest(const bsl::shared_ptr<Queue>& queue,
     // Set the configure callback
     const bsls::TimeInterval absTimeout = bmqu::Time::nowMonotonicClock() +
                                           timeout;
-    const ConfiguredCallback configuredCb = bdlf::BindUtil::bind(
-        &BrokerSession::onCloseQueueConfigured,
-        this,
-        bdlf::PlaceHolders::_1,  // configureQueue context
-        bdlf::PlaceHolders::_2,  // queue
-        closeContext,            // closeQueue context
-        absTimeout,
-        isFinal);  // isFinal
+    const ConfiguredCallback configuredCb =
+        [this, closeContext, absTimeout, isFinal](
+            const RequestSp&              configureQueueContext,
+            const bsl::shared_ptr<Queue>& configuredQueue) {
+            onCloseQueueConfigured(configureQueueContext,
+                                   configuredQueue,
+                                   closeContext,
+                                   absTimeout,
+                                   isFinal);
+        };
 
     // Prepare the queue options (stream parameters)
     bmqt::QueueOptions options(d_allocator_p);
@@ -4268,15 +4268,18 @@ void BrokerSession::doHandlePendingPutExpirationTimeout(
     bsl::shared_ptr<Event>         ackEvent = createEvent();
     bsl::shared_ptr<Queue>         queueSp;
 
-    MessageCorrelationIdContainer::KeyIdsCb callback = bdlf::BindUtil::bind(
-        &BrokerSession::cancelPendingMessageImp,
-        this,
-        &ackBuilder,
-        &ackEvent,
-        bdlf::PlaceHolders::_1,
-        queueSp,
-        bdlf::PlaceHolders::_2,
-        bdlf::PlaceHolders::_3);
+    MessageCorrelationIdContainer::KeyIdsCb callback =
+        [this, &ackBuilder, &ackEvent, queueSp](
+            bool*                    deleteItem,
+            const bmqt::MessageGUID& guid,
+            const MessageCorrelationIdContainer::QueueAndCorrelationId& qac) {
+            return cancelPendingMessageImp(&ackBuilder,
+                                           &ackEvent,
+                                           deleteItem,
+                                           queueSp,
+                                           guid,
+                                           qac);
+        };
 
     const bsls::TimeInterval nextExpirationTime =
         d_messageCorrelationIdContainer.getExpiredIds(
@@ -4418,14 +4421,15 @@ void BrokerSession::onSuspendQueueConfigured(
             // When user reads (1), the callback will be executed and consumed
             // by the SDK; (2) will then be returned to the user. This will be
             // performed transactionally within a single application thread.
-            enqueueSessionEvent(
-                bmqt::SessionEventType::e_QUEUE_SUSPENDED,
-                context->statusCode(),
-                context->result(),
-                "",
-                bmqt::CorrelationId(),
-                queueSp,
-                bdlf::BindUtil::bind(&applyQueueSuspension, queueSp, true));
+            enqueueSessionEvent(bmqt::SessionEventType::e_QUEUE_SUSPENDED,
+                                context->statusCode(),
+                                context->result(),
+                                "",
+                                bmqt::CorrelationId(),
+                                queueSp,
+                                [queueSp](const bsl::shared_ptr<Event>&) {
+                                    applyQueueSuspension(queueSp, true);
+                                });
             enqueueSessionEvent(bmqt::SessionEventType::e_QUEUE_SUSPENDED,
                                 context->statusCode(),
                                 context->result(),
@@ -4491,14 +4495,15 @@ void BrokerSession::onResumeQueueConfigured(
             // When user reads (1), the callback will be executed and consumed
             // by the SDK; (2) will then be returned to the user. This will be
             // performed transactionally within a single application thread.
-            enqueueSessionEvent(
-                bmqt::SessionEventType::e_QUEUE_RESUMED,
-                context->statusCode(),
-                context->result(),
-                "",
-                bmqt::CorrelationId(),
-                queueSp,
-                bdlf::BindUtil::bind(&applyQueueSuspension, queueSp, false));
+            enqueueSessionEvent(bmqt::SessionEventType::e_QUEUE_RESUMED,
+                                context->statusCode(),
+                                context->result(),
+                                "",
+                                bmqt::CorrelationId(),
+                                queueSp,
+                                [queueSp](const bsl::shared_ptr<Event>&) {
+                                    applyQueueSuspension(queueSp, false);
+                                });
             enqueueSessionEvent(bmqt::SessionEventType::e_QUEUE_RESUMED,
                                 context->statusCode(),
                                 context->result(),
@@ -4690,16 +4695,16 @@ bool BrokerSession::cancelPendingMessageImp(
     }
 
     bmqt::EventBuilderResult::Enum rc = bmqp::ProtocolUtil::buildEvent(
-        bdlf::BindUtil::bind(&bmqp::AckEventBuilder::appendMessage,
-                             ackBuilder,
-                             ackStatus,
-                             bmqp::AckMessage::k_NULL_CORRELATION_ID,
-                             guid,
-                             qac.d_queueId.id()),
-        bdlf::BindUtil::bind(&BrokerSession::transferAckEvent,
-                             this,
-                             ackBuilder,
-                             ackEvent));
+        [ackBuilder, ackStatus, guid, queueId = qac.d_queueId.id()]() {
+            return ackBuilder->appendMessage(
+                ackStatus,
+                bmqp::AckMessage::k_NULL_CORRELATION_ID,
+                guid,
+                queueId);
+        },
+        [this, ackBuilder, ackEvent]() {
+            transferAckEvent(ackBuilder, ackEvent);
+        });
 
     if (rc != bmqt::EventBuilderResult::e_SUCCESS) {
         BALL_LOG_ERROR << id() << "Failed to append ACK/NACK [rc: " << rc
@@ -4732,16 +4737,18 @@ void BrokerSession::cancelPendingMessages(
     bmqp::AckEventBuilder  ackBuilder(d_blobSpPool_p, d_allocator_p);
     bsl::shared_ptr<Event> ackEvent = createEvent();
 
-    MessageCorrelationIdContainer::KeyIdsCb callback = bdlf::BindUtil::bindS(
-        d_allocator_p,
-        &BrokerSession::cancelPendingMessageImp,
-        this,
-        &ackBuilder,
-        &ackEvent,
-        bdlf::PlaceHolders::_1,
-        queueSp,
-        bdlf::PlaceHolders::_2,
-        bdlf::PlaceHolders::_3);
+    MessageCorrelationIdContainer::KeyIdsCb callback =
+        [this, &ackBuilder, &ackEvent, queueSp](
+            bool*                    deleteItem,
+            const bmqt::MessageGUID& guid,
+            const MessageCorrelationIdContainer::QueueAndCorrelationId& qac) {
+            return cancelPendingMessageImp(&ackBuilder,
+                                           &ackEvent,
+                                           deleteItem,
+                                           queueSp,
+                                           guid,
+                                           qac);
+        };
 
     d_messageCorrelationIdContainer.iterateAndInvoke(callback);
 
@@ -4921,13 +4928,13 @@ void BrokerSession::retransmitPendingMessages()
 
     bmqp::PutEventBuilder putBuilder(d_blobSpPool_p, d_allocator_p);
 
-    MessageCorrelationIdContainer::KeyIdsCb callback = bdlf::BindUtil::bind(
-        &BrokerSession::handlePendingMessage,
-        this,
-        &putBuilder,
-        bdlf::PlaceHolders::_1,
-        bdlf::PlaceHolders::_2,
-        bdlf::PlaceHolders::_3);
+    MessageCorrelationIdContainer::KeyIdsCb callback =
+        [this, &putBuilder](
+            bool*                    deleteItem,
+            const bmqt::MessageGUID& guid,
+            const MessageCorrelationIdContainer::QueueAndCorrelationId& qac) {
+            return handlePendingMessage(&putBuilder, deleteItem, guid, qac);
+        };
 
     BALL_LOG_DEBUG << "Pending messages [PUTs: "
                    << d_messageCorrelationIdContainer.numberOfPuts()
@@ -5005,9 +5012,9 @@ void BrokerSession::doStart(
         // Add a host-health callback to our HostHealthMonitor.
         bdlmt::SignalerConnection conn =
             d_sessionOptions.hostHealthMonitor()->observeHostHealth(
-                bdlf::BindUtil::bind(&BrokerSession::onHostHealthStateChange,
-                                     this,
-                                     bdlf::PlaceHolders::_1));
+                [this](bmqt::HostHealthState::Enum state) {
+                    onHostHealthStateChange(state);
+                });
 
         // Wrap it in a SignalerConnectionGuard for easy RAII semantics.
         bdlmt::SignalerConnectionGuard guard(bsl::move(conn));
@@ -5266,10 +5273,10 @@ bmqt::GenericResult::Enum BrokerSession::disconnectBroker()
     context->request().choice().makeDisconnect();
     context->setGroupId(k_NON_BUFFERED_REQUEST_GROUP_ID);
 
-    bmqp::RequestManagerRequest::ResponseCb response = bdlf::BindUtil::bind(
-        &BrokerSession::onDisconnectResponse,
-        this,
-        bdlf::PlaceHolders::_1);  // context
+    bmqp::RequestManagerRequest::ResponseCb response =
+        [this](const RequestSp& responseContext) {
+            onDisconnectResponse(responseContext);
+        };
     context->setResponseCb(response);
 
     bmqp::QueueId queueId(bmqimp::Queue::k_INVALID_QUEUE_ID);
@@ -5502,10 +5509,9 @@ void BrokerSession::onHostHealthStateChange(bmqt::HostHealthState::Enum state)
 
     bsl::shared_ptr<Event> event = createEvent();
     event->configureAsRequestEvent(
-        bdlf::BindUtil::bind(&BrokerSession::doHandleHostHealthStateChange,
-                             this,
-                             state,
-                             bdlf::PlaceHolders::_1));  // eventImpl
+        [this, state](const bsl::shared_ptr<Event>& eventImpl) {
+            doHandleHostHealthStateChange(state, eventImpl);
+        });
     enqueueFsmEvent(event);
 }
 
@@ -5706,12 +5712,12 @@ BrokerSession::BrokerSession(
     const SessionId&                        sessionId,
     bslma::Allocator*                       allocator)
 : d_allocators(allocator)
-, d_eventPool(bdlf::BindUtil::bind(&poolCreateEvent,
-                                   bdlf::PlaceHolders::_1,  // address
-                                   bufferFactory,
-                                   bdlf::PlaceHolders::_2),  // allocator
-              -1,
-              d_allocators.get("EventPool"))
+, d_eventPool(
+      [bufferFactory](void* address, bslma::Allocator* eventAllocator) {
+          poolCreateEvent(address, bufferFactory, eventAllocator);
+      },
+      -1,
+      d_allocators.get("EventPool"))
 , d_sessionOptions(sessionOptions)
 , d_scheduler_p(scheduler)
 , d_bufferFactory_p(bufferFactory)
@@ -5736,12 +5742,12 @@ BrokerSession::BrokerSession(
                         sessionOptions.eventQueueHighWatermark()),
                sessionOptions.eventQueueLowWatermark(),
                sessionOptions.eventQueueHighWatermark(),
-               (eventHandlerCb ? bdlf::BindUtil::bind(
-                                     &BrokerSession::eventHandlerCbWrapper,
-                                     this,
-                                     bdlf::PlaceHolders::_1,  // EventSp
-                                     eventHandlerCb)
-                               : eventHandlerCb),
+               (eventHandlerCb
+                    ? [this, eventHandlerCb](
+                          const bsl::shared_ptr<Event>& eventSp) {
+                          eventHandlerCbWrapper(eventSp, eventHandlerCb);
+                      }
+                    : eventHandlerCb),
                // supply an empty handler callback if session is not
                // configured to use event handler
                (eventHandlerCb ? sessionOptions.numProcessingThreads() : 0),
@@ -5798,7 +5804,9 @@ BrokerSession::BrokerSession(
     if (bslmt::ThreadUtil::createWithAllocator(
             &d_fsmThread,
             threadAttributes,
-            bdlf::MemFnUtil::memFn(&BrokerSession::fsmThreadLoop, this),
+            [this]() {
+                fsmThreadLoop();
+            },
             d_allocator_p) != 0) {
         BSLS_ASSERT_OPT(false && "Failed to create the FSM thread");
     }
@@ -5896,10 +5904,9 @@ void BrokerSession::setChannel(const bsl::shared_ptr<bmqio::Channel>& channel)
     // Add to the FSM event queue
     bsl::shared_ptr<Event> queueEvent = createEvent();
     queueEvent->configureAsRequestEvent(
-        bdlf::BindUtil::bind(&BrokerSession::doSetChannel,
-                             this,
-                             channel,
-                             bdlf::PlaceHolders::_1));  // eventImpl
+        [this, channel](const bsl::shared_ptr<Event>& eventImpl) {
+            doSetChannel(channel, eventImpl);
+        });
     enqueueFsmEvent(queueEvent);
 }
 
@@ -5951,13 +5958,13 @@ int BrokerSession::startAsync()
     // Add to the FSM event queue
     bsl::shared_ptr<Event> queueEvent = createEvent();
     queueEvent->configureAsRequestEvent(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &BrokerSession::doStart,
-                              this,
-                              &fsmAcceptedSemaphore,
-                              &startStatus,
-                              bdlf::PlaceHolders::_1,  // eventImpl
-                              createDTSpan("bmq.session.start")));
+        [this,
+         &fsmAcceptedSemaphore,
+         &startStatus,
+         span = createDTSpan("bmq.session.start")](
+            const bsl::shared_ptr<Event>& eventImpl) {
+            doStart(&fsmAcceptedSemaphore, &startStatus, eventImpl, span);
+        });
 
     if (enqueueFsmEvent(queueEvent) != bmqt::GenericResult::e_SUCCESS) {
         return bmqt::GenericResult::e_REFUSED;  // RETURN
@@ -6130,13 +6137,15 @@ BrokerSession::sendOpenConfigureQueue(const RequestSp& openQueueContext,
         openQueueContext->response().choice().isOpenQueueResponseValue());
 
     // Do the 2nd step in openQueue flow: configure queue
-    const ConfiguredCallback configuredCb = bdlf::BindUtil::bind(
-        &BrokerSession::onOpenQueueConfigured,
-        this,
-        bdlf::PlaceHolders::_1,  // configureQueue context
-        bdlf::PlaceHolders::_2,  // queue
-        openQueueContext,        // openQueue context
-        isReopenRequest);
+    const ConfiguredCallback configuredCb =
+        [this, openQueueContext, isReopenRequest](
+            const RequestSp&              configureQueueContext,
+            const bsl::shared_ptr<Queue>& configuredQueue) {
+            onOpenQueueConfigured(configureQueueContext,
+                                  configuredQueue,
+                                  openQueueContext,
+                                  isReopenRequest);
+        };
     const bsls::TimeInterval timeout = absTimeout -
                                        bmqu::Time::nowMonotonicClock();
 
@@ -6171,11 +6180,10 @@ BrokerSession::sendCloseQueue(const RequestSp&              closeQueueContext,
     // Set the 'isFinal' flag only before closing the last subStream for
     // this canonical uri.
 
-    bmqp::RequestManagerRequest::ResponseCb response = bdlf::BindUtil::bind(
-        &BrokerSession::onCloseQueueResponse,
-        this,
-        bdlf::PlaceHolders::_1,  // context
-        queue);
+    bmqp::RequestManagerRequest::ResponseCb response =
+        [this, queue](const RequestSp& context) {
+            onCloseQueueResponse(context, queue);
+        };
     closeQueueContext->setResponseCb(response);
 
     const bsls::TimeInterval timeout = absTimeout -
@@ -6560,14 +6568,17 @@ void BrokerSession::reopenQueues()
     for (bsl::vector<bsl::shared_ptr<Queue> >::size_type idx = 0;
          idx != pendingQueues.size();
          ++idx) {
-        const FsmCallback fsmCallback = bdlf::BindUtil::bind(
-            &BrokerSession::asyncRequestNotifier,
-            this,
-            bdlf::PlaceHolders::_1,  // request
-            bmqt::SessionEventType::e_QUEUE_REOPEN_RESULT,
-            pendingQueues[idx]->correlationId(),
-            pendingQueues[idx],
-            EventCallback());
+        const FsmCallback fsmCallback =
+            [this,
+             correlationId = pendingQueues[idx]->correlationId(),
+             queue         = pendingQueues[idx]](const RequestSp& request) {
+                asyncRequestNotifier(
+                    request,
+                    bmqt::SessionEventType::e_QUEUE_REOPEN_RESULT,
+                    correlationId,
+                    queue,
+                    EventCallback());
+            };
 
         RequestSp context = createOpenQueueContext(pendingQueues[idx],
                                                    fsmCallback,
@@ -6627,10 +6638,9 @@ void BrokerSession::stopAsync()
     // Add to event queue
     bsl::shared_ptr<Event> queueEvent = createEvent();
     queueEvent->configureAsRequestEvent(
-        bdlf::BindUtil::bind(&BrokerSession::doStop,
-                             this,
-                             bdlf::PlaceHolders::_1,  // eventImpl
-                             span));
+        [this, span](const bsl::shared_ptr<Event>& eventImpl) {
+            doStop(eventImpl, span);
+        });
     enqueueFsmEvent(queueEvent);
 }
 
@@ -6705,26 +6715,22 @@ int BrokerSession::openQueue(const bsl::shared_ptr<Queue>& queue,
     int              rc = bmqt::GenericResult::e_NOT_READY;
 
     const bmqimp::BrokerSession::FsmCallback fsmCallback =
-        bdlf::BindUtil::bind(&BrokerSession::syncRequestNotifier,
-                             this,
-                             &syncOperationSemaphore,
-                             &rc,
-                             bdlf::PlaceHolders::_1);  // request
+        [this, &syncOperationSemaphore, &rc](const RequestSp& request) {
+            syncRequestNotifier(&syncOperationSemaphore, &rc, request);
+        };
 
     bmqpi::DTSpan::Baggage baggage(d_allocator_p);
     fillDTSpanQueueBaggage(&baggage, *queue);
     bsl::shared_ptr<bmqpi::DTSpan> openSpan(
         createDTSpan("bmq.queue.open", baggage));
 
-    toFsm(fsmCallback,
-          bdlf::BindUtil::bind(&BrokerSession::doOpenQueue,
-                               this,
-                               queue,
-                               timeout,
-                               fsmCallback,
-                               bdlf::PlaceHolders::_1,  // event
-                               openSpan),
-          true);  // always call 'syncRequestNotifier'
+    toFsm(
+        fsmCallback,
+        [this, queue, timeout, fsmCallback, openSpan](
+            const bsl::shared_ptr<Event>& eventSp) {
+            doOpenQueue(queue, timeout, fsmCallback, eventSp, openSpan);
+        },
+        true);  // always call 'syncRequestNotifier'
 
     // Wait result
     syncOperationSemaphore.wait();
@@ -6736,31 +6742,30 @@ int BrokerSession::openQueueAsync(const bsl::shared_ptr<Queue>& queue,
                                   bsls::TimeInterval            timeout,
                                   const EventCallback&          eventCallback)
 {
-    const FsmCallback fsmCallback = bdlf::BindUtil::bind(
-        &BrokerSession::asyncRequestNotifier,
-        this,
-        bdlf::PlaceHolders::_1,  // request
-        bmqt::SessionEventType::e_QUEUE_OPEN_RESULT,
-        queue->correlationId(),
-        queue,
-        eventCallback);
+    const FsmCallback fsmCallback = [this,
+                                     correlationId = queue->correlationId(),
+                                     queue,
+                                     eventCallback](const RequestSp& request) {
+        asyncRequestNotifier(request,
+                             bmqt::SessionEventType::e_QUEUE_OPEN_RESULT,
+                             correlationId,
+                             queue,
+                             eventCallback);
+    };
 
     bmqpi::DTSpan::Baggage baggage(d_allocator_p);
     fillDTSpanQueueBaggage(&baggage, *queue);
     bsl::shared_ptr<bmqpi::DTSpan> openSpan(
         createDTSpan("bmq.queue.open", baggage));
 
-    int rc = toFsm(fsmCallback,
-                   bdlf::BindUtil::bind(&BrokerSession::doOpenQueue,
-                                        this,
-                                        queue,
-                                        timeout,
-                                        fsmCallback,
-                                        bdlf::PlaceHolders::_1,  // event
-                                        openSpan),
-                   eventCallback !=
-                       0);  // if there is no callback, do not call
-                            // 'asyncRequestNotifier' on failure.
+    int rc = toFsm(
+        fsmCallback,
+        [this, queue, timeout, fsmCallback, openSpan](
+            const bsl::shared_ptr<Event>& eventSp) {
+            doOpenQueue(queue, timeout, fsmCallback, eventSp, openSpan);
+        },
+        eventCallback != 0);  // if there is no callback, do not call
+                              // 'asyncRequestNotifier' on failure.
     return rc;
 }
 
@@ -6769,40 +6774,44 @@ void BrokerSession::openQueueSync(const bsl::shared_ptr<Queue>& queue,
                                   const EventCallback&          eventCallback)
 {
     bslmt::Semaphore    syncOperationSemaphore;
-    const EventCallback callbackAdapter = bdlf::BindUtil::bind(
-        &eventCallbackAdapter,
-        &syncOperationSemaphore,
-        eventCallback,
-        bdlf::PlaceHolders::_1);  // event
+    const EventCallback callbackAdapter =
+        [&syncOperationSemaphore,
+         eventCallback](const bsl::shared_ptr<Event>& eventSp) {
+            eventCallbackAdapter(&syncOperationSemaphore,
+                                 eventCallback,
+                                 eventSp);
+        };
     // The adapter executes given 'eventCallback' and posts the semaphore.
 
     if (d_usingSessionEventHandler) {
         openQueueAsync(queue, timeout, callbackAdapter);  // event
     }
     else {
-        const FsmCallback fsmCallback = bdlf::BindUtil::bind(
-            &BrokerSession::manualSyncRequestNotifier,
-            this,
-            bdlf::PlaceHolders::_1,  // request
-            bmqt::SessionEventType::e_QUEUE_OPEN_RESULT,
-            queue->correlationId(),
-            queue,
-            callbackAdapter);  // adapter
+        const FsmCallback fsmCallback =
+            [this,
+             correlationId = queue->correlationId(),
+             queue,
+             callbackAdapter](const RequestSp& request) {
+                manualSyncRequestNotifier(
+                    request,
+                    bmqt::SessionEventType::e_QUEUE_OPEN_RESULT,
+                    correlationId,
+                    queue,
+                    callbackAdapter);
+            };
 
         bmqpi::DTSpan::Baggage baggage(d_allocator_p);
         fillDTSpanQueueBaggage(&baggage, *queue);
         bsl::shared_ptr<bmqpi::DTSpan> openSpan(
             createDTSpan("bmq.queue.open", baggage));
 
-        toFsm(fsmCallback,
-              bdlf::BindUtil::bind(&BrokerSession::doOpenQueue,
-                                   this,
-                                   queue,
-                                   timeout,
-                                   fsmCallback,
-                                   bdlf::PlaceHolders::_1,  // event
-                                   openSpan),
-              true);  // always call 'manualSyncRequestNotifier'
+        toFsm(
+            fsmCallback,
+            [this, queue, timeout, fsmCallback, openSpan](
+                const bsl::shared_ptr<Event>& eventSp) {
+                doOpenQueue(queue, timeout, fsmCallback, eventSp, openSpan);
+            },
+            true);  // always call 'manualSyncRequestNotifier'
     }
 
     // BS does enqueue/call the `eventCallback` even if the call fails.
@@ -6820,27 +6829,27 @@ int BrokerSession::configureQueue(const bsl::shared_ptr<Queue>& queue,
     int              rc = bmqt::GenericResult::e_NOT_READY;
 
     const bmqimp::BrokerSession::FsmCallback fsmCallback =
-        bdlf::BindUtil::bind(&BrokerSession::syncRequestNotifier,
-                             this,
-                             &syncOperationSemaphore,
-                             &rc,
-                             bdlf::PlaceHolders::_1);  // request
+        [this, &syncOperationSemaphore, &rc](const RequestSp& request) {
+            syncRequestNotifier(&syncOperationSemaphore, &rc, request);
+        };
 
     bmqpi::DTSpan::Baggage baggage(d_allocator_p);
     fillDTSpanQueueBaggage(&baggage, *queue);
     bsl::shared_ptr<bmqpi::DTSpan> configureSpan(
         createDTSpan("bmq.queue.configure", baggage));
 
-    toFsm(fsmCallback,
-          bdlf::BindUtil::bind(&BrokerSession::doConfigureQueue,
-                               this,
-                               queue,
-                               options,
-                               timeout,
-                               fsmCallback,
-                               bdlf::PlaceHolders::_1,  // event
-                               configureSpan),
-          true);  // always call 'syncRequestNotifier'
+    toFsm(
+        fsmCallback,
+        [this, queue, options, timeout, fsmCallback, configureSpan](
+            const bsl::shared_ptr<Event>& eventSp) {
+            doConfigureQueue(queue,
+                             options,
+                             timeout,
+                             fsmCallback,
+                             eventSp,
+                             configureSpan);
+        },
+        true);  // always call 'syncRequestNotifier'
 
     // Wait result
     syncOperationSemaphore.wait();
@@ -6856,11 +6865,13 @@ void BrokerSession::configureQueueSync(const bsl::shared_ptr<Queue>& queue,
     bslmt::Semaphore syncOperationSemaphore;
 
     // The adapter executes given `eventCallback` and posts the semaphore.
-    const EventCallback callbackAdapter = bdlf::BindUtil::bind(
-        &eventCallbackAdapter,
-        &syncOperationSemaphore,
-        eventCallback,
-        bdlf::PlaceHolders::_1);  // event
+    const EventCallback callbackAdapter =
+        [&syncOperationSemaphore,
+         eventCallback](const bsl::shared_ptr<Event>& eventSp) {
+            eventCallbackAdapter(&syncOperationSemaphore,
+                                 eventCallback,
+                                 eventSp);
+        };
 
     if (d_usingSessionEventHandler) {
         configureQueueAsync(queue,
@@ -6870,30 +6881,35 @@ void BrokerSession::configureQueueSync(const bsl::shared_ptr<Queue>& queue,
     }
     else {
         const bmqimp::BrokerSession::FsmCallback fsmCallback =
-            bdlf::BindUtil::bind(
-                &BrokerSession::manualSyncRequestNotifier,
-                this,
-                bdlf::PlaceHolders::_1,  // request
-                bmqt::SessionEventType::e_QUEUE_CONFIGURE_RESULT,
-                queue->correlationId(),
-                queue,
-                callbackAdapter);  // adapter
+            [this,
+             correlationId = queue->correlationId(),
+             queue,
+             callbackAdapter](const RequestSp& request) {
+                manualSyncRequestNotifier(
+                    request,
+                    bmqt::SessionEventType::e_QUEUE_CONFIGURE_RESULT,
+                    correlationId,
+                    queue,
+                    callbackAdapter);
+            };
 
         bmqpi::DTSpan::Baggage baggage(d_allocator_p);
         fillDTSpanQueueBaggage(&baggage, *queue);
         bsl::shared_ptr<bmqpi::DTSpan> configureSpan(
             createDTSpan("bmq.queue.configure", baggage));
 
-        toFsm(fsmCallback,
-              bdlf::BindUtil::bind(&BrokerSession::doConfigureQueue,
-                                   this,
-                                   queue,
-                                   options,
-                                   timeout,
-                                   fsmCallback,
-                                   bdlf::PlaceHolders::_1,  // event
-                                   configureSpan),
-              true);  // always call 'manualSyncRequestNotifier'
+        toFsm(
+            fsmCallback,
+            [this, queue, options, timeout, fsmCallback, configureSpan](
+                const bsl::shared_ptr<Event>& eventSp) {
+                doConfigureQueue(queue,
+                                 options,
+                                 timeout,
+                                 fsmCallback,
+                                 eventSp,
+                                 configureSpan);
+            },
+            true);  // always call 'manualSyncRequestNotifier'
     }
     // BS does enqueue/call the `eventCallback` even if the call fails.
     // Wait result
@@ -6908,31 +6924,34 @@ int BrokerSession::configureQueueAsync(const bsl::shared_ptr<Queue>& queue,
                                        const EventCallback& eventCallback)
 {
     const bmqimp::BrokerSession::FsmCallback fsmCallback =
-        bdlf::BindUtil::bind(&BrokerSession::asyncRequestNotifier,
-                             this,
-                             bdlf::PlaceHolders::_1,  // request
-                             bmqt::SessionEventType::e_QUEUE_CONFIGURE_RESULT,
-                             queue->correlationId(),
-                             queue,
-                             eventCallback);
+        [this, correlationId = queue->correlationId(), queue, eventCallback](
+            const RequestSp& request) {
+            asyncRequestNotifier(
+                request,
+                bmqt::SessionEventType::e_QUEUE_CONFIGURE_RESULT,
+                correlationId,
+                queue,
+                eventCallback);
+        };
 
     bmqpi::DTSpan::Baggage baggage(d_allocator_p);
     fillDTSpanQueueBaggage(&baggage, *queue);
     bsl::shared_ptr<bmqpi::DTSpan> configureSpan(
         createDTSpan("bmq.queue.configure", baggage));
 
-    int rc = toFsm(fsmCallback,
-                   bdlf::BindUtil::bind(&BrokerSession::doConfigureQueue,
-                                        this,
-                                        queue,
-                                        options,
-                                        timeout,
-                                        fsmCallback,
-                                        bdlf::PlaceHolders::_1,  // event
-                                        configureSpan),
-                   eventCallback !=
-                       0);  // if there is no callback, do not call
-                            // 'asyncRequestNotifier' on failure.
+    int rc = toFsm(
+        fsmCallback,
+        [this, queue, options, timeout, fsmCallback, configureSpan](
+            const bsl::shared_ptr<Event>& eventSp) {
+            doConfigureQueue(queue,
+                             options,
+                             timeout,
+                             fsmCallback,
+                             eventSp,
+                             configureSpan);
+        },
+        eventCallback != 0);  // if there is no callback, do not call
+                              // 'asyncRequestNotifier' on failure.
     return rc;
 }
 
@@ -6976,26 +6995,22 @@ int BrokerSession::closeQueue(const bsl::shared_ptr<Queue>& queue,
     int              rc = bmqt::GenericResult::e_NOT_READY;
 
     const bmqimp::BrokerSession::FsmCallback fsmCallback =
-        bdlf::BindUtil::bind(&BrokerSession::syncRequestNotifier,
-                             this,
-                             &syncOperationSemaphore,
-                             &rc,
-                             bdlf::PlaceHolders::_1);  // request
+        [this, &syncOperationSemaphore, &rc](const RequestSp& request) {
+            syncRequestNotifier(&syncOperationSemaphore, &rc, request);
+        };
 
     bmqpi::DTSpan::Baggage baggage(d_allocator_p);
     fillDTSpanQueueBaggage(&baggage, *queue);
     bsl::shared_ptr<bmqpi::DTSpan> closeSpan(
         createDTSpan("bmq.queue.close", baggage));
 
-    toFsm(fsmCallback,
-          bdlf::BindUtil::bind(&BrokerSession::doCloseQueue,
-                               this,
-                               queue,
-                               timeout,
-                               fsmCallback,
-                               bdlf::PlaceHolders::_1,  // event
-                               closeSpan),
-          true);  // always call 'syncRequestNotifier'
+    toFsm(
+        fsmCallback,
+        [this, queue, timeout, fsmCallback, closeSpan](
+            const bsl::shared_ptr<Event>& eventSp) {
+            doCloseQueue(queue, timeout, fsmCallback, eventSp, closeSpan);
+        },
+        true);  // always call 'syncRequestNotifier'
 
     // Wait result
     syncOperationSemaphore.wait();
@@ -7008,30 +7023,28 @@ int BrokerSession::closeQueueAsync(const bsl::shared_ptr<Queue>& queue,
                                    const EventCallback&          eventCallback)
 {
     const bmqimp::BrokerSession::FsmCallback fsmCallback =
-        bdlf::BindUtil::bind(&bmqimp::BrokerSession::asyncRequestNotifier,
-                             this,
-                             bdlf::PlaceHolders::_1,  // request
-                             bmqt::SessionEventType::e_QUEUE_CLOSE_RESULT,
-                             queue->correlationId(),
-                             queue,
-                             eventCallback);
+        [this, correlationId = queue->correlationId(), queue, eventCallback](
+            const RequestSp& request) {
+            asyncRequestNotifier(request,
+                                 bmqt::SessionEventType::e_QUEUE_CLOSE_RESULT,
+                                 correlationId,
+                                 queue,
+                                 eventCallback);
+        };
 
     bmqpi::DTSpan::Baggage baggage(d_allocator_p);
     fillDTSpanQueueBaggage(&baggage, *queue);
     bsl::shared_ptr<bmqpi::DTSpan> closeSpan(
         createDTSpan("bmq.queue.close", baggage));
 
-    int rc = toFsm(fsmCallback,
-                   bdlf::BindUtil::bind(&BrokerSession::doCloseQueue,
-                                        this,
-                                        queue,
-                                        timeout,
-                                        fsmCallback,
-                                        bdlf::PlaceHolders::_1,  // event
-                                        closeSpan),
-                   eventCallback !=
-                       0);  // if there is no callback, do not call
-                            // 'asyncRequestNotifier' on failure.
+    int rc = toFsm(
+        fsmCallback,
+        [this, queue, timeout, fsmCallback, closeSpan](
+            const bsl::shared_ptr<Event>& eventSp) {
+            doCloseQueue(queue, timeout, fsmCallback, eventSp, closeSpan);
+        },
+        eventCallback != 0);  // if there is no callback, do not call
+                              // 'asyncRequestNotifier' on failure.
     return rc;
 }
 
@@ -7040,11 +7053,13 @@ void BrokerSession::closeQueueSync(const bsl::shared_ptr<Queue>& queue,
                                    const EventCallback&          eventCallback)
 {
     bslmt::Semaphore    syncOperationSemaphore;
-    const EventCallback callbackAdapter = bdlf::BindUtil::bind(
-        &eventCallbackAdapter,
-        &syncOperationSemaphore,
-        eventCallback,
-        bdlf::PlaceHolders::_1);  // event
+    const EventCallback callbackAdapter =
+        [&syncOperationSemaphore,
+         eventCallback](const bsl::shared_ptr<Event>& eventSp) {
+            eventCallbackAdapter(&syncOperationSemaphore,
+                                 eventCallback,
+                                 eventSp);
+        };
     // The adapter executes given 'eventCallback' and posts the semaphore.
 
     if (d_usingSessionEventHandler) {
@@ -7052,28 +7067,30 @@ void BrokerSession::closeQueueSync(const bsl::shared_ptr<Queue>& queue,
     }
     else {
         const bmqimp::BrokerSession::FsmCallback fsmCallback =
-            bdlf::BindUtil::bind(&BrokerSession::manualSyncRequestNotifier,
-                                 this,
-                                 bdlf::PlaceHolders::_1,  // request
-                                 bmqt::SessionEventType::e_QUEUE_CLOSE_RESULT,
-                                 queue->correlationId(),
-                                 queue,
-                                 callbackAdapter);  // adapter
+            [this,
+             correlationId = queue->correlationId(),
+             queue,
+             callbackAdapter](const RequestSp& request) {
+                manualSyncRequestNotifier(
+                    request,
+                    bmqt::SessionEventType::e_QUEUE_CLOSE_RESULT,
+                    correlationId,
+                    queue,
+                    callbackAdapter);
+            };
 
         bmqpi::DTSpan::Baggage baggage(d_allocator_p);
         fillDTSpanQueueBaggage(&baggage, *queue);
         bsl::shared_ptr<bmqpi::DTSpan> closeSpan(
             createDTSpan("bmq.queue.close", baggage));
 
-        toFsm(fsmCallback,
-              bdlf::BindUtil::bind(&BrokerSession::doCloseQueue,
-                                   this,
-                                   queue,
-                                   timeout,
-                                   fsmCallback,
-                                   bdlf::PlaceHolders::_1,  // event
-                                   closeSpan),
-              true);  // always call 'manualSyncRequestNotifier'
+        toFsm(
+            fsmCallback,
+            [this, queue, timeout, fsmCallback, closeSpan](
+                const bsl::shared_ptr<Event>& eventSp) {
+                doCloseQueue(queue, timeout, fsmCallback, eventSp, closeSpan);
+            },
+            true);  // always call 'manualSyncRequestNotifier'
     }
 
     // BS does enqueue/call the callback even if the call fails.
@@ -7146,11 +7163,11 @@ void BrokerSession::setupPutExpirationTimer(const bsls::TimeInterval& timeout)
 
     BALL_LOG_INFO << id() << "Setup PUT expiration timer to " << timeout;
 
-    d_scheduler_p->scheduleEvent(
-        &d_messageExpirationTimeoutHandle,
-        timeout,
-        bdlf::BindUtil::bind(&BrokerSession::onPendingPutExpirationTimeout,
-                             this));
+    d_scheduler_p->scheduleEvent(&d_messageExpirationTimeoutHandle,
+                                 timeout,
+                                 [this]() {
+                                     onPendingPutExpirationTimeout();
+                                 });
 }
 
 void BrokerSession::removePendingControlMessage(const RequestSp& context)
@@ -7411,10 +7428,9 @@ void BrokerSession::postToFsm(const bsl::function<void()>& f)
     // 'eventSp' parameter.
     // Note that 'doneCallback' is not used anymore.
 
-    event->configureAsRequestEvent(
-        bdlf::BindUtil::bind(&callbackAdapter,
-                             f,
-                             bdlf::PlaceHolders::_1));  // eventSp
+    event->configureAsRequestEvent([f](const bsl::shared_ptr<Event>& eventSp) {
+        callbackAdapter(f, eventSp);
+    });
     int rc = d_fsmEventQueue.pushBack(bsl::move(event));
 
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
@@ -7462,9 +7478,9 @@ void BrokerSession::onStartTimeout()
 
     bsl::shared_ptr<Event> event = createEvent();
     event->configureAsRequestEvent(
-        bdlf::BindUtil::bind(&BrokerSession::doHandleStartTimeout,
-                             this,
-                             bdlf::PlaceHolders::_1));  // eventImpl
+        [this](const bsl::shared_ptr<Event>& eventImpl) {
+            doHandleStartTimeout(eventImpl);
+        });
     enqueueFsmEvent(event);
 }
 
@@ -7473,10 +7489,10 @@ void BrokerSession::onPendingPutExpirationTimeout()
     // executed by the *SCHEDULER* thread
 
     bsl::shared_ptr<Event> event = createEvent();
-    event->configureAsRequestEvent(bdlf::BindUtil::bind(
-        &BrokerSession::doHandlePendingPutExpirationTimeout,
-        this,
-        bdlf::PlaceHolders::_1));  // eventImpl
+    event->configureAsRequestEvent(
+        [this](const bsl::shared_ptr<Event>& eventImpl) {
+            doHandlePendingPutExpirationTimeout(eventImpl);
+        });
     enqueueFsmEvent(event);
 }
 
@@ -7488,10 +7504,9 @@ void BrokerSession::handleChannelWatermark(
     // Add to the FSM event queue
     bsl::shared_ptr<Event> queueEvent = createEvent();
     queueEvent->configureAsRequestEvent(
-        bdlf::BindUtil::bind(&BrokerSession::doHandleChannelWatermark,
-                             this,
-                             type,
-                             bdlf::PlaceHolders::_1));  // eventImpl
+        [this, type](const bsl::shared_ptr<Event>& eventImpl) {
+            doHandleChannelWatermark(type, eventImpl);
+        });
     enqueueFsmEvent(queueEvent);
 }
 
@@ -7521,9 +7536,9 @@ bool BrokerSession::_synchronize()
     bsl::shared_ptr<Event> queueEvent = createEvent();
 
     queueEvent->configureAsRequestEvent(
-        bdlf::BindUtil::bind(&releaseSemaphore,
-                             &syncOperationSemaphore,
-                             bdlf::PlaceHolders::_1));  // event
+        [&syncOperationSemaphore](const bsl::shared_ptr<Event>& event) {
+            releaseSemaphore(&syncOperationSemaphore, event);
+        });
 
     int rc = enqueueFsmEvent(queueEvent);
 
