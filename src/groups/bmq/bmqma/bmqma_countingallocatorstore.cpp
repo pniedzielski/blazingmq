@@ -58,7 +58,7 @@ bslma::Allocator* CountingAllocatorStore::get(const bsl::string& name)
 
     bsls::SpinLockGuard guard(&d_spinLock);  // SPINLOCK LOCK
 
-    AllocatorMap::iterator iter = d_allocators.find(name);
+    auto iter = d_allocators.find(name);
     if (iter != d_allocators.end()) {
         // Allocator with 'name' already exists, so simply return it.
         return iter->second;  // RETURN
