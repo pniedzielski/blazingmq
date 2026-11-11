@@ -25,7 +25,6 @@
 // BDE
 #include <bdlbb_blobutil.h>
 #include <bdlde_crc32.h>
-#include <bdlf_bind.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_algorithm.h>
 #include <bsl_cstdlib.h>
@@ -738,10 +737,9 @@ static void test5_multithreadedCrc32cDefault()
         bmqtst::TestHelperUtil::allocator());
     for (unsigned int i = 0; i < k_NUM_THREADS; ++i) {
         int rc = threadGroup.addThread(
-            bdlf::BindUtil::bind(&threadFunction,
-                                 &threadsCrc32cData[i],
-                                 payloads,
-                                 &barrier));
+            [out = &threadsCrc32cData[i], payloads, &barrier]() {
+                threadFunction(out, payloads, &barrier);
+            });
         BSLS_ASSERT_OPT(rc == 0);
     }
 

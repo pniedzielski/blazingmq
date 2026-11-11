@@ -25,7 +25,6 @@
 // BDE
 #include <bdlb_guid.h>
 #include <bdlb_guidutil.h>
-#include <bdlf_bind.h>
 #include <bdlt_datetime.h>
 #include <bdlt_epochutil.h>
 #include <bdlt_timeunitratio.h>
@@ -560,11 +559,10 @@ static void test3_multithreadUseIP()
     bmqp::MessageGUIDGenerator generator(0);
 
     for (int i = 0; i < k_NUM_THREADS; ++i) {
-        int rc = threadGroup.addThread(bdlf::BindUtil::bind(&threadFunction,
-                                                            &threadsData[i],
-                                                            &barrier,
-                                                            &generator,
-                                                            k_NUM_GUIDS));
+        int rc = threadGroup.addThread(
+            [out = &threadsData[i], &barrier, &generator]() {
+                threadFunction(out, &barrier, &generator, k_NUM_GUIDS);
+            });
         BMQTST_ASSERT_EQ_D(i, rc, 0);
     }
 
@@ -640,11 +638,10 @@ static void test4_multithreadUseHostname()
     bmqp::MessageGUIDGenerator generator(0, false);
 
     for (int i = 0; i < k_NUM_THREADS; ++i) {
-        int rc = threadGroup.addThread(bdlf::BindUtil::bind(&threadFunction,
-                                                            &threadsData[i],
-                                                            &barrier,
-                                                            &generator,
-                                                            k_NUM_GUIDS));
+        int rc = threadGroup.addThread(
+            [out = &threadsData[i], &barrier, &generator]() {
+                threadFunction(out, &barrier, &generator, k_NUM_GUIDS);
+            });
         BMQTST_ASSERT_EQ_D(i, rc, 0);
     }
 
