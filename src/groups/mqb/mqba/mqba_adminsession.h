@@ -169,10 +169,6 @@ class AdminSession : public mqbnet::Session, public mqbi::DispatcherClient {
   private:
     // PRIVATE MANIPULATORS
 
-    /// Initiate the shutdown of the session and invoke the specified
-    /// `callback` upon completion of (asynchronous) shutdown sequence.
-    void initiateShutdownDispatched(const ShutdownCb& callback);
-
     /// Extract admin command from the specified `adminCmdCtrlMsg` and
     /// enqueue it for execution.
     void

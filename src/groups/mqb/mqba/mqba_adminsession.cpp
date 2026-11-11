@@ -187,18 +187,6 @@ void AdminSession::sendPacket()
     }
 }
 
-void AdminSession::initiateShutdownDispatched(const ShutdownCb& callback)
-{
-    // executed by the *CLIENT* dispatcher thread
-
-    // PRECONDITIONS
-    BSLS_ASSERT_SAFE(inDispatcherThread());
-    BSLS_ASSERT_SAFE(callback);
-
-    d_running = false;
-    callback();
-}
-
 void AdminSession::finalizeAdminCommand(
     const bmqp_ctrlmsg::ControlMessage& adminCommandCtrlMsg,
     const bsl::string&                  commandExecResults)
@@ -461,7 +449,14 @@ void AdminSession::initiateShutdown(const ShutdownCb& callback)
 
     dispatcher()->execute(
         [this, callback]() {
-            initiateShutdownDispatched(callback);
+            // executed by the *CLIENT* dispatcher thread
+
+            // PRECONDITIONS
+            BSLS_ASSERT_SAFE(inDispatcherThread());
+            BSLS_ASSERT_SAFE(callback);
+
+            d_running = false;
+            callback();
         },
         this);
 }
