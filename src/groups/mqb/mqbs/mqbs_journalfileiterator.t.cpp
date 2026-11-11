@@ -1319,8 +1319,8 @@ static void test11_forwardAdvance()
         1,
         it.nextRecord());  // Set iterator to first record position
 
-    bsl::list<NodeType>::const_iterator recordIter = records.cbegin();
-    const unsigned int                  increment  = k_NUM_RECORDS / 100;
+    auto               recordIter = records.cbegin();
+    const unsigned int increment  = k_NUM_RECORDS / 100;
 
     unsigned int i  = 0;
     int          rc = 0;
@@ -1392,8 +1392,8 @@ static void test12_backwardAdvance()
         1,
         it.nextRecord());  // Set iterator to first record position
 
-    bsl::list<NodeType>::const_reverse_iterator recordIter = records.crbegin();
-    const unsigned int increment = k_NUM_RECORDS / 100;
+    auto               recordIter = records.crbegin();
+    const unsigned int increment  = k_NUM_RECORDS / 100;
 
     unsigned int i  = k_NUM_RECORDS - 1;
     int          rc = 0;
