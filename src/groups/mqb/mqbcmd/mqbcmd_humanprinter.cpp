@@ -323,8 +323,7 @@ void printQueueContents(bsl::ostream& os, const QueueContents& queueContents)
     bmqu::MemOutStream msgListing;
     bsls::Types::Int64 totalBytes = 0;
 
-    bsl::vector<Message>::const_iterator it =
-        queueContents.messages().cbegin();
+    auto it = queueContents.messages().cbegin();
     for (bsls::Types::Int64 sequenceNo = queueContents.offset();
          it != queueContents.messages().cend();
          ++sequenceNo, ++it) {
