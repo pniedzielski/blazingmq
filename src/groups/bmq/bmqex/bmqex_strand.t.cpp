@@ -60,108 +60,6 @@ struct NoOp {
     }
 };
 
-// =============
-// struct Assign
-// =============
-
-/// Provides a function object that assigns the specified `src` to the
-/// specified `*dst`.
-struct Assign {
-    // TYPES
-
-    /// Defines the result type of the call operator.
-    typedef void ResultType;
-
-    // ACCESSORS
-    template <class DST, class SRC>
-    void operator()(DST* dst, const SRC& src) const
-    {
-        *dst = src;
-    }
-};
-
-// ===============
-// struct PushBack
-// ===============
-
-/// Provides a function object that calls `push_back` on a specified
-/// `container` with a specified `value` argument.
-struct PushBack {
-    // TYPES
-
-    /// Defines the result type of the call operator.
-    typedef void ResultType;
-
-    // ACCESSORS
-    template <class CONTAINER, class VALUE>
-    void operator()(CONTAINER* container, const VALUE& value) const
-    {
-        container->push_back(value);
-    }
-};
-
-// ===========
-// struct Post
-// ===========
-
-/// Provides a function object that calls `post` on a specified `executor`
-/// with a specified function object `f`.
-struct Post {
-    // TYPES
-
-    /// Defines the result type of the call operator.
-    typedef void ResultType;
-
-    // ACCESSORS
-    template <class EXECUTOR, class FUNCTION>
-    void operator()(const EXECUTOR& executor, const FUNCTION& f) const
-    {
-        executor.post(f);
-    }
-};
-
-// ===============
-// struct Dispatch
-// ===============
-
-/// Provides a function object that calls `dispatch` on a specified
-/// `executor` with a specified function object `f`.
-struct Dispatch {
-    // TYPES
-
-    /// Defines the result type of the call operator.
-    typedef void ResultType;
-
-    // ACCESSORS
-    template <class EXECUTOR, class FUNCTION>
-    void operator()(const EXECUTOR& executor, const FUNCTION& f) const
-    {
-        executor.dispatch(f);
-    }
-};
-
-// ==================
-// struct Synchronize
-// ==================
-
-/// Provides a function object to synchronize with. First calls `post` on
-/// the specified `startedSignal` semaphore and then, calls `wait` on the
-/// specified `continueSignal` semaphore.
-struct Synchronize {
-    // TYPES
-
-    /// Defines the result type of the call operator.
-    typedef void ResultType;
-
-    // ACCESSORS
-    void operator()(bslmt::Semaphore* startedSignal,
-                    bslmt::Semaphore* continueSignal) const
-    {
-        startedSignal->post();
-        continueSignal->wait();
-    }
-};
-
 // ==================
 // struct ThrowOnCopy
 // ==================
@@ -507,7 +405,8 @@ static void test2_strand_start()
     // submit jobs
     for (int i = 0; i < k_NUM_JOBS; ++i) {
         strand.executor().post([&startedSignal, &continueSignal]() {
-            Synchronize()(&startedSignal, &continueSignal);
+            startedSignal.post();
+            continueSignal.wait();
         });
     }
 
@@ -556,13 +455,14 @@ static void test3_strand_stop()
 
     // submit function object #1
     strand.executor().post([&startedSignal, &continueSignal]() {
-        Synchronize()(&startedSignal, &continueSignal);
+        startedSignal.post();
+        continueSignal.wait();
     });
 
     // submit function object #2
     bool job2Executed = false;
     strand.executor().post([&job2Executed]() {
-        Assign()(&job2Executed, true);
+        job2Executed = true;
     });
 
     // start executing function object #1
@@ -617,7 +517,7 @@ static void test4_strand_join()
     // submit jobs
     for (int i = 0; i < k_NUM_JOBS; ++i) {
         strand.executor().post([&out, i]() {
-            PushBack()(&out, i);
+            out.push_back(i);
         });
     }
 
@@ -678,7 +578,8 @@ static void test5_strand_dropPendingJobs()
 
         // push 3 jobs to the strand
         strand.executor().post([&startedSignal, &continueSignal]() {
-            Synchronize()(&startedSignal, &continueSignal);
+            startedSignal.post();
+            continueSignal.wait();
         });
         strand.executor().post(NoOp());
         strand.executor().post(NoOp());
@@ -739,7 +640,8 @@ static void test6_strand_outstandingJobs()
     for (int i = 0; i < k_NUM_JOBS; ++i) {
         // submit a function object
         strand.executor().post([&startedSignal, &continueSignal]() {
-            Synchronize()(&startedSignal, &continueSignal);
+            startedSignal.post();
+            continueSignal.wait();
         });
 
         // outstanding jobs increased by 1
@@ -826,7 +728,7 @@ static void test7_executor_post()
         // submit function objects
         for (int i = 0; i < k_NUM_JOBS; ++i) {
             strand.executor().post([&out, i]() {
-                PushBack()(&out, i);
+                out.push_back(i);
             });
 
             BMQTST_ASSERT_EQ(strand.outstandingJobs(),
@@ -863,14 +765,14 @@ static void test7_executor_post()
             bsl::function<void()> pushBack(bsl::allocator_arg,
                                            &alloc,
                                            [&out, i]() {
-                                               PushBack()(&out, i);
+                                               out.push_back(i);
                                            });
 
             // submit a function object that submits another function object
             // via a call to 'post()'
             strand.executor().post(
                 [executor = strand.executor(), job = bsl::move(pushBack)]() {
-                    Post()(executor, job);
+                    executor.post(job);
                 });
         }
 
@@ -1001,7 +903,7 @@ static void test8_executor_dispatch()
         // submit function objects
         for (int i = 0; i < k_NUM_JOBS; ++i) {
             strand.executor().dispatch([&out, i]() {
-                PushBack()(&out, i);
+                out.push_back(i);
             });
 
             BMQTST_ASSERT_EQ(strand.outstandingJobs(),
@@ -1040,19 +942,20 @@ static void test8_executor_dispatch()
             bsl::function<void()> pushBack(bsl::allocator_arg,
                                            &alloc,
                                            [&out, i]() {
-                                               PushBack()(&out, i);
+                                               out.push_back(i);
                                            });
 
             // submit a function object that submits another function object
             // via a call to 'dispatch'
             strand.executor().post(
                 [executor = strand.executor(), job = bsl::move(pushBack)]() {
-                    Dispatch()(executor, job);
+                    executor.dispatch(job);
                 });
 
             // submit a function object we will synchronize with
             strand.executor().post([&startedSignal, &continueSignal]() {
-                Synchronize()(&startedSignal, &continueSignal);
+                startedSignal.post();
+                continueSignal.wait();
             });
         }
 
@@ -1144,15 +1047,15 @@ static void test10_executor_runningInThisThread()
     // submit several jobs that saves the result of a 'runningInThisThread'
     // invocation
     ex.post([&result1, &ex]() {
-        Assign()(&result1, ex.runningInThisThread());
+        result1 = ex.runningInThisThread();
     });
 
     ex.post([&result2, &ex]() {
-        Assign()(&result2, ex.runningInThisThread());
+        result2 = ex.runningInThisThread();
     });
 
     ex.post([&result3, &ex]() {
-        Assign()(&result3, ex.runningInThisThread());
+        result3 = ex.runningInThisThread();
     });
 
     strand.start();
