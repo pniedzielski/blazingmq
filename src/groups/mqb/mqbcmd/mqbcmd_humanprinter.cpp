@@ -46,17 +46,6 @@ namespace mqbcmd {
 
 namespace {
 
-/// Functor to sort a `PurgeQueueResult` object by it's number of bytes, in
-/// descending order.
-struct SortPurgeQueueResultByBytesDesc {
-    bool operator()(const PurgeQueueResult& lhs,
-                    const PurgeQueueResult& rhs) const
-    {
-        return (lhs.isQueueValue() ? lhs.queue().numBytesPurged() : 0) >
-               (rhs.isQueueValue() ? rhs.queue().numBytesPurged() : 0);
-    }
-};
-
 void printCapacityMeter(bsl::ostream&        os,
                         const CapacityMeter& capacityMeter,
                         int                  level,
@@ -284,7 +273,14 @@ void printPurgedQueues(bsl::ostream& os, const PurgedQueues& purgedQueueList)
     bsl::vector<PurgeQueueResult>& queues =
         const_cast<bsl::vector<PurgeQueueResult>&>(purgedQueueList.queues());
 
-    bsl::sort(queues.begin(), queues.end(), SortPurgeQueueResultByBytesDesc());
+    // Sort by number of bytes purged, in descending order.
+    bsl::sort(
+        queues.begin(),
+        queues.end(),
+        [](const PurgeQueueResult& lhs, const PurgeQueueResult& rhs) {
+            return (lhs.isQueueValue() ? lhs.queue().numBytesPurged() : 0) >
+                   (rhs.isQueueValue() ? rhs.queue().numBytesPurged() : 0);
+        });
 
     bmqu::MemOutStream stream;
     bmqu::MemOutStream errorStream;
