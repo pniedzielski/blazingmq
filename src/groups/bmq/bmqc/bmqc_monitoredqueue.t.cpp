@@ -73,11 +73,7 @@ static void test1_MonitoredQueueState_toAscii()
     // NOTE: Using the 'integer' value instead of the enum to ensure the
     //       numeric values are *never* changed.
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         PVV(test.d_line << ": Testing: toAscii(" << test.d_value
                         << ") == " << test.d_expected);
 
@@ -122,11 +118,7 @@ static void test2_MonitoredQueueState_print()
     // NOTE: Using the 'integer' value instead of the enum to ensure the
     //       numeric values are *never* changed.
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         PVV(test.d_line << ": Testing: print(" << test.d_value
                         << ") == " << test.d_expected);
 
