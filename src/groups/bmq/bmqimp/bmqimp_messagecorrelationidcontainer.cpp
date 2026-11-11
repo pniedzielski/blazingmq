@@ -86,7 +86,7 @@ void MessageCorrelationIdContainer::removeQueueItem(
     const bmqp::QueueId&     queueId,
     const bmqt::MessageGUID& itemGUID)
 {
-    QueueItemsMap::iterator cqit = d_queueItems.find(queueId);
+    auto cqit = d_queueItems.find(queueId);
 
     BSLS_ASSERT_SAFE(cqit != d_queueItems.end() && "Queue not found");
 
@@ -209,8 +209,7 @@ void MessageCorrelationIdContainer::associateMessageData(
 {
     bsls::SpinLockGuard guard(&d_lock);  // LOCK
 
-    CorrelationIdsMap::iterator it = d_correlationIds.find(
-        header.messageGUID());
+    auto it = d_correlationIds.find(header.messageGUID());
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(it == d_correlationIds.end())) {
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         BSLS_ASSERT_SAFE(false && "Key not found");
@@ -295,8 +294,7 @@ bsls::TimeInterval MessageCorrelationIdContainer::getExpiredIds(
     for (const auto& [queueId, items] : d_queueItems) {
         // Get the queue expiration timeout
         const int                                    qId = queueId.id();
-        bsl::unordered_map<int, int>::const_iterator cit =
-            queueExpirationTimeoutMap.find(qId);
+        auto cit = queueExpirationTimeoutMap.find(qId);
 
         // If queueId is absent in the queue timeout map that means this queue
         // is no longer opened. All its pending messages should be removed, so
@@ -341,7 +339,7 @@ int MessageCorrelationIdContainer::find(bmqt::CorrelationId*     correlationId,
 {
     bsls::SpinLockGuard guard(&d_lock);  // LOCK
 
-    CorrelationIdsMap::const_iterator cit = d_correlationIds.find(key);
+    auto cit = d_correlationIds.find(key);
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_correlationIds.end() == cit)) {
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         return -1;  // RETURN
