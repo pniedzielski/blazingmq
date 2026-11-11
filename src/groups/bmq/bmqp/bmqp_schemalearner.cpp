@@ -18,7 +18,6 @@
 #include <bmqscm_version.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bsl_utility.h>
 
 namespace BloombergLP {

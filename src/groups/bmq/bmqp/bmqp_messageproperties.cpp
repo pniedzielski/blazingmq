@@ -29,7 +29,6 @@
 #include <bdlb_bigendian.h>
 #include <bdlb_print.h>
 #include <bdlbb_blobutil.h>
-#include <bdlf_bind.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_algorithm.h>
 #include <bsl_ios.h>

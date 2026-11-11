@@ -20,7 +20,6 @@
 
 // BDE
 #include <bdlcc_fixedqueue.h>
-#include <bdlf_bind.h>
 #include <bdlmt_threadpool.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_functional.h>
