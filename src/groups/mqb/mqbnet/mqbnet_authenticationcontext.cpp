@@ -174,14 +174,13 @@ int AuthenticationContext::setAuthenticatedAndScheduleReauthn(
         &d_timeoutHandle,
         bsls::TimeInterval(bmqu::Time::nowMonotonicClock())
             .addMilliseconds(lifetime),
-        bdlf::BindUtil::bindS(
-            d_allocator_p,
-            bmqu::WeakMemFnUtil::weakMemFn(
-                &AuthenticationContext::onReauthenticationTimeout,
-                d_self.acquireWeak()),
-            bsl::weak_ptr<bmqio::Channel>(channel_sp),  // channel_wp
-            lifetime                                    // timeoutMs
-            ));
+        [weakFn = bmqu::WeakMemFnUtil::weakMemFn(
+             &AuthenticationContext::onReauthenticationTimeout,
+             d_self.acquireWeak()),
+         channel_wp = bsl::weak_ptr<bmqio::Channel>(channel_sp),
+         lifetime]() {
+            weakFn(channel_wp, lifetime);
+        });
 
     return 0;
 }
