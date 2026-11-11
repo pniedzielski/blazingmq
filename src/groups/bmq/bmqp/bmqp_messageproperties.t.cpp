@@ -1583,12 +1583,13 @@ static void testN1_benchmark(benchmark::State& state)
 
     bslmt::ThreadGroup threadGroup(bmqtst::TestHelperUtil::allocator());
     for (size_t i = 0; i < NUM_THREADS; ++i) {
-        const int rc = threadGroup.addThread(
-            bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                  &(BENCHMARK::bench),
-                                  &initThreadLatch,
-                                  &startBenchmarkBarrier,
-                                  &finishBenchmarkLatch));
+        const int rc = threadGroup.addThread([&initThreadLatch,
+                                              &startBenchmarkBarrier,
+                                              &finishBenchmarkLatch]() {
+            BENCHMARK::bench(&initThreadLatch,
+                             &startBenchmarkBarrier,
+                             &finishBenchmarkLatch);
+        });
         BMQTST_ASSERT_EQ_D(i, rc, 0);
     }
 
