@@ -103,10 +103,7 @@
 //                            d_clusterData.membership().netCluster()->nodes(),
 //                            d_transportManager_p);
 //
-//    dispatcher()->execute(
-//              bdlf::BindUtil::bind(&ClusterProxy::refreshActiveNodeManager,
-//                                   this),
-//              this);
+//    dispatcher()->execute([this]() { refreshActiveNodeManager(); }, this);
 //  }
 //
 //  void
@@ -128,11 +125,8 @@
 //                      const bsl::shared_ptr<const mqbnet::Session>&  session)
 //  {
 //    dispatcher()->execute(
-//            bdlf::BindUtil::bind(&ClusterProxy::onNodeStateChange,
-//                                 this,
-//                                 node,
-//                                 session),
-//            this);
+//        [this, node, session]() { onNodeStateChange(node, session); },
+//        this);
 //  }
 //
 //  void
