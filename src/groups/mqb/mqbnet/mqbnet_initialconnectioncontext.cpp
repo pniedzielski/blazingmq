@@ -260,11 +260,11 @@ int InitialConnectionContext::scheduleRead(bsl::ostream& errorDescription)
     channel()->read(
         &status,
         bmqp::Protocol::k_PACKET_MIN_SIZE,
-        bdlf::BindUtil::bind(&InitialConnectionContext::readCallback,
-                             this,
-                             bdlf::PlaceHolders::_1,   // status
-                             bdlf::PlaceHolders::_2,   // numNeeded
-                             bdlf::PlaceHolders::_3),  // blob
+        [this](const bmqio::Status& readStatus,
+               int*                 numNeeded,
+               bdlbb::Blob*         blob) {
+            readCallback(readStatus, numNeeded, blob);
+        },
         bsls::TimeInterval(k_INITIALCONNECTION_READTIMEOUT));
 
     if (!status) {

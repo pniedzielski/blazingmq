@@ -25,7 +25,6 @@
 #include <bmqp_ctrlmsg_messages.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bsl_memory.h>
 #include <bsl_ostream.h>
 #include <bsl_string.h>
@@ -255,13 +254,13 @@ class TestBench {
     /// Return a completion callback recording into `d_result`.
     mqbnet::InitialConnectionContext::InitialConnectionCompleteCb completeCb()
     {
-        return bdlf::BindUtil::bindS(d_allocator_p,
-                                     &onComplete,
-                                     &d_result,
-                                     bdlf::PlaceHolders::_1,   // status
-                                     bdlf::PlaceHolders::_2,   // error
-                                     bdlf::PlaceHolders::_3,   // session
-                                     bdlf::PlaceHolders::_4);  // channel
+        return [result = &d_result](
+                   int                                     status,
+                   const bsl::string&                      errorDescription,
+                   const bsl::shared_ptr<mqbnet::Session>& session,
+                   const bsl::shared_ptr<bmqio::Channel>&  channel) {
+            onComplete(result, status, errorDescription, session, channel);
+        };
     }
 };
 
@@ -283,13 +282,12 @@ static void test1_initialConnectionContext()
 
     bsl::shared_ptr<int> check = bsl::allocate_shared<int>(alloc, 0);
     mqbnet::InitialConnectionContext::InitialConnectionCompleteCb completeCb =
-        bdlf::BindUtil::bind(&complete,
-                             check,
-                             bdlf::PlaceHolders::_1,  // status
-                             bdlf::PlaceHolders::_2,  // errorDescription
-                             bdlf::PlaceHolders::_3,  // session
-                             bdlf::PlaceHolders::_4   // channel
-        );
+        [check](int                                     status,
+                const bsl::string&                      errorDescription,
+                const bsl::shared_ptr<mqbnet::Session>& session,
+                const bsl::shared_ptr<bmqio::Channel>&  sessionChannel) {
+            complete(check, status, errorDescription, session, sessionChannel);
+        };
 
     bmqtst::TestHelper::printTestName("test1_basicConstruction");
     {
