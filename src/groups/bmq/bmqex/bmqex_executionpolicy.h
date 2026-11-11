@@ -154,18 +154,16 @@ class ExecutionPolicy {
     /// Create a `ExecutionPolicy` object having the specified `blocking`
     /// property, the specified associated `executor`, and the specified
     /// associated `allocator`.
-    explicit BSLS_KEYWORD_CONSTEXPR_CPP14
-    ExecutionPolicy(ExecutionProperty::Blocking blocking,
-                    EXECUTOR                    executor,
-                    bslma::Allocator*           allocator);
+    explicit constexpr ExecutionPolicy(ExecutionProperty::Blocking blocking,
+                                       EXECUTOR                    executor,
+                                       bslma::Allocator*           allocator);
 
     /// Create a `ExecutionPolicy` object having the same properties as the
     /// specified `original` object.
     ///
     /// `EXECUTOR` shall be constructible from `OTHER_EXECUTOR`.
     template <class OTHER_EXECUTOR>
-    BSLS_KEYWORD_CONSTEXPR_CPP14
-    ExecutionPolicy(const ExecutionPolicy<OTHER_EXECUTOR>& original);
+    constexpr ExecutionPolicy(const ExecutionPolicy<OTHER_EXECUTOR>& original);
 
   public:
     // ACCESSORS
@@ -248,7 +246,7 @@ struct ExecutionPolicyUtil {
 
 // CREATORS
 template <class EXECUTOR>
-inline BSLS_KEYWORD_CONSTEXPR_CPP14 ExecutionPolicy<EXECUTOR>::ExecutionPolicy(
+inline constexpr ExecutionPolicy<EXECUTOR>::ExecutionPolicy(
     ExecutionProperty::Blocking blocking,
     EXECUTOR                    executor,
     bslma::Allocator*           allocator)
@@ -262,7 +260,7 @@ inline BSLS_KEYWORD_CONSTEXPR_CPP14 ExecutionPolicy<EXECUTOR>::ExecutionPolicy(
 
 template <class EXECUTOR>
 template <class OTHER_EXECUTOR>
-inline BSLS_KEYWORD_CONSTEXPR_CPP14 ExecutionPolicy<EXECUTOR>::ExecutionPolicy(
+inline constexpr ExecutionPolicy<EXECUTOR>::ExecutionPolicy(
     const ExecutionPolicy<OTHER_EXECUTOR>& original)
 : d_blocking(original.d_blocking)
 , d_executor(original.d_executor)

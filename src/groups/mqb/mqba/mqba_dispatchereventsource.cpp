@@ -38,7 +38,7 @@ namespace BloombergLP {
 namespace mqba {
 
 namespace {
-BSLS_KEYWORD_CONSTEXPR const int k_POOL_GROW_BY = 1024;
+constexpr const int k_POOL_GROW_BY = 1024;
 }  // close unnamed namespace
 
 // --------------------------

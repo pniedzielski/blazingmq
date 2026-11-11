@@ -71,7 +71,7 @@ const int k_GUID_VERSION_AND_COUNTER_BYTES = 3;
 /// Number of bytes used to encode those various fields.
 const int k_TIMERTICK_BYTES = 7;
 
-const BSLS_KEYWORD_CONSTEXPR int k_HOSTNAME_LEN = 128;
+const constexpr int k_HOSTNAME_LEN = 128;
 
 }  // close unnamed namespace
 

@@ -481,7 +481,7 @@ void test5_customHashUniqueness()
     // created upon insertion of objects in the map uses the default
     // allocator.
 
-    BSLS_KEYWORD_CONSTEXPR bsl::size_t k_NUM_ELEMS = 10000;  // 10K
+    constexpr bsl::size_t k_NUM_ELEMS = 10000;  // 10K
 
     typedef bsl::unordered_set<mqbu::StorageKey>::const_iterator CITER;
     typedef bsl::vector<mqbu::StorageKey>                        StorageKeys;

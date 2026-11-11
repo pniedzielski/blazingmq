@@ -345,8 +345,8 @@ class Executor_Box_SboImp {
 template <class EXECUTOR>
 struct Executor_Box_SboImpCanHold {
     // CLASS DATA
-    static BSLS_KEYWORD_CONSTEXPR_MEMBER bool value =
-        sizeof(Executor_Box_SboImp) >= sizeof(Executor_Target<EXECUTOR>);
+    static constexpr bool value = sizeof(Executor_Box_SboImp) >=
+                                  sizeof(Executor_Target<EXECUTOR>);
 };
 
 // ==================

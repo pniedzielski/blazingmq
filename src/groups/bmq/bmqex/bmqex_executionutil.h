@@ -153,7 +153,7 @@ class ExecutionUtil_FunctionRef {
 
     /// Create a `ExecutionUtil_FunctionRef` containing the specified
     /// `function` pointer.
-    explicit BSLS_KEYWORD_CONSTEXPR_CPP14 ExecutionUtil_FunctionRef(
+    explicit constexpr ExecutionUtil_FunctionRef(
         typename bsl::remove_reference<F>::type* function) noexcept;
 
   public:
@@ -209,7 +209,7 @@ class ExecutionUtil_OneOffFunction {
 
         /// Create a `DestroyFunctionOnScopeExit` referring to the specified
         /// `functionValue`.
-        explicit BSLS_KEYWORD_CONSTEXPR_CPP14
+        explicit constexpr
         DestroyFunctionOnScopeExit(FunctionValueType* functionValue) noexcept;
 
         /// Destroy the referred to function object.
@@ -244,7 +244,7 @@ class ExecutionUtil_OneOffFunction {
     ///
     /// `F` must be constructible from `bsl::forward<F_PARAM>(f)`.
     template <class F_PARAM>
-    BSLS_KEYWORD_CONSTEXPR_CPP14
+    constexpr
     ExecutionUtil_OneOffFunction(BSLS_COMPILERFEATURES_FORWARD_REF(F_PARAM) f,
                                  bslma::Allocator* allocator);
 
@@ -422,8 +422,7 @@ inline R ExecutionUtil_FunctionRef<R, F>::invoke(
 
 // CREATORS
 template <class R, class F>
-inline BSLS_KEYWORD_CONSTEXPR_CPP14
-ExecutionUtil_FunctionRef<R, F>::ExecutionUtil_FunctionRef(
+inline constexpr ExecutionUtil_FunctionRef<R, F>::ExecutionUtil_FunctionRef(
     typename bsl::remove_reference<F>::type* function) noexcept
 : d_function_p(function)
 {
@@ -460,7 +459,7 @@ inline R ExecutionUtil_OneOffFunction<R, F>::invoke(
 // CREATORS
 template <class R, class F>
 template <class F_PARAM>
-inline BSLS_KEYWORD_CONSTEXPR_CPP14
+inline constexpr
 ExecutionUtil_OneOffFunction<R, F>::ExecutionUtil_OneOffFunction(
     BSLS_COMPILERFEATURES_FORWARD_REF(F_PARAM) f,
     bslma::Allocator* allocator)
@@ -487,7 +486,7 @@ inline R ExecutionUtil_OneOffFunction<R, F>::operator()()
 
 // CREATORS
 template <class R, class F>
-inline BSLS_KEYWORD_CONSTEXPR_CPP14
+inline constexpr
 ExecutionUtil_OneOffFunction<R, F>::DestroyFunctionOnScopeExit::
     DestroyFunctionOnScopeExit(FunctionValueType* functionValue) noexcept
 : d_functionValue_p(functionValue)
