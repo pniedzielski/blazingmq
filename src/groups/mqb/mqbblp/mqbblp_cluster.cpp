@@ -68,8 +68,6 @@
 
 // BDE
 #include <bdlb_print.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_algorithm.h>
@@ -215,17 +213,21 @@ void Cluster::startDispatched(bsl::ostream* errorDescription, int* rc)
                       d_clusterData.clusterConfig()
                           .clusterAttributes()
                           .partitionFsmWatchdogNumRetries(),
-                      bdlf::BindUtil::bind(&Cluster::onRecoveryStatus,
-                                           this,
-                                           bdlf::PlaceHolders::_1,  // status
-                                           bsl::vector<unsigned int>(),
-                                           statRecorder),
-                      bdlf::BindUtil::bind(
-                          &ClusterOrchestrator::onPartitionPrimaryStatus,
-                          &d_clusterOrchestrator,
-                          bdlf::PlaceHolders::_1,   // partitionId
-                          bdlf::PlaceHolders::_2,   // status
-                          bdlf::PlaceHolders::_3),  // primary leaseId
+                      [this,
+                       primaryLeaseIds = bsl::vector<unsigned int>(),
+                       statRecorder](int status) {
+                          onRecoveryStatus(status,
+                                           primaryLeaseIds,
+                                           statRecorder);
+                      },
+                      [this](int          partitionId,
+                             int          status,
+                             unsigned int primaryLeaseId) {
+                          d_clusterOrchestrator.onPartitionPrimaryStatus(
+                              partitionId,
+                              status,
+                              primaryLeaseId);
+                      },
                       storageManagerAllocator))
             : static_cast<mqbi::StorageManager*>(
                   new (*storageManagerAllocator) mqbblp::StorageManager(
@@ -233,18 +235,21 @@ void Cluster::startDispatched(bsl::ostream* errorDescription, int* rc)
                       this,
                       &d_clusterData,
                       &d_state,
-                      bdlf::BindUtil::bind(
-                          &Cluster::onRecoveryStatus,
-                          this,
-                          bdlf::PlaceHolders::_1,  // status
-                          bdlf::PlaceHolders::_2,  // vector<leaseId>
-                          statRecorder),
-                      bdlf::BindUtil::bind(
-                          &ClusterOrchestrator::onPartitionPrimaryStatus,
-                          &d_clusterOrchestrator,
-                          bdlf::PlaceHolders::_1,   // partitionId
-                          bdlf::PlaceHolders::_2,   // status
-                          bdlf::PlaceHolders::_3),  // primary leaseId
+                      [this, statRecorder](
+                          int                              status,
+                          const bsl::vector<unsigned int>& primaryLeaseIds) {
+                          onRecoveryStatus(status,
+                                           primaryLeaseIds,
+                                           statRecorder);
+                      },
+                      [this](int          partitionId,
+                             int          status,
+                             unsigned int primaryLeaseId) {
+                          d_clusterOrchestrator.onPartitionPrimaryStatus(
+                              partitionId,
+                              status,
+                              primaryLeaseId);
+                      },
                       d_clusterData.domainFactory(),
                       clusterDispatcher,
                       &d_clusterData.miscWorkThreadPool(),
@@ -309,14 +314,18 @@ void Cluster::startDispatched(bsl::ostream* errorDescription, int* rc)
     d_clusterData.scheduler().scheduleRecurringEvent(
         &d_logSummarySchedulerHandle,
         bsls::TimeInterval(k_LOG_SUMMARY_INTERVAL),
-        bdlf::BindUtil::bind(&Cluster::logSummaryState, this));
+        [this]() {
+            logSummaryState();
+        });
 
     // Start a recurring clock for gc'ing expired queues.
 
     d_clusterData.scheduler().scheduleRecurringEvent(
         &d_queueGcSchedulerHandle,
         bsls::TimeInterval(k_QUEUE_GC_INTERVAL),
-        bdlf::BindUtil::bind(&Cluster::gcExpiredQueues, this));
+        [this]() {
+            gcExpiredQueues();
+        });
 
     d_isStarted = true;
 
@@ -598,19 +607,19 @@ void Cluster::initiateShutdownDispatched(const VoidFunctor& callback)
         d_clusterData.clusterConfig().queueOperations().shutdownTimeoutMs());
 
     d_shutdownChain.appendInplace(
-        bdlf::BindUtil::bind(&ClusterQueueHelper::checkUnconfirmedV2,
-                             &d_clusterOrchestrator.queueHelper(),
-                             whenToStop,
-                             bdlf::PlaceHolders::_1));  // completionCb
+        [queueHelper = &d_clusterOrchestrator.queueHelper(),
+         whenToStop](const bsl::function<void()>& completionCb) {
+            queueHelper->checkUnconfirmedV2(whenToStop, completionCb);
+        });
 
     // Also update self's status.  Note that this node does not explicitly
     // issue a close-queue request for each of the queues.
 
     d_shutdownChain.appendInplace(
-        bdlf::BindUtil::bind(&Cluster::continueShutdown,
-                             this,
-                             bmqu::Time::highResolutionTimer(),  // startTime
-                             bdlf::PlaceHolders::_1),  // completionCb
+        [this, startTimeNs = bmqu::Time::highResolutionTimer()](
+            const CompletionCallback& completionCb) {
+            continueShutdown(startTimeNs, completionCb);
+        },
         callback);
 
     d_shutdownChain.start();
@@ -622,10 +631,9 @@ void Cluster::continueShutdown(bsls::Types::Int64        startTimeNs,
     // executed by either the *DISPATCHER* thread or one of *CLIENT* threads
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&Cluster::continueShutdownDispatched,
-                             this,
-                             startTimeNs,
-                             completionCb),
+        [this, startTimeNs, completionCb]() {
+            continueShutdownDispatched(startTimeNs, completionCb);
+        },
         this);
 }
 
@@ -711,7 +719,9 @@ void Cluster::continueShutdownDispatched(
     dispatcher()->executeOnAllQueues(
         mqbi::Dispatcher::VoidFunction(),  // empty
         mqbi::DispatcherClientType::e_QUEUE,
-        bdlf::BindUtil::bindS(d_allocator_p, &bslmt::Latch::arrive, &latch));
+        [latchP = &latch]() {
+            latchP->arrive();
+        });
 
     latch.wait();
 
@@ -1634,11 +1644,9 @@ void Cluster::onRecoveryStatus(
     // exected by *ANY* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&Cluster::onRecoveryStatusDispatched,
-                             this,
-                             status,
-                             primaryLeaseIds,
-                             statRecorder),
+        [this, status, primaryLeaseIds, statRecorder]() {
+            onRecoveryStatusDispatched(status, primaryLeaseIds, statRecorder);
+        },
         this);
 }
 
@@ -1656,10 +1664,9 @@ void Cluster::onRecoveryStatusDispatched(
         BALL_LOG_ERROR << description() << ": Stopping cluster as recovery "
                        << "failed with status: " << status;
 
-        bmqex::SystemExecutor().post(
-            bdlf::BindUtil::bind(&Cluster::terminate,
-                                 this,
-                                 mqbu::ExitCode::e_RECOVERY_FAILURE));
+        bmqex::SystemExecutor().post([this]() {
+            terminate(mqbu::ExitCode::e_RECOVERY_FAILURE);
+        });
         return;  // RETURN
     }
 
@@ -1717,10 +1724,9 @@ void Cluster::onRecoveryStatusDispatched(
                     << "). Stopping the node as this node seems  to have more "
                     << "advanced view of the storage." << BMQTSK_ALARMLOG_END;
 
-                bmqex::SystemExecutor().post(bdlf::BindUtil::bind(
-                    &Cluster::terminate,
-                    this,
-                    mqbu::ExitCode::e_STORAGE_OUT_OF_SYNC));
+                bmqex::SystemExecutor().post([this]() {
+                    terminate(mqbu::ExitCode::e_STORAGE_OUT_OF_SYNC);
+                });
                 return;  // RETURN
             }
             // else: all good.
@@ -1792,7 +1798,9 @@ void Cluster::gcExpiredQueues()
     // executed by the *SCHEDULER* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&Cluster::gcExpiredQueuesDispatched, this),
+        [this]() {
+            gcExpiredQueuesDispatched();
+        },
         this);
 }
 
@@ -1811,7 +1819,9 @@ void Cluster::logSummaryState()
     // executed by the *SCHEDULER* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&Cluster::logSummaryStateDispatched, this),
+        [this]() {
+            logSummaryStateDispatched();
+        },
         this);
 }
 
@@ -2192,11 +2202,11 @@ Cluster::~Cluster()
 int Cluster::start(bsl::ostream& errorDescription)
 {
     int rc;
-    dispatcher()->execute(bdlf::BindUtil::bind(&Cluster::startDispatched,
-                                               this,
-                                               &errorDescription,
-                                               &rc),
-                          this);
+    dispatcher()->execute(
+        [this, errorDescriptionP = &errorDescription, rcP = &rc]() {
+            startDispatched(errorDescriptionP, rcP);
+        },
+        this);
 
     // We synchronize twice here.  1st synchronize() is needed to ensure that
     // 'startDispatched' has been executed.  The 2nd synchronize() is needed to
@@ -2225,9 +2235,9 @@ void Cluster::initiateShutdown(const VoidFunctor& callback)
     // executed by *ANY* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&Cluster::initiateShutdownDispatched,
-                             this,
-                             callback),
+        [this, callback]() {
+            initiateShutdownDispatched(callback);
+        },
         this);
 }
 
@@ -2243,8 +2253,11 @@ void Cluster::stop()
 
     d_isStarted = false;
 
-    dispatcher()->execute(bdlf::BindUtil::bind(&Cluster::stopDispatched, this),
-                          this);
+    dispatcher()->execute(
+        [this]() {
+            stopDispatched();
+        },
+        this);
 
     // We need to synchronize twice.  See notes in 'start' for explanation.
 
@@ -2259,7 +2272,9 @@ void Cluster::terminate(mqbu::ExitCode::Enum reason)
     BSLS_ASSERT_SAFE(!inDispatcherThread());
 
     bslmt::Latch latch(1);
-    initiateShutdown(bdlf::BindUtil::bind(&bslmt::Latch::arrive, &latch));
+    initiateShutdown([latchP = &latch]() {
+        latchP->arrive();
+    });
 
     latch.wait();
 
@@ -2279,13 +2294,13 @@ void Cluster::openQueue(
 
     // Enqueue an event to process in the dispatcher thread
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&ClusterQueueHelper::openQueue,
-                             &d_clusterOrchestrator.queueHelper(),
-                             uri,
-                             domain,
-                             handleParameters,
-                             clientContext,
-                             callback),
+        [this, uri, domain, handleParameters, clientContext, callback]() {
+            d_clusterOrchestrator.queueHelper().openQueue(uri,
+                                                          domain,
+                                                          handleParameters,
+                                                          clientContext,
+                                                          callback);
+        },
         this);
 }
 
@@ -2372,11 +2387,11 @@ void Cluster::onDomainReconfigured(const mqbi::Domain&     domain,
                                                   newCfgAppIds);
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&ClusterOrchestrator::updateAppIds,
-                             &d_clusterOrchestrator,
-                             addedIds,
-                             removedIds,
-                             domain.name()),
+        [this, addedIds, removedIds, domainName = domain.name()]() {
+            d_clusterOrchestrator.updateAppIds(addedIds,
+                                               removedIds,
+                                               domainName);
+        },
         this);
 
     // An update error is CSL error (in 'ClusterStateLedger::apply').
@@ -2395,16 +2410,13 @@ int Cluster::processCommand(mqbcmd::ClusterResult*        result,
 {
     // executed by *ANY* thread
 
-    // Note that we bind 'cmd' & 'os' by their addresses because bdlf::bind
-    // does not support binding by references.  While passing streams by
-    // addresses is ungainly, it works, and the stream objects are guaranteed
-    // to outlive the callback because we synchronize the callback.
+    // Note that we capture 'command' by reference: it is guaranteed to
+    // outlive the callback because we synchronize the callback.
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&Cluster::processCommandDispatched,
-                             this,
-                             result,
-                             bsl::ref(command)),
+        [this, result, &command]() {
+            processCommandDispatched(result, command);
+        },
         this);
     dispatcher()->synchronize(this);
 
@@ -2427,10 +2439,9 @@ void Cluster::processControlMessage(
         BSLS_ASSERT_SAFE(!message.rId().isNull());
 
         dispatcher()->execute(
-            bdlf::BindUtil::bind(&Cluster::processResponseDispatched,
-                                 this,
-                                 message,
-                                 source),
+            [this, message, source]() {
+                processResponseDispatched(message, source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_OPEN_QUEUE: {
@@ -2438,11 +2449,10 @@ void Cluster::processControlMessage(
             d_clusterData.membership().getClusterNodeSession(source);
         BSLS_ASSERT_SAFE(node);
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterQueueHelper::processPeerOpenQueueRequest,
-                &d_clusterOrchestrator.queueHelper(),
-                message,
-                node),
+            [this, message, node]() {
+                d_clusterOrchestrator.queueHelper()
+                    .processPeerOpenQueueRequest(message, node);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_CONFIGURE_STREAM:
@@ -2451,11 +2461,10 @@ void Cluster::processControlMessage(
             d_clusterData.membership().getClusterNodeSession(source);
         BSLS_ASSERT_SAFE(node);
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterQueueHelper::processPeerConfigureStreamRequest,
-                &d_clusterOrchestrator.queueHelper(),
-                message,
-                node),
+            [this, message, node]() {
+                d_clusterOrchestrator.queueHelper()
+                    .processPeerConfigureStreamRequest(message, node);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_CLOSE_QUEUE: {
@@ -2463,11 +2472,10 @@ void Cluster::processControlMessage(
             d_clusterData.membership().getClusterNodeSession(source);
         BSLS_ASSERT_SAFE(node);
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterQueueHelper::processPeerCloseQueueRequest,
-                &d_clusterOrchestrator.queueHelper(),
-                message,
-                node),
+            [this, message, node]() {
+                d_clusterOrchestrator.queueHelper()
+                    .processPeerCloseQueueRequest(message, node);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_CLUSTER_MESSAGE: {
@@ -2485,15 +2493,13 @@ void Cluster::processControlMessage(
         const bmqp_ctrlmsg::AdminCommand& adminCommand =
             message.choice().adminCommand();
         const bsl::string& cmd = adminCommand.command();
-        d_adminCb(source->hostName(),
-                  cmd,
-                  bdlf::BindUtil::bind(&Cluster::onProcessedAdminCommand,
-                                       this,
-                                       source,
-                                       message,
-                                       bdlf::PlaceHolders::_1,   // rc
-                                       bdlf::PlaceHolders::_2),  // response
-                  true);  // from reroute
+        d_adminCb(
+            source->hostName(),
+            cmd,
+            [this, source, message](int rc, const bsl::string& results) {
+                onProcessedAdminCommand(source, message, rc, results);
+            },
+            true);  // from reroute
     } break;
     case MsgChoice::SELECTION_ID_ADMIN_COMMAND_RESPONSE: {
         requestManager().processResponse(message);
@@ -2541,10 +2547,9 @@ void Cluster::processClusterControlMessage(
         BSLS_ASSERT_SAFE(!message.rId().isNull());
 
         dispatcher()->execute(
-            bdlf::BindUtil::bind(&Cluster::processResponseDispatched,
-                                 this,
-                                 message,
-                                 source),
+            [this, message, source]() {
+                processResponseDispatched(message, source);
+            },
             this);
     } break;  // BREAK
 
@@ -2563,83 +2568,75 @@ void Cluster::processClusterControlMessage(
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_NODE_STATUS_ADVISORY: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterOrchestrator::processNodeStatusAdvisory,
-                &d_clusterOrchestrator,
-                message,
-                source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processNodeStatusAdvisory(message,
+                                                                source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_LEADER_SYNC_STATE_QUERY: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterOrchestrator::processLeaderSyncStateQuery,
-                &d_clusterOrchestrator,
-                message,
-                source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processLeaderSyncStateQuery(message,
+                                                                  source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_LEADER_SYNC_DATA_QUERY: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterOrchestrator::processLeaderSyncDataQuery,
-                &d_clusterOrchestrator,
-                message,
-                source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processLeaderSyncDataQuery(message,
+                                                                 source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_QUEUE_ASSIGNMENT_REQUEST: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterOrchestrator::processQueueAssignmentRequest,
-                &d_clusterOrchestrator,
-                message,
-                source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processQueueAssignmentRequest(message,
+                                                                    source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_STORAGE_SYNC_REQUEST: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterOrchestrator::processStorageSyncRequest,
-                &d_clusterOrchestrator,
-                message,
-                source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processStorageSyncRequest(message,
+                                                                source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_PARTITION_SYNC_STATE_QUERY: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterOrchestrator::processPartitionSyncStateRequest,
-                &d_clusterOrchestrator,
-                message,
-                source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processPartitionSyncStateRequest(message,
+                                                                       source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_PARTITION_SYNC_DATA_QUERY: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterOrchestrator::processPartitionSyncDataRequest,
-                &d_clusterOrchestrator,
-                message,
-                source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processPartitionSyncDataRequest(message,
+                                                                      source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_PARTITION_SYNC_DATA_QUERY_STATUS: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterOrchestrator::processPartitionSyncDataRequestStatus,
-                &d_clusterOrchestrator,
-                message,
-                source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processPartitionSyncDataRequestStatus(
+                    message,
+                    source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_PRIMARY_STATUS_ADVISORY: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterOrchestrator::processPrimaryStatusAdvisory,
-                &d_clusterOrchestrator,
-                message,
-                source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processPrimaryStatusAdvisory(message,
+                                                                   source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_QUEUE_UN_ASSIGNMENT_ADVISORY: {
@@ -2649,36 +2646,32 @@ void Cluster::processClusterControlMessage(
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_STATE_NOTIFICATION: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterOrchestrator::processStateNotification,
-                &d_clusterOrchestrator,
-                message,
-                source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processStateNotification(message,
+                                                               source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_STOP_REQUEST: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(&ClusterOrchestrator::processStopRequest,
-                                 &d_clusterOrchestrator,
-                                 message,
-                                 source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processStopRequest(message, source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_CLUSTER_STATE_F_S_M_MESSAGE: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterOrchestrator::processClusterStateFSMMessage,
-                &d_clusterOrchestrator,
-                message,
-                source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processClusterStateFSMMessage(message,
+                                                                    source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_PARTITION_MESSAGE: {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(&ClusterOrchestrator::processPartitionMessage,
-                                 &d_clusterOrchestrator,
-                                 message,
-                                 source),
+            [this, message, source]() {
+                d_clusterOrchestrator.processPartitionMessage(message, source);
+            },
             this);
     } break;  // BREAK
     case MsgChoice::SELECTION_ID_UNDEFINED:
@@ -2952,10 +2945,10 @@ void Cluster::onNodeStateChange(mqbnet::ClusterNode* node, bool isAvailable)
     // executed by the *IO* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&ClusterOrchestrator::processNodeStateChangeEvent,
-                             &d_clusterOrchestrator,
-                             node,
-                             isAvailable),
+        [this, node, isAvailable]() {
+            d_clusterOrchestrator.processNodeStateChangeEvent(node,
+                                                              isAvailable);
+        },
         this);
 }
 
@@ -2967,11 +2960,12 @@ void Cluster::onProxyConnectionUp(
     // executed by the *IO* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&Cluster::onProxyConnectionUpDispatched,
-                             this,
-                             channel,
-                             identity,
-                             bsl::string(description, d_allocator_p)),
+        [this,
+         channel,
+         identity,
+         descriptionStr = bsl::string(description, d_allocator_p)]() {
+            onProxyConnectionUpDispatched(channel, identity, descriptionStr);
+        },
         this);
 }
 
@@ -3152,10 +3146,9 @@ void Cluster::purgeAndGCQueueOnDomain(mqbcmd::ClusterResult* result,
     // exected by *ANY* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&Cluster::purgeAndGCQueueOnDomainDispatched,
-                             this,
-                             result,
-                             domainName),
+        [this, result, domainName]() {
+            purgeAndGCQueueOnDomainDispatched(result, domainName);
+        },
         this);
 
     dispatcher()->synchronize(this);
@@ -3208,10 +3201,10 @@ void Cluster::processBufferedPrimaryStatusAdvisories(int partitionId)
     // exected by *ANY* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(
-            &ClusterOrchestrator::processBufferedPrimaryStatusAdvisories,
-            &d_clusterOrchestrator,
-            partitionId),
+        [this, partitionId]() {
+            d_clusterOrchestrator.processBufferedPrimaryStatusAdvisories(
+                partitionId);
+        },
         this);
 }
 
@@ -3284,10 +3277,9 @@ Cluster::sendRequest(const Cluster::RequestManagerType::RequestSp& request,
 
     return d_clusterData.requestManager().sendRequest(
         request,
-        bdlf::BindUtil::bind(&mqbnet::ClusterNode::write,
-                             target,
-                             bdlf::PlaceHolders::_1,
-                             bmqp::EventType::e_CONTROL),
+        [target](const bsl::shared_ptr<bdlbb::Blob>& blob) {
+            return target->write(blob, bmqp::EventType::e_CONTROL);
+        },
         target->nodeDescription(),
         timeout);
 }
