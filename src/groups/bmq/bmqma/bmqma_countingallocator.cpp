@@ -295,7 +295,7 @@ void* CountingAllocator::allocate(size_type size)
     BSLS_ASSERT_SAFE(totalSize >= 0);
     d_statContext_mp->adjustValue(0, totalSize);
 
-    Header* header = static_cast<Header*>(d_allocator_p->allocate(totalSize));
+    auto* header = static_cast<Header*>(d_allocator_p->allocate(totalSize));
     header->d_data.d_numAllocatedBytes = totalSize;
     header->d_data.d_magic             = k_MAGIC;
 
