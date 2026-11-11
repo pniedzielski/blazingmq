@@ -179,10 +179,6 @@ struct AdvisoryInfo {
 /// This class provides a wrapper on top of the IncoreClusterStateLedger
 /// under test and implements a few mechanisms to help testing the object.
 struct Tester {
-  private:
-    // PRIVATE TYPES
-    typedef mqbmock::Cluster::TestChannelMapCIter TestChannelMapCIter;
-
   public:
     // PUBLIC DATA
     bool                                              d_isLeader;
@@ -274,12 +270,11 @@ struct Tester {
         int                         pid = 0;
         mqbnet::Cluster::NodesList& nodes =
             d_cluster_mp->_clusterData()->membership().netCluster()->nodes();
-        for (mqbnet::Cluster::NodesList::iterator iter = nodes.begin();
-             iter != nodes.end();
-             ++iter) {
+        for (const auto& clusterNode : nodes) {
             mqbc::ClusterNodeSession* ns = d_cluster_mp->_clusterData()
                                                ->membership()
-                                               .getClusterNodeSession(*iter);
+                                               .getClusterNodeSession(
+                                                   clusterNode);
             BSLS_ASSERT_OPT(ns);
             d_cluster_mp->_state()->setPartitionPrimary(pid, 1, ns);
             ++pid;
@@ -425,10 +420,9 @@ struct Tester {
         // PRECONDITIONS
         BSLS_ASSERT_OPT(d_cluster_mp->_channels().size() > 0);
 
-        for (TestChannelMapCIter citer = d_cluster_mp->_channels().cbegin();
-             citer != d_cluster_mp->_channels().cend();
-             ++citer) {
-            if (number < citer->second->numWriteCalls()) {
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            if (number < testChannel->numWriteCalls()) {
                 return false;
             }
         }
@@ -445,18 +439,17 @@ struct Tester {
         BSLS_ASSERT_OPT(d_cluster_mp->_channels().size() > 0);
         BSLS_ASSERT_OPT(!d_isLeader);
 
-        for (TestChannelMapCIter citer = d_cluster_mp->_channels().cbegin();
-             citer != d_cluster_mp->_channels().cend();
-             ++citer) {
-            if (citer->first->nodeId() == mqbmock::Cluster::k_LEADER_NODE_ID) {
-                if (!citer->second->waitFor(number)) {
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            if (clusterNode->nodeId() == mqbmock::Cluster::k_LEADER_NODE_ID) {
+                if (!testChannel->waitFor(number)) {
                     return false;  // RETURN
                 }
-                BMQTST_ASSERT_LE(number, citer->second->numWriteCalls());
+                BMQTST_ASSERT_LE(number, testChannel->numWriteCalls());
             }
             else {
-                BMQTST_ASSERT(!citer->second->waitFor(1));
-                BMQTST_ASSERT_EQ(citer->second->numWriteCalls(), 0u);
+                BMQTST_ASSERT(!testChannel->waitFor(1));
+                BMQTST_ASSERT_EQ(testChannel->numWriteCalls(), 0u);
             }
         }
 
@@ -470,10 +463,9 @@ struct Tester {
         BSLS_ASSERT_OPT(d_cluster_mp->_channels().size() > 0);
 
         size_t count = 0;
-        for (TestChannelMapCIter citer = d_cluster_mp->_channels().cbegin();
-             citer != d_cluster_mp->_channels().cend();
-             ++citer) {
-            count += citer->second->numWriteCalls();
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            count += testChannel->numWriteCalls();
         }
 
         return count;
@@ -488,20 +480,19 @@ struct Tester {
         BSLS_ASSERT_OPT(d_cluster_mp->_channels().size() > 0);
         BSLS_ASSERT_OPT(d_isLeader);
 
-        for (TestChannelMapCIter citer = d_cluster_mp->_channels().cbegin();
-             citer != d_cluster_mp->_channels().cend();
-             ++citer) {
-            if (citer->first->nodeId() == d_cluster_mp->_clusterData()
-                                              ->membership()
-                                              .netCluster()
-                                              ->selfNodeId()) {
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            if (clusterNode->nodeId() == d_cluster_mp->_clusterData()
+                                             ->membership()
+                                             .netCluster()
+                                             ->selfNodeId()) {
                 continue;  // CONTINUE
             }
 
-            if (!citer->second->waitFor(number)) {
+            if (!testChannel->waitFor(number)) {
                 return false;  // RETURN
             }
-            BSLS_ASSERT_OPT(number <= citer->second->numWriteCalls());
+            BSLS_ASSERT_OPT(number <= testChannel->numWriteCalls());
         }
 
         return true;
@@ -516,20 +507,19 @@ struct Tester {
 
         bool        blobFound = false;
         bdlbb::Blob blob;
-        for (TestChannelMapCIter citer = d_cluster_mp->_channels().cbegin();
-             citer != d_cluster_mp->_channels().cend();
-             ++citer) {
-            if (citer->first->nodeId() == d_cluster_mp->_clusterData()
-                                              ->membership()
-                                              .netCluster()
-                                              ->selfNodeId()) {
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            if (clusterNode->nodeId() == d_cluster_mp->_clusterData()
+                                             ->membership()
+                                             .netCluster()
+                                             ->selfNodeId()) {
                 continue;  // CONTINUE
             }
 
-            BSLS_ASSERT_OPT(citer->second->waitFor(index + 1));
+            BSLS_ASSERT_OPT(testChannel->waitFor(index + 1));
 
             bmqio::TestChannel::WriteCall writeCall;
-            BMQTST_ASSERT(citer->second->getWriteCall(&writeCall, index));
+            BMQTST_ASSERT(testChannel->getWriteCall(&writeCall, index));
 
             if (!blobFound) {
                 blob      = writeCall.d_blob;
@@ -2216,18 +2206,19 @@ static void test12_persistanceAcrossRolloverLeader()
               compareQueueInfo);
     BMQTST_ASSERT_EQ(snapshot.queues(), qadvisory.queues());
 
-    for (bsl::vector<AdvisoryInfo>::const_iterator cit =
-             uncommittedAdvisories.cbegin();
-         cit != uncommittedAdvisories.cend();
-         ++cit) {
+    for (const auto& advisoryInfo : uncommittedAdvisories) {
         BMQTST_ASSERT_EQ(cslIter->next(), 0);
         BMQTST_ASSERT(cslIter->isValid());
-        verifyRecordHeader(*cslIter, cit->d_recordType, cit->d_sequenceNumber);
+        verifyRecordHeader(*cslIter,
+                           advisoryInfo.d_recordType,
+                           advisoryInfo.d_sequenceNumber);
 
         bmqp_ctrlmsg::ClusterMessage msg;
         BMQTST_ASSERT_EQ(cslIter->loadClusterMessage(&msg), 0);
-        BMQTST_ASSERT(cit->d_advisory.choice().isClusterMessageValue());
-        BMQTST_ASSERT_EQ(msg, cit->d_advisory.choice().clusterMessage());
+        BMQTST_ASSERT(
+            advisoryInfo.d_advisory.choice().isClusterMessageValue());
+        BMQTST_ASSERT_EQ(msg,
+                         advisoryInfo.d_advisory.choice().clusterMessage());
     }
 
     // Skip the advisory which caused rollover, and its associated commit if
@@ -2245,22 +2236,23 @@ static void test12_persistanceAcrossRolloverLeader()
                        mqbc::ClusterStateRecordType::e_COMMIT,
                        pmAdvisoryCommit.sequenceNumber());
 
-    for (bsl::vector<AdvisoryInfo>::const_iterator cit =
-             lastAdvisories.cbegin();
-         cit != lastAdvisories.cend();
-         ++cit) {
+    for (const auto& advisoryInfo : lastAdvisories) {
         BMQTST_ASSERT_EQ(cslIter->next(), 0);
         BMQTST_ASSERT(cslIter->isValid());
-        verifyRecordHeader(*cslIter, cit->d_recordType, cit->d_sequenceNumber);
+        verifyRecordHeader(*cslIter,
+                           advisoryInfo.d_recordType,
+                           advisoryInfo.d_sequenceNumber);
 
         bmqp_ctrlmsg::ClusterMessage msg;
         BMQTST_ASSERT_EQ(cslIter->loadClusterMessage(&msg), 0);
-        BMQTST_ASSERT(cit->d_advisory.choice().isClusterMessageValue());
-        BMQTST_ASSERT_EQ(msg, cit->d_advisory.choice().clusterMessage());
+        BMQTST_ASSERT(
+            advisoryInfo.d_advisory.choice().isClusterMessageValue());
+        BMQTST_ASSERT_EQ(msg,
+                         advisoryInfo.d_advisory.choice().clusterMessage());
 
         BMQTST_ASSERT_EQ(cslIter->next(), 0);
         BMQTST_ASSERT(cslIter->isValid());
-        verifyLeaderAdvisoryCommit(*cslIter, cit->d_sequenceNumber);
+        verifyLeaderAdvisoryCommit(*cslIter, advisoryInfo.d_sequenceNumber);
     }
 
     // Verify end of ledger
