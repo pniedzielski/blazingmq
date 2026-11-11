@@ -35,7 +35,6 @@
 #include <bsl_limits.h>
 #include <bsl_string.h>
 #include <bsls_assert.h>
-#include <bsls_keyword.h>
 #include <bsls_systemtime.h>
 #include <bsls_timeutil.h>
 

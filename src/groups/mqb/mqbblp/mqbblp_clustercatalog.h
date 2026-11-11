@@ -62,7 +62,6 @@
 #include <bslmt_mutex.h>
 #include <bsls_assert.h>
 #include <bsls_cpp11.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 

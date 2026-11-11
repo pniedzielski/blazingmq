@@ -48,7 +48,6 @@
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmf_removecv.h>
 #include <bsls_assert.h>
-#include <bsls_keyword.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {

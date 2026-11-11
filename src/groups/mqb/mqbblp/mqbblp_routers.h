@@ -176,7 +176,6 @@
 #include <bsla_annotations.h>
 #include <bslma_managedptr.h>
 #include <bsls_assert.h>
-#include <bsls_keyword.h>
 #include <bsls_timeinterval.h>
 
 namespace BloombergLP {

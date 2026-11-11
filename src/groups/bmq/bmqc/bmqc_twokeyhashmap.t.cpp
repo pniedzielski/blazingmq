@@ -26,7 +26,6 @@
 #include <bslma_testallocator.h>
 #include <bslmf_movableref.h>
 #include <bsls_assert.h>
-#include <bsls_keyword.h>
 
 // TEST DRIVER
 #include <bmqtst_testhelper.h>

@@ -23,7 +23,6 @@
 #include <bsl_vector.h>
 #include <bslma_managedptr.h>
 #include <bslmf_movableref.h>
-#include <bsls_keyword.h>
 #include <bslstl_sharedptr.h>
 
 namespace BloombergLP {

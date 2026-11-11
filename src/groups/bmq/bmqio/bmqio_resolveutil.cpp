@@ -24,7 +24,6 @@
 
 // NTC
 #include <bsl_memory.h>
-#include <bsls_keyword.h>
 #include <ntsa_error.h>
 #include <ntsa_ipaddress.h>
 #include <ntsa_ipaddressoptions.h>

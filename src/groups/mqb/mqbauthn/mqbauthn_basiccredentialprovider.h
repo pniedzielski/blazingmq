@@ -44,7 +44,6 @@
 #include <bslma_managedptr.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 

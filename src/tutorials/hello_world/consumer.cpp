@@ -53,7 +53,6 @@
 #include <bslmt_condition.h>
 #include <bslmt_lockguard.h>
 #include <bslmt_mutex.h>
-#include <bsls_keyword.h>
 #include <bsls_timeinterval.h>
 
 // SYSTEM

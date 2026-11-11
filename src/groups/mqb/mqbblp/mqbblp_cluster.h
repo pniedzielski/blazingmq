@@ -70,7 +70,6 @@
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
 #include <bsls_atomic.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 

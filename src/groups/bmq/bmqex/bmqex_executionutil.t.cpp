@@ -36,7 +36,6 @@
 #include <bslmt_threadattributes.h>
 #include <bsls_assert.h>
 #include <bsls_atomic.h>
-#include <bsls_keyword.h>
 
 // CONVENIENCE
 using namespace BloombergLP;

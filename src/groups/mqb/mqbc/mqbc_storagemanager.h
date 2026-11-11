@@ -69,7 +69,6 @@
 #include <bslmt_latch.h>
 #include <bslmt_mutex.h>
 #include <bsls_atomic.h>
-#include <bsls_keyword.h>
 #include <bsls_timeinterval.h>
 #include <bsls_types.h>
 

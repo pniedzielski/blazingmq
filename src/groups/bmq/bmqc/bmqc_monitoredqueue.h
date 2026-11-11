@@ -81,7 +81,6 @@
 #include <bslmt_mutex.h>
 #include <bsls_assert.h>
 #include <bsls_atomic.h>
-#include <bsls_keyword.h>
 #include <bsls_performancehint.h>
 #include <bsls_systemclocktype.h>
 #include <bsls_timeinterval.h>

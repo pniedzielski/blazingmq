@@ -199,7 +199,6 @@
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmt_semaphore.h>
 #include <bsls_assert.h>
-#include <bsls_keyword.h>
 #include <bsls_nullptr.h>
 
 namespace BloombergLP {

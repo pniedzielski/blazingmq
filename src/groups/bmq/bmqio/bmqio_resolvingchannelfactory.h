@@ -44,7 +44,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_atomic.h>
-#include <bsls_keyword.h>
 
 // NTC
 #include <ntsa_error.h>

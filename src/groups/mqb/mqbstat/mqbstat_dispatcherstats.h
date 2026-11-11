@@ -33,7 +33,6 @@
 #include <bsl_memory.h>
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
-#include <bsls_keyword.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {

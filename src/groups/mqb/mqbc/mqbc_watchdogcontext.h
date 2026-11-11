@@ -32,7 +32,6 @@
 // BDE
 #include <bdlmt_eventscheduler.h>
 #include <bsls_atomic.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 namespace mqbc {

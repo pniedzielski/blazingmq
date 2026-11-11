@@ -58,7 +58,6 @@
 #include <bsla_annotations.h>
 #include <bslma_managedptr.h>
 #include <bslma_usesbslmaallocator.h>
-#include <bsls_keyword.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {

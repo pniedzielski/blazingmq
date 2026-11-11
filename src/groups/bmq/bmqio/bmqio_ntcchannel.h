@@ -49,7 +49,6 @@
 #include <bsl_vector.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_keyword.h>
 #include <bsls_timeinterval.h>
 #include <bsls_types.h>
 

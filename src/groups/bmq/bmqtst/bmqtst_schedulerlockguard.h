@@ -63,7 +63,6 @@
 
 // BDE
 #include <bsl_memory.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 

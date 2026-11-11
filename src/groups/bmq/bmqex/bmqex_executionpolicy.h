@@ -100,7 +100,6 @@
 #include <bslmf_movableref.h>
 #include <bslmf_util.h>
 #include <bsls_assert.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 

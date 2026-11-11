@@ -80,7 +80,6 @@
 #include <bslmt_mutex.h>
 #include <bsls_atomic.h>
 #include <bsls_deprecatefeature.h>
-#include <bsls_keyword.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {

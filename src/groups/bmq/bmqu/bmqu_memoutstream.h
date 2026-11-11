@@ -47,7 +47,6 @@
 #include <bsl_ostream.h>
 #include <bsl_string.h>
 #include <bslma_allocator.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 

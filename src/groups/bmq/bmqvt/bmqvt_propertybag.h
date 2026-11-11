@@ -57,7 +57,6 @@
 #include <bsl_vector.h>
 #include <bslma_managedptr.h>
 #include <bsls_assert.h>
-#include <bsls_keyword.h>
 #include <bsls_spinlock.h>
 #include <bsls_types.h>
 

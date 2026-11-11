@@ -66,7 +66,6 @@
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bslmf_allocatorargt.h>
-#include <bsls_keyword.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {

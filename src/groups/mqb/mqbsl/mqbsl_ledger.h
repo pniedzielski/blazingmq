@@ -45,7 +45,6 @@
 #include <bslmf_istriviallycopyable.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 namespace mqbsl {

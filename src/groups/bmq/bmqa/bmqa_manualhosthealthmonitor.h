@@ -34,7 +34,6 @@
 // BDE
 #include <bdlmt_signaler.h>
 #include <bsl_memory.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 

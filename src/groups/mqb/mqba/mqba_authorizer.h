@@ -26,7 +26,6 @@
 // BDE
 #include <ball_log.h>
 #include <bsl_ostream.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 

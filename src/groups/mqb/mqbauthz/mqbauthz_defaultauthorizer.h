@@ -40,7 +40,6 @@
 #include <bsla_nodiscard.h>
 #include <bslma_managedptr.h>
 #include <bslmf_movableref.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 

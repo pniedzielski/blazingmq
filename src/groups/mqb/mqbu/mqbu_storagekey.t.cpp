@@ -30,7 +30,6 @@
 #include <bdlde_md5.h>
 #include <bsl_set.h>
 #include <bslh_hash.h>
-#include <bsls_keyword.h>
 #include <bsls_timeutil.h>
 #include <bsls_types.h>
 

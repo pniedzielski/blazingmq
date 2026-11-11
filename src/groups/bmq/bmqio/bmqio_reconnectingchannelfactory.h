@@ -52,7 +52,6 @@
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmt_mutex.h>
 #include <bsls_atomic.h>
-#include <bsls_keyword.h>
 
 namespace BloombergLP {
 namespace bmqio {

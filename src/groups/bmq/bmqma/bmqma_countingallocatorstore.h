@@ -242,7 +242,6 @@
 #include <bsl_unordered_map.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_keyword.h>
 #include <bsls_spinlock.h>
 
 namespace BloombergLP {
