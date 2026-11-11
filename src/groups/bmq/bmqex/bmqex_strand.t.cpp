@@ -19,7 +19,6 @@
 #include <bmqtst_testhelper.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bdlmt_threadpool.h>
 #include <bsl_functional.h>
 #include <bsl_iostream.h>
@@ -507,9 +506,9 @@ static void test2_strand_start()
 
     // submit jobs
     for (int i = 0; i < k_NUM_JOBS; ++i) {
-        strand.executor().post(bdlf::BindUtil::bind(Synchronize(),
-                                                    &startedSignal,
-                                                    &continueSignal));
+        strand.executor().post([&startedSignal, &continueSignal]() {
+            Synchronize()(&startedSignal, &continueSignal);
+        });
     }
 
     // do start
@@ -556,13 +555,15 @@ static void test3_strand_stop()
     Strand               strand(ctx.executor(), &alloc);
 
     // submit function object #1
-    strand.executor().post(
-        bdlf::BindUtil::bind(Synchronize(), &startedSignal, &continueSignal));
+    strand.executor().post([&startedSignal, &continueSignal]() {
+        Synchronize()(&startedSignal, &continueSignal);
+    });
 
     // submit function object #2
     bool job2Executed = false;
-    strand.executor().post(
-        bdlf::BindUtil::bind(Assign(), &job2Executed, true));
+    strand.executor().post([&job2Executed]() {
+        Assign()(&job2Executed, true);
+    });
 
     // start executing function object #1
     strand.start();
@@ -615,7 +616,9 @@ static void test4_strand_join()
 
     // submit jobs
     for (int i = 0; i < k_NUM_JOBS; ++i) {
-        strand.executor().post(bdlf::BindUtil::bind(PushBack(), &out, i));
+        strand.executor().post([&out, i]() {
+            PushBack()(&out, i);
+        });
     }
 
     // start context and join it
@@ -674,9 +677,9 @@ static void test5_strand_dropPendingJobs()
             continueSignal;              // signaled to allow job to complete
 
         // push 3 jobs to the strand
-        strand.executor().post(bdlf::BindUtil::bind(Synchronize(),
-                                                    &startedSignal,
-                                                    &continueSignal));
+        strand.executor().post([&startedSignal, &continueSignal]() {
+            Synchronize()(&startedSignal, &continueSignal);
+        });
         strand.executor().post(NoOp());
         strand.executor().post(NoOp());
         BMQTST_ASSERT_EQ(strand.outstandingJobs(), 3u);
@@ -735,9 +738,9 @@ static void test6_strand_outstandingJobs()
     // submit 'k_NUM_JOBS' function objects
     for (int i = 0; i < k_NUM_JOBS; ++i) {
         // submit a function object
-        strand.executor().post(bdlf::BindUtil::bind(Synchronize(),
-                                                    &startedSignal,
-                                                    &continueSignal));
+        strand.executor().post([&startedSignal, &continueSignal]() {
+            Synchronize()(&startedSignal, &continueSignal);
+        });
 
         // outstanding jobs increased by 1
         BMQTST_ASSERT_EQ(strand.outstandingJobs(), static_cast<size_t>(i + 1));
@@ -822,7 +825,9 @@ static void test7_executor_post()
 
         // submit function objects
         for (int i = 0; i < k_NUM_JOBS; ++i) {
-            strand.executor().post(bdlf::BindUtil::bind(PushBack(), &out, i));
+            strand.executor().post([&out, i]() {
+                PushBack()(&out, i);
+            });
 
             BMQTST_ASSERT_EQ(strand.outstandingJobs(),
                              static_cast<size_t>(i + 1));
@@ -855,17 +860,18 @@ static void test7_executor_post()
 
         // submit function objects
         for (int i = 0; i < k_NUM_JOBS; ++i) {
-            bsl::function<void()> pushBack(
-                bsl::allocator_arg,
-                &alloc,
-                bdlf::BindUtil::bind(PushBack(), &out, i));
+            bsl::function<void()> pushBack(bsl::allocator_arg,
+                                           &alloc,
+                                           [&out, i]() {
+                                               PushBack()(&out, i);
+                                           });
 
             // submit a function object that submits another function object
             // via a call to 'post()'
-            strand.executor().post(bdlf::BindUtil::bindS(&alloc,
-                                                         Post(),
-                                                         strand.executor(),
-                                                         pushBack));
+            strand.executor().post(
+                [executor = strand.executor(), job = bsl::move(pushBack)]() {
+                    Post()(executor, job);
+                });
         }
 
         // start the context and join it
@@ -994,8 +1000,9 @@ static void test8_executor_dispatch()
 
         // submit function objects
         for (int i = 0; i < k_NUM_JOBS; ++i) {
-            strand.executor().dispatch(
-                bdlf::BindUtil::bind(PushBack(), &out, i));
+            strand.executor().dispatch([&out, i]() {
+                PushBack()(&out, i);
+            });
 
             BMQTST_ASSERT_EQ(strand.outstandingJobs(),
                              static_cast<size_t>(i + 1));
@@ -1030,22 +1037,23 @@ static void test8_executor_dispatch()
 
         // submit function objects
         for (int i = 0; i < k_NUM_JOBS; ++i) {
-            bsl::function<void()> pushBack(
-                bsl::allocator_arg,
-                &alloc,
-                bdlf::BindUtil::bind(PushBack(), &out, i));
+            bsl::function<void()> pushBack(bsl::allocator_arg,
+                                           &alloc,
+                                           [&out, i]() {
+                                               PushBack()(&out, i);
+                                           });
 
             // submit a function object that submits another function object
             // via a call to 'dispatch'
-            strand.executor().post(bdlf::BindUtil::bindS(&alloc,
-                                                         Dispatch(),
-                                                         strand.executor(),
-                                                         pushBack));
+            strand.executor().post(
+                [executor = strand.executor(), job = bsl::move(pushBack)]() {
+                    Dispatch()(executor, job);
+                });
 
             // submit a function object we will synchronize with
-            strand.executor().post(bdlf::BindUtil::bind(Synchronize(),
-                                                        &startedSignal,
-                                                        &continueSignal));
+            strand.executor().post([&startedSignal, &continueSignal]() {
+                Synchronize()(&startedSignal, &continueSignal);
+            });
         }
 
         // start the strand
@@ -1135,20 +1143,17 @@ static void test10_executor_runningInThisThread()
 
     // submit several jobs that saves the result of a 'runningInThisThread'
     // invocation
-    ex.post(bdlf::BindUtil::bind(
-        Assign(),
-        &result1,
-        bdlf::BindUtil::bind(&StrandExecutor::runningInThisThread, &ex)));
+    ex.post([&result1, &ex]() {
+        Assign()(&result1, ex.runningInThisThread());
+    });
 
-    ex.post(bdlf::BindUtil::bind(
-        Assign(),
-        &result2,
-        bdlf::BindUtil::bind(&StrandExecutor::runningInThisThread, &ex)));
+    ex.post([&result2, &ex]() {
+        Assign()(&result2, ex.runningInThisThread());
+    });
 
-    ex.post(bdlf::BindUtil::bind(
-        Assign(),
-        &result3,
-        bdlf::BindUtil::bind(&StrandExecutor::runningInThisThread, &ex)));
+    ex.post([&result3, &ex]() {
+        Assign()(&result3, ex.runningInThisThread());
+    });
 
     strand.start();
     strand.join();
