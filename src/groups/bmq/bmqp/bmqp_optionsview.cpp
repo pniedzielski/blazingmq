@@ -342,11 +342,8 @@ int OptionsView::loadSubQueueInfosOption(
         }
 
         // Populate SubQueueInfos
-        for (bsl::vector<bdlb::BigEndianUint32>::const_iterator cit =
-                 tempVec.cbegin();
-             cit != tempVec.cend();
-             ++cit) {
-            subQueueInfos->push_back(SubQueueInfo(*cit));
+        for (const bdlb::BigEndianUint32& subQueueId : tempVec) {
+            subQueueInfos->push_back(SubQueueInfo(subQueueId));
         }
 
         return rc_SUCCESS;  // RETURN
