@@ -421,9 +421,8 @@ void SearchShortResult::outputResult()
 {
     if (!d_printOnDelete) {
         // Print results that were not printed on Delete record processing
-        bsl::list<GuidData>::const_iterator it = d_guidList.cbegin();
-        for (; it != d_guidList.cend(); ++it) {
-            outputGuidData(*it);
+        for (const GuidData& guidData : d_guidList) {
+            outputGuidData(guidData);
         }
     }
 
@@ -437,15 +436,14 @@ void SearchShortResult::outputResult(const GuidsList& guidFilter)
 {
     // Print only Guids from `guidFilter`
     if (!d_printOnDelete) {
-        GuidsList::const_iterator it = guidFilter.cbegin();
-        for (; it != guidFilter.cend(); ++it) {
-            GuidDataMap::const_iterator gIt = d_guidMap.find(*it);
+        for (const bmqt::MessageGUID& guid : guidFilter) {
+            GuidDataMap::const_iterator gIt = d_guidMap.find(guid);
             if (gIt != d_guidMap.end()) {
                 outputGuidData(*gIt->second);
             }
             else {
                 // this should not happen
-                d_printer->printGuidNotFound(*it);
+                d_printer->printGuidNotFound(guid);
             }
         }
     }
@@ -600,9 +598,8 @@ bool SearchDetailResult::processJournalOpRecord(
 void SearchDetailResult::outputResult()
 {
     if (!d_cleanUnprinted) {
-        DetailsList::const_iterator it = d_messageDetailsList.cbegin();
-        for (; it != d_messageDetailsList.cend(); ++it) {
-            outputMessageDetails(*it);
+        for (const MessageDetails& messageDetails : d_messageDetailsList) {
+            outputMessageDetails(messageDetails);
         }
     }
 
@@ -616,15 +613,14 @@ void SearchDetailResult::outputResult(const GuidsList& guidFilter)
 {
     // Print only Guids from `guidFilter`
     if (!d_cleanUnprinted) {
-        GuidsList::const_iterator it = guidFilter.cbegin();
-        for (; it != guidFilter.cend(); ++it) {
-            DetailsMap::const_iterator dIt = d_messageDetailsMap.find(*it);
+        for (const bmqt::MessageGUID& guid : guidFilter) {
+            DetailsMap::const_iterator dIt = d_messageDetailsMap.find(guid);
             if (dIt != d_messageDetailsMap.end()) {
                 outputMessageDetails(*dIt->second);
             }
             else {
                 // this should not happen
-                d_printer->printGuidNotFound(*it);
+                d_printer->printGuidNotFound(guid);
             }
         }
     }
@@ -1005,9 +1001,8 @@ bool SearchPartiallyConfirmedDecorator::processDeletionRecord(
 
 void SearchPartiallyConfirmedDecorator::outputResult()
 {
-    GuidsMap::const_iterator it = d_notConfirmedGuids.cbegin();
-    for (; it != d_notConfirmedGuids.cend(); ++it) {
-        d_guidsList.erase(it->second);
+    for (const auto& [guid, guidsListIt] : d_notConfirmedGuids) {
+        d_guidsList.erase(guidsListIt);
     }
     SearchResultDecorator::outputResult(d_guidsList);
 
@@ -1035,10 +1030,9 @@ SearchGuidDecorator::SearchGuidDecorator(
 , d_guids(allocator)
 {
     // Build MessageGUID->StrGUID Map
-    bsl::vector<bsl::string>::const_iterator it = guids.cbegin();
-    for (; it != guids.cend(); ++it) {
+    for (const bsl::string& guidStr : guids) {
         bmqt::MessageGUID guid;
-        guid.fromHex(it->c_str());
+        guid.fromHex(guidStr.c_str());
         d_guidsMap.emplace(guid, d_guids.insert(d_guids.cend(), guid));
     }
 }
@@ -1510,13 +1504,10 @@ void SummaryProcessor::finalizeQueueDetails()
             if (queueInfo.has_value()) {
                 // Set required fields
                 details.d_queueUri = queueInfo->uri();
-                for (QueueDetails::AppDetailsMap::iterator appIt =
-                         details.d_appDetailsMap.begin();
-                     appIt != details.d_appDetailsMap.end();
-                     ++appIt) {
-                    findQueueAppIdByAppKey(&appIt->second.d_appId,
+                for (auto& [appKey, appDetails] : details.d_appDetailsMap) {
+                    findQueueAppIdByAppKey(&appDetails.d_appId,
                                            queueInfo->appIds(),
-                                           appIt->first);
+                                           appKey);
                 }
             }
             ++it;
