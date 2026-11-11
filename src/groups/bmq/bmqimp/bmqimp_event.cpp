@@ -469,7 +469,7 @@ Event::lookupQueue(int queueId, unsigned int subscriptionId) const
     bsl::shared_ptr<Queue> result;
 
     // lookup by 'subscriptionId'
-    QueuesBySubscriptionId::const_iterator cit = d_queuesBySubscriptionId.find(
+    auto cit = d_queuesBySubscriptionId.find(
         SubscriptionId(queueId, subscriptionId));
 
     if (cit == d_queuesBySubscriptionId.end()) {
@@ -486,7 +486,7 @@ Event::lookupQueue(const bmqp::QueueId& queueId) const
     bsl::shared_ptr<Queue> result;
 
     // lookup by 'subscriptionId'
-    QueuesMap::const_iterator cit = d_queues.find(queueId);
+    auto cit = d_queues.find(queueId);
 
     if (cit == d_queues.end()) {
         return bsl::shared_ptr<Queue>();  // RETURN
