@@ -166,17 +166,6 @@ struct SubcontextInfo {
     bool               d_filteredOut;
 };
 
-// FUNCTIONS
-struct SubcontextInfoComparator {
-    StatContextTableInfoProvider::SortFn* d_sort_p;
-
-    // ACCESSORS
-    bool operator()(const SubcontextInfo& lhs, const SubcontextInfo& rhs)
-    {
-        return (*d_sort_p)(lhs.d_context_p, rhs.d_context_p);
-    }
-};
-
 }  // close anonymous namespace
 
 // ----------------------------------------------
@@ -253,9 +242,12 @@ void StatContextTableInfoProvider::addContext(const StatContext* context,
 
     // Sort
     if (d_cmp) {
-        SubcontextInfoComparator cmp;
-        cmp.d_sort_p = &d_cmp;
-        bsl::sort(contexts.begin(), contexts.end(), cmp);
+        bsl::sort(contexts.begin(),
+                  contexts.end(),
+                  [this](const SubcontextInfo& lhs,
+                         const SubcontextInfo& rhs) {
+                      return d_cmp(lhs.d_context_p, rhs.d_context_p);
+                  });
     }
 
     for (const SubcontextInfo& subcontext : contexts) {
