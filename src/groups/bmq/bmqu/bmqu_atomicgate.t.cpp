@@ -16,7 +16,6 @@
 #include <bmqu_atomicgate.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bslmt_semaphore.h>
 #include <bslmt_threadutil.h>
 
@@ -161,10 +160,9 @@ static void test3_atomicGate_closeAndDrain()
     // Start a thread that will also try to enter
     bslmt::ThreadUtil::createWithAllocator(
         &threadHandle,
-        bdlf::BindUtil::bind(&enterThreadFn,
-                             &gate,
-                             &startSemaphore,
-                             &doneSemaphore),
+        [&gate, &startSemaphore, &doneSemaphore]() {
+            enterThreadFn(&gate, &startSemaphore, &doneSemaphore);
+        },
         bmqtst::TestHelperUtil::allocator());
 
     // Wait for thread to start
@@ -267,10 +265,9 @@ static void test6_gateKeeper_threadSafety()
     // Start a thread that will try to enter
     bslmt::ThreadUtil::createWithAllocator(
         &threadHandle,
-        bdlf::BindUtil::bind(&gateKeeperThreadFn,
-                             &gateKeeper,
-                             &startSemaphore,
-                             &doneSemaphore),
+        [&gateKeeper, &startSemaphore, &doneSemaphore]() {
+            gateKeeperThreadFn(&gateKeeper, &startSemaphore, &doneSemaphore);
+        },
         bmqtst::TestHelperUtil::allocator());
 
     // Wait for thread to start
