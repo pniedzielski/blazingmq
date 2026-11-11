@@ -378,9 +378,9 @@ static void test4_defaultHashUniqueness()
              << "GUIDs with the highest collisions..: " << endl;
 
         Guids& guids = hashes[maxCollisionsHash];
-        for (size_t i = 0; i < guids.size(); ++i) {
+        for (const bmqt::MessageGUID& guid : guids) {
             cout << "  ";
-            mqbu::MessageGUIDUtil::print(cout, guids[i]);
+            mqbu::MessageGUIDUtil::print(cout, guid);
             cout << endl;
         }
     }
@@ -466,9 +466,9 @@ static void test5_customHashUniqueness()
              << "GUIDs with the highest collisions..: " << endl;
 
         Guids& guids = hashes[maxCollisionsHash];
-        for (size_t i = 0; i < guids.size(); ++i) {
+        for (const bmqt::MessageGUID& guid : guids) {
             cout << "  ";
-            mqbu::MessageGUIDUtil::print(cout, guids[i]);
+            mqbu::MessageGUIDUtil::print(cout, guid);
             cout << endl;
         }
     }
