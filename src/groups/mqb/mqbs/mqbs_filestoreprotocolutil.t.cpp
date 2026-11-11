@@ -92,9 +92,7 @@ static void jobForThreadPool(const Results* testData, bslmt::Barrier* barrier)
 
     barrier->wait();
     for (int i = 0; i < 1000; ++i) {
-        for (ResultsIt r = testData->begin(); r != testData->end(); ++r) {
-            const bsl::string& source = r->first;
-            const bsl::string& hex    = r->second;
+        for (const auto& [source, hex] : *testData) {
             bsl::string        expected(bmqtst::TestHelperUtil::allocator());
             bytesFromHex(&expected, hex);
 
@@ -1046,10 +1044,8 @@ static void test7_loadAppInfos()
 
         BMQTST_ASSERT_EQ(static_cast<size_t>(numAppIds), appIdKeyPairs.size());
 
-        for (AppInfos::const_iterator cit = appIdKeyPairs.begin();
-             cit != appIdKeyPairs.end();
-             ++cit) {
-            BMQTST_ASSERT_EQ(expectedAppInfos.count(cit->first), 1u);
+        for (const auto& [appId, appKey] : appIdKeyPairs) {
+            BMQTST_ASSERT_EQ(expectedAppInfos.count(appId), 1u);
         }
 
         alloc->deallocate(p);
