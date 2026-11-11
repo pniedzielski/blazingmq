@@ -149,12 +149,12 @@ ConsoleObserver::getColorCodeForRecord(const ball::Record& record) const
 
     // Errors and Warnings have a special color, regardless of the category
     if (record.fixedFields().severity() == ball::Severity::e_WARN) {
-        ColorMap::const_iterator it = d_colorMap.find(k_COLOR_WARN);
+        auto it = d_colorMap.find(k_COLOR_WARN);
         BSLS_ASSERT_SAFE(it != d_colorMap.end());
         return it->second.c_str();  // RETURN
     }
     if (record.fixedFields().severity() == ball::Severity::e_ERROR) {
-        ColorMap::const_iterator it = d_colorMap.find(k_COLOR_ERROR);
+        auto it = d_colorMap.find(k_COLOR_ERROR);
         BSLS_ASSERT_SAFE(it != d_colorMap.end());
         return it->second.c_str();  // RETURN
     }
