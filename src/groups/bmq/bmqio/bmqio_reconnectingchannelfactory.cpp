@@ -508,10 +508,8 @@ void ReconnectingChannelFactory::cancelAllHandles()
         handlesCopy.swap(d_handles);
     }  // UNLOCK
 
-    for (ConnectHandleMap::iterator iter = handlesCopy.begin();
-         iter != handlesCopy.end();
-         ++iter) {
-        iter->second->cancel();
+    for (const auto& entry : handlesCopy) {
+        entry.second->cancel();
     }
 }
 
@@ -605,19 +603,17 @@ void ReconnectingChannelFactoryUtil::resolveEndpointFn(
 
     bdlb::Tokenizer endpoints(options.endpoint().c_str(),
                               bslstl::StringRef(&separator, 1));
-    for (bdlb::TokenizerIterator endpointsIter = endpoints.begin();
-         endpointsIter != endpoints.end();
-         ++endpointsIter) {
+    for (const bslstl::StringRef& endpoint : endpoints) {
         const size_t colonOffset = bdlb::StringRefUtil::findFirstOf(
-            *endpointsIter,
+            endpoint,
             bslstl::StringRef(&k_HOSTPORT_SEPARATOR, 1));
         if (colonOffset == bdlb::StringRefUtil::k_NPOS) {
-            BALL_LOG_ERROR << "Invalid endpoint format '" << *endpointsIter
+            BALL_LOG_ERROR << "Invalid endpoint format '" << endpoint
                            << "' (missing ':port' part)";
             continue;  // CONTINUE
         }
-        const bsl::string host(endpointsIter->begin(), colonOffset, &arena);
-        const bsl::string port(bdlb::StringRefUtil::substr(*endpointsIter,
+        const bsl::string host(endpoint.begin(), colonOffset, &arena);
+        const bsl::string port(bdlb::StringRefUtil::substr(endpoint,
                                                            colonOffset + 1),
                                &arena);
 
@@ -629,16 +625,13 @@ void ReconnectingChannelFactoryUtil::resolveEndpointFn(
             continue;  // CONTINUE
         }
 
-        for (bsl::vector<ntsa::IpAddress>::const_iterator it =
-                 addresses.begin();
-             it != addresses.end();
-             ++it) {
+        for (const ntsa::IpAddress& address : addresses) {
             bsl::string hostname(&arena);
-            error = bmqio::ResolveUtil::getDomainName(&hostname, *it);
+            error = bmqio::ResolveUtil::getDomainName(&hostname, address);
             if (error.code() != ntsa::Error::e_OK) {
                 // If we fail to resolve, log an error and skip this entry
                 BALL_LOG_ERROR << "Unable to resolve hostname of address "
-                               << *it << " from host '" << host
+                               << address << " from host '" << host
                                << "' (error: " << error << ")";
                 continue;  // CONTINUE
             }
