@@ -17,7 +17,6 @@
 
 #include <mqbscm_version.h>
 // BDE
-#include <bdlf_bind.h>
 #include <bsl_memory.h>
 #include <bsl_utility.h>
 #include <bslmt_lockguard.h>
@@ -91,12 +90,15 @@ Channel::Channel(bdlbb::BlobBufferFactory* blobBufferFactory,
     bsl::string             threadName("bmqNet-");
     attr.setThreadName(threadName + d_name);
     d_buffer.setWatermarks(50000, 100000, 500000);
-    d_buffer.setStateCallback(
-        bdlf::MemFnUtil::memFn(&Channel::onBufferStateChange, this));
+    d_buffer.setStateCallback([this](bmqc::MonitoredQueueState::Enum state) {
+        onBufferStateChange(state);
+    });
     int rc = bslmt::ThreadUtil::createWithAllocator(
         &d_threadHandle,
         attr,
-        bdlf::MemFnUtil::memFn(&Channel::threadFn, this),
+        [this]() {
+            threadFn();
+        },
         d_allocator_p);
     BSLS_ASSERT_OPT(rc == 0 && "Failed to create channel thread");
 }
@@ -319,10 +321,10 @@ void Channel::setChannel(const bsl::weak_ptr<bmqio::Channel>& value)
     // TCP thread
 
     d_description = d_name + " - " + channelSp->peerUri();
-    channelSp->onWatermark(bdlf::BindUtil::bind(&Channel::onWatermark,
-                                                this,
-                                                value,
-                                                bdlf::PlaceHolders::_1));
+    channelSp->onWatermark(
+        [this, value](bmqio::ChannelWatermarkType::Enum type) {
+            onWatermark(value, type);
+        });
     // type
     d_channel_wp = value;
     setState(e_RESET);

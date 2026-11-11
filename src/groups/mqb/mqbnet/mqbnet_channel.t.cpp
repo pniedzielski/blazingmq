@@ -35,7 +35,6 @@
 #include <bdlbb_blob.h>
 #include <bdlbb_blobutil.h>
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 #include <bsl_deque.h>
 #include <bsla_annotations.h>
 #include <bslmt_barrier.h>
@@ -705,7 +704,9 @@ void Tester<Builder>::createThread(bslmt::Barrier* phase1,
 {
     bslmt::ThreadUtil::createWithAllocator(
         &d_threadHandle,
-        bdlf::BindUtil::bind(&Tester<Builder>::threadFn, this, phase1, phase2),
+        [this, phase1, phase2]() {
+            threadFn(phase1, phase2);
+        },
         d_allocator_p);
 }
 
