@@ -236,24 +236,24 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
     // PRIVATE MANIPULATORS
 
     /// Start the `Cluster`.
-    void startDispatched();
+    void startImpl();
 
     /// Initiate the shutdown of the cluster.  The specified `callback` will
     /// be called when the shutdown is completed.  This routine is invoked
     /// in the cluster-dispatcher thread.
-    void initiateShutdownDispatched(const VoidFunctor& callback);
+    void initiateShutdownImpl(const VoidFunctor& callback);
 
     /// Continue shutdown after unconfirmed messages have been drained.
     /// Deletes and unregisters queues with no handles from the domain.
     void continueShutdown(const VoidFunctor& completionCb);
 
     /// Stop the `Cluster`.
-    void stopDispatched();
+    void stopImpl();
 
     /// Process the specified `command`, and load the result to the
     /// specified `result`.
-    void processCommandDispatched(mqbcmd::ClusterResult*        result,
-                                  const mqbcmd::ClusterCommand& command);
+    void processCommandImpl(mqbcmd::ClusterResult*        result,
+                            const mqbcmd::ClusterCommand& command);
 
     // PRIVATE MANIPULATORS
     //   (Active node handling)
@@ -266,23 +266,16 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
     /// The specified `node` is the one which status has changed.
     void onActiveNodeDown(const mqbnet::ClusterNode* node);
 
-    void onNodeUpDispatched(
-        mqbnet::ClusterNode*                                 node,
-        [[maybe_unused]] const bmqp_ctrlmsg::ClientIdentity& identity);
-
     /// Executed by the dispatcher thread when the specified `node` becomes
     /// unavailable.
-    void onNodeDownDispatched(mqbnet::ClusterNode* node);
+    void processNodeDown(mqbnet::ClusterNode* node);
 
     /// Callback method when the `activeNodeLookupEvent` has expired.
     void onActiveNodeLookupTimerExpired();
 
-    /// Callback method when the `activeNodeLookupEvent` has expired.
-    void onActiveNodeLookupTimerExpiredDispatched();
-
     /// Trigger searching for active node if there is none.  Executed on
     /// DISPATCHER thread.
-    void refreshActiveNodeManagerDispatched();
+    void refreshActiveNodeManager();
 
     /// Process result of searching for active node.  The specified `result`
     /// is a bit mask of E_NO_CHANGE/E_LOST_ACTIVE/E_NEW_ACTIVE.
@@ -359,8 +352,7 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
 
     /// Apply the specified `response` to the request manager.  This method
     /// is invoked in the cluster-dispatcher thread.
-    void
-    processResponseDispatched(const bmqp_ctrlmsg::ControlMessage& response);
+    void applyResponse(const bmqp_ctrlmsg::ControlMessage& response);
 
     // PRIVATE ACCESSORS
 

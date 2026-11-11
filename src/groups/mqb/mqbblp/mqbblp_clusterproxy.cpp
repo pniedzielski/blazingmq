@@ -81,7 +81,7 @@ const double k_ACTIVE_NODE_INITIAL_WAIT = 10.0;
 
 // PRIVATE MANIPULATORS
 
-void ClusterProxy::startDispatched()
+void ClusterProxy::startImpl()
 {
     // executed by the *DISPATCHER* thread
 
@@ -112,7 +112,7 @@ void ClusterProxy::startDispatched()
 
     dispatcher()->execute(
         [this]() {
-            refreshActiveNodeManagerDispatched();
+            refreshActiveNodeManager();
         },
         this);
 
@@ -129,7 +129,7 @@ void ClusterProxy::startDispatched()
         });
 }
 
-void ClusterProxy::initiateShutdownDispatched(const VoidFunctor& callback)
+void ClusterProxy::initiateShutdownImpl(const VoidFunctor& callback)
 {
     // executed by the *DISPATCHER* thread
 
@@ -181,7 +181,7 @@ void ClusterProxy::continueShutdown(const VoidFunctor& completionCb)
     completionCb();
 }
 
-void ClusterProxy::stopDispatched()
+void ClusterProxy::stopImpl()
 {
     // executed by the *DISPATCHER* thread
 
@@ -209,7 +209,7 @@ void ClusterProxy::stopDispatched()
     }
 
     // Close all channels of the associated cluster.  Once we return from this
-    // 'stopDispatched' method, this cluster proxy object gets destroyed, but
+    // 'stopImpl' method, this cluster proxy object gets destroyed, but
     // not the underlying channels, which will be destroyed later; so if a
     // message is received on the channel, it will try to invoke the
     // 'processEvent' method on that now destroyed cluster proxy instance.
@@ -225,9 +225,8 @@ void ClusterProxy::stopDispatched()
     d_clusterData.membership().netCluster()->closeChannels();
 }
 
-void ClusterProxy::processCommandDispatched(
-    mqbcmd::ClusterResult*        result,
-    const mqbcmd::ClusterCommand& command)
+void ClusterProxy::processCommandImpl(mqbcmd::ClusterResult*        result,
+                                      const mqbcmd::ClusterCommand& command)
 {
     // executed by the *DISPATCHER* thread
 
@@ -258,20 +257,15 @@ void ClusterProxy::onActiveNodeLookupTimerExpired()
     // executed by the *SCHEDULER* thread
     dispatcher()->execute(
         [this]() {
-            onActiveNodeLookupTimerExpiredDispatched();
+            d_activeNodeLookupEventHandle.release();
+            d_activeNodeManager.enableExtendedSelection();
+
+            refreshActiveNodeManager();
         },
         this);
 }
 
-void ClusterProxy::onActiveNodeLookupTimerExpiredDispatched()
-{
-    d_activeNodeLookupEventHandle.release();
-    d_activeNodeManager.enableExtendedSelection();
-
-    refreshActiveNodeManagerDispatched();
-}
-
-void ClusterProxy::refreshActiveNodeManagerDispatched()
+void ClusterProxy::refreshActiveNodeManager()
 {
     // executed by the *DISPATCHER* thread
 
@@ -590,7 +584,7 @@ void ClusterProxy::processEvent(const bmqp::Event&   event,
 
             dispatcher()->execute(
                 [this, controlMessage]() {
-                    processResponseDispatched(controlMessage);
+                    applyResponse(controlMessage);
                 },
                 this);
             return;  // RETURN
@@ -719,9 +713,9 @@ void ClusterProxy::processResponse(
     BSLS_ASSERT_SAFE((!response.rId().isNull()));
 
     // This is a response to a request.
-    // Call `processResponseDispatched` directly since we are already in the
+    // Call `applyResponse` directly since we are already in the
     // dispatcher thread.
-    processResponseDispatched(response);
+    applyResponse(response);
 }
 
 void ClusterProxy::processPeerStopResponse(
@@ -823,8 +817,7 @@ void ClusterProxy::processNodeStatusAdvisory(
     processActiveNodeManagerResult(result, source);
 }
 
-void ClusterProxy::processResponseDispatched(
-    const bmqp_ctrlmsg::ControlMessage& response)
+void ClusterProxy::applyResponse(const bmqp_ctrlmsg::ControlMessage& response)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -973,7 +966,7 @@ int ClusterProxy::start([[maybe_unused]] bsl::ostream& errorDescription)
 {
     dispatcher()->execute(
         [this]() {
-            startDispatched();
+            startImpl();
         },
         this);
     dispatcher()->synchronize(this);
@@ -992,7 +985,7 @@ void ClusterProxy::initiateShutdown(const VoidFunctor& callback)
 
     dispatcher()->execute(
         [this, callback]() {
-            initiateShutdownDispatched(callback);
+            initiateShutdownImpl(callback);
         },
         this);
 
@@ -1013,20 +1006,20 @@ void ClusterProxy::stop()
 
     dispatcher()->execute(
         [this]() {
-            stopDispatched();
+            stopImpl();
         },
         this);
     dispatcher()->synchronize(this);
 
     // We synchronize twice here.  1st synchronize() is needed to ensure that
-    // 'stopDispatched' has been executed.  The 2nd synchronize() is needed to
-    // ensure that any event that 'stopDispatched' may have enqueued back to
+    // 'stopImpl' has been executed.  The 2nd synchronize() is needed to
+    // ensure that any event that 'stopImpl' may have enqueued back to
     // cluster's dispatcher thread has also been executed.  An example is
     // 'ClusterStateMonitor::verifyAllStates' which schedules
     // 'ClusterStateMonitor::updateAllStates'.
     // 'ClusterStateMonitor::stop' waits for concurrent 'verifyAllStates' but
     // we also need to wait for 'updateAllStates'.
-    // Another way to think of this is that 'stopDispatched' is async, which
+    // Another way to think of this is that 'stopImpl' is async, which
     // itself performs some async operations, so we need to synchronize twice.
 
     dispatcher()->synchronize(this);
@@ -1125,7 +1118,7 @@ int ClusterProxy::processCommand(mqbcmd::ClusterResult*        result,
     // executed by *ANY* thread
     dispatcher()->execute(
         [this, result, &command]() {
-            processCommandDispatched(result, command);
+            processCommandImpl(result, command);
         },
         this);
     dispatcher()->synchronize(this);
@@ -1374,34 +1367,27 @@ void ClusterProxy::onNodeStateChange(mqbnet::ClusterNode* node,
 
         dispatcher()->execute(
             [this, node, identity = node->identity()]() {
-                onNodeUpDispatched(node, identity);
+                // executed by the *DISPATCHER* thread
+
+                // PRECONDITIONS
+                BSLS_ASSERT_SAFE(inDispatcherThread());
+
+                int result = d_activeNodeManager.onNodeUp(node, identity);
+
+                processActiveNodeManagerResult(result, node);
             },
             this);
     }
     else {
         dispatcher()->execute(
             [this, node]() {
-                onNodeDownDispatched(node);
+                processNodeDown(node);
             },
             this);
     }
 }
 
-void ClusterProxy::onNodeUpDispatched(
-    mqbnet::ClusterNode*                node,
-    const bmqp_ctrlmsg::ClientIdentity& identity)
-{
-    // executed by the *DISPATCHER* thread
-
-    // PRECONDITIONS
-    BSLS_ASSERT_SAFE(inDispatcherThread());
-
-    int result = d_activeNodeManager.onNodeUp(node, identity);
-
-    processActiveNodeManagerResult(result, node);
-}
-
-void ClusterProxy::onNodeDownDispatched(mqbnet::ClusterNode* node)
+void ClusterProxy::processNodeDown(mqbnet::ClusterNode* node)
 {
     // executed by the *DISPATCHER* thread
 
