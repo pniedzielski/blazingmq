@@ -201,13 +201,15 @@ void DomainManager::onDomainResolverDomainLocatedCb(
                   << "querying config provider";
     d_configProvider_p->getDomainConfig(
         domain,
-        bdlf::BindUtil::bind(&DomainManager::onConfigProviderDomainConfigCb,
-                             this,
-                             bdlf::PlaceHolders::_1,  // configProviderStatus
-                             bdlf::PlaceHolders::_2,  // configProviderResult
-                             domain,
-                             domainLocation,
-                             callback));
+        [this, domain, domainLocation, callback](
+            int                configProviderStatus,
+            const bsl::string& configProviderResult) {
+            onConfigProviderDomainConfigCb(configProviderStatus,
+                                           configProviderResult,
+                                           domain,
+                                           domainLocation,
+                                           callback);
+        });
 }
 
 void DomainManager::onConfigProviderDomainConfigCb(
@@ -613,10 +615,10 @@ int DomainManager::locateOrCreateDomain(DomainSp*          domain,
 
         bslmt::Latch latch(1);
         createDomain(domainName,
-                     bdlf::BindUtil::bind(&onDomain,
-                                          bdlf::PlaceHolders::_1,  // status
-                                          bdlf::PlaceHolders::_2,  // domain*
-                                          &latch));
+                     [&latch](const bmqp_ctrlmsg::Status& status,
+                              mqbi::Domain*               createdDomain) {
+                         onDomain(status, createdDomain, &latch);
+                     });
 
         // To return a result from command execution, we need to
         // synchronize with the domain creation attempt
@@ -693,14 +695,18 @@ int DomainManager::processCommand(mqbcmd::DomainsResult*        result,
         DecodeAndUpsertValue configureResult;
         d_configProvider_p->getDomainConfig(
             domainSp->name(),
-            bdlf::BindUtil::bind(
-                &DomainManager::decodeAndUpsert,
-                this,
-                &configureResult,
-                bdlf::PlaceHolders::_1,  // configProviderStatus
-                bdlf::PlaceHolders::_2,  // configProviderResult
-                domainSp->name(),
-                domainSp->cluster()->name()));
+            [this,
+             &configureResult,
+             domainName  = domainSp->name(),
+             clusterName = domainSp->cluster()->name()](
+                int                configProviderStatus,
+                const bsl::string& configProviderResult) {
+                decodeAndUpsert(&configureResult,
+                                configProviderStatus,
+                                configProviderResult,
+                                domainName,
+                                clusterName);
+            });
 
         if (configureResult.isError()) {
             result->makeError().message() = configureResult.error().d_details;
@@ -874,12 +880,14 @@ void DomainManager::createDomain(
 
     d_domainResolver_mp->locateDomain(
         name,
-        bdlf::BindUtil::bind(&DomainManager::onDomainResolverDomainLocatedCb,
-                             this,
-                             bdlf::PlaceHolders::_1,  // status
-                             bdlf::PlaceHolders::_2,  // result
-                             bsl::string(name),
-                             callback));
+        [this, domainName = bsl::string(name), callback](
+            const bmqp_ctrlmsg::Status& status,
+            const bsl::string&          result) {
+            onDomainResolverDomainLocatedCb(status,
+                                            result,
+                                            domainName,
+                                            callback);
+        });
 }
 
 mqbi::Domain* DomainManager::getDomain(const bsl::string& name) const
