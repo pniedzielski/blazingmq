@@ -449,15 +449,22 @@ void RelayQueueEngine::onHandleConfigured(
     // thread, and invokes 'configuredCb' there.
 
     handle->queue()->dispatcher()->execute(
-        bdlf::BindUtil::bind(&RelayQueueEngine::onHandleConfiguredDispatched,
-                             this,
-                             self,
-                             status,
-                             upStreamParameters,
-                             handle,
-                             downStreamParameters,
-                             routing_sp,
-                             configuredCb),
+        [this,
+         self,
+         status,
+         upStreamParameters,
+         handle,
+         downStreamParameters,
+         routing_sp,
+         configuredCb]() {
+            onHandleConfiguredDispatched(self,
+                                         status,
+                                         upStreamParameters,
+                                         handle,
+                                         downStreamParameters,
+                                         routing_sp,
+                                         configuredCb);
+        },
         handle->queue());
 
     // 'onHandleConfiguredDispatched' is now responsible for calling the
@@ -628,9 +635,9 @@ void RelayQueueEngine::onHandleReleasedDispatched(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queueState_p->queue()->inDispatcherThread());
 
-    bdlb::ScopeExitAny proctorGuard(
-        bdlf::BindUtil::bind(&QueueEngineUtil_ReleaseHandleProctor::release,
-                             proctor.get()));
+    bdlb::ScopeExitAny proctorGuard([releaseProctor = proctor.get()]() {
+        releaseProctor->release();
+    });
 
     // RelayQueueEngine now assumes that closeQueue request cannot fail.  Even
     // if request fails due to some reason (timeout, upstream crashing or
@@ -896,12 +903,11 @@ void RelayQueueEngine::processAppRedelivery(unsigned int upstreamSubQueueId,
     }
 
     if (delay != bsls::TimeInterval()) {
-        app->scheduleThrottle(
-            bmqu::Time::nowMonotonicClock() + delay,
-            bdlf::BindUtil::bind(&RelayQueueEngine::processAppRedelivery,
-                                 this,
-                                 upstreamSubQueueId,
-                                 app));
+        app->scheduleThrottle(bmqu::Time::nowMonotonicClock() + delay,
+                              [this, upstreamSubQueueId, app]() {
+                                  processAppRedelivery(upstreamSubQueueId,
+                                                       app);
+                              });
     }
 
     if (app->isReadyForDelivery()) {
@@ -1008,15 +1014,22 @@ void RelayQueueEngine::configureApp(
     }
 
     const QueueHandle::HandleConfiguredCallback& callback =
-        bdlf::BindUtil::bind(&RelayQueueEngine::onHandleConfigured,
-                             this,
-                             d_self.acquireWeak(),
-                             bdlf::PlaceHolders::_1,  // status
-                             bdlf::PlaceHolders::_2,  // upStreamParameters
-                             handle,
-                             streamParameters,  // downStreamParameters
-                             routing_sp,
-                             notifier.releaseCb());
+        [this,
+         self = d_self.acquireWeak(),
+         handle,
+         downStreamParameters = streamParameters,
+         routing_sp,
+         requesterCb = notifier.releaseCb()](
+            const bmqp_ctrlmsg::Status&           status,
+            const bmqp_ctrlmsg::StreamParameters& upStreamParameters) {
+            onHandleConfigured(self,
+                               status,
+                               upStreamParameters,
+                               handle,
+                               downStreamParameters,
+                               routing_sp,
+                               requesterCb);
+        };
 
     // Send a configure stream request upstream.
     d_queueState_p->domain()->cluster()->configureQueue(
