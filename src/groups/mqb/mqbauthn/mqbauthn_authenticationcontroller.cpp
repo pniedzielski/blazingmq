@@ -319,7 +319,7 @@ int AuthenticationController::validateAnonymousCredential(
         bsl::string anonMechanism = bsl::string(AnonAuthenticator::k_MECHANISM,
                                                 d_allocator_p);
 
-        if (d_authenticators.find(anonMechanism) != d_authenticators.cend()) {
+        if (d_authenticators.contains(anonMechanism)) {
             errorDescription << "Provided anonymous authenticator but "
                                 "anonymous credential is not provided";
             return rc_NO_MATCHING_AUTHENTICATOR;  // RETURN
@@ -335,7 +335,7 @@ int AuthenticationController::validateAnonymousCredential(
             anonCredential->credential().mechanism(),
             d_allocator_p);
 
-        if (d_authenticators.find(normAnonMech) == d_authenticators.cend()) {
+        if (!d_authenticators.contains(normAnonMech)) {
             errorDescription
                 << "Anonymous credential mechanism '" << normAnonMech
                 << "' does not match any configured authenticator";
