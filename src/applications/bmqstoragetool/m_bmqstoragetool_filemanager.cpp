@@ -331,8 +331,7 @@ void FileManagerImpl::CslFileHandler::fillQueueMap(QueueMap* queueMap_p) const
     }
 
     using namespace bmqp_ctrlmsg;
-    typedef bsl::vector<QueueInfo>     QueueInfos;
-    typedef QueueInfos::const_iterator QueueInfosIt;
+    typedef bsl::vector<QueueInfo> QueueInfos;
 
     // Process last snapshot
     ClusterMessage clusterMessage;
@@ -343,12 +342,9 @@ void FileManagerImpl::CslFileHandler::fillQueueMap(QueueMap* queueMap_p) const
     // Get queue info from snapshot (leaderAdvisory) record
     LeaderAdvisory& leaderAdvisory = clusterMessage.choice().leaderAdvisory();
     QueueInfos&     queuesInfo     = leaderAdvisory.queues();
-    {
-        // Fill queue map
-        QueueInfosIt it = queuesInfo.cbegin();
-        for (; it != queuesInfo.cend(); ++it) {
-            queueMap_p->insert(*it);
-        }
+    // Fill queue map
+    for (const QueueInfo& queueInfo : queuesInfo) {
+        queueMap_p->insert(queueInfo);
     }
 
     // Iterate from last snapshot to get updates
@@ -368,9 +364,8 @@ void FileManagerImpl::CslFileHandler::fillQueueMap(QueueMap* queueMap_p) const
                 QueueAssignmentAdvisory& queueAdvisory =
                     clusterMessage.choice().queueAssignmentAdvisory();
                 const QueueInfos& updateQueuesInfo = queueAdvisory.queues();
-                QueueInfosIt      it               = updateQueuesInfo.cbegin();
-                for (; it != updateQueuesInfo.cend(); ++it) {
-                    queueMap_p->insert(*it);
+                for (const QueueInfo& queueInfo : updateQueuesInfo) {
+                    queueMap_p->insert(queueInfo);
                 }
             }
             else if (clusterMessage.choice().selectionId() ==
@@ -381,10 +376,9 @@ void FileManagerImpl::CslFileHandler::fillQueueMap(QueueMap* queueMap_p) const
                     clusterMessage.choice().queueUpdateAdvisory();
                 const bsl::vector<QueueInfoUpdate>& queueInfoUpdates =
                     queueUpdateAdvisory.queueUpdates();
-                bsl::vector<QueueInfoUpdate>::const_iterator it =
-                    queueInfoUpdates.cbegin();
-                for (; it != queueInfoUpdates.cend(); ++it) {
-                    queueMap_p->update(*it);
+                for (const QueueInfoUpdate& queueInfoUpdate :
+                     queueInfoUpdates) {
+                    queueMap_p->update(queueInfoUpdate);
                 }
             }
         }
