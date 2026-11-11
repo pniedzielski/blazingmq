@@ -373,11 +373,8 @@ bmqt::EventBuilderResult::Enum PushEventBuilder::addSubQueueInfosOption(
 
     // Only pack in the subQueueIds
     tempVec.reserve(numSubQueueIds);
-    for (Protocol::SubQueueInfosArray::const_iterator citer =
-             subQueueInfos.begin();
-         citer != subQueueInfos.end();
-         ++citer) {
-        tempVec.push_back(bdlb::BigEndianUint32::make(citer->id()));
+    for (const SubQueueInfo& subQueueInfo : subQueueInfos) {
+        tempVec.push_back(bdlb::BigEndianUint32::make(subQueueInfo.id()));
     }
 
     d_options.add(d_blob_sp.get(),
