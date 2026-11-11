@@ -77,10 +77,8 @@ bslma::Allocator* CountingAllocatorStore::get(const bsl::string& name)
 void CountingAllocatorStore::clear()
 {
     bsls::SpinLockGuard guard(&d_spinLock);  // SPINLOCK LOCK
-    for (AllocatorMap::iterator iter = d_allocators.begin();
-         iter != d_allocators.end();
-         ++iter) {
-        d_allocator_p->deleteObject(iter->second);
+    for (const auto& [name, allocator] : d_allocators) {
+        d_allocator_p->deleteObject(allocator);
     }
 
     d_allocators.clear();
