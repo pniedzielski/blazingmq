@@ -464,9 +464,7 @@ static void test1_breathingTest()
     // Write records to CSL
     bsl::vector<RecordInfo> recordInfos(bmqtst::TestHelperUtil::allocator());
     recordInfos.reserve(k_NUM_DATA);
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::LeaderMessageSequence lms;
         lms.electorTerm()    = test.d_electorTerm;
         lms.sequenceNumber() = test.d_sequenceNumber;
@@ -638,9 +636,7 @@ static void test2_searchRecordsByTypeTest()
     // Write records to CSL
     bsl::vector<RecordInfo> recordInfos(bmqtst::TestHelperUtil::allocator());
     recordInfos.reserve(k_NUM_DATA);
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::LeaderMessageSequence lms;
         lms.electorTerm()    = test.d_electorTerm;
         lms.sequenceNumber() = test.d_sequenceNumber;
@@ -806,9 +802,7 @@ static void test3_searchRecordsByQueueKeyTest()
     // Write records to CSL
     bsl::vector<RecordInfo> recordInfos(bmqtst::TestHelperUtil::allocator());
     recordInfos.reserve(k_NUM_DATA);
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::LeaderMessageSequence lms;
         lms.electorTerm()    = test.d_electorTerm;
         lms.sequenceNumber() = test.d_sequenceNumber;
@@ -860,10 +854,9 @@ static void test3_searchRecordsByQueueKeyTest()
     // Prepare expected output
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());
     Sequence                               s;
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
+    for (const Test& test : k_DATA) {
         standardCslIt.next();
 
-        const Test& test = k_DATA[idx];
         if (test.d_queueKey == "2222222222" ||
             test.d_queueKey == "3333333333") {
             // standardCslIt.header() has no `operator==` defined, so skip it
@@ -957,9 +950,7 @@ static void test4_searchRecordsByTimestampRangeTest()
     // Write records to CSL
     bsl::vector<RecordInfo> recordInfos(bmqtst::TestHelperUtil::allocator());
     recordInfos.reserve(k_NUM_DATA);
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::LeaderMessageSequence lms;
         lms.electorTerm()    = test.d_electorTerm;
         lms.sequenceNumber() = test.d_sequenceNumber;
@@ -1009,10 +1000,9 @@ static void test4_searchRecordsByTimestampRangeTest()
     // Prepare expected output with list of snapshot records in CSL file
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());
     Sequence                               s;
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
+    for (const Test& test : k_DATA) {
         standardCslIt.next();
 
-        const Test& test = k_DATA[idx];
         if (test.d_timeStamp > params.d_range.d_timestampGt &&
             test.d_timeStamp < params.d_range.d_timestampLt) {
             // standardCslIt.header() has no `operator==` defined, so skip it
@@ -1104,9 +1094,7 @@ static void test5_searchRecordsByOffsetRangeTest()
     // Write records to CSL
     bsl::vector<RecordInfo> recordInfos(bmqtst::TestHelperUtil::allocator());
     recordInfos.reserve(k_NUM_DATA);
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::LeaderMessageSequence lms;
         lms.electorTerm()    = test.d_electorTerm;
         lms.sequenceNumber() = test.d_sequenceNumber;
@@ -1252,9 +1240,7 @@ static void test6_searchRecordsBySeqNumberRangeTest()
     // Write records to CSL
     bsl::vector<RecordInfo> recordInfos(bmqtst::TestHelperUtil::allocator());
     recordInfos.reserve(k_NUM_DATA);
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::LeaderMessageSequence lms;
         lms.electorTerm()    = test.d_electorTerm;
         lms.sequenceNumber() = test.d_sequenceNumber;
@@ -1304,10 +1290,9 @@ static void test6_searchRecordsBySeqNumberRangeTest()
     // Prepare expected output with list of snapshot records in CSL file
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());
     Sequence                               s;
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
+    for (const Test& test : k_DATA) {
         standardCslIt.next();
 
-        const Test&             test = k_DATA[idx];
         CompositeSequenceNumber recSeqNum(test.d_electorTerm,
                                           test.d_sequenceNumber);
         if (params.d_range.d_seqNumGt < recSeqNum &&
@@ -1401,9 +1386,7 @@ static void test7_searchRecordsByOffsetTest()
     // Write records to CSL
     bsl::vector<RecordInfo> recordInfos(bmqtst::TestHelperUtil::allocator());
     recordInfos.reserve(k_NUM_DATA);
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::LeaderMessageSequence lms;
         lms.electorTerm()    = test.d_electorTerm;
         lms.sequenceNumber() = test.d_sequenceNumber;
@@ -1548,9 +1531,7 @@ static void test8_searchRecordsBySeqNumberTest()
     // Write records to CSL
     bsl::vector<RecordInfo> recordInfos(bmqtst::TestHelperUtil::allocator());
     recordInfos.reserve(k_NUM_DATA);
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::LeaderMessageSequence lms;
         lms.electorTerm()    = test.d_electorTerm;
         lms.sequenceNumber() = test.d_sequenceNumber;
@@ -1600,10 +1581,9 @@ static void test8_searchRecordsBySeqNumberTest()
     // Prepare expected output with list of snapshot records in CSL file
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());
     Sequence                               s;
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
+    for (const Test& test : k_DATA) {
         standardCslIt.next();
 
-        const Test& test = k_DATA[idx];
         if ((test.d_electorTerm == 1U || test.d_electorTerm == 2U) &&
             test.d_sequenceNumber == 2U) {
             // standardCslIt.header() has no `operator==` defined, so skip it
@@ -1711,9 +1691,7 @@ static void test9_summaryTest()
     // Write records to CSL
     bsl::vector<RecordInfo> recordInfos(bmqtst::TestHelperUtil::allocator());
     recordInfos.reserve(k_NUM_DATA);
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::LeaderMessageSequence lms;
         lms.electorTerm()    = test.d_electorTerm;
         lms.sequenceNumber() = test.d_sequenceNumber;
