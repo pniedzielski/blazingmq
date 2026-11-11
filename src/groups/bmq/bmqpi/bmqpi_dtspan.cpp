@@ -63,7 +63,7 @@ bsl::string_view DTSpan::Baggage::get(const bsl::string&      key,
 {
     bsl::string_view result(dflt);
 
-    MapType::const_iterator it = d_data.find(key);
+    auto it = d_data.find(key);
     if (it != d_data.end()) {
         result = it->second;
     }
