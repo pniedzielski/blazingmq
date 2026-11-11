@@ -152,20 +152,18 @@ bool StorageUtil::loadDifference(mqbi::Storage::AppInfos*       result,
                                  bool                           findConflicts)
 {
     bool noConflicts = true;
-    for (mqbi::Storage::AppInfos::const_iterator cit = baseSet.cbegin();
-         cit != baseSet.cend();
-         ++cit) {
+    for (const auto& baseEntry : baseSet) {
         mqbi::Storage::AppInfos::const_iterator match = subtractionSet.find(
-            cit->first);
+            baseEntry.first);
 
         if (subtractionSet.end() == match) {
-            result->insert(bsl::make_pair(cit->first, cit->second));
+            result->insert(bsl::make_pair(baseEntry.first, baseEntry.second));
         }
-        else if (findConflicts && match->second != cit->second) {
-            BALL_LOG_ERROR << "appId [" << cit->first
-                           << "] has conflicting appKeys [" << cit->second
+        else if (findConflicts && match->second != baseEntry.second) {
+            BALL_LOG_ERROR << "appId [" << baseEntry.first
+                           << "] has conflicting appKeys [" << baseEntry.second
                            << " vs " << match->second << "].  Ignoring ["
-                           << cit->second << "]";
+                           << baseEntry.second << "]";
             noConflicts = false;
         }
     }
@@ -178,12 +176,9 @@ void StorageUtil::loadDifference(
     const bsl::unordered_set<bsl::string>& baseSet,
     const bsl::unordered_set<bsl::string>& subtractionSet)
 {
-    for (bsl::unordered_set<bsl::string>::const_iterator cit =
-             baseSet.cbegin();
-         cit != baseSet.cend();
-         ++cit) {
-        if (subtractionSet.end() == subtractionSet.find(*cit)) {
-            result->push_back(*cit);
+    for (const auto& baseEntry : baseSet) {
+        if (subtractionSet.end() == subtractionSet.find(baseEntry)) {
+            result->push_back(baseEntry);
         }
     }
 }
@@ -433,19 +428,18 @@ int StorageUtil::updateQueuePrimaryRaw(mqbs::ReplicatedStorage* storage,
     }
 
     if (!removedIdKeyPairs.empty()) {
-        for (AppInfos::const_iterator cit = removedIdKeyPairs.begin();
-             cit != removedIdKeyPairs.end();
-             ++cit) {
+        for (const auto& appIdKeyPair : removedIdKeyPairs) {
             rc = removeVirtualStorageInternal(storage,
-                                              cit->second,
+                                              appIdKeyPair.second,
                                               true);  // asPrimary
             if (0 != rc) {
                 BALL_LOG_ERROR << fs->description()
                                << ": failed to remove storage for  appKey ["
-                               << cit->second << "], appId [" << cit->first
-                               << "], for queue [" << storage->queueUri()
-                               << "], queueKey [" << storage->queueKey()
-                               << "], rc: " << rc << ".";
+                               << appIdKeyPair.second << "], appId ["
+                               << appIdKeyPair.first << "], for queue ["
+                               << storage->queueUri() << "], queueKey ["
+                               << storage->queueKey() << "], rc: " << rc
+                               << ".";
                 return rc;  // RETURN
             }
         }
@@ -497,21 +491,19 @@ int StorageUtil::addVirtualStoragesInternal(mqbs::ReplicatedStorage* storage,
     if (isFanout) {
         // Register appKeys with with the underlying physical 'storage'.
 
-        for (AppInfos::const_iterator cit = appIdKeyPairs.begin();
-             cit != appIdKeyPairs.end();
-             ++cit) {
+        for (const auto& appIdKeyPair : appIdKeyPairs) {
             const int rc = storage->addVirtualStorage(errorDesc,
-                                                      cit->first,
-                                                      cit->second);
+                                                      appIdKeyPair.first,
+                                                      appIdKeyPair.second);
 
             if (rc) {
                 BALL_LOG_WARN << partitionDesc
                               << ": failed to add virtual storage for AppKey ["
-                              << cit->second << "], appId [" << cit->first
-                              << "], for queue [" << storage->queueUri()
-                              << "], queueKey [" << storage->queueKey()
-                              << "]. Reason: [" << errorDesc.str()
-                              << "], rc: " << rc << ".";
+                              << appIdKeyPair.second << "], appId ["
+                              << appIdKeyPair.first << "], for queue ["
+                              << storage->queueUri() << "], queueKey ["
+                              << storage->queueKey() << "]. Reason: ["
+                              << errorDesc.str() << "], rc: " << rc << ".";
 
                 return rc_VIRTUAL_STORAGE_CREATION_FAILURE;  // RETURN
             }
@@ -604,10 +596,10 @@ void StorageUtil::loadStorages(bsl::vector<mqbcmd::StorageQueueInfo>* storages,
 
     // Merge vector of vectors into a single vector
     StorageList storageList;
-    for (StorageListsConstIter cit = storageLists.cbegin();
-         cit != storageLists.cend();
-         ++cit) {
-        bsl::copy(cit->cbegin(), cit->cend(), bsl::back_inserter(storageList));
+    for (const auto& partitionStorageList : storageLists) {
+        bsl::copy(partitionStorageList.cbegin(),
+                  partitionStorageList.cend(),
+                  bsl::back_inserter(storageList));
     }
 
     mqbs::StorageCollectionUtil::sortStorages(
@@ -615,21 +607,20 @@ void StorageUtil::loadStorages(bsl::vector<mqbcmd::StorageQueueInfo>* storages,
         mqbs::StorageCollectionUtilSortMetric::e_BYTE_COUNT);
 
     storages->reserve(storageList.size());
-    for (StorageList::const_iterator cit = storageList.begin();
-         cit != storageList.end();
-         ++cit) {
+    for (const auto& queueStorage : storageList) {
         storages->resize(storages->size() + 1);
         mqbcmd::StorageQueueInfo& storage = storages->back();
 
         bmqu::MemOutStream os;
-        os << (*cit)->queueKey();
+        os << queueStorage->queueKey();
         storage.queueKey()    = os.str();
-        storage.partitionId() = (*cit)->partitionId();
-        storage.numMessages() = (*cit)->numMessages(
+        storage.partitionId() = queueStorage->partitionId();
+        storage.numMessages() = queueStorage->numMessages(
             mqbu::StorageKey::k_NULL_KEY);
-        storage.numBytes() = (*cit)->numBytes(mqbu::StorageKey::k_NULL_KEY);
-        storage.queueUri() = (*cit)->queueUri().asString();
-        storage.isPersistent() = (*cit)->isPersistent();
+        storage.numBytes() = queueStorage->numBytes(
+            mqbu::StorageKey::k_NULL_KEY);
+        storage.queueUri()     = queueStorage->queueUri().asString();
+        storage.isPersistent() = queueStorage->isPersistent();
     }
 }
 
@@ -891,11 +882,9 @@ int StorageUtil::processReplicationCommand(
             tunableConfirmation.oldValue().makeTheInteger(*replicationFactor);
             *replicationFactor = tunable.value().theInteger();
 
-            for (FileStores::iterator it = fileStores->begin();
-                 it != fileStores->end();
-                 ++it) {
-                (*it)->execute(
-                    [fs                   = *it,
+            for (const auto& fileStore : *fileStores) {
+                fileStore->execute(
+                    [fs                   = fileStore,
                      newReplicationFactor = tunable.value().theInteger()]() {
                         fs->setReplicationFactor(newReplicationFactor);
                     });
@@ -1604,10 +1593,8 @@ void StorageUtil::recoveredQueuesCb(
     // a global list of AppIds (in fact, we can't have that, because AppIds can
     // clash), so we check uniqueness of AppIds only for a given queue.
 
-    for (QueueKeyInfoMapConstIter qit = queueKeyInfoMap->begin();
-         qit != queueKeyInfoMap->end();
-         ++qit) {
-        const mqbs::DataStoreConfigQueueInfo& qinfo = qit->second;
+    for (const auto& queueKeyInfo : *queueKeyInfoMap) {
+        const mqbs::DataStoreConfigQueueInfo& qinfo = queueKeyInfo.second;
         bmqt::Uri                             uri(qinfo.canonicalQueueUri());
         if (!uri.isValid()) {
             BMQTSK_ALARMLOG_ALARM("RECOVERY")
@@ -1624,11 +1611,8 @@ void StorageUtil::recoveredQueuesCb(
             // This is a fanout queue
             AppIds appIds;
 
-            for (mqbs::DataStoreConfigQueueInfo::AppInfos::const_iterator cit =
-                     qinfo.appIdKeyPairs().cbegin();
-                 cit != qinfo.appIdKeyPairs().cend();
-                 ++cit) {
-                AppIdsInsertRc appIdsIrc = appIds.insert(cit->second);
+            for (const auto& appIdKeyPair : qinfo.appIdKeyPairs()) {
+                AppIdsInsertRc appIdsIrc = appIds.insert(appIdKeyPair.second);
                 if (false == appIdsIrc.second) {
                     // Duplicate AppId.
 
@@ -1637,9 +1621,9 @@ void StorageUtil::recoveredQueuesCb(
                         << "]: "
                         << "encountered a duplicate AppId while processing "
                         << "recovered queue [" << uri << "], " << "queueKey ["
-                        << qit->first << "]. AppId [" << *(appIdsIrc.first)
-                        << "]. AppKey [" << cit->first << "]."
-                        << BMQTSK_ALARMLOG_END;
+                        << queueKeyInfo.first << "]. AppId ["
+                        << *(appIdsIrc.first) << "]. AppKey ["
+                        << appIdKeyPair.first << "]." << BMQTSK_ALARMLOG_END;
                     mqbu::ExitUtil::terminate(
                         mqbu::ExitCode::e_RECOVERY_FAILURE);
                     // EXIT
@@ -1664,8 +1648,8 @@ void StorageUtil::recoveredQueuesCb(
               static_cast<bsls::Types::Int64>(domainMap.size()))
        << " domains.";
 
-    for (DomainMapIter it = domainMap.begin(); it != domainMap.end(); ++it) {
-        os << "\n  " << it->first;
+    for (const auto& domainEntry : domainMap) {
+        os << "\n  " << domainEntry.first;
     }
 
     BALL_LOG_INFO << os.str();
@@ -1680,14 +1664,17 @@ void StorageUtil::recoveredQueuesCb(
     // issuing and blocking on one request at a time.
     bslmt::Latch latch(domainMap.size());
 
-    for (DomainMapIter dit = domainMap.begin(); dit != domainMap.end();
-         ++dit) {
+    for (auto& domainEntry : domainMap) {
         BALL_LOG_INFO << clusterDescription << ": Partition [" << partitionId
-                      << "]: requesting domain for [" << dit->first << "].";
+                      << "]: requesting domain for [" << domainEntry.first
+                      << "].";
 
         domainFactory->createDomain(
-            dit->first,
-            [out = &(dit->second), &latch, fs, domainName = dit->first](
+            domainEntry.first,
+            [out = &(domainEntry.second),
+             &latch,
+             fs,
+             domainName = domainEntry.first](
                 const bmqp_ctrlmsg::Status& status,
                 mqbi::Domain*               domain) {
                 onDomain(status, domain, out, &latch, fs, domainName);
@@ -1709,10 +1696,9 @@ void StorageUtil::recoveredQueuesCb(
         bslmt::LockGuard<bslmt::Mutex> unrecognizedDomainsLockGuard(
             unrecognizedDomainsLock);  // LOCK
 
-        for (DomainMapIter dit = domainMap.begin(); dit != domainMap.end();
-             ++dit) {
-            if (dit->second == 0 ||
-                !dit->second->cluster()->isClusterMember()) {
+        for (const auto& domainEntry : domainMap) {
+            if (domainEntry.second == 0 ||
+                !domainEntry.second->cluster()->isClusterMember()) {
                 // Two scenarios:
                 // 1. Failed to create domain for this domain name.
                 // 2. Domain is associated with a proxy cluster.
@@ -1720,11 +1706,11 @@ void StorageUtil::recoveredQueuesCb(
                 // Will add it to the map of unrecognized domain names for
                 // further investigation.
                 unrecognizedDomains->insert(bsl::make_pair(
-                    dit->first,
+                    domainEntry.first,
                     mqbs::StorageUtil::QueueMessagesCountMap()));
             }
             else {
-                recognizedDomains.insert(*dit);
+                recognizedDomains.insert(domainEntry);
             }
         }
     }
@@ -1743,11 +1729,9 @@ void StorageUtil::recoveredQueuesCb(
     // All domains have been created.  Now make 2nd pass over 'queueKeyUriMap'
     // and create file-backed storages for each recovered queue.
 
-    for (QueueKeyInfoMapConstIter qit = queueKeyInfoMap->begin();
-         qit != queueKeyInfoMap->end();
-         ++qit) {
-        const mqbu::StorageKey&                         queueKey = qit->first;
-        const mqbs::DataStoreConfigQueueInfo&           qinfo    = qit->second;
+    for (const auto& queueKeyInfo : *queueKeyInfoMap) {
+        const mqbu::StorageKey&               queueKey = queueKeyInfo.first;
+        const mqbs::DataStoreConfigQueueInfo& qinfo    = queueKeyInfo.second;
         const mqbs::DataStoreConfigQueueInfo::AppInfos& appIdKeyPairs =
             qinfo.appIdKeyPairs();
         const bmqt::Uri queueUri(qinfo.canonicalQueueUri());
@@ -1782,12 +1766,11 @@ void StorageUtil::recoveredQueuesCb(
             BSLS_ASSERT_SAFE(queueKey == rstorage->queueKey());
             BSLS_ASSERT_SAFE(partitionId == rstorage->partitionId());
 
-            for (mqbs::DataStoreConfigQueueInfo::AppInfos::const_iterator ait =
-                     appIdKeyPairs.cbegin();
-                 ait != appIdKeyPairs.cend();
-                 ++ait) {
-                [[maybe_unused]] const bsl::string&      appId  = ait->second;
-                [[maybe_unused]] const mqbu::StorageKey& appKey = ait->first;
+            for (const auto& appIdKeyPair : appIdKeyPairs) {
+                [[maybe_unused]] const bsl::string& appId =
+                    appIdKeyPair.second;
+                [[maybe_unused]] const mqbu::StorageKey& appKey =
+                    appIdKeyPair.first;
 
                 BSLS_ASSERT_SAFE(!appKey.isNull());
                 BSLS_ASSERT_SAFE(!appId.empty());
@@ -1887,7 +1870,7 @@ void StorageUtil::recoveredQueuesCb(
             // EXIT
         }
 
-        if (!qit->second.isRecorded()) {
+        if (!queueKeyInfo.second.isRecorded()) {
             BALL_LOG_INFO << clusterDescription << " Partition ["
                           << partitionId
                           << "]: did not recover QueueCreationRecord and "
@@ -1910,12 +1893,9 @@ void StorageUtil::recoveredQueuesCb(
         bmqu::MemOutStream errorDesc;
         int                rc;
         if (domainCfg->mode().isFanoutValue()) {
-            for (mqbs::DataStoreConfigQueueInfo::AppInfos::const_iterator ait =
-                     appIdKeyPairs.cbegin();
-                 ait != appIdKeyPairs.cend();
-                 ++ait) {
-                const bsl::string&      appId  = ait->second;
-                const mqbu::StorageKey& appKey = ait->first;
+            for (const auto& appIdKeyPair : appIdKeyPairs) {
+                const bsl::string&      appId  = appIdKeyPair.second;
+                const mqbu::StorageKey& appKey = appIdKeyPair.first;
 
                 BSLS_ASSERT_SAFE(!appKey.isNull());
                 BSLS_ASSERT_SAFE(!appId.empty());
@@ -1985,7 +1965,6 @@ void StorageUtil::recoveredQueuesCb(
                   << "records found during recovery: " << fs->numRecords();
 
     typedef bsl::vector<mqbs::DataStoreRecordHandle> DataStoreRecordHandles;
-    typedef DataStoreRecordHandles::iterator DataStoreRecordHandlesIter;
 
     mqbs::FileStoreIterator fsIt(fs);
     DataStoreRecordHandles  recordsToPurge;  // TODO: allocator
@@ -2184,19 +2163,16 @@ void StorageUtil::recoveredQueuesCb(
     }
 
     // Purge all records that have been invalidated
-    for (DataStoreRecordHandlesIter it = recordsToPurge.begin();
-         it != recordsToPurge.end();
-         ++it) {
-        fs->removeRecordRaw(*it);
+    for (const auto& recordHandle : recordsToPurge) {
+        fs->removeRecordRaw(recordHandle);
     }
 
     fs->setLastStrongConsistency(lastStrongConsistencyPrimaryLeaseId,
                                  lastStrongConsistencySequenceNum);
 
     // Calculate offsets
-    for (StorageSpMapIter it = storageMap->begin(); it != storageMap->end();
-         ++it) {
-        it->second->calibrate();
+    for (const auto& storageEntry : *storageMap) {
+        storageEntry.second->calibrate();
     }
 }
 
@@ -2234,13 +2210,10 @@ void StorageUtil::dumpUnknownRecoveredDomains(
         // the log with statistics about them, allowing BlazingMQ developers to
         // investigate.
 
-        for (DomainQueueMessagesCountMaps::const_iterator cit =
-                 unrecognizedDomains.cbegin();
-             cit != unrecognizedDomains.cend();
-             ++cit) {
+        for (const auto& partitionUnrecognizedDomains : unrecognizedDomains) {
             mqbs::StorageUtil::mergeDomainQueueMessagesCountMap(
                 &unrecognizedDomainsFlat,
-                *cit);
+                partitionUnrecognizedDomains);
         }
     }
 
@@ -2250,11 +2223,8 @@ void StorageUtil::dumpUnknownRecoveredDomains(
 
     MapKeys keys;
     keys.reserve(unrecognizedDomainsFlat.size());
-    for (mqbs::StorageUtil::DomainQueueMessagesCountMap::const_iterator cit =
-             unrecognizedDomainsFlat.cbegin();
-         cit != unrecognizedDomainsFlat.cend();
-         ++cit) {
-        keys.push_back(cit->first);
+    for (const auto& domainEntry : unrecognizedDomainsFlat) {
+        keys.push_back(domainEntry.first);
     }
     bsl::sort(keys.begin(), keys.end());
 
@@ -2264,35 +2234,29 @@ void StorageUtil::dumpUnknownRecoveredDomains(
     bdlb::Print::newlineAndIndent(out, level);
     out << "Unrecognized domains found while recovering '"
         << clusterDescription << "'";
-    for (MapKeys::const_iterator cit = keys.cbegin(); cit != keys.cend();
-         ++cit) {
+    for (const auto& domainName : keys) {
         bdlb::Print::newlineAndIndent(out, level + 1);
-        out << *cit << ":";
+        out << domainName << ":";
 
         // Sort the queues by number of messages
         typedef bsl::vector<mqbs::StorageUtil::QueueMessagesCount>
             QueueMessagesList;
 
         const mqbs::StorageUtil::QueueMessagesCountMap& queueMessages =
-            unrecognizedDomainsFlat[*cit];
+            unrecognizedDomainsFlat[domainName];
         QueueMessagesList queueMessagesList;
-        for (mqbs::StorageUtil::QueueMessagesCountMap::const_iterator qmcit =
-                 queueMessages.cbegin();
-             qmcit != queueMessages.cend();
-             ++qmcit) {
-            queueMessagesList.push_back(*qmcit);
+        for (const auto& queueMessagesCount : queueMessages) {
+            queueMessagesList.push_back(queueMessagesCount);
         }
         bsl::sort(queueMessagesList.begin(),
                   queueMessagesList.end(),
                   mqbs::StorageUtil::queueMessagesCountComparator);
 
-        for (QueueMessagesList::const_iterator qmlcit =
-                 queueMessagesList.cbegin();
-             qmlcit != queueMessagesList.cend();
-             ++qmlcit) {
+        for (const auto& queueMessagesCount : queueMessagesList) {
             bdlb::Print::newlineAndIndent(out, level + 2);
-            out << qmlcit->first << ": "
-                << bmqu::PrintUtil::prettyNumber(qmlcit->second) << " msgs";
+            out << queueMessagesCount.first << ": "
+                << bmqu::PrintUtil::prettyNumber(queueMessagesCount.second)
+                << " msgs";
         }
     }
 
@@ -3381,11 +3345,9 @@ void StorageUtil::purgeDomainInPartition(
             (*storageLockVec)[partitionId].get());  // LOCK
 
         const StorageSpMap& partitionStorages = (*storageMapVec)[partitionId];
-        for (StorageSpMap::const_iterator it = partitionStorages.cbegin();
-             it != partitionStorages.cend();
-             it++) {
-            if (filter(it->second.get())) {
-                domainStorages.push_back(it->second.get());
+        for (const auto& storageEntry : partitionStorages) {
+            if (filter(storageEntry.second.get())) {
+                domainStorages.push_back(storageEntry.second.get());
             }
         }
         // Prepare a vector of storages to purge and release the partition
