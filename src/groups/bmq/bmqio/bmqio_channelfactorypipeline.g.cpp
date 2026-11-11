@@ -24,8 +24,6 @@
 #include <bmqio_testchannelfactory.h>
 
 // BDE
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bsl_memory.h>
 #include <bsl_utility.h>
 #include <bsla_annotations.h>
@@ -148,12 +146,10 @@ TEST_F(ChannelFactoryPipelineConfigTest, addWith)
         }
     };
 
-    using bdlf::PlaceHolders::_1;
-    builder.addWith(
-        bdlf::BindUtil::bindS(bslma::AllocatorUtil::adapt(get_allocator()),
-                              FactoryFunctor::make,
-                              get_allocator(),
-                              _1));
+    builder.addWith([allocator = get_allocator()](
+                        bsl::shared_ptr<bmqio::ChannelFactory>& prev) {
+        return FactoryFunctor::make(allocator, prev);
+    });
 
     EXPECT_EQ(2, builder.size());
 }
@@ -171,12 +167,11 @@ TEST_F(ChannelFactoryPipelineConfigTest, addWithFails)
         }
     };
 
-    using bdlf::PlaceHolders::_1;
-    EXPECT_THROW(builder.addWith(bdlf::BindUtil::bindS(
-                     bslma::AllocatorUtil::adapt(get_allocator()),
-                     FactoryFunctor::make,
-                     _1)),
-                 bsls::AssertTestException);
+    EXPECT_THROW(
+        builder.addWith([](bsl::shared_ptr<bmqio::ChannelFactory>& prev) {
+            return FactoryFunctor::make(prev);
+        }),
+        bsls::AssertTestException);
 }
 
 TEST_F(ChannelFactoryPipelineConfigTest, canMove)
@@ -226,12 +221,10 @@ class ChannelFactoryPipelineTest : public ::testing::Test {
             }
         };
 
-        using bdlf::PlaceHolders::_1;
-        return bdlf::BindUtil::bindS(
-            bslma::AllocatorUtil::adapt(get_allocator()),
-            Config::make,
-            get_allocator(),
-            _1);
+        return [allocator = get_allocator()](
+                   bsl::shared_ptr<bmqio::ChannelFactory>& prev) {
+            return Config::make(allocator, prev);
+        };
     }
 };
 
