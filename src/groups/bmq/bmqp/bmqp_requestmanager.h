@@ -335,7 +335,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmt_mutex.h>
-#include <bsls_cpp11.h>
 #include <bsls_timeinterval.h>
 #include <bsls_types.h>
 
@@ -500,10 +499,10 @@ class RequestManager {
 
   private:
     // NOT IMPLEMENTED
-    RequestManager(const RequestManager&) BSLS_CPP11_DELETED;
+    RequestManager(const RequestManager&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    RequestManager& operator=(const RequestManager&) BSLS_CPP11_DELETED;
+    RequestManager& operator=(const RequestManager&) = delete;
 
   public:
     // TRAITS

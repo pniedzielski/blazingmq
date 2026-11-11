@@ -72,7 +72,6 @@
 #include <bslma_allocator.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_cpp11.h>
 #include <bsls_performancehint.h>
 
 namespace BloombergLP {
@@ -84,7 +83,7 @@ namespace bmqp {
 // =====================
 
 /// Mechanism to build a BlazingMQ ACK event
-class AckEventBuilder BSLS_CPP11_FINAL {
+class AckEventBuilder final {
   public:
     // TYPES
     typedef bmqp::BlobPoolUtil::BlobSpPool BlobSpPool;
@@ -106,10 +105,10 @@ class AckEventBuilder BSLS_CPP11_FINAL {
 
   private:
     // NOT IMPLEMENTED
-    AckEventBuilder(const AckEventBuilder&) BSLS_CPP11_DELETED;
+    AckEventBuilder(const AckEventBuilder&) = delete;
 
     /// Copy constructor and assignment operator not implemented
-    AckEventBuilder& operator=(const AckEventBuilder&) BSLS_CPP11_DELETED;
+    AckEventBuilder& operator=(const AckEventBuilder&) = delete;
 
   public:
     // TRAITS

@@ -49,7 +49,6 @@
 #include <bslma_allocator.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_cpp11.h>
 #include <bsls_spinlock.h>
 
 namespace BloombergLP {
@@ -180,10 +179,10 @@ class MessageCorrelationIdContainer {
 
   private:
     // NOT IMPLEMENTED
-    MessageCorrelationIdContainer(const MessageCorrelationIdContainer&)
-        BSLS_CPP11_DELETED;
+    MessageCorrelationIdContainer(const MessageCorrelationIdContainer&) =
+        delete;
     MessageCorrelationIdContainer&
-    operator=(const MessageCorrelationIdContainer&) BSLS_CPP11_DELETED;
+    operator=(const MessageCorrelationIdContainer&) = delete;
 
   public:
     // TRAITS

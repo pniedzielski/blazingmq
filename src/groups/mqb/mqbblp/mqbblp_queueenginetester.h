@@ -143,7 +143,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -252,8 +251,8 @@ class QueueEngineTester {
 
   private:
     // NOT IMPLEMENTED
-    QueueEngineTester(const QueueEngineTester&) BSLS_CPP11_DELETED;
-    QueueEngineTester& operator=(const QueueEngineTester&) BSLS_CPP11_DELETED;
+    QueueEngineTester(const QueueEngineTester&)            = delete;
+    QueueEngineTester& operator=(const QueueEngineTester&) = delete;
 
   private:
     // PRIVATE MANIPULATORS
@@ -513,9 +512,9 @@ class QueueEngineTesterGuard {
 
   private:
     // NOT IMPLEMENTED
-    QueueEngineTesterGuard(const QueueEngineTesterGuard&) BSLS_CPP11_DELETED;
-    QueueEngineTesterGuard<QUEUE_ENGINE_TYPE>& operator=(
-        const QueueEngineTesterGuard<QUEUE_ENGINE_TYPE>&) BSLS_CPP11_DELETED;
+    QueueEngineTesterGuard(const QueueEngineTesterGuard&) = delete;
+    QueueEngineTesterGuard<QUEUE_ENGINE_TYPE>&
+    operator=(const QueueEngineTesterGuard<QUEUE_ENGINE_TYPE>&) = delete;
 
   public:
     // CREATORS

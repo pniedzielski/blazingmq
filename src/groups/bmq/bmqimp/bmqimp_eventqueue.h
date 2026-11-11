@@ -156,7 +156,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_atomic.h>
-#include <bsls_cpp11.h>
 #include <bsls_spinlock.h>
 #include <bsls_systemtime.h>
 #include <bsls_timeinterval.h>
@@ -288,8 +287,8 @@ class EventQueue {
 
   private:
     // NOT IMPLEMENTED
-    EventQueue(const EventQueue& other) BSLS_CPP11_DELETED;
-    EventQueue& operator=(const EventQueue& rhs) BSLS_CPP11_DELETED;
+    EventQueue(const EventQueue& other)          = delete;
+    EventQueue& operator=(const EventQueue& rhs) = delete;
 
   private:
     // PRIVATE MANIPULATORS

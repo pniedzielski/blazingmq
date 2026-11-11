@@ -53,7 +53,6 @@
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
 #include <bsls_assert.h>
-#include <bsls_cpp11.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {
@@ -100,7 +99,7 @@ namespace mqbblp {
 // ===========
 
 /// @todo Document this class
-class Queue BSLS_CPP11_FINAL : public mqbi::Queue {
+class Queue final : public mqbi::Queue {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBBLP.QUEUE");
@@ -115,10 +114,10 @@ class Queue BSLS_CPP11_FINAL : public mqbi::Queue {
 
   private:
     // NOT IMPLEMENTED
-    Queue(const Queue& other) BSLS_CPP11_DELETED;
+    Queue(const Queue& other) = delete;
 
     /// Copy constructor and assignment operator are not implemented
-    Queue& operator=(const Queue& other) BSLS_CPP11_DELETED;
+    Queue& operator=(const Queue& other) = delete;
 
   private:
     // PRIVATE MANIPULATORS

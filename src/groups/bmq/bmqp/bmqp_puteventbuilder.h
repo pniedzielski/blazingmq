@@ -79,7 +79,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -180,10 +179,10 @@ class PutEventBuilder {
 
   private:
     // NOT IMPLEMENTED
-    PutEventBuilder(const PutEventBuilder&) BSLS_CPP11_DELETED;
+    PutEventBuilder(const PutEventBuilder&) = delete;
 
     /// Copy constructor and assignment operator not implemented
-    PutEventBuilder& operator=(const PutEventBuilder&) BSLS_CPP11_DELETED;
+    PutEventBuilder& operator=(const PutEventBuilder&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

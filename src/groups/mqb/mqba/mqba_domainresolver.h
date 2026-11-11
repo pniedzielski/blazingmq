@@ -70,7 +70,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmt_mutex.h>
-#include <bsls_cpp11.h>
 #include <bsls_timeinterval.h>
 
 namespace BloombergLP {
@@ -210,10 +209,10 @@ class DomainResolver {
 
   private:
     // NOT IMPLEMENTED
-    DomainResolver(const DomainResolver&) BSLS_CPP11_DELETED;
+    DomainResolver(const DomainResolver&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    DomainResolver& operator=(const DomainResolver&) BSLS_CPP11_DELETED;
+    DomainResolver& operator=(const DomainResolver&) = delete;
 
   public:
     // TRAITS

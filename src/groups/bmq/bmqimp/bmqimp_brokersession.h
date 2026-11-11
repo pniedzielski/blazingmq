@@ -83,7 +83,6 @@
 #include <bslmt_threadutil.h>
 #include <bslmt_timedsemaphore.h>
 #include <bsls_atomic.h>
-#include <bsls_cpp11.h>
 #include <bsls_timeinterval.h>
 #include <bsls_types.h>
 
@@ -131,7 +130,7 @@ class BrokerSession_Executor {
 // ===================
 
 /// Implementation of a session with the bmqbrkr.
-class BrokerSession BSLS_CPP11_FINAL {
+class BrokerSession final {
   public:
     // PUBLIC TYPES
     typedef bmqp::BlobPoolUtil::BlobSpPool BlobSpPool;

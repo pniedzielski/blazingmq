@@ -34,7 +34,6 @@
 #include <bslma_allocator.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -46,7 +45,7 @@ namespace mqbs {
 
 /// This class provides a VST to capture the names of three files (data,
 /// journal and qlist) that are part of a `mqbs::FileStore`.
-class FileStoreSet BSLS_CPP11_FINAL {
+class FileStoreSet final {
   private:
     // DATA
     bsl::string d_dataFile;

@@ -44,7 +44,6 @@
 #include <bslma_managedptr.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_cpp11.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {
@@ -256,10 +255,10 @@ class ClusterStats {
 
   private:
     // NOT IMPLEMENTED
-    ClusterStats(const ClusterStats&) BSLS_CPP11_DELETED;
+    ClusterStats(const ClusterStats&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    ClusterStats& operator=(const ClusterStats&) BSLS_CPP11_DELETED;
+    ClusterStats& operator=(const ClusterStats&) = delete;
 
   public:
     // TRAITS
@@ -362,10 +361,10 @@ class PartitionStats {
 
   private:
     // NOT IMPLEMENTED
-    PartitionStats(const PartitionStats&) BSLS_CPP11_DELETED;
+    PartitionStats(const PartitionStats&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    PartitionStats& operator=(const PartitionStats&) BSLS_CPP11_DELETED;
+    PartitionStats& operator=(const PartitionStats&) = delete;
 
   public:
     // CREATORS

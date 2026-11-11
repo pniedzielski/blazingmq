@@ -42,7 +42,6 @@
 #include <bslma_allocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_atomic.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -189,9 +188,8 @@ class QueueSessionManager {
         d_requesterContext_sp;
 
     // NOT IMPLEMENTED
-    QueueSessionManager(const QueueSessionManager&) BSLS_CPP11_DELETED;
-    QueueSessionManager&
-    operator=(const QueueSessionManager&) BSLS_CPP11_DELETED;
+    QueueSessionManager(const QueueSessionManager&)            = delete;
+    QueueSessionManager& operator=(const QueueSessionManager&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

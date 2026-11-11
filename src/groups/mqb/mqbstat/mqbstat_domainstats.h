@@ -34,7 +34,6 @@
 #include <bsl_string.h>
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
-#include <bsls_cpp11.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {
@@ -99,10 +98,10 @@ class DomainStats {
 
   private:
     // NOT IMPLEMENTED
-    DomainStats(const DomainStats&) BSLS_CPP11_DELETED;
+    DomainStats(const DomainStats&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    DomainStats& operator=(const DomainStats&) BSLS_CPP11_DELETED;
+    DomainStats& operator=(const DomainStats&) = delete;
 
   public:
     // CLASS METHODS

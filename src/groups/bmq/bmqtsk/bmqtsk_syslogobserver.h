@@ -86,7 +86,6 @@
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmt_lockguard.h>
 #include <bslmt_mutex.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -116,10 +115,10 @@ class SyslogObserver : public ball::ObserverAdapter {
 
   private:
     // NOT IMPLEMENTED
-    SyslogObserver(const SyslogObserver&) BSLS_CPP11_DELETED;
+    SyslogObserver(const SyslogObserver&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    SyslogObserver& operator=(const SyslogObserver&) BSLS_CPP11_DELETED;
+    SyslogObserver& operator=(const SyslogObserver&) = delete;
 
   public:
     // TRAITS

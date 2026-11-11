@@ -54,7 +54,6 @@
 #include <bslma_allocator.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -135,10 +134,10 @@ class Domain : public mqbi::Domain {
 
   private:
     // NOT IMPLEMENTED
-    Domain(const Domain&) BSLS_CPP11_DELETED;
+    Domain(const Domain&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    Domain& operator=(const Domain&) BSLS_CPP11_DELETED;
+    Domain& operator=(const Domain&) = delete;
 
   public:
     // TRAITS
@@ -267,10 +266,10 @@ class DomainFactory : public mqbi::DomainFactory {
 
   private:
     // NOT IMPLEMENTED
-    DomainFactory(const Domain&) BSLS_CPP11_DELETED;
+    DomainFactory(const Domain&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    DomainFactory& operator=(const DomainFactory&) BSLS_CPP11_DELETED;
+    DomainFactory& operator=(const DomainFactory&) = delete;
 
   public:
     // TRAITS

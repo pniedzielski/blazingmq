@@ -55,12 +55,12 @@ namespace mqba {
 // -------------------------
 
 // CREATORS
-Dispatcher_Executor::Dispatcher_Executor(const Dispatcher* dispacher,
-                                         const mqbi::DispatcherClient* client)
-    BSLS_CPP11_NOEXCEPT : d_eventSource_sp(),
-                          d_processorPool_p(0),
-                          d_statContext_p(0),
-                          d_processorHandle()
+Dispatcher_Executor::Dispatcher_Executor(
+    const Dispatcher*             dispacher,
+    const mqbi::DispatcherClient* client) noexcept : d_eventSource_sp(),
+                                                     d_processorPool_p(0),
+                                                     d_statContext_p(0),
+                                                     d_processorHandle()
 {
     // PRECONDITIONS
     BSLS_ASSERT(dispacher);
@@ -85,8 +85,8 @@ Dispatcher_Executor::Dispatcher_Executor(const Dispatcher* dispacher,
 }
 
 // ACCESSORS
-bool Dispatcher_Executor::operator==(const Dispatcher_Executor& rhs) const
-    BSLS_CPP11_NOEXCEPT
+bool Dispatcher_Executor::operator==(
+    const Dispatcher_Executor& rhs) const noexcept
 {
     return d_processorPool_p == rhs.d_processorPool_p &&
            d_processorHandle == rhs.d_processorHandle &&

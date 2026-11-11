@@ -52,7 +52,6 @@
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmt_mutex.h>
 #include <bsls_atomic.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 namespace mqbmock {
@@ -100,8 +99,8 @@ class Dispatcher final : public mqbi::Dispatcher {
 
   private:
     // NOT IMPLEMENTED
-    Dispatcher(const Dispatcher&) BSLS_CPP11_DELETED;
-    Dispatcher& operator=(const Dispatcher&) BSLS_CPP11_DELETED;
+    Dispatcher(const Dispatcher&)            = delete;
+    Dispatcher& operator=(const Dispatcher&) = delete;
 
   public:
     // TRAITS

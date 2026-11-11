@@ -99,7 +99,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
-#include <bsls_cpp11.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {
@@ -232,9 +231,9 @@ class QueueConsumptionMonitor {
     bslma::Allocator* d_allocator_p;
 
     // NOT IMPLEMENTED
-    QueueConsumptionMonitor(const QueueConsumptionMonitor&) BSLS_CPP11_DELETED;
+    QueueConsumptionMonitor(const QueueConsumptionMonitor&) = delete;
     QueueConsumptionMonitor&
-    operator=(const QueueConsumptionMonitor&) BSLS_CPP11_DELETED;
+    operator=(const QueueConsumptionMonitor&) = delete;
 
     // ACCESSORS
 

@@ -73,7 +73,6 @@
 #include <bslma_allocator.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_cpp11.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {
@@ -84,7 +83,7 @@ namespace bmqp {
 // ==========================
 
 /// Mechanism to build a BlazingMQ RECOVERY event
-class RecoveryEventBuilder BSLS_CPP11_FINAL {
+class RecoveryEventBuilder final {
   public:
     // TYPES
     typedef bmqp::BlobPoolUtil::BlobSpPool BlobSpPool;
@@ -104,9 +103,8 @@ class RecoveryEventBuilder BSLS_CPP11_FINAL {
 
   private:
     // NOT IMPLEMENTED
-    RecoveryEventBuilder(const RecoveryEventBuilder&) BSLS_CPP11_DELETED;
-    RecoveryEventBuilder&
-    operator=(const RecoveryEventBuilder&) BSLS_CPP11_DELETED;
+    RecoveryEventBuilder(const RecoveryEventBuilder&)            = delete;
+    RecoveryEventBuilder& operator=(const RecoveryEventBuilder&) = delete;
 
   public:
     // TRAITS

@@ -41,7 +41,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_atomic.h>
-#include <bsls_cpp11.h>
 #include <bsls_performancehint.h>
 
 namespace BloombergLP {
@@ -57,7 +56,7 @@ class MessageCorrelationIdContainer;
 // ===================
 
 /// Mechanism to dump messages.
-class MessageDumper BSLS_CPP11_FINAL {
+class MessageDumper final {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("BMQIMP.MESSAGEDUMPER");
@@ -139,8 +138,8 @@ class MessageDumper BSLS_CPP11_FINAL {
 
   private:
     // NOT IMPLEMENTED
-    MessageDumper(const MessageDumper&) BSLS_CPP11_DELETED;
-    MessageDumper& operator=(const MessageDumper&) BSLS_CPP11_DELETED;
+    MessageDumper(const MessageDumper&)            = delete;
+    MessageDumper& operator=(const MessageDumper&) = delete;
 
     // PRIVATE MANIPULATORS
 

@@ -37,7 +37,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmt_mutex.h>
-#include <bsls_cpp11.h>
 #include <bsls_timeinterval.h>
 
 namespace BloombergLP {
@@ -138,10 +137,10 @@ class ConfigProvider {
 
   private:
     // NOT IMPLEMENTED
-    ConfigProvider(const ConfigProvider&) BSLS_CPP11_DELETED;
+    ConfigProvider(const ConfigProvider&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    ConfigProvider& operator=(const ConfigProvider&) BSLS_CPP11_DELETED;
+    ConfigProvider& operator=(const ConfigProvider&) = delete;
 
   public:
     // TRAITS

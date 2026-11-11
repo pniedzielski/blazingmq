@@ -43,7 +43,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -72,7 +71,7 @@ namespace mqbblp {
 // ================
 
 /// @todo Document this class.
-class LocalQueue BSLS_CPP11_FINAL {
+class LocalQueue final {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBBLP.LOCALQUEUE");
@@ -89,10 +88,10 @@ class LocalQueue BSLS_CPP11_FINAL {
 
   private:
     // NOT IMPLEMENTED
-    LocalQueue(const LocalQueue& other) BSLS_CPP11_DELETED;
+    LocalQueue(const LocalQueue& other) = delete;
 
     /// Copy constructor and assignment operator are not implemented
-    LocalQueue& operator=(const LocalQueue& other) BSLS_CPP11_DELETED;
+    LocalQueue& operator=(const LocalQueue& other) = delete;
 
   public:
     // TRAITS

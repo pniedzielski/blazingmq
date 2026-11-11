@@ -78,7 +78,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
-#include <bsls_cpp11.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {
@@ -90,7 +89,7 @@ namespace bmqp {
 // =========================
 
 /// Mechanism to build a BlazingMQ STORAGE event
-class StorageEventBuilder BSLS_CPP11_FINAL {
+class StorageEventBuilder final {
   public:
     /// Pool of shared pointers to Blobs
     typedef bmqp::BlobPoolUtil::BlobSpPool BlobSpPool;
@@ -117,11 +116,10 @@ class StorageEventBuilder BSLS_CPP11_FINAL {
 
   private:
     // NOT IMPLEMENTED
-    StorageEventBuilder(const StorageEventBuilder&) BSLS_CPP11_DELETED;
+    StorageEventBuilder(const StorageEventBuilder&) = delete;
 
     /// Copy constructor and assignment operator not implemented
-    StorageEventBuilder&
-    operator=(const StorageEventBuilder&) BSLS_CPP11_DELETED;
+    StorageEventBuilder& operator=(const StorageEventBuilder&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

@@ -37,7 +37,6 @@
 #include <bsl_string.h>
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
-#include <bsls_cpp11.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {
@@ -91,10 +90,10 @@ class BrokerStats {
 
   private:
     // NOT IMPLEMENTED
-    BrokerStats(const BrokerStats&) BSLS_CPP11_DELETED;
+    BrokerStats(const BrokerStats&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    BrokerStats& operator=(const BrokerStats&) BSLS_CPP11_DELETED;
+    BrokerStats& operator=(const BrokerStats&) = delete;
 
     // CREATORS
 

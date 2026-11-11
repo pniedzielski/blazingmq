@@ -434,10 +434,10 @@ class Channel {
 
   private:
     // NOT IMPLEMENTED
-    Channel(const Channel&) BSLS_CPP11_DELETED;
+    Channel(const Channel&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    Channel& operator=(const Channel&) BSLS_CPP11_DELETED;
+    Channel& operator=(const Channel&) = delete;
 
     /// @brief Reset active buffer and builders.  This must be called from
     /// the writing thread only, while the channel is not available.

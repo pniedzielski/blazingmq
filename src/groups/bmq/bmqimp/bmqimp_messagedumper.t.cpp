@@ -54,7 +54,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
-#include <bsls_cpp11.h>
 #include <bsls_timeinterval.h>
 #include <bsls_types.h>
 
@@ -102,7 +101,7 @@ static bool regexMatch(const bslstl::StringRef& str,
 
 /// This class provides a wrapper on top of the MessageDumper under test and
 /// implements a few mechanisms to help testing the object.
-struct Tester BSLS_CPP11_FINAL {
+struct Tester final {
     /// full URI -> QueueId (id, subId)
     typedef bsl::unordered_map<bsl::string, bmqp::QueueId> QueueIdsMap;
 
@@ -158,8 +157,8 @@ struct Tester BSLS_CPP11_FINAL {
     // Allocator to use
 
   private:
-    Tester(const Tester& other) BSLS_CPP11_DELETED;
-    Tester& operator=(const Tester& other) BSLS_CPP11_DELETED;
+    Tester(const Tester& other)            = delete;
+    Tester& operator=(const Tester& other) = delete;
 
   private:
     // PRIVATE MANIPULATORS

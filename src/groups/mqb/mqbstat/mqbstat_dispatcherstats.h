@@ -171,10 +171,10 @@ class DispatcherStats {
 
   private:
     // NOT IMPLEMENTED
-    DispatcherStats(const DispatcherStats&) BSLS_CPP11_DELETED;
+    DispatcherStats(const DispatcherStats&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    DispatcherStats& operator=(const DispatcherStats&) BSLS_CPP11_DELETED;
+    DispatcherStats& operator=(const DispatcherStats&) = delete;
 };
 
 // ==========================

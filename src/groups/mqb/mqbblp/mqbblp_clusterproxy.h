@@ -86,7 +86,6 @@
 #include <bslma_managedptr.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_cpp11.h>
 #include <bsls_timeinterval.h>
 #include <bsls_types.h>
 
@@ -372,10 +371,10 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
 
   private:
     // NOT IMPLEMENTED
-    ClusterProxy(const ClusterProxy&) BSLS_CPP11_DELETED;
+    ClusterProxy(const ClusterProxy&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    ClusterProxy& operator=(const ClusterProxy&) BSLS_CPP11_DELETED;
+    ClusterProxy& operator=(const ClusterProxy&) = delete;
 
   public:
     // TRAITS

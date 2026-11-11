@@ -356,11 +356,10 @@ class ClusterQueueHelper final : public mqbc::ClusterStateObserver,
         mqbi::Cluster::OpenQueueCallback d_callback;
 
         // NOT IMPLEMENTED
-        OpenQueueContext(const OpenQueueContext&) BSLS_CPP11_DELETED;
+        OpenQueueContext(const OpenQueueContext&) = delete;
 
         /// Copy constructor and assignment operator are not implemented.
-        OpenQueueContext&
-        operator=(const OpenQueueContext&) BSLS_CPP11_DELETED;
+        OpenQueueContext& operator=(const OpenQueueContext&) = delete;
 
         OpenQueueContext(
             mqbi::Domain*                              domain,

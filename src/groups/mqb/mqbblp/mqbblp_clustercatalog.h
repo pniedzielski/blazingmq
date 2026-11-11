@@ -61,7 +61,6 @@
 #include <bslmt_lockguard.h>
 #include <bslmt_mutex.h>
 #include <bsls_assert.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -238,10 +237,10 @@ class ClusterCatalog {
 
   private:
     // NOT IMPLEMENTED
-    ClusterCatalog(const ClusterCatalog&) BSLS_CPP11_DELETED;
+    ClusterCatalog(const ClusterCatalog&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    ClusterCatalog& operator=(const ClusterCatalog&) BSLS_CPP11_DELETED;
+    ClusterCatalog& operator=(const ClusterCatalog&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

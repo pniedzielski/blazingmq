@@ -54,7 +54,6 @@
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmt_mutex.h>
 #include <bsls_atomic.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -95,7 +94,7 @@ class DomainResolver;
 // ===================
 
 /// Manager for all queue domains.
-class DomainManager BSLS_CPP11_FINAL : public mqbi::DomainFactory {
+class DomainManager final : public mqbi::DomainFactory {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBA.DOMAINMANAGER");
@@ -273,10 +272,10 @@ class DomainManager BSLS_CPP11_FINAL : public mqbi::DomainFactory {
 
   private:
     // NOT IMPLEMENTED
-    DomainManager(const DomainManager&) BSLS_CPP11_DELETED;
+    DomainManager(const DomainManager&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    DomainManager& operator=(const DomainManager&) BSLS_CPP11_DELETED;
+    DomainManager& operator=(const DomainManager&) = delete;
 
   public:
     // TRAITS

@@ -83,7 +83,6 @@
 #include <bsl_iosfwd.h>
 #include <bsl_string.h>
 #include <bsls_atomic.h>
-#include <bsls_cpp11.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {
@@ -134,11 +133,10 @@ class MessageGUIDGenerator {
 
   private:
     // NOT IMPLEMENTED
-    MessageGUIDGenerator(const MessageGUIDGenerator&) BSLS_CPP11_DELETED;
+    MessageGUIDGenerator(const MessageGUIDGenerator&) = delete;
 
     /// Copy constructor and assignment operator not implemented
-    MessageGUIDGenerator&
-    operator=(const MessageGUIDGenerator&) BSLS_CPP11_DELETED;
+    MessageGUIDGenerator& operator=(const MessageGUIDGenerator&) = delete;
 
   public:
     // CREATORS

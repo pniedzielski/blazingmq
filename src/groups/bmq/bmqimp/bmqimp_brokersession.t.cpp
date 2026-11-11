@@ -333,7 +333,7 @@ void getConsumerInfo(bmqp_ctrlmsg::ConsumerInfo*  out,
 
 /// This class provides a wrapper on top of the BrokerSession under test and
 /// implements a few mechanisms to help testing the object.
-struct TestSession BSLS_CPP11_FINAL {
+struct TestSession final {
   public:
     // CONSTANTS
     static const bsls::TimeInterval k_EVENT_TIMEOUT;
@@ -437,8 +437,8 @@ struct TestSession BSLS_CPP11_FINAL {
     int d_stopCounter;
     // register state changes
   private:
-    TestSession(const TestSession& other) BSLS_CPP11_DELETED;
-    TestSession& operator=(const TestSession& other) BSLS_CPP11_DELETED;
+    TestSession(const TestSession& other)            = delete;
+    TestSession& operator=(const TestSession& other) = delete;
 
   public:
     // CREATORS

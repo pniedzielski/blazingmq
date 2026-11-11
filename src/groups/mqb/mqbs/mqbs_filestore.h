@@ -79,7 +79,6 @@
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
 #include <bsls_atomic.h>
-#include <bsls_cpp11.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {
@@ -389,10 +388,10 @@ class FileStore final : public DataStore {
 
   private:
     // NOT IMPLEMENTED
-    FileStore(const FileStore&) BSLS_CPP11_DELETED;
+    FileStore(const FileStore&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    FileStore& operator=(const FileStore&) BSLS_CPP11_DELETED;
+    FileStore& operator=(const FileStore&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

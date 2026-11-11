@@ -78,7 +78,6 @@
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmt_semaphore.h>
 #include <bsls_assert.h>
-#include <bsls_cpp11.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {
@@ -237,11 +236,10 @@ class RequestManagerRequest {
 
   private:
     // NOT IMPLEMENTED
-    RequestManagerRequest(const RequestManagerRequest&) BSLS_CPP11_DELETED;
+    RequestManagerRequest(const RequestManagerRequest&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    RequestManagerRequest&
-    operator=(const RequestManagerRequest&) BSLS_CPP11_DELETED;
+    RequestManagerRequest& operator=(const RequestManagerRequest&) = delete;
 
     /// If a Distributed Trace span and context have been set for this
     /// request, then this sets the span as the active one within the

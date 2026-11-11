@@ -44,7 +44,6 @@
 #include <bsl_vector.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -56,7 +55,7 @@ class PluginFactory;
 // class PluginManager
 // ===================
 
-class PluginManager BSLS_CPP11_FINAL {
+class PluginManager final {
   private:
     // PRIVATE TYPES
     typedef bsl::unordered_map<bsl::string, int> RequiredPluginsRecord;

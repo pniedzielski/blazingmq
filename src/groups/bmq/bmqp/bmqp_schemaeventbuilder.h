@@ -80,7 +80,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
-#include <bsls_cpp11.h>
 #include <bsls_performancehint.h>
 
 namespace BloombergLP {
@@ -121,11 +120,10 @@ class SchemaEventBuilder {
 
   private:
     // NOT IMPLEMENTED
-    SchemaEventBuilder(const SchemaEventBuilder&) BSLS_CPP11_DELETED;
+    SchemaEventBuilder(const SchemaEventBuilder&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    SchemaEventBuilder&
-    operator=(const SchemaEventBuilder&) BSLS_CPP11_DELETED;
+    SchemaEventBuilder& operator=(const SchemaEventBuilder&) = delete;
 
   public:
     // TRAITS

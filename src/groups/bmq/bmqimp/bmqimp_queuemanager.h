@@ -86,7 +86,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_atomic.h>
-#include <bsls_cpp11.h>
 #include <bsls_spinlock.h>
 #include <bsls_types.h>
 
@@ -225,8 +224,8 @@ class QueueManager {
 
   private:
     // NOT IMPLEMENTED
-    QueueManager(const QueueManager&) BSLS_CPP11_DELETED;
-    QueueManager& operator=(const QueueManager&) BSLS_CPP11_DELETED;
+    QueueManager(const QueueManager&)            = delete;
+    QueueManager& operator=(const QueueManager&) = delete;
 
     // PRIVATE MANIPULATORS
 

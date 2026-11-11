@@ -52,7 +52,6 @@
 #include <bsl_vector.h>
 #include <bslma_managedptr.h>
 #include <bsls_atomic.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 

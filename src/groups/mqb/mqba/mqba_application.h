@@ -48,7 +48,6 @@
 #include <bslma_managedptr.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -207,10 +206,10 @@ class Application {
 
   private:
     // NOT IMPLEMENTED
-    Application(const Application& other) BSLS_CPP11_DELETED;
+    Application(const Application& other) = delete;
 
     /// Copy constructor and assignment operator are not implemented
-    Application& operator=(const Application& other) BSLS_CPP11_DELETED;
+    Application& operator=(const Application& other) = delete;
 
   public:
     // CREATORS

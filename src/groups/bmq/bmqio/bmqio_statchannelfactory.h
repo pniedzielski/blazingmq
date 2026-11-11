@@ -53,7 +53,6 @@
 #include <bslma_managedptr.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 namespace bmqio {
@@ -134,10 +133,9 @@ struct StatChannelFactoryHandle : public ChannelFactory::OpHandle {
     friend class StatChannelFactory;
 
     // NOT IMPLEMENTED
-    StatChannelFactoryHandle(const StatChannelFactoryHandle&)
-        BSLS_CPP11_DELETED;
+    StatChannelFactoryHandle(const StatChannelFactoryHandle&) = delete;
     StatChannelFactoryHandle&
-    operator=(const StatChannelFactoryHandle&) BSLS_CPP11_DELETED;
+    operator=(const StatChannelFactoryHandle&) = delete;
 
   public:
     // TRAITS

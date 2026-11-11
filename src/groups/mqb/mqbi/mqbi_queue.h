@@ -228,12 +228,11 @@ class QueueHandleRequesterContext {
     InlineClient* d_inlineClient_p;
 
     // NOT IMPLEMENTED
-    QueueHandleRequesterContext(const QueueHandleRequesterContext&)
-        BSLS_CPP11_DELETED;
+    QueueHandleRequesterContext(const QueueHandleRequesterContext&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
     QueueHandleRequesterContext&
-    operator=(const QueueHandleRequesterContext&) BSLS_CPP11_DELETED;
+    operator=(const QueueHandleRequesterContext&) = delete;
 
   public:
     // TRAITS

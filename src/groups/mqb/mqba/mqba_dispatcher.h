@@ -119,15 +119,14 @@ class Dispatcher_Executor {
     /// specified `client` is registered on the specified `dispacher` and
     /// the client type is not `e_UNDEFINED`.
     Dispatcher_Executor(const Dispatcher*             dispacher,
-                        const mqbi::DispatcherClient* client)
-        BSLS_CPP11_NOEXCEPT;
+                        const mqbi::DispatcherClient* client) noexcept;
 
   public:
     // ACCESSORS
 
     /// Return `true` if `*this` refer to the same processor as `rhs`, and
     /// `false` otherwise.
-    bool operator==(const Dispatcher_Executor& rhs) const BSLS_CPP11_NOEXCEPT;
+    bool operator==(const Dispatcher_Executor& rhs) const noexcept;
 
     /// Submit the specified function object `f` to be executed on the
     /// executor's associated processor.  Return immediately without waiting
@@ -166,11 +165,10 @@ class Dispatcher final : public mqbi::Dispatcher {
     struct DispatcherContext {
       private:
         // NOT IMPLEMENTED
-        DispatcherContext(const DispatcherContext&) BSLS_CPP11_DELETED;
+        DispatcherContext(const DispatcherContext&) = delete;
 
         /// Copy constructor and assignment operator are not implemented.
-        DispatcherContext&
-        operator=(const DispatcherContext&) BSLS_CPP11_DELETED;
+        DispatcherContext& operator=(const DispatcherContext&) = delete;
 
       public:
         // PUBLIC DATA
@@ -284,8 +282,8 @@ class Dispatcher final : public mqbi::Dispatcher {
 
   private:
     // NOT IMPLEMENTED
-    Dispatcher(const Dispatcher&) BSLS_CPP11_DELETED;
-    Dispatcher& operator=(const Dispatcher&) BSLS_CPP11_DELETED;
+    Dispatcher(const Dispatcher&)            = delete;
+    Dispatcher& operator=(const Dispatcher&) = delete;
 
   private:
     // DATA

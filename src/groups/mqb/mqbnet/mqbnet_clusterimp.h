@@ -54,7 +54,6 @@
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bslmt_mutex.h>
 #include <bsls_atomic.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -103,10 +102,10 @@ class ClusterNodeImp : public ClusterNode {
 
   private:
     // NOT IMPLEMENTED
-    ClusterNodeImp(const ClusterNodeImp&) BSLS_CPP11_DELETED;
+    ClusterNodeImp(const ClusterNodeImp&) = delete;
 
     /// Copy constructor and assignment operator are not implemented.
-    ClusterNodeImp& operator=(const ClusterNodeImp&) BSLS_CPP11_DELETED;
+    ClusterNodeImp& operator=(const ClusterNodeImp&) = delete;
 
   public:
     // TRAITS

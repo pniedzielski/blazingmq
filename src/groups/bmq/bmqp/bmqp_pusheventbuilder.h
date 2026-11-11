@@ -76,7 +76,6 @@
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 
@@ -149,10 +148,10 @@ class PushEventBuilder {
 
   private:
     // NOT IMPLEMENTED
-    PushEventBuilder(const PushEventBuilder&) BSLS_CPP11_DELETED;
+    PushEventBuilder(const PushEventBuilder&) = delete;
 
     /// Copy constructor and assignment operator not implemented
-    PushEventBuilder& operator=(const PushEventBuilder&) BSLS_CPP11_DELETED;
+    PushEventBuilder& operator=(const PushEventBuilder&) = delete;
 
   public:
     // TRAITS

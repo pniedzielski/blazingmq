@@ -25,7 +25,6 @@
 /// configuration.
 
 // BDE
-#include <bsls_cpp11.h>
 
 namespace BloombergLP {
 namespace mqbcfg {
@@ -40,9 +39,9 @@ class AppConfig;
 /// Mechanism to set and get the broker configuration.
 struct BrokerConfig {
     // NOT IMPLEMENTED
-    BrokerConfig() BSLS_CPP11_DELETED;
-    BrokerConfig(const BrokerConfig&) BSLS_CPP11_DELETED;
-    BrokerConfig& operator=(const BrokerConfig&) BSLS_CPP11_DELETED;
+    BrokerConfig()                               = delete;
+    BrokerConfig(const BrokerConfig&)            = delete;
+    BrokerConfig& operator=(const BrokerConfig&) = delete;
 
     // MANIPULATORS
 
