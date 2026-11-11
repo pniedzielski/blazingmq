@@ -31,8 +31,6 @@
 // BDE
 #include <bdlbb_blob.h>
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlmt_eventscheduler.h>
 #include <bsl_deque.h>
 #include <bsl_memory.h>
@@ -86,8 +84,7 @@ bsl::optional<bmqt::AuthnCredential> basicCredentialCb()
 /// mechanism "BASIC" and data "testdata".
 AuthnCredentialCb makeDefaultCredentialCb()
 {
-    return bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                 basicCredentialCb);  // error stream
+    return &basicCredentialCb;
 }
 
 // -----------------
@@ -227,14 +224,15 @@ void TestContext::connect()
         .setAttemptInterval(bsls::TimeInterval(1));
 
     Status status(bmqtst::TestHelperUtil::allocator());
-    obj().connect(&status,
-                  &d_connectHandle,
-                  options,
-                  bdlf::BindUtil::bind(&TestContext::connectResultCb,
-                                       this,
-                                       bdlf::PlaceHolders::_1,
-                                       bdlf::PlaceHolders::_2,
-                                       bdlf::PlaceHolders::_3));
+    obj().connect(
+        &status,
+        &d_connectHandle,
+        options,
+        [this](ChannelFactoryEvent::Enum       resultEvent,
+               const Status&                   resultStatus,
+               const bsl::shared_ptr<Channel>& resultChannel) {
+            connectResultCb(resultEvent, resultStatus, resultChannel);
+        });
     BMQTST_ASSERT(status);
 }
 
@@ -508,9 +506,7 @@ BMQTST_TEST(CredentialCallbackFailure)
         }
     };
 
-    AuthnCredentialCb nulloptCb = bdlf::BindUtil::bindS(
-        bmqtst::TestHelperUtil::allocator(),
-        Local::alwaysFailCb);  // error stream
+    AuthnCredentialCb nulloptCb = &Local::alwaysFailCb;
     TestContext ctx(nulloptCb);
 
     ctx.connect();
