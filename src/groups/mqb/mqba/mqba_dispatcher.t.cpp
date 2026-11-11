@@ -27,7 +27,6 @@
 #include <bmqu_time.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bdlmt_eventscheduler.h>
 #include <bsl_functional.h>
 #include <bsl_iostream.h>
@@ -387,9 +386,9 @@ static void test3_executorsSupport()
 
         // submit a functor on a processor using the executor's 'post'
         // function, check that 'post' does not block the calling thread
-        executor1.post(bdlf::BindUtil::bind(Synchronize(),
-                                            &startedSignal,
-                                            &continueSignal));
+        executor1.post([&startedSignal, &continueSignal]() {
+            Synchronize()(&startedSignal, &continueSignal);
+        });
 
         startedSignal.wait();   // wait for the job to start executing
         continueSignal.post();  // allow the job to complete
@@ -404,13 +403,17 @@ static void test3_executorsSupport()
             bmqex::ExecutionPolicyUtil::alwaysBlocking()
                 .useExecutor(executor1)
                 .useAllocator(bmqtst::TestHelperUtil::allocator()),
-            bdlf::BindUtil::bind(LoadSelfThreadId(), &threadId1));
+            [&threadId1]() {
+                LoadSelfThreadId()(&threadId1);
+            });
 
         bmqex::ExecutionUtil::execute(
             bmqex::ExecutionPolicyUtil::alwaysBlocking()
                 .useExecutor(executor1)
                 .useAllocator(bmqtst::TestHelperUtil::allocator()),
-            bdlf::BindUtil::bind(LoadSelfThreadId(), &threadId2));
+            [&threadId2]() {
+                LoadSelfThreadId()(&threadId2);
+            });
 
         // both functors were invoked in the same thread that is not this
         // thread
@@ -419,9 +422,9 @@ static void test3_executorsSupport()
 
         // submit a functor on a processor using the executor's 'dispatch'
         // function, check that 'dispatch' does not block the calling thread
-        executor2.dispatch(bdlf::BindUtil::bind(Synchronize(),
-                                                &startedSignal,
-                                                &continueSignal));
+        executor2.dispatch([&startedSignal, &continueSignal]() {
+            Synchronize()(&startedSignal, &continueSignal);
+        });
 
         startedSignal.wait();   // wait for the job to start executing
         continueSignal.post();  // allow the job to complete
@@ -437,13 +440,17 @@ static void test3_executorsSupport()
             bmqex::ExecutionPolicyUtil::alwaysBlocking()
                 .useExecutor(executor2)
                 .useAllocator(bmqtst::TestHelperUtil::allocator()),
-            bdlf::BindUtil::bind(LoadSelfThreadId(), &threadId1));
+            [&threadId1]() {
+                LoadSelfThreadId()(&threadId1);
+            });
 
         bmqex::ExecutionUtil::execute(
             bmqex::ExecutionPolicyUtil::alwaysBlocking()
                 .useExecutor(executor2)
                 .useAllocator(bmqtst::TestHelperUtil::allocator()),
-            bdlf::BindUtil::bind(LoadSelfThreadId(), &threadId2));
+            [&threadId2]() {
+                LoadSelfThreadId()(&threadId2);
+            });
 
         // both functors were invoked in the same thread that is not this
         // thread
@@ -472,11 +479,12 @@ static void test3_executorsSupport()
             bmqex::ExecutionPolicyUtil::alwaysBlocking()
                 .useExecutor(executor1)
                 .useAllocator(bmqtst::TestHelperUtil::allocator()),
-            bdlf::BindUtil::bind(
-                &Local::executeBlocking,
-                &executor3,
-                bsl::function<void()>(
-                    bdlf::BindUtil::bind(LoadSelfThreadId(), &threadId1))));
+            [&executor3, &threadId1]() {
+                Local::executeBlocking(&executor3,
+                                       bsl::function<void()>([&threadId1]() {
+                                           LoadSelfThreadId()(&threadId1);
+                                       }));
+            });
 
         // the nested functor was invoked in-place (we know that because
         // otherwise the operation above would not complete)
@@ -548,8 +556,9 @@ static void test4_eventSource()
 
             bsl::shared_ptr<mqbevt::CallbackEvent> event =
                 client.getEvent<mqbevt::CallbackEvent>();
-            event->setCallback(
-                bdlf::BindUtil::bindS(alloc, &Local::callbackFn, &done));
+            event->setCallback([&done]() {
+                Local::callbackFn(&done);
+            });
 
             dispatcher.dispatchEvent(bsl::move(event), &client);
             done.wait();
@@ -561,8 +570,9 @@ static void test4_eventSource()
 
             bsl::shared_ptr<mqbevt::CallbackEvent> event =
                 client.getEvent<mqbevt::CallbackEvent>();
-            event->setCallback(
-                bdlf::BindUtil::bindS(alloc, &Local::callbackFn, &done));
+            event->setCallback([&done]() {
+                Local::callbackFn(&done);
+            });
 
             dispatcher.dispatchEvent(bsl::move(event), &client);
             done.wait();
@@ -577,8 +587,9 @@ static void test4_eventSource()
 
             bsl::shared_ptr<mqbevt::CallbackEvent> event =
                 client.getEvent<mqbevt::CallbackEvent>();
-            event->setCallback(
-                bdlf::BindUtil::bindS(alloc, &Local::callbackFn, &done));
+            event->setCallback([&done]() {
+                Local::callbackFn(&done);
+            });
 
             dispatcher.dispatchEvent(bsl::move(event), &client);
             done.wait();
@@ -649,15 +660,13 @@ static void test5_executeOnAllQueues()
                 ExecuteOnAllQueuesHelper helper(k_NUM_QUEUE_PROCESSORS);
 
                 dispatcher.executeOnAllQueues(
-                    bdlf::BindUtil::bindS(
-                        alloc,
-                        &ExecuteOnAllQueuesHelper::incrementCounter,
-                        &helper),
+                    [&helper]() {
+                        helper.incrementCounter();
+                    },
                     mqbi::DispatcherClientType::e_QUEUE,
-                    bdlf::BindUtil::bindS(
-                        alloc,
-                        &ExecuteOnAllQueuesHelper::signalDone,
-                        &helper));
+                    [&helper]() {
+                        helper.signalDone();
+                    });
 
                 helper.verifyDone();
             }
@@ -667,12 +676,11 @@ static void test5_executeOnAllQueues()
         {
             ExecuteOnAllQueuesHelper helper(0);
 
-            dispatcher.executeOnAllQueues(
-                mqbi::Dispatcher::VoidFunction(),
-                mqbi::DispatcherClientType::e_QUEUE,
-                bdlf::BindUtil::bindS(alloc,
-                                      &ExecuteOnAllQueuesHelper::signalDone,
-                                      &helper));
+            dispatcher.executeOnAllQueues(mqbi::Dispatcher::VoidFunction(),
+                                          mqbi::DispatcherClientType::e_QUEUE,
+                                          [&helper]() {
+                                              helper.signalDone();
+                                          });
 
             helper.d_doneSemaphore.wait();
         }
@@ -737,13 +745,12 @@ static void testN1_inDispatcherThread()
         bsls::Types::Int64 dt = 0;
         bslmt::Semaphore   doneSemaphore;
 
-        obj.execute(bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                          &Local::callbackFn,
-                                          &dt,
-                                          &doneSemaphore,
-                                          &cli),
-                    &cli,
-                    mqbi::DispatcherEventType::e_CALLBACK);
+        obj.execute(
+            [&dt, &doneSemaphore, &cli]() {
+                Local::callbackFn(&dt, &doneSemaphore, &cli);
+            },
+            &cli,
+            mqbi::DispatcherEventType::e_CALLBACK);
 
         doneSemaphore.wait();
 

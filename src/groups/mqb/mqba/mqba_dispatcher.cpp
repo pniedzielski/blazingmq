@@ -30,8 +30,6 @@
 #include <mqbstat_dispatcherstats.h>
 
 // BDE
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlmt_eventscheduler.h>
 #include <bsl_cstddef.h>
 #include <bsl_functional.h>
@@ -211,18 +209,16 @@ int Dispatcher::startContext(bsl::ostream&                    errorDescription,
     ProcessorPool::Config processorPoolConfig(
         config.numProcessors(),
         context->d_threadPool_mp.get(),
-        bdlf::BindUtil::bind(
-            &Dispatcher::eventCallbackCreator,
-            this,
-            type,
-            bdlf::PlaceHolders::_1,   // queueId
-            bdlf::PlaceHolders::_2),  // lastProcessingStartTime
-        bdlf::BindUtil::bind(&Dispatcher::queueCreator,
-                             this,
-                             type,
-                             config.processorConfig(),
-                             bdlf::PlaceHolders::_1,   // queueId
-                             bdlf::PlaceHolders::_2),  // allocator*
+        [this, type](int queueId, bsls::AtomicInt64* lastProcessingStartTime) {
+            return eventCallbackCreator(type,
+                                        queueId,
+                                        lastProcessingStartTime);
+        },
+        [this, type, processorConfig = config.processorConfig()](
+            int               queueId,
+            bslma::Allocator* allocator) {
+            return queueCreator(type, processorConfig, queueId, allocator);
+        },
         d_allocator_p);
 
     processorPoolConfig.setName(mqbi::DispatcherClientType::toAscii(type))
@@ -266,15 +262,20 @@ Dispatcher::queueCreator(mqbi::DispatcherClientType::Enum             type,
 
     queue->setWatermarks(config.queueSizeLowWatermark(),
                          config.queueSizeHighWatermark());
-    queue->setStateCallback(
-        bdlf::BindUtil::bind(&bmqc::MonitoredQueueUtil::stateLogCallback,
-                             queueName,
-                             "ALARM [DISPATCHER]",  // warning string
-                             config.queueSizeLowWatermark(),
-                             config.queueSizeHighWatermark(),
-                             config.queueSize(),
-                             config.queueSize(),
-                             bdlf::PlaceHolders::_1));  // state
+    queue->setStateCallback([queueName,
+                             lowWatermark  = config.queueSizeLowWatermark(),
+                             highWatermark = config.queueSizeHighWatermark(),
+                             queueSize     = config.queueSize()](
+                                bmqc::MonitoredQueueState::Enum state) {
+        bmqc::MonitoredQueueUtil::stateLogCallback(
+            queueName,
+            "ALARM [DISPATCHER]",  // warning string
+            lowWatermark,
+            highWatermark,
+            queueSize,
+            queueSize,
+            state);
+    });
 
     // Create stat context for the client's queue
     DispatcherContext* context = d_contexts[type].get();
@@ -356,15 +357,21 @@ int Dispatcher::start(bsl::ostream& errorDescription)
         return rc;  // RETURN
     }
 
-    executeOnAllQueues(bdlf::BindUtil::bind(&bslmt::ThreadUtil::setThreadName,
-                                            "bmqDispSession"),
-                       mqbi::DispatcherClientType::e_SESSION);
-    executeOnAllQueues(bdlf::BindUtil::bind(&bslmt::ThreadUtil::setThreadName,
-                                            "bmqDispQueue"),
-                       mqbi::DispatcherClientType::e_QUEUE);
-    executeOnAllQueues(bdlf::BindUtil::bind(&bslmt::ThreadUtil::setThreadName,
-                                            "bmqDispCluster"),
-                       mqbi::DispatcherClientType::e_CLUSTER);
+    executeOnAllQueues(
+        []() {
+            bslmt::ThreadUtil::setThreadName("bmqDispSession");
+        },
+        mqbi::DispatcherClientType::e_SESSION);
+    executeOnAllQueues(
+        []() {
+            bslmt::ThreadUtil::setThreadName("bmqDispQueue");
+        },
+        mqbi::DispatcherClientType::e_QUEUE);
+    executeOnAllQueues(
+        []() {
+            bslmt::ThreadUtil::setThreadName("bmqDispCluster");
+        },
+        mqbi::DispatcherClientType::e_CLUSTER);
 
     d_isStarted = true;
 
@@ -635,15 +642,13 @@ void Dispatcher::synchronize(mqbi::DispatcherClientType::Enum  type,
         d_contexts[type]->d_processorPool_mp->queueThreadId(handle) !=
         bslmt::ThreadUtil::selfId());  // Deadlock detection
 
-    typedef void (bslmt::Semaphore::*PostFn)();
-
     bslmt::Semaphore                         semaphore;
     bsl::shared_ptr<mqbevt::DispatcherEvent> event_sp =
         d_defaultEventSource_sp->getEvent<mqbevt::DispatcherEvent>();
     (*event_sp).setEnqueueTime(bmqu::Time::highResolutionTimer());
-    (*event_sp).setCallback(
-        bdlf::BindUtil::bind(static_cast<PostFn>(&bslmt::Semaphore::post),
-                             &semaphore));
+    (*event_sp).setCallback([&semaphore]() {
+        semaphore.post();
+    });
     dispatchEvent(bsl::move(event_sp), type, handle);
     semaphore.wait();
 }
