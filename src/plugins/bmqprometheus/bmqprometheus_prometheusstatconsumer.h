@@ -101,8 +101,6 @@ class PrometheusStatConsumer : public mqbplug::StatConsumer {
         int         d_stat;
     };
 
-    using DatapointDefCIter = const DatapointDef*;
-
     const bmqst::StatContext* d_systemStatContext_p;
     // The system stat context
 

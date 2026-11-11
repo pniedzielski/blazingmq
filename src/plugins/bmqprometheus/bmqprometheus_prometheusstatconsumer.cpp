@@ -33,7 +33,6 @@
 
 // BDE
 #include <ball_log.h>
-#include <bdlb_arrayutil.h>
 #include <bdld_manageddatum.h>
 #include <bdlt_currenttime.h>
 #include <bsl_atomic.h>
@@ -352,13 +351,11 @@ void PrometheusStatConsumer::captureQueueStats()
                     {"queue_confirm_time_avg", Stat::e_CONFIRM_TIME_AVG},
                     {"queue_confirm_time_max", Stat::e_CONFIRM_TIME_MAX}};
 
-                for (DatapointDefCIter dpIt = bdlb::ArrayUtil::begin(defs);
-                     dpIt != bdlb::ArrayUtil::end(defs);
-                     ++dpIt) {
+                for (const DatapointDef& def : defs) {
                     // If there are subcontexts, skip 'confirm_time_max'
                     // metric, it will be processed later.
                     if (static_cast<mqbstat::QueueStatsDomain::Stat::Enum>(
-                            dpIt->d_stat) == Stat::e_CONFIRM_TIME_MAX &&
+                            def.d_stat) == Stat::e_CONFIRM_TIME_MAX &&
                         queueIt->numSubcontexts() > 0) {
                         continue;
                     }
@@ -368,8 +365,8 @@ void PrometheusStatConsumer::captureQueueStats()
                             *queueIt,
                             d_snapshotId,
                             static_cast<mqbstat::QueueStatsDomain::Stat::Enum>(
-                                dpIt->d_stat));
-                    updateMetric(dpIt->d_name, labels, value);
+                                def.d_stat));
+                    updateMetric(def.d_name, labels, value);
                 }
             }
 
@@ -396,13 +393,11 @@ void PrometheusStatConsumer::captureQueueStats()
                     {"queue_nack_noquorum_msgs", Stat::e_NO_SC_MSGS_ABS},
                 };
 
-                for (DatapointDefCIter dpIt = bdlb::ArrayUtil::begin(defs);
-                     dpIt != bdlb::ArrayUtil::end(defs);
-                     ++dpIt) {
+                for (const DatapointDef& def : defs) {
                     // If there are subcontexts, skip 'cqueue_time_max' metric,
                     // it will be processed later.
                     if (static_cast<mqbstat::QueueStatsDomain::Stat::Enum>(
-                            dpIt->d_stat) == Stat::e_QUEUE_TIME_MAX &&
+                            def.d_stat) == Stat::e_QUEUE_TIME_MAX &&
                         queueIt->numSubcontexts() > 0) {
                         continue;
                     }
@@ -412,8 +407,8 @@ void PrometheusStatConsumer::captureQueueStats()
                             *queueIt,
                             d_snapshotId,
                             static_cast<mqbstat::QueueStatsDomain::Stat::Enum>(
-                                dpIt->d_stat));
-                    updateMetric(dpIt->d_name, labels, value);
+                                def.d_stat));
+                    updateMetric(def.d_name, labels, value);
                 }
             }
 
@@ -437,32 +432,26 @@ void PrometheusStatConsumer::captureQueueStats()
                 tagger.setAppId(appIdIt->name());
                 const auto labels = tagger.getLabels();
 
-                for (DatapointDefCIter dpIt =
-                         bdlb::ArrayUtil::begin(defsCommon);
-                     dpIt != bdlb::ArrayUtil::end(defsCommon);
-                     ++dpIt) {
+                for (const DatapointDef& def : defsCommon) {
                     const bsls::Types::Int64 value =
                         mqbstat::QueueStatsDomain::getValue(
                             *appIdIt,
                             d_snapshotId,
                             static_cast<mqbstat::QueueStatsDomain::Stat::Enum>(
-                                dpIt->d_stat));
-                    updateMetric(dpIt->d_name, labels, value);
+                                def.d_stat));
+                    updateMetric(def.d_name, labels, value);
                 }
 
                 if (role == mqbstat::QueueStatsDomain::Role::e_PRIMARY) {
-                    for (DatapointDefCIter dpIt =
-                             bdlb::ArrayUtil::begin(defsPrimary);
-                         dpIt != bdlb::ArrayUtil::end(defsPrimary);
-                         ++dpIt) {
+                    for (const DatapointDef& def : defsPrimary) {
                         const bsls::Types::Int64 value =
                             mqbstat::QueueStatsDomain::getValue(
                                 *appIdIt,
                                 d_snapshotId,
                                 static_cast<
                                     mqbstat::QueueStatsDomain::Stat::Enum>(
-                                    dpIt->d_stat));
-                        updateMetric(dpIt->d_name, labels, value);
+                                    def.d_stat));
+                        updateMetric(def.d_name, labels, value);
                     }
                 }
             }
@@ -500,13 +489,10 @@ void PrometheusStatConsumer::captureSystemStats()
     tagger.setInstance(mqbcfg::BrokerConfig::get().brokerInstanceName())
         .setDataType("host-data");
 
-    for (bsl::vector<bsl::pair<bsl::string, double> >::iterator it =
-             datapoints.begin();
-         it != datapoints.end();
-         ++it) {
-        updateMetric(it->first.c_str(),
+    for (const auto& [name, value] : datapoints) {
+        updateMetric(name.c_str(),
                      tagger.getLabels(),
-                     static_cast<bsls::Types::Int64>(it->second + 0.5));
+                     static_cast<bsls::Types::Int64>(value + 0.5));
     }
 
     // POSTCONDITIONS
@@ -592,14 +578,12 @@ void PrometheusStatConsumer::captureBrokerStats()
     tagger.setInstance(mqbcfg::BrokerConfig::get().brokerInstanceName())
         .setDataType("host-data");
 
-    for (DatapointDefCIter dpIt = bdlb::ArrayUtil::begin(defs);
-         dpIt != bdlb::ArrayUtil::end(defs);
-         ++dpIt) {
+    for (const DatapointDef& def : defs) {
         const bsls::Types::Int64 value = mqbstat::BrokerStats::getValue(
             *d_brokerStatContext_p,
             d_snapshotId,
-            static_cast<Stat::Enum>(dpIt->d_stat));
-        updateMetric(dpIt->d_name, tagger.getLabels(), value);
+            static_cast<Stat::Enum>(def.d_stat));
+        updateMetric(def.d_name, tagger.getLabels(), value);
     }
 }
 
@@ -657,16 +641,14 @@ void PrometheusStatConsumer::captureClusterStats(const LeaderSet& leaders)
                 tagger.setRemoteHost(upstream.empty() ? "_none_" : upstream);
             }
 
-            for (DatapointDefCIter dpIt = bdlb::ArrayUtil::begin(defs);
-                 dpIt != bdlb::ArrayUtil::end(defs);
-                 ++dpIt) {
+            for (const DatapointDef& def : defs) {
                 const bsls::Types::Int64 value =
                     mqbstat::ClusterStats::getValue(
                         *clusterIt,
                         d_snapshotId,
-                        static_cast<Stat::Enum>(dpIt->d_stat));
+                        static_cast<Stat::Enum>(def.d_stat));
 
-                updateMetric(dpIt->d_name, tagger.getLabels(), value);
+                updateMetric(def.d_name, tagger.getLabels(), value);
             }
         }
 
@@ -690,16 +672,14 @@ void PrometheusStatConsumer::captureClusterStats(const LeaderSet& leaders)
                 .setInstance(mqbcfg::BrokerConfig::get().brokerInstanceName())
                 .setDataType("global-data");
 
-            for (DatapointDefCIter dpIt = bdlb::ArrayUtil::begin(defs);
-                 dpIt != bdlb::ArrayUtil::end(defs);
-                 ++dpIt) {
+            for (const DatapointDef& def : defs) {
                 const bsls::Types::Int64 value =
                     mqbstat::ClusterStats::getValue(
                         *clusterIt,
                         d_snapshotId,
-                        static_cast<Stat::Enum>(dpIt->d_stat));
+                        static_cast<Stat::Enum>(def.d_stat));
 
-                updateMetric(dpIt->d_name, tagger.getLabels(), value);
+                updateMetric(def.d_name, tagger.getLabels(), value);
             }
         }
     }
@@ -777,16 +757,14 @@ void PrometheusStatConsumer::captureClusterPartitionsStats()
                 .setInstance(mqbcfg::BrokerConfig::get().brokerInstanceName())
                 .setDataType("global-data");
 
-            for (DatapointDefCIter dpIt = bdlb::ArrayUtil::begin(defs);
-                 dpIt != bdlb::ArrayUtil::end(defs);
-                 ++dpIt) {
+            for (const DatapointDef& def : defs) {
                 const bsls::Types::Int64 value =
                     mqbstat::ClusterStats::getValue(
                         *partitionIt,
                         d_snapshotId,
                         static_cast<mqbstat::ClusterStats::Stat::Enum>(
-                            dpIt->d_stat));
-                updateMetric(dpIt->d_name, tagger.getLabels(), value);
+                            def.d_stat));
+                updateMetric(def.d_name, tagger.getLabels(), value);
             }
         }
     }
@@ -825,15 +803,13 @@ void PrometheusStatConsumer::captureDomainStats(const LeaderSet& leaders)
             {"domain_queue_count_open", Stat::e_QUEUE_COUNT_OPEN},
         };
 
-        for (DatapointDefCIter dpIt = bdlb::ArrayUtil::begin(defs);
-             dpIt != bdlb::ArrayUtil::end(defs);
-             ++dpIt) {
+        for (const DatapointDef& def : defs) {
             const bsls::Types::Int64 value = mqbstat::DomainStats::getValue(
                 *domainIt,
                 d_snapshotId,
-                static_cast<Stat::Enum>(dpIt->d_stat));
+                static_cast<Stat::Enum>(def.d_stat));
 
-            updateMetric(dpIt->d_name, tagger.getLabels(), value);
+            updateMetric(def.d_name, tagger.getLabels(), value);
         }
     }
 }
@@ -984,15 +960,13 @@ void PrometheusStatConsumer::captureDispatcherStats()
                  Stat::e_PROCESSED_COUNT_REPLICATION_RECEIPT},
             };
 
-            for (DatapointDefCIter dpIt = bdlb::ArrayUtil::begin(defs);
-                 dpIt != bdlb::ArrayUtil::end(defs);
-                 ++dpIt) {
+            for (const DatapointDef& def : defs) {
                 const bsls::Types::Int64 value =
                     mqbstat::DispatcherStats::getValue(
                         *queueIt,
                         d_snapshotId,
-                        static_cast<Stat::Enum>(dpIt->d_stat));
-                updateMetric(dpIt->d_name, labels, value);
+                        static_cast<Stat::Enum>(def.d_stat));
+                updateMetric(def.d_name, labels, value);
             }
         }
     }
