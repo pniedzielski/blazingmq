@@ -559,12 +559,10 @@ inline void QueueInfo<VALUE>::addSubscriptions(
     iterator itStream = findByAppId(parameters.appId());
 
     const Subscriptions& subscriptions = parameters.subscriptions();
-    for (Subscriptions::const_iterator it = subscriptions.begin();
-         it != subscriptions.end();
-         ++it) {
+    for (const bmqp_ctrlmsg::Subscription& subscription : subscriptions) {
         [[maybe_unused]] bsl::pair<typename SubscriptionsMap::iterator, bool>
             insertRC = d_subscriptions.insert(
-                bsl::make_pair(it->sId(), itStream));
+                bsl::make_pair(subscription.sId(), itStream));
         BSLS_ASSERT_SAFE(insertRC.second);
     }
 }
