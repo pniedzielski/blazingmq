@@ -275,9 +275,8 @@ void QueueManager::resetState()
     // Before giving up our own internal handle to each queue, set their sate
     // to 'closed', so that if the user still have their own reference, the
     // queue will be considered invalid when they try to use it.
-    for (QueuesMap::iterator iter = d_queues.begin(); iter != d_queues.end();
-         ++iter) {
-        iter->value()->setState(QueueState::e_CLOSED);
+    for (const auto& item : d_queues) {
+        item.value()->setState(QueueState::e_CLOSED);
     }
 
     d_nextQueueId = 0;
@@ -543,17 +542,16 @@ void QueueManager::updateSubscriptions(
 
     const bmqp_ctrlmsg::StreamParameters& previous = queue->config();
 
-    for (size_t i = 0; i < previous.subscriptions().size(); ++i) {
-        unsigned int internalSubscriptionId =
-            previous.subscriptions()[i].sId();
+    for (const auto& subscription : previous.subscriptions()) {
+        unsigned int internalSubscriptionId = subscription.sId();
 
         SubscriptionId id(queue->id(), internalSubscriptionId);
 
         d_queuesBySubscriptionIds.erase(id);
     }
 
-    for (size_t i = 0; i < config.subscriptions().size(); ++i) {
-        unsigned int internalSubscriptionId = config.subscriptions()[i].sId();
+    for (const auto& subscription : config.subscriptions()) {
+        unsigned int internalSubscriptionId = subscription.sId();
 
         d_queuesBySubscriptionIds.insert(bsl::make_pair(
             SubscriptionId(queue->id(), internalSubscriptionId),
