@@ -519,15 +519,14 @@ int PutHeaderFlagUtil::fromString(bsl::ostream&      errorDescription,
     *out   = 0;
 
     bdlb::Tokenizer tokenizer(str, ",");
-    for (bdlb::TokenizerIterator it = tokenizer.begin(); it != tokenizer.end();
-         ++it) {
+    for (const bslstl::StringRef& token : tokenizer) {
         PutHeaderFlags::Enum value;
-        if (PutHeaderFlags::fromAscii(&value, *it) == false) {
+        if (PutHeaderFlags::fromAscii(&value, token) == false) {
             if (rc == 0) {  // First wrong flag
-                errorDescription << "Invalid flag(s) '" << *it << "'";
+                errorDescription << "Invalid flag(s) '" << token << "'";
             }
             else {
-                errorDescription << ",'" << *it << "'";
+                errorDescription << ",'" << token << "'";
             }
             rc = -1;
         }
@@ -692,15 +691,14 @@ int PushHeaderFlagUtil::fromString(bsl::ostream&      errorDescription,
     *out   = 0;
 
     bdlb::Tokenizer tokenizer(str, ",");
-    for (bdlb::TokenizerIterator it = tokenizer.begin(); it != tokenizer.end();
-         ++it) {
+    for (const bslstl::StringRef& token : tokenizer) {
         PushHeaderFlags::Enum value;
-        if (PushHeaderFlags::fromAscii(&value, *it) == false) {
+        if (PushHeaderFlags::fromAscii(&value, token) == false) {
             if (rc == 0) {  // First wrong flag
-                errorDescription << "Invalid flag(s) '" << *it << "'";
+                errorDescription << "Invalid flag(s) '" << token << "'";
             }
             else {
-                errorDescription << ",'" << *it << "'";
+                errorDescription << ",'" << token << "'";
             }
             rc = -1;
         }
@@ -904,15 +902,14 @@ int StorageHeaderFlagUtil::fromString(bsl::ostream&      errorDescription,
     *out   = 0;
 
     bdlb::Tokenizer tokenizer(str, ",");
-    for (bdlb::TokenizerIterator it = tokenizer.begin(); it != tokenizer.end();
-         ++it) {
+    for (const bslstl::StringRef& token : tokenizer) {
         StorageHeaderFlags::Enum value;
-        if (StorageHeaderFlags::fromAscii(&value, *it) == false) {
+        if (StorageHeaderFlags::fromAscii(&value, token) == false) {
             if (rc == 0) {  // First wrong flag
-                errorDescription << "Invalid flag(s) '" << *it << "'";
+                errorDescription << "Invalid flag(s) '" << token << "'";
             }
             else {
-                errorDescription << ",'" << *it << "'";
+                errorDescription << ",'" << token << "'";
             }
             rc = -1;
         }
