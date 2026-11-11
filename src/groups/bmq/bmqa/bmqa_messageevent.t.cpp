@@ -187,10 +187,8 @@ static void test2_ackMesageIteratorTest()
                             bmqtst::TestHelperUtil::allocator());
     eventImpl->configureAsMessageEvent(rawEvent);
 
-    for (bsl::vector<AckData>::const_iterator i = messages.begin();
-         i != messages.end();
-         ++i) {
-        eventImpl->addContext(bmqt::CorrelationId(i->d_corrId));
+    for (const AckData& message : messages) {
+        eventImpl->addContext(bmqt::CorrelationId(message.d_corrId));
     }
 
     bmqa::MessageEvent              event;
