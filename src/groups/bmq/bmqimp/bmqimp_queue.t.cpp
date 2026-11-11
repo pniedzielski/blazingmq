@@ -216,11 +216,7 @@ static void test3_printQueueStateTest()
                   {bmqimp::QueueState::e_CLOSED, "CLOSED"},
                   {bmqimp::QueueState::e_PENDING, "PENDING"}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqu::MemOutStream out(bmqtst::TestHelperUtil::allocator());
         bmqu::MemOutStream expected(bmqtst::TestHelperUtil::allocator());
 
