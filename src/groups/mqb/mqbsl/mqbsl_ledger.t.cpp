@@ -341,10 +341,8 @@ static void test2_openMultipleLogs()
     BMQTST_ASSERT_EQ(ledger->outstandingNumBytes(), Tester::k_OLD_LOG_LEN * 3);
     BMQTST_ASSERT_EQ(ledger->totalNumBytes(), Tester::k_OLD_LOG_LEN * 3);
 
-    for (mqbsl::Ledger::Logs::const_iterator cit = ledger->logs().cbegin();
-         cit != ledger->logs().cend();
-         ++cit) {
-        const mqbu::StorageKey& logId = (*cit)->logConfig().logId();
+    for (const mqbsl::Ledger::LogSp& log : ledger->logs()) {
+        const mqbu::StorageKey& logId = log->logConfig().logId();
         BMQTST_ASSERT_EQ(ledger->outstandingNumBytes(logId),
                          Tester::k_OLD_LOG_LEN);
         BMQTST_ASSERT_EQ(ledger->totalNumBytes(logId), Tester::k_OLD_LOG_LEN);

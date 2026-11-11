@@ -110,15 +110,14 @@ void Ledger::openFailureCleanup(LedgerState::Enum* state, LogsMap* logs)
 {
     *state = LedgerState::e_CLOSED;
 
-    for (LogsMapIt it = logs->begin(); it != logs->end(); ++it) {
-        if (it->second->isOpened()) {
-            int rc = it->second->close();
+    for (const auto& [logId, log] : *logs) {
+        if (log->isOpened()) {
+            int rc = log->close();
             if (rc != LedgerOpResult::e_SUCCESS) {
                 BALL_LOG_ERROR
                     << "Failed to close the log located at '"
-                    << it->second->logConfig().location() << "' with logId = '"
-                    << it->second->logConfig().logId() << "' [rc: " << rc
-                    << "]";
+                    << log->logConfig().location() << "' with logId = '"
+                    << log->logConfig().logId() << "' [rc: " << rc << "]";
             }
         }
     }
@@ -132,12 +131,12 @@ int Ledger::reopen(int flags)
     populateLogFlags(&logFlags, flags);
 
     int rc = LedgerOpResult::e_UNKNOWN;
-    for (LogsMapIt it = d_logs.begin(); it != d_logs.end(); ++it) {
-        rc = it->second->open(logFlags);
+    for (const auto& [logId, log] : d_logs) {
+        rc = log->open(logFlags);
         if (rc != LogOpResult::e_SUCCESS) {
             return rc * 100 + LedgerOpResult::e_LOG_OPEN_FAILURE;  // RETURN
         }
-        d_outstandingNumBytes += it->second->outstandingNumBytes();
+        d_outstandingNumBytes += log->outstandingNumBytes();
     }
 
     // POSTCONDITIONS
@@ -475,9 +474,7 @@ int Ledger::open(int flags)
 
     // Create logs for selected files, open and insert them into internal data
     // structures
-    for (bsl::vector<bsl::string>::size_type i = 0; i < files.size(); ++i) {
-        const bsl::string& logFullPath = files[i];
-
+    for (const bsl::string& logFullPath : files) {
         // Extract the logId and parse logName
         mqbu::StorageKey logId;
         int rc = d_config.extractLogIdCallback()(&logId, logFullPath);
@@ -559,9 +556,9 @@ int Ledger::close()
     }
 
     int rc = LedgerOpResult::e_UNKNOWN;
-    for (LogsMapIt it = d_logs.begin(); it != d_logs.end(); ++it) {
-        if (it->second->isOpened()) {
-            rc = it->second->close();
+    for (const auto& [logId, log] : d_logs) {
+        if (log->isOpened()) {
+            rc = log->close();
             if (rc != LogOpResult::e_SUCCESS) {
                 return rc * 100 + LedgerOpResult::e_LEDGER_UNGRACEFUL_CLOSE;
                 // RETURN
