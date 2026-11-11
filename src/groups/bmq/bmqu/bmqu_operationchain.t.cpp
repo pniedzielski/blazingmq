@@ -21,9 +21,7 @@
 // BDE
 #include <bdlb_randomdevice.h>
 #include <bdlcc_deque.h>
-#include <bdlf_bind.h>
 #include <bdlf_noop.h>
-#include <bdlf_placeholder.h>
 #include <bdlmt_threadpool.h>
 #include <bsl_functional.h>
 #include <bsl_iostream.h>
@@ -299,19 +297,21 @@ static void test1_usageExample()
     // receive data from 10 clients
     bmqu::OperationChainLink link(chain.allocator());
     for (int i = 0; i < 10; ++i) {
-        link.insert(bdlf::BindUtil::bind(&UsageExample::receive,
-                                         bdlf::PlaceHolders::_1),
-                    &UsageExample::onDataReceived);
+        link.insert(
+            [](const UsageExample::ReceiveCallback& callback) {
+                UsageExample::receive(callback);
+            },
+            &UsageExample::onDataReceived);
     }
 
     chain.append(&link);
 
     // send data to another client
-    chain.appendInplace(bdlf::BindUtil::bind(&UsageExample::send,
-                                             k_MY_CLIENT_ID,
-                                             k_MY_PAYLOAD,
-                                             bdlf::PlaceHolders::_1),
-                        &UsageExample::onDataSent);
+    chain.appendInplace(
+        [](const UsageExample::SendCallback& callback) {
+            UsageExample::send(k_MY_CLIENT_ID, k_MY_PAYLOAD, callback);
+        },
+        &UsageExample::onDataSent);
 
     // execute operations in the chain
     chain.start();
@@ -398,10 +398,12 @@ static void test3_chain_startStop(bdlmt::ThreadPool* threadPool)
         for (unsigned operationId = 0; operationId < k_NUM_OPERATIONS;
              ++operationId) {
             chain.appendInplace(
-                bdlf::BindUtil::bind(&asyncNullOperation,
-                                     threadPool,
-                                     bdlf::PlaceHolders::_1),
-                bdlf::BindUtil::bind(PushBack(), &completionIds, operationId));
+                [threadPool](const bsl::function<void()>& callback) {
+                    asyncNullOperation(threadPool, callback);
+                },
+                [&completionIds, operationId]() {
+                    PushBack()(&completionIds, operationId);
+                });
         }
 
         // make sure operation haven't started executing
@@ -441,13 +443,15 @@ static void test3_chain_startStop(bdlmt::ThreadPool* threadPool)
         // add several operations
         for (unsigned operationId = 0; operationId < k_NUM_OPERATIONS;
              ++operationId) {
-            chain.appendInplace(bdlf::BindUtil::bind(&asyncNullOperation,
-                                                     threadPool,
-                                                     bdlf::PlaceHolders::_1),
-                                bdlf::BindUtil::bind(PushBackSynchronize(),
-                                                     &semaphore,
-                                                     &completionIds,
-                                                     operationId));
+            chain.appendInplace(
+                [threadPool](const bsl::function<void()>& callback) {
+                    asyncNullOperation(threadPool, callback);
+                },
+                [&semaphore, &completionIds, operationId]() {
+                    PushBackSynchronize()(&semaphore,
+                                          &completionIds,
+                                          operationId);
+                });
         }
 
         // no executing operations
@@ -505,12 +509,13 @@ static void test4_chain_join(bdlmt::ThreadPool* threadPool)
     // add several operations
     for (unsigned operationId = 0; operationId < k_NUM_OPERATIONS;
          ++operationId) {
-        chain.appendInplace(bdlf::BindUtil::bind(&asyncNullOperation,
-                                                 threadPool,
-                                                 bdlf::PlaceHolders::_1),
-                            bdlf::BindUtil::bind(PushBackRndSleep(),
-                                                 &completionIds,
-                                                 operationId));
+        chain.appendInplace(
+            [threadPool](const bsl::function<void()>& callback) {
+                asyncNullOperation(threadPool, callback);
+            },
+            [&completionIds, operationId]() {
+                PushBackRndSleep()(&completionIds, operationId);
+            });
     }
 
     // start executing
@@ -615,10 +620,13 @@ static void test5_chain_append1(bdlmt::ThreadPool* threadPool)
         bslmt::Semaphore semaphore;
 
         // append a link with one operation
-        chain.appendInplace(bdlf::BindUtil::bind(&asyncNullOperation,
-                                                 threadPool,
-                                                 bdlf::PlaceHolders::_1),
-                            bdlf::BindUtil::bind(Synchronize(), &semaphore));
+        chain.appendInplace(
+            [threadPool](const bsl::function<void()>& callback) {
+                asyncNullOperation(threadPool, callback);
+            },
+            [&semaphore]() {
+                Synchronize()(&semaphore);
+            });
 
         // the chain is executing one operation
         BMQTST_ASSERT_EQ(chain.numLinks(), 1u);
@@ -626,10 +634,13 @@ static void test5_chain_append1(bdlmt::ThreadPool* threadPool)
         BMQTST_ASSERT_EQ(chain.numOperationsExecuting(), 1u);
 
         // append another link with one operation
-        chain.appendInplace(bdlf::BindUtil::bind(&asyncNullOperation,
-                                                 threadPool,
-                                                 bdlf::PlaceHolders::_1),
-                            bdlf::BindUtil::bind(Synchronize(), &semaphore));
+        chain.appendInplace(
+            [threadPool](const bsl::function<void()>& callback) {
+                asyncNullOperation(threadPool, callback);
+            },
+            [&semaphore]() {
+                Synchronize()(&semaphore);
+            });
 
         // the chain is still executing only one operation
         BMQTST_ASSERT_EQ(chain.numLinks(), 2u);
@@ -901,10 +912,13 @@ static void test8_chain_popBack(bdlmt::ThreadPool* threadPool)
         bslmt::Semaphore semaphore;
 
         // append a link with one operation
-        chain.appendInplace(bdlf::BindUtil::bind(&asyncNullOperation,
-                                                 threadPool,
-                                                 bdlf::PlaceHolders::_1),
-                            bdlf::BindUtil::bind(Synchronize(), &semaphore));
+        chain.appendInplace(
+            [threadPool](const bsl::function<void()>& callback) {
+                asyncNullOperation(threadPool, callback);
+            },
+            [&semaphore]() {
+                Synchronize()(&semaphore);
+            });
 
         // the chain is executing one operation
         BMQTST_ASSERT_EQ(chain.numLinks(), 1u);
@@ -1022,11 +1036,13 @@ static void test9_chain_removeAll(bdlmt::ThreadPool* threadPool)
 
         // append several links with one operation each
         for (unsigned i = 0; i < k_NUM_LINKS; ++i) {
-            chain.appendInplace(bdlf::BindUtil::bind(&asyncNullOperation,
-                                                     threadPool,
-                                                     bdlf::PlaceHolders::_1),
-                                bdlf::BindUtil::bind(Synchronize(),
-                                                     &semaphore));
+            chain.appendInplace(
+                [threadPool](const bsl::function<void()>& callback) {
+                    asyncNullOperation(threadPool, callback);
+                },
+                [&semaphore]() {
+                    Synchronize()(&semaphore);
+                });
         }
 
         // the chain is executing one operation
@@ -1081,12 +1097,13 @@ static void test10_chain_serialization(bdlmt::ThreadPool* threadPool)
     for (unsigned i = 0; i < k_NUM_LINKS; ++i) {
         for (unsigned j = 0; j < k_NUM_OPERATIONS; ++j) {
             unsigned operationId = i * k_NUM_OPERATIONS + j;
-            link.insert(bdlf::BindUtil::bind(&asyncNullOperation,
-                                             threadPool,
-                                             bdlf::PlaceHolders::_1),
-                        bdlf::BindUtil::bind(PushBackRndSleep(),
-                                             &completionIds,
-                                             operationId));
+            link.insert(
+                [threadPool](const bsl::function<void()>& callback) {
+                    asyncNullOperation(threadPool, callback);
+                },
+                [&completionIds, operationId]() {
+                    PushBackRndSleep()(&completionIds, operationId);
+                });
         }
 
         chain.append(&link);
@@ -1135,16 +1152,18 @@ test11_chain_exceptionHandling([[maybe_unused]] bdlmt::ThreadPool* threadPool)
     // add several operations, each handling an exception thrown from the
     // completion callback
     bool exception1Thrown = false;
-    chain.appendInplace(bdlf::BindUtil::bind(ExceptionHandlingOperation(),
-                                             &exception1Thrown,
-                                             bdlf::PlaceHolders::_1),
-                        ThrowException());
+    chain.appendInplace(
+        [&exception1Thrown](const auto& callback) {
+            ExceptionHandlingOperation()(&exception1Thrown, callback);
+        },
+        ThrowException());
 
     bool exception2Thrown = false;
-    chain.appendInplace(bdlf::BindUtil::bind(ExceptionHandlingOperation(),
-                                             &exception2Thrown,
-                                             bdlf::PlaceHolders::_1),
-                        ThrowException());
+    chain.appendInplace(
+        [&exception2Thrown](const auto& callback) {
+            ExceptionHandlingOperation()(&exception2Thrown, callback);
+        },
+        ThrowException());
 
     // execute operations
     chain.start();
