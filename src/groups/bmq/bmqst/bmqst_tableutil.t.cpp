@@ -38,10 +38,8 @@ namespace {
 void stringVector(bsl::vector<bsl::string>* out, bsl::string_view s)
 {
     bdlb::Tokenizer tokenizer(s, " ");
-    for (bdlb::TokenizerIterator iter = tokenizer.begin();
-         iter != tokenizer.end();
-         ++iter) {
-        out->emplace_back(*iter);
+    for (const bslstl::StringRef& token : tokenizer) {
+        out->emplace_back(token);
     }
 }
 
@@ -102,12 +100,12 @@ class TestTableInfoProvider : public bmqst::TableInfoProvider {
     int getHeaderSize(int level, int column) const override
     {
         const Row& row = d_headers[level];
-        for (size_t i = 0; i < row.size(); ++i) {
-            if (row[i] == "-") {
+        for (const bsl::string& header : row) {
+            if (header == "-") {
                 continue;
             }
             if (column == 0) {
-                return static_cast<int>(row[i].length());
+                return static_cast<int>(header.length());
             }
             --column;
         }
@@ -142,12 +140,12 @@ class TestTableInfoProvider : public bmqst::TableInfoProvider {
                               int) const override
     {
         const Row& row = d_headers[level];
-        for (size_t i = 0; i < row.size(); ++i) {
-            if (row[i] == "-") {
+        for (const bsl::string& header : row) {
+            if (header == "-") {
                 continue;
             }
             if (column == 0) {
-                return stream << row[i];
+                return stream << header;
             }
             --column;
         }
