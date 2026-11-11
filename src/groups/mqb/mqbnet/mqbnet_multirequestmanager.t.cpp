@@ -261,10 +261,15 @@ TestContext::TestContext(int nodesCount, bslma::Allocator* allocator)
 
     bmqu::Time::shutdown();
     bmqu::Time::initialize(
-        bdlf::BindUtil::bind(&mqbmock::Cluster::getTime, d_cluster_mp.get()),
-        bdlf::BindUtil::bind(&mqbmock::Cluster::getTime, d_cluster_mp.get()),
-        bdlf::BindUtil::bind(&mqbmock::Cluster::getTimeInt64,
-                             d_cluster_mp.get()));
+        [cluster = d_cluster_mp.get()]() {
+            return cluster->getTime();
+        },
+        [cluster = d_cluster_mp.get()]() {
+            return cluster->getTime();
+        },
+        [cluster = d_cluster_mp.get()]() {
+            return cluster->getTimeInt64();
+        });
 
     int rc = d_cluster_mp->_scheduler().start();
     BMQTST_ASSERT_EQ(rc, 0);
@@ -276,9 +281,9 @@ TestContext::~TestContext()
 {
     bool called = false;
     d_requestContextSp->setResponseCb(
-        bdlf::BindUtil::bind(&Caller::callback,
-                             &called,
-                             bdlf::PlaceHolders::_1));
+        [calledFlag = &called](const ReqContextSp& requestContext) {
+            Caller::callback(calledFlag, requestContext);
+        });
     cancelRequests();
     d_cluster_mp->netCluster().closeChannels();
     d_cluster_mp->_scheduler().stop();
@@ -565,9 +570,10 @@ static void test4_handleResponseTest()
         ReqSp       req = context.createRequest();
         context.populateRequest(req);
         bool called = false;
-        context.setResponseCb(bdlf::BindUtil::bind(&Caller::callback,
-                                                   &called,
-                                                   bdlf::PlaceHolders::_1));
+        context.setResponseCb(
+            [calledFlag = &called](const ReqContextSp& requestContext) {
+                Caller::callback(calledFlag, requestContext);
+            });
         context.sendRequest(req);
 
         bsl::vector<Mes> responses(bmqtst::TestHelperUtil::allocator());
@@ -605,9 +611,10 @@ static void test4_handleResponseTest()
         ReqSp       req = context.createRequest();
         context.populateRequest(req);
         bool called = false;
-        context.setResponseCb(bdlf::BindUtil::bind(&Caller::callback,
-                                                   &called,
-                                                   bdlf::PlaceHolders::_1));
+        context.setResponseCb(
+            [calledFlag = &called](const ReqContextSp& requestContext) {
+                Caller::callback(calledFlag, requestContext);
+            });
         context.sendRequest(req);
 
         BMQTST_ASSERT(!called);
@@ -662,9 +669,10 @@ static void test4_handleResponseTest()
         ReqSp       req = context.createRequest();
         context.populateRequest(req);
         bool called = false;
-        context.setResponseCb(bdlf::BindUtil::bind(&Caller::callback,
-                                                   &called,
-                                                   bdlf::PlaceHolders::_1));
+        context.setResponseCb(
+            [calledFlag = &called](const ReqContextSp& requestContext) {
+                Caller::callback(calledFlag, requestContext);
+            });
         context.sendRequest(req);
 
         NodesIt it = context.nodes().begin();
@@ -680,12 +688,15 @@ static void test4_handleResponseTest()
 
         // Start the threads to process responses from queue
         for (bsl::size_t i = 0; i < threadsCount; ++i) {
-            int rc = threadGroup.addThread(
-                bdlf::BindUtil::bind(&ConcurrentCaller::processResponsesJob,
-                                     &responses,
-                                     &responsesLock,
-                                     &barrier,
-                                     &context));
+            int rc = threadGroup.addThread([responsesPtr     = &responses,
+                                            responsesLockPtr = &responsesLock,
+                                            barrierPtr       = &barrier,
+                                            contextPtr       = &context]() {
+                ConcurrentCaller::processResponsesJob(responsesPtr,
+                                                      responsesLockPtr,
+                                                      barrierPtr,
+                                                      contextPtr);
+            });
             BMQTST_ASSERT_EQ(0, rc);
         }
 
@@ -732,17 +743,17 @@ static void test5_cancelByComponentIdTest()
         // untaggedCtx: default k_NO_COMPONENT_ID
 
         clusterCtx->setResponseCb(
-            bdlf::BindUtil::bind(&Caller::callback,
-                                 &clusterCalled,
-                                 bdlf::PlaceHolders::_1));
-        partitionCtx->setResponseCb(
-            bdlf::BindUtil::bind(&Caller::callback,
-                                 &partitionCalled,
-                                 bdlf::PlaceHolders::_1));
-        untaggedCtx->setResponseCb(
-            bdlf::BindUtil::bind(&Caller::callback,
-                                 &untaggedCalled,
-                                 bdlf::PlaceHolders::_1));
+            [calledFlag = &clusterCalled](const ReqContextSp& requestContext) {
+                Caller::callback(calledFlag, requestContext);
+            });
+        partitionCtx->setResponseCb([calledFlag = &partitionCalled](
+                                        const ReqContextSp& requestContext) {
+            Caller::callback(calledFlag, requestContext);
+        });
+        untaggedCtx->setResponseCb([calledFlag = &untaggedCalled](
+                                       const ReqContextSp& requestContext) {
+            Caller::callback(calledFlag, requestContext);
+        });
 
         // Populate and send all 3 multi-requests
         ReqSp req = context.createRequest();

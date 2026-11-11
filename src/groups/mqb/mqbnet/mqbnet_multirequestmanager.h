@@ -433,11 +433,10 @@ MultiRequestManager<TARGET>::MultiRequestManager(
     bslma::Allocator*     allocator)
 : d_requestManager_p(requestManager)
 , d_requestContextPool(
-      bdlf::BindUtil::bind(&MultiRequestManager::poolCreateRequestContext,
-                           this,
-                           bdlf::PlaceHolders::_1,   // address
-                           bdlf::PlaceHolders::_2),  // allocator
-      -1,                                            // geometric growth
+      [this](void* address, bslma::Allocator* objectAllocator) {
+          poolCreateRequestContext(address, objectAllocator);
+      },
+      -1,  // geometric growth
       allocator)
 {
     BSLS_ASSERT_SAFE(d_requestManager_p);
@@ -472,11 +471,10 @@ void MultiRequestManager<TARGET>::sendRequest(const RequestContextSp& context,
         RequestSp singleRequestCtx  = d_requestManager_p->createRequest();
         singleRequestCtx->request() = context->d_request;
         singleRequestCtx->setResponseCb(
-            bdlf::BindUtil::bind(&MultiRequestManager::onSingleResponse,
-                                 this,
-                                 bdlf::PlaceHolders::_1,
-                                 context,
-                                 it->first));
+            [this, context, node = it->first](
+                const RequestSp& singleRequestContext) {
+                onSingleResponse(singleRequestContext, context, node);
+            });
         setGroupId(singleRequestCtx, it->first);
         if (context->componentId() !=
             bmqp::RequestManagerComponentId::k_NO_COMPONENT_ID) {
@@ -559,10 +557,9 @@ template <class TARGET>
 inline const typename MultiRequestManager<TARGET>::SendFn
 MultiRequestManager<TARGET>::sendFn(mqbnet::ClusterNode* target) const
 {
-    return bdlf::BindUtil::bind(&mqbnet::ClusterNode::write,
-                                target,
-                                bdlf::PlaceHolders::_1,
-                                bmqp::EventType::e_CONTROL);
+    return [target](const bsl::shared_ptr<bdlbb::Blob>& blob) {
+        return target->write(blob, bmqp::EventType::e_CONTROL);
+    };
 }
 
 template <class TARGET>
@@ -570,9 +567,10 @@ inline const typename MultiRequestManager<TARGET>::SendFn
 MultiRequestManager<TARGET>::sendFn(
     const bsl::shared_ptr<mqbnet::Session>& target) const
 {
-    return bdlf::BindUtil::bind(&sendHelper,
-                                target->channel().get(),
-                                bdlf::PlaceHolders::_1);  // blob
+    return [channel = target->channel().get()](
+               const bsl::shared_ptr<bdlbb::Blob>& blob) {
+        return sendHelper(channel, blob);
+    };
 }
 
 }  // close package namespace
