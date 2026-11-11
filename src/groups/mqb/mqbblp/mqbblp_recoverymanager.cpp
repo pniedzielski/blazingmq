@@ -52,8 +52,6 @@
 #include <bdlb_nullablevalue.h>
 #include <bdlb_print.h>
 #include <bdlde_md5.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdls_filesystemutil.h>
 #include <bdlt_currenttime.h>
 #include <bdlt_datetime.h>
@@ -273,10 +271,9 @@ void RecoveryManager_ChunkDeleter::operator()(
             d_primarySyncContext_p->fileStore()->dispatcherClientData();
 
         rm->d_dispatcher_p->execute(
-            bdlf::BindUtil::bind(
-                &RecoveryManager::partitionSyncCleanupDispatched,
-                rm,
-                pid),
+            [rm, pid]() {
+                rm->partitionSyncCleanupDispatched(pid);
+            },
             dispData);
 
         return;  // RETURN
@@ -371,9 +368,9 @@ void RecoveryManager::recoveryStartupWaitCb(int partitionId)
     }
 
     d_dispatcher_p->execute(
-        bdlf::BindUtil::bind(&RecoveryManager::recoveryStartupWaitDispatched,
-                             this,
-                             partitionId),
+        [this, partitionId]() {
+            recoveryStartupWaitDispatched(partitionId);
+        },
         d_cluster_p);
 }
 
@@ -430,11 +427,10 @@ void RecoveryManager::recoveryStartupWaitDispatched(int partitionId)
     const PartitionInfo&              pinfo    = d_partitionsInfo[partitionId];
     const mqbi::DispatcherClientData& dispData = pinfo.dispatcherClientData();
     d_dispatcher_p->execute(
-        bdlf::BindUtil::bind(
-            &RecoveryManager::recoveryStartupWaitPartitionDispatched,
-            this,
-            partitionId,
-            availableNodes),
+        [this, partitionId, availableNodes]() {
+            recoveryStartupWaitPartitionDispatched(partitionId,
+                                                   availableNodes);
+        },
         dispData);
 }
 
@@ -497,9 +493,9 @@ void RecoveryManager::recoveryStartupWaitPartitionDispatched(
         d_clusterData_p->scheduler().scheduleEvent(
             &recoveryCtx.recoveryStartupWaitHandle(),
             after,
-            bdlf::BindUtil::bind(&RecoveryManager::recoveryStartupWaitCb,
-                                 this,
-                                 partitionId));
+            [this, partitionId]() {
+                recoveryStartupWaitCb(partitionId);
+            });
 
         return;  // RETURN
     }
@@ -582,9 +578,9 @@ void RecoveryManager::recoveryStatusCb(int partitionId)
     const mqbi::DispatcherClientData& dispData =
         d_partitionsInfo[partitionId].dispatcherClientData();
     d_dispatcher_p->execute(
-        bdlf::BindUtil::bind(&RecoveryManager::recoveryStatusDispatched,
-                             this,
-                             partitionId),
+        [this, partitionId]() {
+            recoveryStatusDispatched(partitionId);
+        },
         dispData);
 }
 
@@ -636,9 +632,9 @@ void RecoveryManager::primarySyncStatusCb(int partitionId)
     const mqbi::DispatcherClientData& dispData =
         d_partitionsInfo[partitionId].dispatcherClientData();
     d_dispatcher_p->execute(
-        bdlf::BindUtil::bind(&RecoveryManager::primarySyncStatusDispatched,
-                             this,
-                             partitionId),
+        [this, partitionId]() {
+            primarySyncStatusDispatched(partitionId);
+        },
         dispData);
 }
 
@@ -797,11 +793,10 @@ void RecoveryManager::sendStorageSyncRequesterHelper(RecoveryContext* context,
         spOffsetPair.offset()    = context->newSyncPointOffset();
     }
 
-    request->setResponseCb(
-        bdlf::BindUtil::bind(&RecoveryManager::onStorageSyncResponse,
-                             this,
-                             bdlf::PlaceHolders::_1,
-                             context->recoveryPeer()));
+    request->setResponseCb([this, recoveryPeer = context->recoveryPeer()](
+                               const RequestSp& requestContext) {
+        onStorageSyncResponse(requestContext, recoveryPeer);
+    });
 
     bsls::TimeInterval timeoutMs;
     timeoutMs.setTotalMilliseconds(d_clusterConfig.partitionConfig()
@@ -845,9 +840,9 @@ void RecoveryManager::sendStorageSyncRequesterHelper(RecoveryContext* context,
         d_clusterData_p->scheduler().scheduleEvent(
             &(context->recoveryStatusCheckHandle()),
             after,
-            bdlf::BindUtil::bind(&RecoveryManager::recoveryStatusCb,
-                                 this,
-                                 partitionId));
+            [this, partitionId]() {
+                recoveryStatusCb(partitionId);
+            });
     }
 }
 
@@ -880,11 +875,9 @@ void RecoveryManager::onStorageSyncResponse(
     const mqbi::DispatcherClientData& dispData =
         d_partitionsInfo[partitionId].dispatcherClientData();
     d_dispatcher_p->execute(
-        bdlf::BindUtil::bind(&RecoveryManager::onStorageSyncResponseDispatched,
-                             this,
-                             partitionId,
-                             context,
-                             responder),
+        [this, partitionId, context, responder]() {
+            onStorageSyncResponseDispatched(partitionId, context, responder);
+        },
         dispData);
 }
 
@@ -2454,11 +2447,10 @@ void RecoveryManager::onPartitionSyncStateQueryResponse(
         d_partitionsInfo[req.partitionId()].dispatcherClientData();
 
     d_dispatcher_p->execute(
-        bdlf::BindUtil::bind(
-            &RecoveryManager::onPartitionSyncStateQueryResponseDispatched,
-            this,
-            req.partitionId(),
-            requestContext),
+        [this, partitionId = req.partitionId(), requestContext]() {
+            onPartitionSyncStateQueryResponseDispatched(partitionId,
+                                                        requestContext);
+        },
         dispData);
 }
 
@@ -2678,11 +2670,10 @@ void RecoveryManager::onPartitionSyncStateQueryResponseDispatched(
     // recovery at startup should have brought partition upto speed), we
     // still send this request to the peer and let it deal with it.
 
-    request->setResponseCb(bdlf::BindUtil::bind(
-        &RecoveryManager::onPartitionSyncDataQueryResponse,
-        this,
-        bdlf::PlaceHolders::_1,
-        maxSeqNode));
+    request->setResponseCb(
+        [this, maxSeqNode](const RequestSp& dataQueryContext) {
+            onPartitionSyncDataQueryResponse(dataQueryContext, maxSeqNode);
+        });
 
     bsls::TimeInterval timeoutMs;
     timeoutMs.setTotalMilliseconds(d_clusterConfig.partitionConfig()
@@ -2731,12 +2722,11 @@ void RecoveryManager::onPartitionSyncDataQueryResponse(
     const mqbi::DispatcherClientData& dispData =
         d_partitionsInfo[req.partitionId()].dispatcherClientData();
     d_dispatcher_p->execute(
-        bdlf::BindUtil::bind(
-            &RecoveryManager::onPartitionSyncDataQueryResponseDispatched,
-            this,
-            req.partitionId(),
-            context,
-            responder),
+        [this, partitionId = req.partitionId(), context, responder]() {
+            onPartitionSyncDataQueryResponseDispatched(partitionId,
+                                                       context,
+                                                       responder);
+        },
         dispData);
 }
 
@@ -2969,10 +2959,9 @@ void RecoveryManager::stop()
         const mqbi::DispatcherClientData& dispData =
             d_partitionsInfo[i].dispatcherClientData();
         d_dispatcher_p->execute(
-            bdlf::BindUtil::bind(&RecoveryManager::stopDispatched,
-                                 this,
-                                 static_cast<int>(i),  // partitionId
-                                 &latch),
+            [this, partitionId = static_cast<int>(i), latchP = &latch]() {
+                stopDispatched(partitionId, latchP);
+            },
             dispData);
     }
 
@@ -3043,9 +3032,9 @@ void RecoveryManager::startRecovery(
     d_clusterData_p->scheduler().scheduleEvent(
         &recoveryCtx.recoveryStartupWaitHandle(),
         after,
-        bdlf::BindUtil::bind(&RecoveryManager::recoveryStartupWaitCb,
-                             this,
-                             partitionId));
+        [this, partitionId]() {
+            recoveryStartupWaitCb(partitionId);
+        });
 
     // Max number of file sets that we want to be inspected.  TBD: add reason
     // for '2'.
@@ -4408,9 +4397,9 @@ void RecoveryManager::startPartitionPrimarySync(
     d_clusterData_p->scheduler().scheduleEvent(
         &primarySyncCtx.primarySyncStatusEventHandle(),
         after,
-        bdlf::BindUtil::bind(&RecoveryManager::primarySyncStatusCb,
-                             this,
-                             pid));
+        [this, pid]() {
+            primarySyncStatusCb(pid);
+        });
 
     // Send PartitionSyncStateRequest to all *AVAILABLE* peers.
 
@@ -4426,10 +4415,9 @@ void RecoveryManager::startPartitionPrimarySync(
     req.partitionId() = pid;
 
     contextSp->setDestinationNodes(peers);
-    contextSp->setResponseCb(bdlf::BindUtil::bind(
-        &RecoveryManager::onPartitionSyncStateQueryResponse,
-        this,
-        bdlf::PlaceHolders::_1));
+    contextSp->setResponseCb([this](const RequestContextSp& requestContext) {
+        onPartitionSyncStateQueryResponse(requestContext);
+    });
 
     bsls::TimeInterval timeoutMs;
     timeoutMs.setTotalMilliseconds(d_clusterConfig.partitionConfig()
@@ -5013,10 +5001,9 @@ void RecoveryManager::onNodeStateChange(mqbnet::ClusterNode* node,
             const mqbi::DispatcherClientData& disp =
                 pinfo.dispatcherClientData();
             d_dispatcher_p->execute(
-                bdlf::BindUtil::bind(&RecoveryManager::onNodeDownDispatched,
-                                     this,
-                                     pid,
-                                     node),
+                [this, partitionId = static_cast<int>(pid), node]() {
+                    onNodeDownDispatched(partitionId, node);
+                },
                 disp);
         }
         else {
