@@ -144,16 +144,16 @@ void Cluster::_initializeNetcluster()
 
     // Create and set channels on nodes
     NodesList& nodes = d_netCluster_mp->nodes();
-    for (NodesListIter iter = nodes.begin(); iter != nodes.end(); ++iter) {
+    for (mqbnet::ClusterNode* node : nodes) {
         d_channels.emplace(
-            *iter,
+            node,
             bsl::allocate_shared<bmqio::TestChannel>(d_allocator_p),
             d_allocator_p);
 
-        bsl::weak_ptr<bmqio::Channel> channelWp(d_channels.at(*iter));
-        (*iter)->setChannel(channelWp,
-                            bmqp_ctrlmsg::ClientIdentity(),
-                            bmqio::Channel::ReadCallback());
+        bsl::weak_ptr<bmqio::Channel> channelWp(d_channels.at(node));
+        node->setChannel(channelWp,
+                         bmqp_ctrlmsg::ClientIdentity(),
+                         bmqio::Channel::ReadCallback());
     }
 
     const int selfNodeId = d_isLeader ? k_LEADER_NODE_ID
@@ -172,11 +172,9 @@ void Cluster::_initializeNodeSessions()
     mqbc::ClusterMembership& clusterMembership =
         d_clusterData_mp->membership();
 
-    NodesListIter nodeIter = clusterMembership.netCluster()->nodes().begin();
-    NodesListIter endIter  = clusterMembership.netCluster()->nodes().end();
-    for (; nodeIter != endIter; ++nodeIter) {
+    for (mqbnet::ClusterNode* node : clusterMembership.netCluster()->nodes()) {
         // Create stat context for each cluster node
-        bmqst::StatContextConfiguration config((*nodeIter)->hostName());
+        bmqst::StatContextConfiguration config(node->hostName());
 
         StatContextSp statContextSp(
             d_clusterData_mp->clusterNodesStatContext()->addSubcontext(config),
@@ -185,7 +183,7 @@ void Cluster::_initializeNodeSessions()
         mqbc::ClusterMembership::ClusterNodeSessionSp nodeSessionSp;
         nodeSessionSp.createInplace(d_allocator_p,
                                     this,
-                                    *nodeIter,
+                                    node,
                                     d_clusterData_mp->identity().name(),
                                     d_clusterData_mp->identity().identity(),
                                     statContextSp,
@@ -198,10 +196,9 @@ void Cluster::_initializeNodeSessions()
                                      bmqp_ctrlmsg::NodeStatus::E_AVAILABLE);
 
         clusterMembership.clusterNodeSessionMap().insert(
-            bsl::make_pair(*nodeIter, nodeSessionSp));
+            bsl::make_pair(node, nodeSessionSp));
 
-        if (clusterMembership.netCluster()->selfNodeId() ==
-            (*nodeIter)->nodeId()) {
+        if (clusterMembership.netCluster()->selfNodeId() == node->nodeId()) {
             clusterMembership.setSelfNodeSession(nodeSessionSp.get());
         }
     }
@@ -376,10 +373,8 @@ void Cluster::stop()
 
         d_clusterData_mp->membership().netCluster()->closeChannels();
 
-        for (TestChannelMapIter iter = d_channels.begin();
-             iter != d_channels.end();
-             ++iter) {
-            iter->second->reset();
+        for (const auto& [node, channel] : d_channels) {
+            channel->reset();
         }
     }
 

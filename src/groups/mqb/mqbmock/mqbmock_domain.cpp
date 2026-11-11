@@ -176,9 +176,8 @@ void Domain::loadAllQueues(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(out);
 
-    for (QueueMapCIter cit = d_queues.cbegin(); cit != d_queues.cend();
-         ++cit) {
-        out->push_back(cit->second);
+    for (const auto& [uri, queue] : d_queues) {
+        out->push_back(queue);
     }
 }
 
@@ -187,9 +186,8 @@ void Domain::loadAllQueues(bsl::vector<bmqt::Uri>* out) const
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(out);
 
-    for (QueueMapCIter cit = d_queues.cbegin(); cit != d_queues.cend();
-         ++cit) {
-        out->push_back(cit->second->uri());
+    for (const auto& [uri, queue] : d_queues) {
+        out->push_back(queue->uri());
     }
 }
 
