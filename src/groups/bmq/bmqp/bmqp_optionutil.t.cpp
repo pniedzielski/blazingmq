@@ -274,10 +274,7 @@ static void test2_basicOptionsBoxCanAdd()
                                       k_MAX_TYPE * (smallPayload + headerSize);
         const int oneTooMany         = maxAllowedContent + 1;
         const int testContentSizes[] = {4, maxAllowedContent, oneTooMany};
-        for (unsigned int i = 0;
-             i < (sizeof(testContentSizes) / sizeof(testContentSizes[0]));
-             ++i) {
-            const int    contentSize = testContentSizes[i];
+        for (const int contentSize : testContentSizes) {
             const LimitT limit = maxCanBeAdded(contentSize, smallPayload);
             if (contentSize == oneTooMany) {
                 BMQTST_ASSERT_EQ(Result::e_OPTION_TOO_BIG, limit.second);
@@ -299,10 +296,7 @@ static void test2_basicOptionsBoxCanAdd()
        "of all options > EventHeader::k_MAX_SIZE_SOFT")
     {
         const int testContentSizes[] = {4, 2 * k_MAX_SIZE};
-        for (unsigned int i = 0;
-             i < (sizeof(testContentSizes) / sizeof(testContentSizes[0]));
-             ++i) {
-            const int    contentSize = testContentSizes[i];
+        for (const int contentSize : testContentSizes) {
             const int    maxPayload  = k_MAX_SIZE - headerSize;
             const LimitT limit       = maxCanBeAdded(contentSize, maxPayload);
             BMQTST_ASSERT_EQ(Result::e_OPTION_TOO_BIG, limit.second);

@@ -373,9 +373,7 @@ static void test1_breathingTest()
         // moreover that the order of the SubQueueInfos in the original message
         // determines the ordering of the replicated messages in the flattened
         // event.
-        for (bmqp::Protocol::SubQueueInfosArray::size_type j = 0;
-             j < D.d_subQueueInfos.size();
-             ++j) {
+        for (const bmqp::SubQueueInfo& subQueueInfo : D.d_subQueueInfos) {
             rc = msgIterator.next();
             BSLS_ASSERT_OPT(rc == 1);
             BSLS_ASSERT_OPT(msgIterator.hasOptions());
@@ -401,7 +399,7 @@ static void test1_breathingTest()
             BSLS_ASSERT_OPT(rc == 0);
             BSLS_ASSERT_OPT(subQueueInfos.size() == 1);
 
-            BMQTST_ASSERT_EQ(D.d_subQueueInfos[j], subQueueInfos[0]);
+            BMQTST_ASSERT_EQ(subQueueInfo, subQueueInfos[0]);
 
             // Verify that 'eventInfo' contains the queueId pair (id, subId)
             // corresponding to this message
