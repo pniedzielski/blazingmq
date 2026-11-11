@@ -46,42 +46,6 @@ struct SchedulerLockGuard_Context {
     bslmt::Semaphore d_releaseSem;
 };
 
-namespace {
-
-/// Functor scheduled by `SchedulerLockGuard` to park the scheduler's
-/// dispatcher thread.  Co-owns the shared context via a `shared_ptr` so it
-/// stays alive for the callback's lifetime.
-class SchedulerPauseFunctor {
-  private:
-    // DATA
-    bsl::shared_ptr<SchedulerLockGuard_Context> d_context_sp;
-
-  public:
-    // CREATORS
-    explicit SchedulerPauseFunctor(
-        const bsl::shared_ptr<SchedulerLockGuard_Context>& context)
-    : d_context_sp(context)
-    {
-        // PRECONDITIONS
-        BSLS_ASSERT_SAFE(d_context_sp);
-    }
-
-    // ACCESSORS
-
-    /// Run on the scheduler dispatcher thread: signal that the dispatcher is
-    /// parked, then block on the release latch until the owning guard is
-    /// destroyed.  The scheduler's internal mutex is *not* held while this
-    /// runs, so other threads may still (re)schedule events; those events
-    /// simply will not fire until this returns.
-    void operator()() const
-    {
-        d_context_sp->d_enteredSem.post();
-        d_context_sp->d_releaseSem.wait();
-    }
-};
-
-}  // close unnamed namespace
-
 // ------------------------
 // class SchedulerLockGuard
 // ------------------------
@@ -97,9 +61,16 @@ SchedulerLockGuard::SchedulerLockGuard(bdlmt::EventScheduler* scheduler,
 
     // Schedule a callback which parks the scheduler's dispatcher thread, and
     // block until that thread confirms it is parked.  Once parked, no other
-    // scheduled event can fire until this guard is destroyed.
+    // scheduled event can fire until this guard is destroyed.  The callback
+    // co-owns the shared context so it stays alive for the callback's
+    // lifetime.  The scheduler's internal mutex is *not* held while the
+    // callback runs, so other threads may still (re)schedule events; those
+    // events simply will not fire until it returns.
     d_scheduler_p->scheduleEvent(d_scheduler_p->now(),
-                                 SchedulerPauseFunctor(d_context_sp));
+                                 [context = d_context_sp]() {
+                                     context->d_enteredSem.post();
+                                     context->d_releaseSem.wait();
+                                 });
     d_context_sp->d_enteredSem.wait();
 }
 
