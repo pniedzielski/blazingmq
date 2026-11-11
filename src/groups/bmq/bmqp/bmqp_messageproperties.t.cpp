@@ -434,11 +434,10 @@ void encode(bdlbb::Blob* blob, const PropertyMap& pmap)
     totalSize += sizeof(bmqp::MessagePropertiesHeader);
 
     // First pass.
-    for (PropertyMapConstIter cit = pmap.begin(); cit != pmap.end(); ++cit) {
-        const PropertyTypeSizeVariantPair& tsvPair = cit->second;
-        bmqp::MessagePropertyHeader        mph;
+    for (const auto& [name, tsvPair] : pmap) {
+        bmqp::MessagePropertyHeader mph;
         mph.setPropertyType(tsvPair.first.first);
-        mph.setPropertyNameLength(static_cast<int>(cit->first.length()));
+        mph.setPropertyNameLength(static_cast<int>(name.length()));
         mph.setPropertyValueLength(static_cast<int>(tsvPair.first.second));
 
         bdlbb::BlobUtil::append(blob,
@@ -448,12 +447,11 @@ void encode(bdlbb::Blob* blob, const PropertyMap& pmap)
     }
 
     // Second pass.
-    for (PropertyMapConstIter cit = pmap.begin(); cit != pmap.end(); ++cit) {
-        const PropertyTypeSizeVariantPair& tsvPair = cit->second;
+    for (const auto& [name, tsvPair] : pmap) {
         bdlbb::BlobUtil::append(blob,
-                                cit->first.c_str(),
-                                static_cast<int>(cit->first.length()));
-        totalSize += static_cast<int>(cit->first.length());
+                                name.c_str(),
+                                static_cast<int>(name.length()));
+        totalSize += static_cast<int>(name.length());
 
         PropertyValueStreamOutVisitor visitor(blob);
         tsvPair.second.apply(visitor);
@@ -1485,8 +1483,8 @@ struct MessagePropertiesBenchmark_getPropertyRef {
 
         // Init vector once to allow faster iteration in benchmark
         bsl::vector<bsl::string> propertyNames(alloc);
-        for (auto iter = pmap.cbegin(); iter != pmap.cend(); iter++) {
-            propertyNames.push_back(iter->first);
+        for (const auto& entry : pmap) {
+            propertyNames.push_back(entry.first);
         }
 
         BMQTST_ASSERT_EQ(numProps, pmap.size());
@@ -1503,9 +1501,9 @@ struct MessagePropertiesBenchmark_getPropertyRef {
             props.setDeepCopy(false);
             props.streamIn(wireRep, true);
 
-            for (size_t j = 0; j < propertyNames.size(); j++) {
+            for (const bsl::string& name : propertyNames) {
                 // Don't use slow `bmqtst::TestHelperUtil::allocator`:
-                (void)props.getPropertyRef(propertyNames[j], 0);
+                (void)props.getPropertyRef(name, 0);
             }
         }
 

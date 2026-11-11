@@ -947,10 +947,8 @@ MessageProperties::streamOut(bdlbb::BlobBufferFactory*          bufferFactory,
     }
 
     // Make sure all Properties are read.
-    for (PropertyMapConstIter cit = d_properties.begin();
-         cit != d_properties.end();
-         ++cit) {
-        const Property& p = cit->second;
+    for (const auto& entry : d_properties) {
+        const Property& p = entry.second;
         if (p.d_value.isUnset() && p.d_isValid) {
             [[maybe_unused]] bool result = streamInPropertyValue(p);
             BSLS_ASSERT(result);
@@ -1009,11 +1007,7 @@ MessageProperties::streamOut(bdlbb::BlobBufferFactory*          bufferFactory,
     // Add MessagePropertHeader structs, one for each property.
     int offset = 0;
 
-    for (PropertyMapConstIter cit = d_properties.begin();
-         cit != d_properties.end();
-         ++cit) {
-        const Property& p = cit->second;
-
+    for (const auto& [name, p] : d_properties) {
         if (!p.d_isValid) {
             continue;  // CONTINUE
         }
@@ -1029,18 +1023,17 @@ MessageProperties::streamOut(bdlbb::BlobBufferFactory*          bufferFactory,
             true);  // write flag
         new (msgPropHeader.object()) MessagePropertyHeader();
         msgPropHeader->setPropertyType(p.d_type);
-        msgPropHeader->setPropertyNameLength(
-            static_cast<int>(cit->first.length()));
+        msgPropHeader->setPropertyNameLength(static_cast<int>(name.length()));
         if (info.isExtended()) {
             msgPropHeader->setPropertyValueLength(offset);
         }
         else {
-            msgPropHeader->setPropertyValueLength(cit->second.d_length);
+            msgPropHeader->setPropertyValueLength(p.d_length);
         }
 
         msgPropHeader.reset();  // write out the header
         totalSize += sizeof(MessagePropertyHeader);
-        offset += static_cast<int>(cit->first.length());
+        offset += static_cast<int>(name.length());
         offset += p.d_length;
     }
 
@@ -1048,20 +1041,16 @@ MessageProperties::streamOut(bdlbb::BlobBufferFactory*          bufferFactory,
 
     // Now add property name and value individually.
 
-    for (PropertyMapConstIter cit = d_properties.begin();
-         cit != d_properties.end();
-         ++cit) {
-        const Property& p = cit->second;
-
+    for (const auto& [name, p] : d_properties) {
         if (!p.d_isValid) {
             continue;  // CONTINUE
         }
         // Append property name.
 
         bdlbb::BlobUtil::append(blob,
-                                cit->first.c_str(),
-                                static_cast<int>(cit->first.length()));
-        totalSize += static_cast<int>(cit->first.length());
+                                name.c_str(),
+                                static_cast<int>(name.length()));
+        totalSize += static_cast<int>(name.length());
 
         // Append property value.
 
