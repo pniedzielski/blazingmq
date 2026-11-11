@@ -28,7 +28,6 @@
 #include <bdlb_stringrefutil.h>
 #include <bdlbb_blobutil.h>
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 #include <bsl_deque.h>
 #include <bsl_memory.h>
 #include <bsla_annotations.h>
@@ -607,10 +606,11 @@ void Tester::init(int line)
                   d_allocator_p);
 
     if (d_setPreCreateCb) {
-        d_object->onCreate(bdlf::BindUtil::bind(&Tester::preCreationCb,
-                                                this,
-                                                bdlf::PlaceHolders::_1,
-                                                bdlf::PlaceHolders::_2));
+        d_object->onCreate(
+            [this](const bsl::shared_ptr<NtcChannel>&               channel,
+                   const bsl::shared_ptr<ChannelFactory::OpHandle>& handle) {
+                preCreationCb(channel, handle);
+            });
     }
 
     int ret = d_object->start();
@@ -636,13 +636,11 @@ void Tester::listen(int                      line,
     ChannelFactory::ResultCallback resultCb(
         bsl::allocator_arg_t(),
         d_allocator_p,
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &Tester::resultCb,
-                              this,
-                              handleNameStr,
-                              bdlf::PlaceHolders::_1,
-                              bdlf::PlaceHolders::_2,
-                              bdlf::PlaceHolders::_3));
+        [this, handleNameStr](ChannelFactoryEvent::Enum       event,
+                              const Status&                   status,
+                              const bsl::shared_ptr<Channel>& channel) {
+            resultCb(handleNameStr, event, status, channel);
+        });
 
     Status status;
     d_object->listen(&status, &opHandle, options, resultCb);
@@ -695,13 +693,11 @@ void Tester::connect(int                          line,
     ChannelFactory::ResultCallback resultCb(
         bsl::allocator_arg_t(),
         d_allocator_p,
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &Tester::resultCb,
-                              this,
-                              handleNameStr,
-                              bdlf::PlaceHolders::_1,
-                              bdlf::PlaceHolders::_2,
-                              bdlf::PlaceHolders::_3));
+        [this, handleNameStr](ChannelFactoryEvent::Enum       event,
+                              const Status&                   status,
+                              const bsl::shared_ptr<Channel>& channel) {
+            resultCb(handleNameStr, event, status, channel);
+        });
 
     Status status;
     d_object->connect(&status, &opHandle, reqOptions, resultCb);
@@ -914,29 +910,27 @@ void Tester::checkResultCallback(int                       line,
 
         Channel::CloseFn closeFn(bsl::allocator_arg_t(),
                                  d_allocator_p,
-                                 bdlf::BindUtil::bind(&Tester::channelCloseCb,
-                                                      this,
-                                                      channelNameStr));
+                                 [this, channelNameStr](const Status&) {
+                                     channelCloseCb(channelNameStr);
+                                 });
         cbInfo.d_channel->onClose(closeFn);
 
         Channel::WatermarkFn watermarkFn(
             bsl::allocator_arg_t(),
             d_allocator_p,
-            bdlf::BindUtil::bind(&Tester::channelWatermarkCb,
-                                 this,
-                                 channelNameStr,
-                                 bdlf::PlaceHolders::_1));
+            [this, channelNameStr](ChannelWatermarkType::Enum watermarkType) {
+                channelWatermarkCb(channelNameStr, watermarkType);
+            });
         cbInfo.d_channel->onWatermark(watermarkFn);
 
         Channel::ReadCallback readCb(
             bsl::allocator_arg_t(),
             bmqtst::TestHelperUtil::allocator(),
-            bdlf::BindUtil::bind(&Tester::channelReadCb,
-                                 this,
-                                 channelName,
-                                 bdlf::PlaceHolders::_1,
-                                 bdlf::PlaceHolders::_2,
-                                 bdlf::PlaceHolders::_3));
+            [this, channelName](const Status& status,
+                                int*          numNeeded,
+                                bdlbb::Blob*  blob) {
+                channelReadCb(channelName, status, numNeeded, blob);
+            });
         Status readStatus(bmqtst::TestHelperUtil::allocator());
         cbInfo.d_channel->read(&readStatus, 1, readCb);
         if (readStatus) {
@@ -1050,12 +1044,13 @@ void Tester::startFilteringLogs(const bsl::string& messageSubstring)
                                  bmqtst::TestHelperUtil::allocator());
 
     bsl::shared_ptr<ball::FilteringObserver> filtObserver;
-    filtObserver.createInplace(bmqtst::TestHelperUtil::allocator(),
-                               d_ballObserver,
-                               bdlf::BindUtil::bind(&ballFilter,
-                                                    messageSubstring,
-                                                    bdlf::PlaceHolders::_1,
-                                                    bdlf::PlaceHolders::_2));
+    filtObserver.createInplace(
+        bmqtst::TestHelperUtil::allocator(),
+        d_ballObserver,
+        [messageSubstring](const ball::Record&  record,
+                           const ball::Context& context) {
+            return ballFilter(messageSubstring, record, context);
+        });
 
     ball::LoggerManager::singleton().deregisterObserver(k_BALL_OBSERVER_NAME);
     ball::LoggerManager::singleton().registerObserver(filtObserver,
@@ -1150,12 +1145,10 @@ static void test7_checkMultithreadListen()
             bmqtst::TestHelperUtil::allocator());
         attributes.setThreadName("Listener-" + bsl::to_string(i + 1));
 
-        bsl::function<void(void)> task = bdlf::BindUtil::bindS(
-            bmqtst::TestHelperUtil::allocator(),
-            LocalFuncs::listenerThreadFunc,
-            &doneLatch,
-            &t.object(),
-            port);
+        bsl::function<void(void)> task =
+            [&doneLatch, cf = &t.object(), port]() {
+                LocalFuncs::listenerThreadFunc(&doneLatch, cf, port);
+            };
 
         const int rc = bslmt::ThreadUtil::createWithAllocator(
             &handles[i],
