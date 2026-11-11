@@ -36,7 +36,6 @@
 #include <bdlb_string.h>
 #include <bdlbb_blobutil.h>
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 #include <bsl_iosfwd.h>
 #include <bsls_assert.h>
 #include <bsls_types.h>
@@ -203,7 +202,9 @@ int ClusterStateLedgerUtil::extractLogId(mqbu::StorageKey*  logId,
         return ClusterStateLedgerUtilRc::e_FILE_OPEN_FAILURE;  // RETURN
     }
 
-    bdlb::ScopeExitAny guard(bdlf::BindUtil::bind(::close, fd));
+    bdlb::ScopeExitAny guard([fd]() {
+        ::close(fd);
+    });
 
     // Read file header
     ClusterStateFileHeader header;
