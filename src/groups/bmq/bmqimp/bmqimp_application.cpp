@@ -223,11 +223,10 @@ bslma::ManagedPtr<bmqio::ChannelFactoryPipeline> makeChannelFactoryPipeline(
         }
     };
 
-    bsl::shared_ptr<bmqio::NtcChannelFactory> channelFactory =
-        bsl::make_shared<bmqio::NtcChannelFactory>(
-            ntcCreateInterfaceConfig(sessionOptions, allocator),
-            blobBufferFactory,
-            allocator);
+    auto channelFactory = bsl::make_shared<bmqio::NtcChannelFactory>(
+        ntcCreateInterfaceConfig(sessionOptions, allocator),
+        blobBufferFactory,
+        allocator);
 
     bmqio::ChannelFactoryPipeline::Config builder(channelFactory, allocator);
     builder
