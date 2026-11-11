@@ -1733,10 +1733,10 @@ void ClientSession::onPushEvent(const mqbevt::PushEvent& event)
     if (BALL_LOG_IS_ENABLED(ball::Severity::e_TRACE)) {
         // If there are multiple subStreams, we add the corresponding
         // subQueueInfos.
-        for (size_t i = 0; i < event.subQueueInfos().size(); ++i) {
+        for (const auto& subQueueInfo : event.subQueueInfos()) {
             BALL_LOG_TRACE << description() << ": PUSH'ing message "
                            << "[queue: '" << handle_p->queue()->uri() << "'"
-                           << ", subQueueInfo: " << event.subQueueInfos()[i]
+                           << ", subQueueInfo: " << subQueueInfo
                            << ", GUID: " << event.guid() << "]:\n"
                            << bmqu::BlobStartHexDumper(blob, k_PAYLOAD_DUMP);
         }
@@ -1815,10 +1815,8 @@ void ClientSession::onPushEvent(const mqbevt::PushEvent& event)
                  ? !handleRequesterContext()->isFirstHop()
                  : false);
 
-        for (bmqp::Protocol::SubQueueInfosArray::size_type i = 0;
-             i < event.subQueueInfos().size();
-             ++i) {
-            unsigned int subscriptionId = event.subQueueInfos()[i].id();
+        for (const auto& subQueueInfo : event.subQueueInfos()) {
+            unsigned int               subscriptionId = subQueueInfo.id();
             StreamsMap::const_iterator subQueueCiter =
                 context_p->d_subQueueInfosMap.findBySubscriptionIdSafe(
                     subscriptionId);
@@ -1844,7 +1842,7 @@ void ClientSession::onPushEvent(const mqbevt::PushEvent& event)
                         << ": PUSH for an unknown subStream of the queue "
                            "[queue: '"
                         << handle_p->queue()->uri()
-                        << "', subQueueInfo: " << event.subQueueInfos()[i]
+                        << "', subQueueInfo: " << subQueueInfo
                         << ", GUID: " << event.guid() << "]:\n"
                         << bmqu::BlobStartHexDumper(blob, k_PAYLOAD_DUMP);
 
@@ -3012,11 +3010,9 @@ void ClientSession::processStopRequest(ShutdownContextSp& contextSp)
 
         return;  // RETURN
     }
-    for (QueueStateMapCIter cit = d_queueSessionManager.queues().begin();
-         cit != d_queueSessionManager.queues().end();
-         ++cit) {
-        if (!cit->second.d_hasReceivedFinalCloseQueue) {
-            cit->second.d_handle_p->deconfigureAll([this, contextSp]() {
+    for (const auto& [queueId, queueState] : d_queueSessionManager.queues()) {
+        if (!queueState.d_hasReceivedFinalCloseQueue) {
+            queueState.d_handle_p->deconfigureAll([this, contextSp]() {
                 onDeconfiguredHandle(contextSp);
             });
         }
@@ -3026,15 +3022,13 @@ void ClientSession::processStopRequest(ShutdownContextSp& contextSp)
 int ClientSession::dropAllQueueHandles(bool doDeconfigure, bool hasLostClient)
 {
     int numHandlesDropped = 0;
-    for (QueueStateMapIter it = d_queueSessionManager.queues().begin();
-         it != d_queueSessionManager.queues().end();
-         ++it) {
-        it->second.d_handle_p->clearClient(hasLostClient);
+    for (auto& [queueId, queueState] : d_queueSessionManager.queues()) {
+        queueState.d_handle_p->clearClient(hasLostClient);
 
-        if (!it->second.d_hasReceivedFinalCloseQueue) {
-            it->second.d_handle_p->drop(doDeconfigure);
-            it->second.d_handle_p                   = 0;
-            it->second.d_hasReceivedFinalCloseQueue = true;
+        if (!queueState.d_hasReceivedFinalCloseQueue) {
+            queueState.d_handle_p->drop(doDeconfigure);
+            queueState.d_handle_p                   = 0;
+            queueState.d_hasReceivedFinalCloseQueue = true;
             ++numHandlesDropped;
         }
     }
