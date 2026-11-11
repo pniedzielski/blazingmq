@@ -570,9 +570,9 @@ ExecutionUtil::execute(const ExecutionPolicy<EXECUTOR>& policy, FUNCTION&& f)
         Task task(bsl::forward<FUNCTION>(f), policy.allocator());
 
         // submit the function object for execution via 'dispatch'
-        ExecutorTraits<EXECUTOR>::dispatch(
-            policy.executor(),
-            bdlf::MemFnUtil::memFn(&Task::operator(), &task));
+        ExecutorTraits<EXECUTOR>::dispatch(policy.executor(), [&task]() {
+            task();
+        });
 
         // block the calling thread pending completion of the submitted
         // function object invocation
