@@ -224,11 +224,10 @@ void RootQueueEngine::deliverMessages(AppState* app)
     }
 
     if (delay != bsls::TimeInterval()) {
-        app->scheduleThrottle(
-            bmqu::Time::nowMonotonicClock() + delay,
-            bdlf::BindUtil::bind(&RootQueueEngine::deliverMessages,
-                                 this,
-                                 app));
+        app->scheduleThrottle(bmqu::Time::nowMonotonicClock() + delay,
+                              [this, app]() {
+                                  deliverMessages(app);
+                              });
     }
 
     if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(numMessages > 0)) {
@@ -340,15 +339,15 @@ RootQueueEngine::RootQueueEngine(QueueState*             queueState,
 : d_queueState_p(queueState)
 , d_consumptionMonitor(
       queueState,
-      bdlf::BindUtil::bind(&RootQueueEngine::haveUndeliveredCb,
-                           this,
-                           bdlf::PlaceHolders::_1,   // alarmTime_p
-                           bdlf::PlaceHolders::_2,   // appId
-                           bdlf::PlaceHolders::_3),  // now
-      bdlf::BindUtil::bind(&RootQueueEngine::logAlarmCb,
-                           this,
-                           bdlf::PlaceHolders::_1,   // appId
-                           bdlf::PlaceHolders::_2),  // oldestMsgIt
+      [this](bsls::TimeInterval*       alarmTime_p,
+             const bsl::string&        appId,
+             const bsls::TimeInterval& now) {
+          return haveUndeliveredCb(alarmTime_p, appId, now);
+      },
+      [this](const bsl::string&                              appId,
+             const bslma::ManagedPtr<mqbi::StorageIterator>& oldestMsgIt) {
+          logAlarmCb(appId, oldestMsgIt);
+      },
       allocator)
 , d_apps(allocator)
 , d_hasAppSubscriptions(false)
@@ -358,10 +357,9 @@ RootQueueEngine::RootQueueEngine(QueueState*             queueState,
 , d_appsDeliveryContext(d_queueState_p->queue(), allocator)
 , d_flowController()
 , d_flowControlEventHandle()
-, d_flowControlTimerCb(
-      bdlf::BindUtil::bindS(allocator,
-                            &RootQueueEngine::onFlowControlTimer,
-                            this))
+, d_flowControlTimerCb([this]() {
+    onFlowControlTimer();
+})
 , d_allocator_p(allocator)
 {
     // PRECONDITIONS
@@ -1067,12 +1065,11 @@ void RootQueueEngine::configureHandle(
         &d_queueState_p->routingContext());
 
     d_queueState_p->handleCatalog().iterateConsumers(
-        bdlf::BindUtil::bind(&RootQueueEngine::rebuildSelectedApp,
-                             this,
-                             bdlf::PlaceHolders::_1,  // handle
-                             bdlf::PlaceHolders::_2,  // info
-                             iter,
-                             previous.get()));
+        [this, iter, previousApp = previous.get()](
+            mqbi::QueueHandle*                   queueHandle,
+            const mqbi::QueueHandle::StreamInfo& info) {
+            rebuildSelectedApp(queueHandle, info, iter, previousApp);
+        });
 
     affectedApp->routing()->finalize();
     affectedApp->routing()->apply();
@@ -1439,10 +1436,9 @@ void RootQueueEngine::afterNewMessage()
             d_scheduler_p->scheduleEvent(
                 &d_flowControlEventHandle,
                 now + timeout,
-                bdlf::BindUtil::bindS(d_allocator_p,
-                                      executeInQueueDispatcher,
-                                      queue,
-                                      d_flowControlTimerCb));
+                [queue, timerCb = d_flowControlTimerCb]() {
+                    executeInQueueDispatcher(queue, timerCb);
+                });
         }
 
         // bypass the loop and go to the cleaning at the end.
@@ -1717,15 +1713,22 @@ int RootQueueEngine::onRejectMessage(
                         msgGUID);
                     BSLS_ASSERT_SAFE(retrievalRc == 0);
                     static_cast<void>(retrievalRc);
-                    d_miscWorkThreadPool_p->enqueueJob(bdlf::BindUtil::bind(
-                        &QueueEngineUtil::logRejectMessage,
-                        msgGUID,
-                        app.appId(),
-                        app.upstreamSubQueueId(),
-                        appData,
-                        attributes,
-                        d_queueState_p,
-                        d_allocator_p));
+                    d_miscWorkThreadPool_p->enqueueJob(
+                        [msgGUID,
+                         appId         = app.appId(),
+                         appSubQueueId = app.upstreamSubQueueId(),
+                         appData,
+                         attributes,
+                         queueState = d_queueState_p,
+                         allocator  = d_allocator_p]() {
+                            QueueEngineUtil::logRejectMessage(msgGUID,
+                                                              appId,
+                                                              appSubQueueId,
+                                                              appData,
+                                                              attributes,
+                                                              queueState,
+                                                              allocator);
+                        });
                 }
                 d_queueState_p->stats()
                     ->onEvent<mqbstat::QueueStatsDomain::EventType::e_REJECT>(
@@ -2279,9 +2282,9 @@ void RootQueueEngine::evaluateAppSubscriptions(
 
     queue.d_preader->next(appData, mpi);
 
-    bdlb::ScopeExitAny guard(
-        bdlf::BindUtil::bind(&Routers::MessagePropertiesReader::clear,
-                             queue.d_preader));
+    bdlb::ScopeExitAny guard([preader = queue.d_preader]() {
+        preader->clear();
+    });
 
     d_queueState_p->storage()->selectForAutoConfirming(
         putHeader.messageGUID());
