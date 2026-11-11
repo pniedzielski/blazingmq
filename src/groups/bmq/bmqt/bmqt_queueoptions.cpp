@@ -108,13 +108,11 @@ QueueOptions::print(bsl::ostream& stream, int level, int spacesPerLevel) const
 
         stream << "Subscriptions:";
 
-        for (Subscriptions::const_iterator cit = d_subscriptions.begin();
-             cit != d_subscriptions.end();
-             ++cit) {
+        for (const auto& [handle, subscription] : d_subscriptions) {
             stream << "\n";
 
-            cit->first.print(stream, level + 1, spacesPerLevel);
-            cit->second.print(stream, level + 2, spacesPerLevel);
+            handle.print(stream, level + 1, spacesPerLevel);
+            subscription.print(stream, level + 2, spacesPerLevel);
         }
     }
 
@@ -221,10 +219,8 @@ void QueueOptions::loadSubscriptions(SubscriptionsSnapshot* snapshot) const
     BSLS_ASSERT_SAFE(snapshot);
     snapshot->clear();
 
-    for (Subscriptions::const_iterator cit = d_subscriptions.begin();
-         cit != d_subscriptions.end();
-         ++cit) {
-        snapshot->emplace_back(cit->first, cit->second);
+    for (const auto& [handle, subscription] : d_subscriptions) {
+        snapshot->emplace_back(handle, subscription);
     }
     // If 'd_hadSubscriptions == false', add default subscription.
     if (snapshot->empty() && !d_hadSubscriptions) {
