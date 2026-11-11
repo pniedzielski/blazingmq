@@ -2363,9 +2363,8 @@ class DTTestSpan : public bmqpi::DTSpan {
         bmqu::MemOutStream event(d_allocator_p);
         event << "START " << d_operation;
 
-        bmqpi::DTSpan::Baggage::const_iterator it = baggage.begin();
-        for (; it != baggage.end(); ++it) {
-            event << "; " << it->first << "=" << it->second;
+        for (const auto& [key, value] : baggage) {
+            event << "; " << key << "=" << value;
         }
 
         d_eventsQueue_p->pushBack(event.str());
@@ -4836,11 +4835,7 @@ static void queueAsyncCanceled_OPEN_OPENING()
         },
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const AsyncCancelTestData& test = k_DATA[idx];
-
+    for (const AsyncCancelTestData& test : k_DATA) {
         queueAsyncCanceled(test.d_line,
                            test.d_queueTestStep,
                            test.d_queueFlags,
@@ -4905,11 +4900,7 @@ static void queueAsyncCanceled_OPEN_CONFIGURING()
         },
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const AsyncCancelTestData& test = k_DATA[idx];
-
+    for (const AsyncCancelTestData& test : k_DATA) {
         queueAsyncCanceled(test.d_line,
                            test.d_queueTestStep,
                            test.d_queueFlags,
@@ -4972,11 +4963,7 @@ static void queueAsyncCanceled_REOPEN_OPENING()
         },
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const AsyncCancelTestData& test = k_DATA[idx];
-
+    for (const AsyncCancelTestData& test : k_DATA) {
         queueAsyncCanceled(test.d_line,
                            test.d_queueTestStep,
                            test.d_queueFlags,
@@ -5039,11 +5026,7 @@ static void queueAsyncCanceled_REOPEN_CONFIGURING()
         },
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const AsyncCancelTestData& test = k_DATA[idx];
-
+    for (const AsyncCancelTestData& test : k_DATA) {
         queueAsyncCanceled(test.d_line,
                            test.d_queueTestStep,
                            test.d_queueFlags,
@@ -5106,11 +5089,7 @@ static void queueAsyncCanceled_CONFIGURING()
         },
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const AsyncCancelTestData& test = k_DATA[idx];
-
+    for (const AsyncCancelTestData& test : k_DATA) {
         queueAsyncCanceled(test.d_line,
                            test.d_queueTestStep,
                            test.d_queueFlags,
@@ -5173,11 +5152,7 @@ static void queueAsyncCanceled_CONFIGURING_RECONFIGURING()
         },
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const AsyncCancelTestData& test = k_DATA[idx];
-
+    for (const AsyncCancelTestData& test : k_DATA) {
         queueAsyncCanceled(test.d_line,
                            test.d_queueTestStep,
                            test.d_queueFlags,
@@ -5240,11 +5215,7 @@ static void queueAsyncCanceled_CLOSE_CONFIGURING()
         },
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const AsyncCancelTestData& test = k_DATA[idx];
-
+    for (const AsyncCancelTestData& test : k_DATA) {
         queueAsyncCanceled(test.d_line,
                            test.d_queueTestStep,
                            test.d_queueFlags,
@@ -5307,11 +5278,7 @@ static void queueAsyncCanceled_CLOSE_CLOSING()
         },
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const AsyncCancelTestData& test = k_DATA[idx];
-
+    for (const AsyncCancelTestData& test : k_DATA) {
         queueAsyncCanceled(test.d_line,
                            test.d_queueTestStep,
                            test.d_queueFlags,
@@ -7745,11 +7712,11 @@ static void test44_hostHealthMonitoringMultipleQueues()
                                    sizeof(naiveWriters[0]);
 
     PVV_SAFE("Step 4. Test with readers only.");
-    for (size_t k = 0; k < numSensitiveReaders; k++) {
-        obj.openQueue(sensitiveReaders[k]);
+    for (const bsl::shared_ptr<bmqimp::Queue>& queue : sensitiveReaders) {
+        obj.openQueue(queue);
     }
-    for (size_t k = 0; k < numNaiveReaders; k++) {
-        obj.openQueue(naiveReaders[k]);
+    for (const bsl::shared_ptr<bmqimp::Queue>& queue : naiveReaders) {
+        obj.openQueue(queue);
     }
     testHostHealthWithMultipleQueues(&obj,
                                      monitor,
@@ -7763,11 +7730,11 @@ static void test44_hostHealthMonitoringMultipleQueues()
                                      0);
 
     PVV_SAFE("Step 5. Test with mixed readers and writers.");
-    for (size_t k = 0; k < numSensitiveWriters; k++) {
-        obj.openQueue(sensitiveWriters[k]);
+    for (const bsl::shared_ptr<bmqimp::Queue>& queue : sensitiveWriters) {
+        obj.openQueue(queue);
     }
-    for (size_t k = 0; k < numNaiveWriters; k++) {
-        obj.openQueue(naiveWriters[k]);
+    for (const bsl::shared_ptr<bmqimp::Queue>& queue : naiveWriters) {
+        obj.openQueue(queue);
     }
     testHostHealthWithMultipleQueues(&obj,
                                      monitor,
@@ -7781,11 +7748,11 @@ static void test44_hostHealthMonitoringMultipleQueues()
                                      numNaiveWriters);
 
     PVV_SAFE("Step 6. Test with writers only.");
-    for (size_t k = 0; k < numSensitiveReaders; k++) {
-        obj.closeQueue(sensitiveReaders[k], bsls::TimeInterval(5), true);
+    for (const bsl::shared_ptr<bmqimp::Queue>& queue : sensitiveReaders) {
+        obj.closeQueue(queue, bsls::TimeInterval(5), true);
     }
-    for (size_t k = 0; k < numNaiveReaders; k++) {
-        obj.closeQueue(naiveReaders[k], bsls::TimeInterval(5), true);
+    for (const bsl::shared_ptr<bmqimp::Queue>& queue : naiveReaders) {
+        obj.closeQueue(queue, bsls::TimeInterval(5), true);
     }
     testHostHealthWithMultipleQueues(&obj,
                                      monitor,
