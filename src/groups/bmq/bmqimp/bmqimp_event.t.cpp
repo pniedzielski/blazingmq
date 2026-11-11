@@ -32,7 +32,6 @@
 // BDE
 #include <bdlbb_blobutil.h>
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
@@ -351,7 +350,9 @@ static void test2_setterGetterTest()
 
     // setDoneCallback / doneCallback / lookupQueue
     int input = 7;
-    obj.setDoneCallback(bdlf::BindUtil::bind(dummy_doneCallback, &input));
+    obj.setDoneCallback([&input]() {
+        dummy_doneCallback(&input);
+    });
     obj.doneCallback()();
     BMQTST_ASSERT_EQ(8, input);
 
@@ -1509,7 +1510,9 @@ static void test11_doneCallbackTest()
 
     // setDoneCallback / clear
     int input = 7;
-    obj.setDoneCallback(bdlf::BindUtil::bind(dummy_doneCallback, &input));
+    obj.setDoneCallback([&input]() {
+        dummy_doneCallback(&input);
+    });
     obj.clear();
     BMQTST_ASSERT_EQ(8, input);
 
