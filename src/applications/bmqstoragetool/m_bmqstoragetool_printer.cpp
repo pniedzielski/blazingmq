@@ -69,12 +69,10 @@ void printMessageDetails(bsl::ostream&         os,
     const bsl::vector<RecordDetails<mqbs::ConfirmRecord> >& confirmRecords =
         details.confirmRecords();
     if (!confirmRecords.empty()) {
-        typename bsl::vector<
-            RecordDetails<mqbs::ConfirmRecord> >::const_iterator it =
-            confirmRecords.begin();
-        for (; it != confirmRecords.end(); ++it) {
+        for (const RecordDetails<mqbs::ConfirmRecord>& confirmRecord :
+             confirmRecords) {
             RecordPrinter::printDelimeter<PRINTER_TYPE>(os);
-            printer.printRecordDetails(*it);
+            printer.printRecordDetails(confirmRecord);
         }
     }
 
@@ -292,12 +290,9 @@ void printQueueDetails(bsl::ostream&          ostream,
                 // Sort Apps by number of records ascending
                 AppsData appsData(allocator);
                 appsData.reserve(appKeysCount);
-                for (QueueDetails::AppDetailsMap::const_iterator appIt =
-                         details.d_appDetailsMap.cbegin();
-                     appIt != details.d_appDetailsMap.cend();
-                     ++appIt) {
-                    appsData.emplace_back(appIt->second.d_recordsNumber,
-                                          appIt->first);
+                for (const auto& [appKey, appDetails] :
+                     details.d_appDetailsMap) {
+                    appsData.emplace_back(appDetails.d_recordsNumber, appKey);
                 }
                 bsl::sort(appsData.begin(), appsData.end());
 
@@ -636,9 +631,8 @@ void HumanReadablePrinter::printGuidsNotFound(const GuidsList& guids) const
     if (!guids.empty()) {
         d_ostream << "\nThe following " << guids.size()
                   << " GUID(s) not found:\n";
-        GuidsList::const_iterator it = guids.cbegin();
-        for (; it != guids.cend(); ++it) {
-            d_ostream << *it << '\n';
+        for (const bmqt::MessageGUID& guid : guids) {
+            d_ostream << guid << '\n';
         }
     }
 }
@@ -649,9 +643,8 @@ void HumanReadablePrinter::printOffsetsNotFound(
     if (!offsets.empty()) {
         d_ostream << "\nThe following " << offsets.size()
                   << " offset(s) not found:\n";
-        OffsetsVec::const_iterator it = offsets.cbegin();
-        for (; it != offsets.cend(); ++it) {
-            d_ostream << *it << '\n';
+        for (const bsls::Types::Int64 offset : offsets) {
+            d_ostream << offset << '\n';
         }
     }
 }
@@ -662,9 +655,8 @@ void HumanReadablePrinter::printCompositesNotFound(
     if (!seqNums.empty()) {
         d_ostream << "\nThe following " << seqNums.size()
                   << " sequence number(s) not found:\n";
-        CompositesVec::const_iterator it = seqNums.cbegin();
-        for (; it != seqNums.cend(); ++it) {
-            d_ostream << *it << '\n';
+        for (const CompositeSequenceNumber& seqNum : seqNums) {
+            d_ostream << seqNum << '\n';
         }
     }
 }
