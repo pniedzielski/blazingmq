@@ -102,15 +102,13 @@ TablePrinter::TablePrinter(const StatContextsMap& statContextsMap,
 , d_contexts(allocator)
 {
     // Insert all the required Contexts
-    for (StatContextsMap::const_iterator it = statContextsMap.begin();
-         it != statContextsMap.end();
-         ++it) {
+    for (const auto& [name, statContext] : statContextsMap) {
         bsl::shared_ptr<Context> contextSp;
         contextSp.createInplace(allocator);
 
         ContextsMap::iterator cit =
-            d_contexts.insert(bsl::make_pair(it->first, contextSp)).first;
-        cit->second->d_statContext_p = it->second;
+            d_contexts.insert(bsl::make_pair(name, contextSp)).first;
+        cit->second->d_statContext_p = statContext;
     }
 
     if (historySize > 0) {

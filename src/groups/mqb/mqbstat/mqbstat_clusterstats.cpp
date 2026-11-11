@@ -327,13 +327,11 @@ void ClusterStats::setPartitionCfgBytes(bsls::Types::Int64 dataBytes,
         ClusterStatsIndex::e_PARTITION_CFG_JOURNAL_BYTES,
         journalBytes);
     d_statContext_mp->setValue(ClusterStatsIndex::e_CSL_CFG_BYTES, cslBytes);
-    bsl::vector<bsl::shared_ptr<PartitionStats> >::const_iterator it =
-        d_partitionsStats.cbegin();
-    for (; it != d_partitionsStats.cend(); ++it) {
-        (*it)->statContext()->setValue(
+    for (const auto& partitionStats : d_partitionsStats) {
+        partitionStats->statContext()->setValue(
             ClusterStatsIndex::e_PARTITION_CFG_DATA_BYTES,
             dataBytes);
-        (*it)->statContext()->setValue(
+        partitionStats->statContext()->setValue(
             ClusterStatsIndex::e_PARTITION_CFG_JOURNAL_BYTES,
             journalBytes);
     }

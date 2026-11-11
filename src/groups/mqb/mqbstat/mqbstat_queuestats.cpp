@@ -441,13 +441,12 @@ void QueueStatsDomain::initialize(const bmqt::Uri& uri, mqbi::Domain* domain)
         domainCfg->mode().fanout().publishAppIdMetrics()) {
         const bsl::vector<bsl::string>& appIDs =
             domainCfg->mode().fanout().appIDs();
-        for (bsl::vector<bsl::string>::const_iterator cit = appIDs.begin();
-             cit != appIDs.end();
-             ++cit) {
+        for (const bsl::string& appId : appIDs) {
             StatSubContextMp subContext = d_statContext_mp->addSubcontext(
-                bmqst::StatContextConfiguration(*cit, &localAllocator));
+                bmqst::StatContextConfiguration(appId, &localAllocator));
 
-            d_subContextsLookup.insert(bsl::make_pair(*cit, subContext.get()));
+            d_subContextsLookup.insert(
+                bsl::make_pair(appId, subContext.get()));
             d_subContextsHolder.emplace_back(bsl::move(subContext));
         }
     }
@@ -590,14 +589,11 @@ void QueueStatsDomain::updateDomainAppIds(
     // 2. Add the remaining appIds
     bdlma::LocalSequentialAllocator<2048> localAllocator(d_allocator_p);
 
-    for (bsl::unordered_set<bsl::string>::const_iterator sIt =
-             remainingAppIds.begin();
-         sIt != remainingAppIds.end();
-         sIt++) {
+    for (const bsl::string& appId : remainingAppIds) {
         StatSubContextMp subContext = d_statContext_mp->addSubcontext(
-            bmqst::StatContextConfiguration(*sIt, &localAllocator));
+            bmqst::StatContextConfiguration(appId, &localAllocator));
 
-        d_subContextsLookup.insert(bsl::make_pair(*sIt, subContext.get()));
+        d_subContextsLookup.insert(bsl::make_pair(appId, subContext.get()));
         d_subContextsHolder.emplace_back(bsl::move(subContext));
     }
 }
