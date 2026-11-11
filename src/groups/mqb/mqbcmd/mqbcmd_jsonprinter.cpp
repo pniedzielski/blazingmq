@@ -75,20 +75,17 @@ JsonPrinter::printResponses(bsl::ostream&            os,
     bsl::vector<mqbcmd::RouteResponseResult>& responseResults =
         responseResultList.responses();
 
-    for (bsl::vector<mqbcmd::RouteResponse>::const_iterator rit =
-             responseList.responses().begin();
-         rit != responseList.responses().end();
-         rit++) {
+    for (const mqbcmd::RouteResponse& response : responseList.responses()) {
         mqbcmd::RouteResponseResult result;
-        result.sourceNodeDescription() = rit->sourceNodeDescription();
-        bsl::istringstream jsonStream(rit->response());
+        result.sourceNodeDescription() = response.sourceNodeDescription();
+        bsl::istringstream jsonStream(response.response());
         const int          rc = decoder.decode(jsonStream,
                                       &result.result(),
                                       decoderOptions);
         if (0 != rc) {
             BALL_LOG_SET_CATEGORY(k_LOG_CATEGORY);
-            BALL_LOG_ERROR << "failed to decode result [" << rit->response()
-                           << "] , rc = " << rc;
+            BALL_LOG_ERROR << "failed to decode result ["
+                           << response.response() << "] , rc = " << rc;
             return os;  // RETURN
         }
         responseResults.push_back(result);
