@@ -98,8 +98,8 @@ char* addRecords(bslma::Allocator*                                  ta,
         bsl::vector<unsigned int>& appIdWords    = appIdWordsVec[i];
         bsl::vector<unsigned int>& appIdPaddings = appIdPaddingsVec[i];
 
-        for (size_t j = 0; j < appIds.size(); ++j) {
-            length = appIds[j].length();
+        for (const bsl::string& appId : appIds) {
+            length = appId.length();
 
             if (0 == length) {
                 appIdWords.push_back(0);
