@@ -42,10 +42,10 @@ bsls::Types::Uint64 SequentialContext_ThreadUtil::invalidThreadId() noexcept
 // -----------------------
 
 // PRIVATE MANIPULATORS
-void SequentialContext::run() BSLS_NOTHROW_SPEC
+void SequentialContext::run() noexcept
 {
-    // NOTE: 'BSLS_NOTHROW_SPEC' specification ensures that 'bsl::terminate' is
-    //       called in case of exception in C++03.
+    // NOTE: The 'noexcept' specification ensures that 'bsl::terminate' is
+    //       called in case of exception.
 
     bslmt::LockGuard<bslmt::Mutex> lock(&d_mutex);  // LOCK
 

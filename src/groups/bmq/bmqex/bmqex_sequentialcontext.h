@@ -96,7 +96,6 @@
 #include <bslmt_mutex.h>
 #include <bslmt_threadutil.h>
 #include <bsls_atomic.h>
-#include <bsls_exceptionutil.h>  // BSLS_NOTHROW_SPEC
 
 namespace BloombergLP {
 
@@ -175,7 +174,7 @@ class SequentialContext {
 
   private:
     // PRIVATE MANIPULATORS
-    void run() BSLS_NOTHROW_SPEC;
+    void run() noexcept;
 
   private:
     // NOT IMPLEMENTED

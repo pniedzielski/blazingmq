@@ -175,7 +175,6 @@
 #include <bslmt_lockguard.h>
 #include <bslmt_mutex.h>
 #include <bsls_assert.h>
-#include <bsls_exceptionutil.h>  // BSLS_NOTHROW_SPEC
 
 #include <bsl_initializer_list.h>
 #include <bsl_type_traits.h>
@@ -393,7 +392,7 @@ class OperationChain_Job {
     /// contained operation callback. On completion, invoke the contained
     /// completion callback and notify the specified operation `chain` using
     /// the specified `jobHandle`.
-    void execute(OperationChain* chain, JobHandle jobHandle) BSLS_NOTHROW_SPEC;
+    void execute(OperationChain* chain, JobHandle jobHandle) noexcept;
 
   public:
     // ACCESSORS
@@ -796,10 +795,10 @@ inline OperationChain_Job::~OperationChain_Job()
 
 // MANIPULATORS
 inline void OperationChain_Job::execute(OperationChain* chain,
-                                        JobHandle jobHandle) BSLS_NOTHROW_SPEC
+                                        JobHandle       jobHandle) noexcept
 {
-    // NOTE: 'BSLS_NOTHROW_SPEC' specification ensures that 'bsl::terminate' is
-    //       called in case of exception in C++03.
+    // NOTE: The 'noexcept' specification ensures that 'bsl::terminate' is
+    //       called in case of exception.
 
     // PRECONDITIONS
     BSLS_ASSERT(chain);

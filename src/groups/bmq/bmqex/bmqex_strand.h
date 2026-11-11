@@ -86,7 +86,6 @@
 #include <bslmt_mutex.h>
 #include <bslmt_threadutil.h>
 #include <bsls_atomic.h>
-#include <bsls_exceptionutil.h>  // BSLS_NOTHROW_SPEC
 
 namespace BloombergLP {
 
@@ -161,7 +160,7 @@ class Strand {
 
     /// Invoke functors from the job queue until either the queue is empty,
     /// or the context is stopped. Then, signal the condition.
-    void run() BSLS_NOTHROW_SPEC;
+    void run() noexcept;
 
   private:
     // NOT IMPLEMENTED
@@ -352,10 +351,10 @@ void swap(StrandExecutor<EXECUTOR>& lhs,
 
 // PRIVATE MANIPULATORS
 template <class EXECUTOR>
-inline void Strand<EXECUTOR>::run() BSLS_NOTHROW_SPEC
+inline void Strand<EXECUTOR>::run() noexcept
 {
-    // NOTE: 'BSLS_NOTHROW_SPEC' specification ensures that 'bsl::terminate' is
-    //       called in case of exception in C++03.
+    // NOTE: The 'noexcept' specification ensures that 'bsl::terminate' is
+    //       called in case of exception.
 
     bslmt::LockGuard<bslmt::Mutex> lock(&d_mutex);  // LOCK
 

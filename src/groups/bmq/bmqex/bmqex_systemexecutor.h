@@ -76,7 +76,6 @@
 #include <bslmt_threadutil.h>
 #include <bsls_assert.h>
 #include <bsls_atomic.h>
-#include <bsls_exceptionutil.h>  // BSLS_NOTHROW_SPEC
 #include <bsls_spinlock.h>
 
 namespace BloombergLP {
@@ -179,7 +178,7 @@ class SystemExecutor_Context {
 
     /// This function is executed when a spawned thread starts.
     template <class THREAD_DATA>
-    void onThreadRun(THREAD_DATA* threadData) BSLS_NOTHROW_SPEC;
+    void onThreadRun(THREAD_DATA* threadData) noexcept;
 
     /// This function is called by a spawned thread before completion to
     /// establish necessary postconditions.
@@ -364,10 +363,10 @@ SystemExecutor_Context::threadRunHandler(void* threadData) noexcept
 // PRIVATE MANIPULATORS
 template <class THREAD_DATA>
 inline void
-SystemExecutor_Context::onThreadRun(THREAD_DATA* threadData) BSLS_NOTHROW_SPEC
+SystemExecutor_Context::onThreadRun(THREAD_DATA* threadData) noexcept
 {
-    // NOTE: 'BSLS_NOTHROW_SPEC' specification ensures that 'bsl::terminate' is
-    //       called in case of exception in C++03.
+    // NOTE: The 'noexcept' specification ensures that 'bsl::terminate' is
+    //       called in case of exception.
 
     // PRECONDITIONS
     BSLS_ASSERT(threadData);
