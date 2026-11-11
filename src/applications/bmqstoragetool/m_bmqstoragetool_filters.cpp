@@ -35,7 +35,7 @@ bool isQueueKeyMatch(const QueueInfos&                           queuesInfo,
         mqbu::StorageKey key(mqbu::StorageKey::BinaryRepresentation(),
                              queueInfo.key().data());
         // Match by queueKey
-        if (queueKeys.find(key) != queueKeys.end()) {
+        if (queueKeys.contains(key)) {
             return true;  // RETURN
         }
     }
@@ -138,10 +138,7 @@ bool Filters::apply(const mqbs::RecordHeader& recordHeader,
     // Apply `queue key` filter
     if (queueKey != mqbu::StorageKey::k_NULL_KEY && !d_queueKeys.empty()) {
         // Match by queueKey
-        auto it = bsl::find(d_queueKeys.cbegin(),
-                            d_queueKeys.cend(),
-                            queueKey);
-        if (it == d_queueKeys.cend()) {
+        if (!d_queueKeys.contains(queueKey)) {
             // Not matched
             return false;  // RETURN
         }
