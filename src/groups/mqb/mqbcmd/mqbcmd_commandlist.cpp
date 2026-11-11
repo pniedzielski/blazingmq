@@ -177,14 +177,13 @@ void CommandList::loadCommands(mqbcmd::Help* out, const bool isPlumbing)
     commands.reserve(BDLB_ARRAYUTIL_SIZE(k_COMMANDS));
     out->isPlumbing() = isPlumbing;
 
-    for (const CommandDefinition* it = k_COMMANDS;
-         it != bdlb::ArrayUtil::end(k_COMMANDS);
-         ++it) {
+    for (const CommandDefinition& definition : k_COMMANDS) {
         commands.resize(commands.size() + 1);
 
         CommandSpec& command  = commands.back();
-        command.command()     = it->d_command;
-        command.description() = isPlumbing ? it->d_summary : it->d_description;
+        command.command()     = definition.d_command;
+        command.description() = isPlumbing ? definition.d_summary
+                                           : definition.d_description;
     }
 }
 
