@@ -550,9 +550,8 @@ void DomainManager::stop()
     bmqu::SharedResource<DomainManager> self(this);
     bslmt::Latch latch(d_domains.size(), bsls::SystemClockType::e_MONOTONIC);
 
-    for (DomainSpMap::iterator it = d_domains.begin(); it != d_domains.end();
-         ++it) {
-        it->second->teardown(bdlf::BindUtil::bind(
+    for (const auto& [domainName, domainSp] : d_domains) {
+        domainSp->teardown(bdlf::BindUtil::bind(
             bmqu::WeakMemFnUtil::weakMemFn(&DomainManager::onDomainClosed,
                                            self.acquireWeak()),
             bdlf::PlaceHolders::_1,  // Domain Name
