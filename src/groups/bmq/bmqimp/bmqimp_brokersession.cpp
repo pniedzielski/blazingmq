@@ -1412,7 +1412,7 @@ void BrokerSession::QueueFsm::actionInitiateQueueResume(
 void BrokerSession::QueueFsm::logOperationTime(const bsl::string& queueUri,
                                                const char*        operation)
 {
-    TimestampMap::iterator it = d_timestampMap.find(queueUri);
+    auto it = d_timestampMap.find(queueUri);
     if (it != d_timestampMap.end()) {
         const bsls::Types::Int64 elapsed = bmqu::Time::highResolutionTimer() -
                                            it->second;
