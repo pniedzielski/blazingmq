@@ -719,9 +719,7 @@
     void Test##NAME ::body()
 
 /// Enable libbenchmark benchmarks on supported platforms.
-/// Note that some benchmark's code contains C++11 features.
-#if (defined(BSLS_PLATFORM_OS_LINUX) || defined(BSLS_PLATFORM_OS_DARWIN)) &&  \
-    (__cplusplus > 199711L)
+#if defined(BSLS_PLATFORM_OS_LINUX) || defined(BSLS_PLATFORM_OS_DARWIN)
 #define BMQTST_BENCHMARK_ENABLED
 #endif
 
