@@ -295,10 +295,10 @@ struct Tester {
                     bmqtst::TestHelperUtil::allocator()),
             bmqtst::TestHelperUtil::allocator());
         d_clusterStateLedger_mp->setCommitCb(
-            bdlf::BindUtil::bind(&Tester::onCommitCb,
-                                 this,
-                                 bdlf::PlaceHolders::_1,    // advisory
-                                 bdlf::PlaceHolders::_2));  // status
+            [this](const bmqp_ctrlmsg::ControlMessage&        advisory,
+                   mqbc::ClusterStateLedgerCommitStatus::Enum status) {
+                onCommitCb(advisory, status);
+            });
 
         bmqp_ctrlmsg::LeaderMessageSequence leaderSeqNum;
         leaderSeqNum.electorTerm()    = 1;

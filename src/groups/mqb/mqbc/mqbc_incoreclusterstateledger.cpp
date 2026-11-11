@@ -50,8 +50,6 @@
 #include <bdlbb_blob.h>
 #include <bdlbb_blobutil.h>
 #include <bdlde_md5.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdls_filesystemutil.h>
 #include <bdlsb_memoutstreambuf.h>
 #include <bdlt_currenttime.h>
@@ -363,11 +361,9 @@ void IncoreClusterStateLedger::onQuorumChangeCb(unsigned int ackQuorum)
     else {
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         d_clusterData_p->cluster().dispatcher()->execute(
-            bdlf::BindUtil::bindS(
-                d_allocator_p,
-                &IncoreClusterStateLedger::reviewUncommittedAdvisories,
-                this,
-                ackQuorum),
+            [this, ackQuorum]() {
+                reviewUncommittedAdvisories(ackQuorum);
+            },
             &d_clusterData_p->cluster());
     }
 }
@@ -1319,22 +1315,20 @@ IncoreClusterStateLedger::IncoreClusterStateLedger(
         .setLogFactory(logFactory)
         .setExtractLogIdCallback(ClusterStateLedgerUtil::extractLogId)
         .setValidateLogCallback(ClusterStateLedgerUtil::validateLog)
-        .setRolloverCallback(
-            bdlf::BindUtil::bind(&IncoreClusterStateLedger::onLogRolloverCb,
-                                 this,
-                                 bdlf::PlaceHolders::_1,   // oldLogId
-                                 bdlf::PlaceHolders::_2))  // newLogId
-        .setCleanupCallback(
-            bdlf::BindUtil::bind(&IncoreClusterStateLedger::cleanupLog,
-                                 this,
-                                 bdlf::PlaceHolders::_1));  // logPath
+        .setRolloverCallback([this](const mqbu::StorageKey& oldLogId,
+                                    const mqbu::StorageKey& newLogId) {
+            return onLogRolloverCb(oldLogId, newLogId);
+        })
+        .setCleanupCallback([this](const bsl::string& logPath) {
+            return cleanupLog(logPath);
+        });
 
     // At the moment the cluster and its *CLUSTER DISPATCHER* thread are not
     // started yet.
     d_clusterData_p->quorumManager().setCallback(
-        bdlf::BindUtil::bind(&IncoreClusterStateLedger::onQuorumChangeCb,
-                             this,
-                             bdlf::PlaceHolders::_1));  // ackQuorum
+        [this](unsigned int ackQuorum) {
+            onQuorumChangeCb(ackQuorum);
+        });
 }
 
 IncoreClusterStateLedger::~IncoreClusterStateLedger()
