@@ -1271,7 +1271,8 @@ static void test3_partitionFullAlarm()
                     poster.postMessage() == mqbi::StorageResult::e_SUCCESS);
 
     // 7. Close and reopen the partition.  Wait for background work from
-    //    the rollover (gcWorkerDispatched, deleteArchiveFilesCb) to finish.
+    //    the rollover (closeAndArchiveFileSet, deleteArchiveFilesCb) to
+    //    finish.
     tester.miscWorkThreadPool().drain();
     tester.scheduler().cancelAllEventsAndWait();
     tester.dispatcher().processQueue();

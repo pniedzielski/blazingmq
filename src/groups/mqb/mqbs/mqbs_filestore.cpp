@@ -3074,7 +3074,7 @@ int FileStore::rolloverImpl(bsls::Types::Uint64 timestamp)
         d_fileSets.erase(d_fileSets.begin());
 
         rc = d_miscWorkThreadPool_p->enqueueJob([this, activeFileSetSp]() {
-            gcWorkerDispatched(activeFileSetSp);
+            closeAndArchiveFileSet(activeFileSetSp);
         });
         BSLS_ASSERT_SAFE(rc == 0);
     }
@@ -3645,18 +3645,18 @@ void FileStore::gc(FileSet* fileSet)
     // Fast path if we are already in dispatcher thread of this file store.
 
     if (inDispatcherThread()) {
-        gcDispatched(d_config.partitionId(), fileSet);
+        retireFileSet(d_config.partitionId(), fileSet);
         return;  // RETURN
     }
 
     // Enqueue an event in the partition's dispatcher thread.
     execute([this, partitionId = d_config.partitionId(), fileSet]() {
-        gcDispatched(partitionId, fileSet);
+        retireFileSet(partitionId, fileSet);
     });
 }
 
-void FileStore::gcDispatched([[maybe_unused]] int partitionId,
-                             FileSet*             fileSet)
+void FileStore::retireFileSet([[maybe_unused]] int partitionId,
+                              FileSet*             fileSet)
 {
     // executed by the *DISPATCHER* thread
 
@@ -3712,12 +3712,12 @@ void FileStore::gcDispatched([[maybe_unused]] int partitionId,
 
     [[maybe_unused]] const int rc = d_miscWorkThreadPool_p->enqueueJob(
         [this, fileSetSp]() {
-            gcWorkerDispatched(fileSetSp);
+            closeAndArchiveFileSet(fileSetSp);
         });
     BSLS_ASSERT_SAFE(rc == 0);
 }
 
-void FileStore::gcWorkerDispatched(const bsl::shared_ptr<FileSet>& fileSet)
+void FileStore::closeAndArchiveFileSet(const bsl::shared_ptr<FileSet>& fileSet)
 {
     // executed by a *WORKER* thread
 
@@ -4128,8 +4128,18 @@ void FileStore::issueSyncPointCb()
         return;  // RETURN
     }
 
-    execute([this, partitionId = d_config.partitionId()]() {
-        issueSyncPointDispatched(partitionId);
+    execute([this]() {
+        // executed by the *DISPATCHER* thread
+
+        if (!d_isOpen || !d_isPrimary || d_isStopping) {
+            return;  // RETURN
+        }
+
+        // This routine is invoked *only* by the scheduled recurring event
+        // which attempts to issue a SyncPt if applicable, which means that
+        // there must be space for at least 2 journal records.
+
+        issueSyncPointIfNeeded();
     });
 }
 
@@ -4143,11 +4153,11 @@ void FileStore::alarmHighwatermarkIfNeededCb()
     }
 
     execute([this]() {
-        alarmHighwatermarkIfNeededDispatched();
+        alarmHighwatermarkIfNeeded();
     });
 }
 
-void FileStore::alarmHighwatermarkIfNeededDispatched()
+void FileStore::alarmHighwatermarkIfNeeded()
 {
     // executed by the *DISPATCHER* thread
 
@@ -4229,21 +4239,6 @@ void FileStore::alarmHighwatermarkIfNeededDispatched()
                 << out.str() << BMQTSK_ALARMLOG_END;
         }
     }
-}
-
-void FileStore::issueSyncPointDispatched([[maybe_unused]] int partitionId)
-{
-    // executed by the *DISPATCHER* thread
-
-    if (!d_isOpen || !d_isPrimary || d_isStopping) {
-        return;  // RETURN
-    }
-
-    // This routine is invoked *only* by the scheduled recurring event which
-    // attempts to issue a SyncPt if applicable (see 'issueSyncPointCb'), which
-    // means that there must be space for at least 2 journal records.
-
-    issueSyncPointIfNeeded();
 }
 
 void FileStore::issueSyncPointIfNeeded()

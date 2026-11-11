@@ -443,14 +443,14 @@ class FileStore final : public DataStore {
     ///
     /// THREAD: This method should only be invoked by the partition
     /// *dispatcher* thread.
-    void gcDispatched(int partitionId, FileSet* fileSet);
+    void retireFileSet(int partitionId, FileSet* fileSet);
 
     /// Garbage-collect the specified `fileSet` by closing and archiving all
     /// files in the `fileSet`.
     ///
     /// THREAD: This method is invoked in a thread from the miscellaneous
     /// *worker* thread pool.
-    void gcWorkerDispatched(const bsl::shared_ptr<FileSet>& fileSet);
+    void closeAndArchiveFileSet(const bsl::shared_ptr<FileSet>& fileSet);
 
     /// Open this instance in non-recovery mode.  Return zero on success and
     /// a non-zero value otherwise.  Note that this routine can be used in
@@ -618,12 +618,7 @@ class FileStore final : public DataStore {
     /// watermark (soft limit) for outstanding bytes.
     ///
     /// THREAD: This method is called from the partition thread.
-    void alarmHighwatermarkIfNeededDispatched();
-
-    /// Issue a sync point.
-    ///
-    /// THREAD: This method executes in the partition dispatcher thread.
-    void issueSyncPointDispatched(int partitionId);
+    void alarmHighwatermarkIfNeeded();
 
     /// Issue a regular sync point if a new record has been published since
     /// the last one.
