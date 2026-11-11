@@ -232,7 +232,7 @@ class ClusterStateMonitor {
     /// changes.
     ///
     /// THREAD: This method is called from the Cluster's dispatcher thread.
-    void verifyAllStatesDispatched();
+    void updateAllStates();
 
     /// Get the dispatcher pointer.
     mqbi::Dispatcher* dispatcher();

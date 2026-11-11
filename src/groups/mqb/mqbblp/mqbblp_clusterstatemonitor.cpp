@@ -280,12 +280,12 @@ void ClusterStateMonitor::verifyAllStates()
 
     dispatcher()->execute(
         [this]() {
-            verifyAllStatesDispatched();
+            updateAllStates();
         },
         dispatcherClient());
 }
 
-void ClusterStateMonitor::verifyAllStatesDispatched()
+void ClusterStateMonitor::updateAllStates()
 {
     // invoked in the cluster *DISPATCHER* thread
 

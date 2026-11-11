@@ -1021,9 +1021,9 @@ void ClusterProxy::stop()
     // ensure that any event that 'stopDispatched' may have enqueued back to
     // cluster's dispatcher thread has also been executed.  An example is
     // 'ClusterStateMonitor::verifyAllStates' which schedules
-    // 'ClusterStateMonitor::verifyAllStatesDispatched'.
+    // 'ClusterStateMonitor::updateAllStates'.
     // 'ClusterStateMonitor::stop' waits for concurrent 'verifyAllStates' but
-    // we also need to wait for 'verifyAllStatesDispatched'.
+    // we also need to wait for 'updateAllStates'.
     // Another way to think of this is that 'stopDispatched' is async, which
     // itself performs some async operations, so we need to synchronize twice.
 
