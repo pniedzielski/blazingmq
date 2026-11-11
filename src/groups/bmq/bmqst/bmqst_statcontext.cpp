@@ -244,8 +244,7 @@ void StatContext::clearDeletedSubcontexts(
             updates.resize(updates.size() - 1);
         }
 
-        BSLS_ASSERT(d_subcontextsById.find(context->d_uniqueId) !=
-                    d_subcontextsById.end());
+        BSLS_ASSERT(d_subcontextsById.contains(context->d_uniqueId));
         d_subcontextsById.erase(d_subcontextsById.find(context->d_uniqueId));
 
         d_allocator_p->deleteObject(context);
@@ -275,8 +274,7 @@ void StatContext::moveNewSubcontexts()
                                        context);
         d_subcontexts.insert(val);
 
-        BSLS_ASSERT(d_subcontextsById.find(context->d_uniqueId) ==
-                    d_subcontextsById.end());
+        BSLS_ASSERT(!d_subcontextsById.contains(context->d_uniqueId));
         d_subcontextsById.insert(bsl::make_pair(context->d_uniqueId, context));
 
         if (updates) {
