@@ -39,8 +39,6 @@
 
 // BDE
 #include <bdld_datummapbuilder.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bsl_cstddef.h>  // size_t
 #include <bsl_memory.h>
 #include <bsl_string.h>
@@ -688,18 +686,17 @@ int ClusterOrchestrator::start(bsl::ostream& errorDescription)
 
     d_clusterData_p->electorInfo().setLeaderMessageSequence(ledgerLSN);
 
-    using namespace bdlf::PlaceHolders;
     d_elector_mp.load(
         new (*d_allocator_p) mqbnet::Elector(
             d_clusterConfig.elector(),
             &d_clusterData_p->cluster(),
             &d_clusterData_p->quorumManager(),
-            bdlf::BindUtil::bind(&ClusterOrchestrator::onElectorStateChange,
-                                 this,
-                                 _1,   // ElectorState
-                                 _2,   // ElectorTransitionCode
-                                 _3,   // LeaderNodeId
-                                 _4),  // Term
+            [this](mqbnet::ElectorState::Enum            state,
+                   mqbnet::ElectorTransitionReason::Enum code,
+                   int                                   leaderNodeId,
+                   bsls::Types::Uint64                   term) {
+                onElectorStateChange(state, code, leaderNodeId, term);
+            },
             ledgerLSN.electorTerm(),
             &d_clusterData_p->blobSpPool(),
             d_allocators.get("Elector")),
@@ -1040,7 +1037,9 @@ void ClusterOrchestrator::processNodeStoppingNotification(
 
     for (int i = static_cast<int>(partitions.size()) - 1; 0 <= i; --i) {
         d_storageManager_p->fileStore(partitions[i])
-            .execute(bdlf::BindUtil::bind(&bslmt::Latch::arrive, &latch));
+            .execute([latchP = &latch]() {
+                latchP->arrive();
+            });
     }
 
     latch.wait();
@@ -1935,12 +1934,11 @@ void ClusterOrchestrator::onPartitionPrimaryStatus(int          partitionId,
     // exected by *ANY* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(
-            &ClusterOrchestrator::onPartitionPrimaryStatusDispatched,
-            this,
-            partitionId,
-            status,
-            primaryLeaseId),
+        [this, partitionId, status, primaryLeaseId]() {
+            onPartitionPrimaryStatusDispatched(partitionId,
+                                               status,
+                                               primaryLeaseId);
+        },
         d_cluster_p);
 }
 
