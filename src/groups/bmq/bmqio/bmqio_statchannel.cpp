@@ -20,8 +20,6 @@
 #include <bmqst_statcontext.h>
 
 // BDE
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bsl_iostream.h>
 #include <bsla_annotations.h>
 #include <bslmt_lockguard.h>
@@ -98,12 +96,11 @@ void StatChannel::read(Status*                   status,
     d_config.d_channel_sp->read(
         status,
         numBytes,
-        bdlf::BindUtil::bind(&StatChannel::readCbWrapper,
-                             this,
-                             readCallback,
-                             bdlf::PlaceHolders::_1,   // status
-                             bdlf::PlaceHolders::_2,   // numNeeded
-                             bdlf::PlaceHolders::_3),  // blob
+        [this, readCallback](const Status& readStatus,
+                             int*          numNeeded,
+                             bdlbb::Blob*  blob) {
+            readCbWrapper(readCallback, readStatus, numNeeded, blob);
+        },
         timeout);
 }
 
