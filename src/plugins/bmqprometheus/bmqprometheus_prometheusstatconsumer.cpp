@@ -652,7 +652,7 @@ void PrometheusStatConsumer::captureClusterStats(const LeaderSet& leaders)
             }
         }
 
-        if (leaders.find(clusterIt->name()) != leaders.end()) {
+        if (leaders.contains(clusterIt->name())) {
             static const DatapointDef defs[] = {
                 {"cluster_partition_cfg_journal_bytes",
                  Stat::e_PARTITION_CFG_JOURNAL_BYTES},
@@ -785,7 +785,7 @@ void PrometheusStatConsumer::captureDomainStats(const LeaderSet& leaders)
 
         const bsl::string_view clusterName = map.find("cluster")->theString();
 
-        if (leaders.find(clusterName) == leaders.end()) {
+        if (!leaders.contains(clusterName)) {
             // is NOT leader
             continue;  // CONTINUE
         }
