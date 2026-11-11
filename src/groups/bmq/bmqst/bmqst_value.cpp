@@ -51,7 +51,7 @@ void Value::ownValue()
     if (!d_owned && d_value.is<bslstl::StringRef>() &&
         !d_value.the<bslstl::StringRef>().isEmpty()) {
         bslstl::StringRef& ref = d_value.the<bslstl::StringRef>();
-        char* buf = static_cast<char*>(d_allocator_p->allocate(ref.length()));
+        auto* buf = static_cast<char*>(d_allocator_p->allocate(ref.length()));
         bsl::memcpy(buf, ref.data(), ref.length());
         ref.assign(buf, ref.length());
         d_owned = true;
