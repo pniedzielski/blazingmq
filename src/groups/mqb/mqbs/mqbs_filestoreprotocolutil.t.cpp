@@ -70,7 +70,7 @@ static void bytesFromHex(bsl::string* destination, const bsl::string& source)
 {
     destination->clear();
     destination->reserve(source.size() / 2);
-    bsl::string::const_iterator src = source.begin();
+    auto src = source.begin();
     while (src != source.end() && (src + 1) != source.end()) {
         bslstl::StringRef sub(src, src + 2);
         destination->push_back(static_cast<char>(bsl::stoi(sub, 0, 16)));
