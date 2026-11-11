@@ -185,18 +185,15 @@ BasicCredentialProviderPluginFactory::create(bslma::Allocator* allocator)
     bsl::string username(allocator);
     bsl::string password(allocator);
 
-    for (bsl::vector<mqbcfg::PluginSettingKeyValue>::const_iterator it =
-             cfg.settings().cbegin();
-         it != cfg.settings().cend();
-         ++it) {
-        if (!it->value().isStringValValue()) {
+    for (const auto& setting : cfg.settings()) {
+        if (!setting.value().isStringValValue()) {
             continue;  // CONTINUE
         }
-        if (it->key() == "username") {
-            username = it->value().stringVal();
+        if (setting.key() == "username") {
+            username = setting.value().stringVal();
         }
-        else if (it->key() == "password") {
-            password = it->value().stringVal();
+        else if (setting.key() == "password") {
+            password = setting.value().stringVal();
         }
     }
 
