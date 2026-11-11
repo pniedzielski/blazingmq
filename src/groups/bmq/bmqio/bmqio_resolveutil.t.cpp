@@ -91,11 +91,8 @@ static void test1_breathingTest()
         BMQTST_ASSERT_EQ(error.code(), ntsa::Error::e_OK);
         BMQTST_ASSERT_GT(addresses.size(), 0U);
 
-        for (bsl::vector<ntsa::IpAddress>::const_iterator it =
-                 addresses.begin();
-             it != addresses.end();
-             ++it) {
-            PVV(*it);
+        for (const ntsa::IpAddress& address : addresses) {
+            PVV(address);
         }
     }
 
@@ -112,12 +109,9 @@ static void test1_breathingTest()
         ntsa::IpAddress loopback("127.0.0.1");
         bool            foundLoopback = false;
 
-        for (bsl::vector<ntsa::IpAddress>::const_iterator it =
-                 addresses.begin();
-             it != addresses.end();
-             ++it) {
-            PVV(*it);
-            if (it->equals(loopback)) {
+        for (const ntsa::IpAddress& address : addresses) {
+            PVV(address);
+            if (address.equals(loopback)) {
                 foundLoopback = true;
             }
         }
