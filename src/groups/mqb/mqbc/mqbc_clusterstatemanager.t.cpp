@@ -83,8 +83,6 @@ static void testSigintHandler(int /* signum */)
 }
 
 // TYPES
-typedef mqbmock::Cluster::TestChannelMapCIter TestChannelMapCIter;
-
 typedef mqbc::ClusterStateManager::NodeToLSNMap      NodeToLSNMap;
 typedef mqbc::ClusterStateManager::NodeToLSNMapCIter NodeToLSNMapCIter;
 
@@ -292,10 +290,9 @@ struct Tester {
 
     void clearChannels()
     {
-        for (TestChannelMapCIter cit = d_cluster_mp->_channels().cbegin();
-             cit != d_cluster_mp->_channels().cend();
-             ++cit) {
-            cit->second->reset();
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            testChannel->reset();
         }
     }
 
@@ -342,17 +339,16 @@ struct Tester {
             .choice()
             .makeFollowerLSNRequest();
 
-        for (TestChannelMapCIter cit = d_cluster_mp->_channels().cbegin();
-             cit != d_cluster_mp->_channels().cend();
-             ++cit) {
-            if (cit->first->nodeId() ==
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            if (clusterNode->nodeId() ==
                 d_cluster_mp->netCluster().selfNodeId()) {
-                BMQTST_ASSERT(!cit->second->waitFor(1));
+                BMQTST_ASSERT(!testChannel->waitFor(1));
                 continue;  // CONTINUE
             }
 
             bmqio::TestChannel::WriteCall writeCall;
-            BMQTST_ASSERT(cit->second->getWriteCall(&writeCall, 0));
+            BMQTST_ASSERT(testChannel->getWriteCall(&writeCall, 0));
 
             bmqp_ctrlmsg::ControlMessage message;
             mqbc::ClusterUtil::extractMessage(
@@ -380,13 +376,12 @@ struct Tester {
                 .makeFollowerLSNResponse();
         response.sequenceNumber() = sequenceNumber;
 
-        for (TestChannelMapCIter cit = d_cluster_mp->_channels().cbegin();
-             cit != d_cluster_mp->_channels().cend();
-             ++cit) {
-            if (cit->first->nodeId() ==
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            if (clusterNode->nodeId() ==
                 d_cluster_mp->_clusterData()->electorInfo().leaderNodeId()) {
                 bmqio::TestChannel::WriteCall writeCall;
-                BMQTST_ASSERT(cit->second->getWriteCall(&writeCall, 0));
+                BMQTST_ASSERT(testChannel->getWriteCall(&writeCall, 0));
 
                 bmqp_ctrlmsg::ControlMessage message;
                 mqbc::ClusterUtil::extractMessage(
@@ -396,7 +391,7 @@ struct Tester {
                 BMQTST_ASSERT_EQ(message, expectedMessage);
             }
             else {
-                BMQTST_ASSERT(!cit->second->waitFor(1));
+                BMQTST_ASSERT(!testChannel->waitFor(1));
             }
         }
     }
@@ -413,12 +408,11 @@ struct Tester {
         response.code()     = mqbi::ClusterErrorCode::e_NOT_FOLLOWER;
         response.message()  = k_REFUSAL_MESSAGE;
 
-        for (TestChannelMapCIter cit = d_cluster_mp->_channels().cbegin();
-             cit != d_cluster_mp->_channels().cend();
-             ++cit) {
-            if (cit->first->nodeId() == destination.nodeId()) {
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            if (clusterNode->nodeId() == destination.nodeId()) {
                 bmqio::TestChannel::WriteCall writeCall;
-                BMQTST_ASSERT(cit->second->getWriteCall(&writeCall, 0));
+                BMQTST_ASSERT(testChannel->getWriteCall(&writeCall, 0));
 
                 bmqp_ctrlmsg::ControlMessage message;
                 mqbc::ClusterUtil::extractMessage(
@@ -428,7 +422,7 @@ struct Tester {
                 BMQTST_ASSERT_EQ(message, expectedMessage);
             }
             else {
-                BMQTST_ASSERT(!cit->second->waitFor(1));
+                BMQTST_ASSERT(!testChannel->waitFor(1));
             }
         }
     }
@@ -450,13 +444,12 @@ struct Tester {
             .registrationRequest()
             .sequenceNumber() = sequenceNumber;
 
-        for (TestChannelMapCIter cit = d_cluster_mp->_channels().cbegin();
-             cit != d_cluster_mp->_channels().cend();
-             ++cit) {
-            if (cit->first->nodeId() ==
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            if (clusterNode->nodeId() ==
                 d_cluster_mp->_clusterData()->electorInfo().leaderNodeId()) {
                 bmqio::TestChannel::WriteCall writeCall;
-                BMQTST_ASSERT(cit->second->getWriteCall(&writeCall, 0));
+                BMQTST_ASSERT(testChannel->getWriteCall(&writeCall, 0));
 
                 bmqp_ctrlmsg::ControlMessage message;
                 mqbc::ClusterUtil::extractMessage(
@@ -467,7 +460,7 @@ struct Tester {
                                  expectedMessage);
             }
             else {
-                BMQTST_ASSERT(!cit->second->waitFor(1));
+                BMQTST_ASSERT(!testChannel->waitFor(1));
             }
         }
     }
@@ -486,12 +479,11 @@ struct Tester {
             .choice()
             .makeRegistrationResponse();
 
-        for (TestChannelMapCIter cit = d_cluster_mp->_channels().cbegin();
-             cit != d_cluster_mp->_channels().cend();
-             ++cit) {
-            if (cit->first->nodeId() == destination.nodeId()) {
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            if (clusterNode->nodeId() == destination.nodeId()) {
                 bmqio::TestChannel::WriteCall writeCall;
-                BMQTST_ASSERT(cit->second->getWriteCall(&writeCall, 0));
+                BMQTST_ASSERT(testChannel->getWriteCall(&writeCall, 0));
 
                 bmqp_ctrlmsg::ControlMessage message;
                 mqbc::ClusterUtil::extractMessage(
@@ -501,7 +493,7 @@ struct Tester {
                 BMQTST_ASSERT_EQ(message, expectedMessage);
             }
             else {
-                BMQTST_ASSERT(!cit->second->waitFor(1));
+                BMQTST_ASSERT(!testChannel->waitFor(1));
             }
         }
     }
@@ -517,11 +509,10 @@ struct Tester {
 
         mqbnet::ClusterNode*                highestLSNFollower = 0;
         bmqp_ctrlmsg::LeaderMessageSequence highestLSN;
-        for (NodeToLSNMapCIter cit = lsnMap.cbegin(); cit != lsnMap.cend();
-             ++cit) {
-            if (!highestLSNFollower || cit->second > highestLSN) {
-                highestLSNFollower = cit->first;
-                highestLSN         = cit->second;
+        for (const auto& nodeLSN : lsnMap) {
+            if (!highestLSNFollower || nodeLSN.second > highestLSN) {
+                highestLSNFollower = nodeLSN.first;
+                highestLSN         = nodeLSN.second;
             }
         }
 
@@ -539,12 +530,11 @@ struct Tester {
             .choice()
             .makeFollowerClusterStateRequest();
 
-        for (TestChannelMapCIter cit = d_cluster_mp->_channels().cbegin();
-             cit != d_cluster_mp->_channels().cend();
-             ++cit) {
-            if (cit->first->nodeId() == highestLSNFollower->nodeId()) {
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            if (clusterNode->nodeId() == highestLSNFollower->nodeId()) {
                 bmqio::TestChannel::WriteCall writeCall;
-                BMQTST_ASSERT(cit->second->getWriteCall(&writeCall, 0));
+                BMQTST_ASSERT(testChannel->getWriteCall(&writeCall, 0));
 
                 bmqp_ctrlmsg::ControlMessage message;
                 mqbc::ClusterUtil::extractMessage(
@@ -555,7 +545,7 @@ struct Tester {
                                 expectedFollowerClusterStateRequest);
             }
             else {
-                BSLS_ASSERT_OPT(!cit->second->waitFor(1));
+                BSLS_ASSERT_OPT(!testChannel->waitFor(1));
             }
         }
     }
@@ -583,13 +573,12 @@ struct Tester {
             &response.clusterStateSnapshot().queues(),
             *d_cluster_mp->_state());
 
-        for (TestChannelMapCIter cit = d_cluster_mp->_channels().cbegin();
-             cit != d_cluster_mp->_channels().cend();
-             ++cit) {
-            if (cit->first->nodeId() ==
+        for (const auto& [clusterNode, testChannel] :
+             d_cluster_mp->_channels()) {
+            if (clusterNode->nodeId() ==
                 d_cluster_mp->_clusterData()->electorInfo().leaderNodeId()) {
                 bmqio::TestChannel::WriteCall writeCall;
-                BMQTST_ASSERT(cit->second->getWriteCall(&writeCall, 0));
+                BMQTST_ASSERT(testChannel->getWriteCall(&writeCall, 0));
 
                 bmqp_ctrlmsg::ControlMessage message;
                 mqbc::ClusterUtil::extractMessage(
@@ -599,7 +588,7 @@ struct Tester {
                 BMQTST_ASSERT_EQ(message, expectedMessage);
             }
             else {
-                BMQTST_ASSERT(!cit->second->waitFor(1));
+                BMQTST_ASSERT(!testChannel->waitFor(1));
             }
         }
     }
