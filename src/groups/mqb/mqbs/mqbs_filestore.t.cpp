@@ -410,10 +410,7 @@ class Tester {
             .setMaxDataFileSize(d_partitionCfg.maxDataFileSize())
             .setMaxJournalFileSize(d_partitionCfg.maxJournalFileSize())
             .setMaxQlistFileSize(d_partitionCfg.maxQlistFileSize())
-            .setRecoveredQueuesCb(bdlf::BindUtil::bind(
-                &recoveredQueuesCb,
-                bdlf::PlaceHolders::_1,    // partitionId
-                bdlf::PlaceHolders::_2));  // queueKeyInfoMap
+            .setRecoveredQueuesCb(&recoveredQueuesCb);
 
         d_clusterStats.initialize("testCluster",
                                   1,  // numPartitions

@@ -64,8 +64,6 @@
 #include <bdlb_print.h>
 #include <bdlb_string.h>
 #include <bdlbb_blobutil.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdls_filesystemutil.h>
 #include <bdlt_currenttime.h>
@@ -765,9 +763,9 @@ int FileStore::openInRecoveryMode(bsl::ostream&    errorDescription,
     FileSetSp fileSetSp;
     fileSetSp.createInplace(d_allocator_p, this, d_allocator_p);
     FileSet* fs = fileSetSp.get();
-    fs->d_aliasedChunk_sp.reset(
-        fs,
-        bdlf::BindUtil::bind(&FileStore::gc, this, fs));
+    fs->d_aliasedChunk_sp.reset(fs, [this, fs](FileSet*) {
+        gc(fs);
+    });
     fs->d_aliasedChunk_wp = fs->d_aliasedChunk_sp;
     d_fileSets.insert(d_fileSets.begin(), fileSetSp);
 
@@ -2774,9 +2772,9 @@ int FileStore::create(FileSetSp* fileSetSp)
                                    d_allocator_p);
     if (0 == rc) {
         FileSet* fs = fileSetSp->get();
-        fs->d_aliasedChunk_sp.reset(
-            fs,
-            bdlf::BindUtil::bind(&FileStore::gc, this, fs));
+        fs->d_aliasedChunk_sp.reset(fs, [this, fs](FileSet*) {
+            gc(fs);
+        });
         fs->d_aliasedChunk_wp = fs->d_aliasedChunk_sp;
     }
 
@@ -3075,10 +3073,9 @@ int FileStore::rolloverImpl(bsls::Types::Uint64 timestamp)
         bsl::shared_ptr<FileSet> activeFileSetSp(*d_fileSets.begin());
         d_fileSets.erase(d_fileSets.begin());
 
-        rc = d_miscWorkThreadPool_p->enqueueJob(
-            bdlf::BindUtil::bind(&FileStore::gcWorkerDispatched,
-                                 this,
-                                 activeFileSetSp));
+        rc = d_miscWorkThreadPool_p->enqueueJob([this, activeFileSetSp]() {
+            gcWorkerDispatched(activeFileSetSp);
+        });
         BSLS_ASSERT_SAFE(rc == 0);
     }
     else {
@@ -3115,9 +3112,10 @@ int FileStore::rolloverImpl(bsls::Types::Uint64 timestamp)
     // should also be processed in the same event scheduler's dispatcher thread
     // to avoid any race while deleting archived files.
 
-    d_config.scheduler()->scheduleEvent(
-        bmqu::Time::nowMonotonicClock(),
-        bdlf::BindUtil::bind(&FileStore::deleteArchiveFilesCb, this));
+    d_config.scheduler()->scheduleEvent(bmqu::Time::nowMonotonicClock(),
+                                        [this]() {
+                                            deleteArchiveFilesCb();
+                                        });
 
     BALL_LOG_INFO_BLOCK
     {
@@ -3652,10 +3650,9 @@ void FileStore::gc(FileSet* fileSet)
     }
 
     // Enqueue an event in the partition's dispatcher thread.
-    execute(bdlf::BindUtil::bind(&FileStore::gcDispatched,
-                                 this,
-                                 d_config.partitionId(),
-                                 fileSet));
+    execute([this, partitionId = d_config.partitionId(), fileSet]() {
+        gcDispatched(partitionId, fileSet);
+    });
 }
 
 void FileStore::gcDispatched([[maybe_unused]] int partitionId,
@@ -3714,7 +3711,9 @@ void FileStore::gcDispatched([[maybe_unused]] int partitionId,
     d_fileSets.erase(it);
 
     [[maybe_unused]] const int rc = d_miscWorkThreadPool_p->enqueueJob(
-        bdlf::BindUtil::bind(&FileStore::gcWorkerDispatched, this, fileSetSp));
+        [this, fileSetSp]() {
+            gcWorkerDispatched(fileSetSp);
+        });
     BSLS_ASSERT_SAFE(rc == 0);
 }
 
@@ -4129,9 +4128,9 @@ void FileStore::issueSyncPointCb()
         return;  // RETURN
     }
 
-    execute(bdlf::BindUtil::bind(&FileStore::issueSyncPointDispatched,
-                                 this,
-                                 d_config.partitionId()));
+    execute([this, partitionId = d_config.partitionId()]() {
+        issueSyncPointDispatched(partitionId);
+    });
 }
 
 void FileStore::alarmHighwatermarkIfNeededCb()
@@ -4143,9 +4142,9 @@ void FileStore::alarmHighwatermarkIfNeededCb()
         return;  // RETURN
     }
 
-    execute(
-        bdlf::BindUtil::bind(&FileStore::alarmHighwatermarkIfNeededDispatched,
-                             this));
+    execute([this]() {
+        alarmHighwatermarkIfNeededDispatched();
+    });
 }
 
 void FileStore::alarmHighwatermarkIfNeededDispatched()
@@ -7218,15 +7217,18 @@ void FileStore::setActivePrimary(mqbnet::ClusterNode* primaryNode,
         d_config.scheduler()->scheduleRecurringEvent(
             &d_syncPointEventHandle,
             bsls::TimeInterval(1),  // 1 sec. TBD: make configurable
-            bdlf::BindUtil::bind(&FileStore::issueSyncPointCb, this));
+            [this]() {
+                issueSyncPointCb();
+            });
     }
 
     if (!d_partitionHighwatermarkEventHandle) {
         d_config.scheduler()->scheduleRecurringEvent(
             &d_partitionHighwatermarkEventHandle,
             bsls::TimeInterval(k_PARTITION_AVAILABLESPACE_SECS),
-            bdlf::BindUtil::bind(&FileStore::alarmHighwatermarkIfNeededCb,
-                                 this));
+            [this]() {
+                alarmHighwatermarkIfNeededCb();
+            });
     }
 
     // Issue one SyncPt right away.  Note that we invoke the 'higher' level
