@@ -187,10 +187,8 @@ void CslRecordPrinter<PRINTER_TYPE>::printRecordsSummary(
     d_fields.push_back("UpdateRecords");
     if (recordCount.d_updateCount > 0) {
         bmqp_ctrlmsg::ClusterMessageChoice clusterMessageChoice(d_allocator_p);
-        for (CslUpdateChoiceMap::const_iterator it = updateChoiceMap.begin();
-             it != updateChoiceMap.end();
-             ++it) {
-            clusterMessageChoice.makeSelection(it->first);
+        for (const auto& [choice, count] : updateChoiceMap) {
+            clusterMessageChoice.makeSelection(choice);
             d_fields.push_back(clusterMessageChoice.selectionName());
         }
     }
@@ -204,10 +202,8 @@ void CslRecordPrinter<PRINTER_TYPE>::printRecordsSummary(
 
     *d_printer_mp << recordCount.d_snapshotCount << recordCount.d_updateCount;
     if (recordCount.d_updateCount > 0) {
-        for (CslUpdateChoiceMap::const_iterator it = updateChoiceMap.begin();
-             it != updateChoiceMap.end();
-             ++it) {
-            *d_printer_mp << it->second;
+        for (const auto& [choice, count] : updateChoiceMap) {
+            *d_printer_mp << count;
         }
     }
     *d_printer_mp << recordCount.d_commitCount << recordCount.d_ackCount;
