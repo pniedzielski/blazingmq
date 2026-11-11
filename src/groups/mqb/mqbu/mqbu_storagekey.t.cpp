@@ -397,8 +397,7 @@ void test4_defaultHashUniqueness()
         k_NUM_ELEMS = 10000  // 10K
     };
 
-    typedef bsl::unordered_set<mqbu::StorageKey>::const_iterator CITER;
-    typedef bsl::vector<mqbu::StorageKey>                        StorageKeys;
+    typedef bsl::vector<mqbu::StorageKey> StorageKeys;
 
     // hash -> vector of corresponding StorageKeys
     bsl::unordered_map<size_t, StorageKeys> hashes(
@@ -413,9 +412,7 @@ void test4_defaultHashUniqueness()
     size_t                      maxCollisionsHash = 0;
     size_t                      maxCollisions     = 0;
 
-    for (CITER citer = keySet.cbegin(); citer != keySet.cend(); ++citer) {
-        const mqbu::StorageKey& currKey = *citer;
-
+    for (const mqbu::StorageKey& currKey : keySet) {
         size_t hash = hasher(currKey);
 
         StorageKeys& keysByHash = hashes[hash];
@@ -449,9 +446,9 @@ void test4_defaultHashUniqueness()
              << "StorageKeys with the highest collisions..: " << endl;
 
         StorageKeys& keys = hashes[maxCollisionsHash];
-        for (size_t i = 0; i < keys.size(); ++i) {
+        for (const mqbu::StorageKey& key : keys) {
             cout << "  ";
-            keys[i].print(cout);
+            key.print(cout);
             cout << endl;
         }
     }
@@ -482,8 +479,7 @@ void test5_customHashUniqueness()
 
     constexpr bsl::size_t k_NUM_ELEMS = 10000;  // 10K
 
-    typedef bsl::unordered_set<mqbu::StorageKey>::const_iterator CITER;
-    typedef bsl::vector<mqbu::StorageKey>                        StorageKeys;
+    typedef bsl::vector<mqbu::StorageKey> StorageKeys;
 
     // hash -> vector of corresponding StorageKeys
     bsl::unordered_map<size_t, StorageKeys> hashes(
@@ -499,9 +495,7 @@ void test5_customHashUniqueness()
     size_t                               maxCollisions     = 0;
 
     // Generate hashes and keep track of recurring hashes
-    for (CITER citer = keySet.cbegin(); citer != keySet.cend(); ++citer) {
-        const mqbu::StorageKey& currKey = *citer;
-
+    for (const mqbu::StorageKey& currKey : keySet) {
         size_t hash = hasher(currKey);
 
         StorageKeys& keysByHash = hashes[hash];
@@ -535,9 +529,9 @@ void test5_customHashUniqueness()
              << "StorageKeys with the highest collisions..: " << endl;
 
         StorageKeys& keys = hashes[maxCollisionsHash];
-        for (size_t i = 0; i < keys.size(); ++i) {
+        for (const mqbu::StorageKey& key : keys) {
             cout << "  ";
-            keys[i].print(cout);
+            key.print(cout);
             cout << endl;
         }
     }
@@ -648,8 +642,6 @@ void testN3_hashTableWithDefaultHashBenchmark()
 {
     bmqtst::TestHelper::printTestName("HASH TABLE w/ DEFAULT HASH BENCHMARK");
 
-    typedef bsl::unordered_set<mqbu::StorageKey>::const_iterator CITER;
-
     const size_t                         k_NUM_ELEMS = 10000;  // 10K
     bsl::unordered_set<mqbu::StorageKey> keySet(
         bmqtst::TestHelperUtil::allocator());
@@ -664,8 +656,8 @@ void testN3_hashTableWithDefaultHashBenchmark()
 
     // <time>
     bsls::Types::Int64 begin = bsls::TimeUtil::getTimer();
-    for (CITER citer = keySet.cbegin(); citer != keySet.cend(); ++citer) {
-        ht.insert(bsl::make_pair(*citer, i++));
+    for (const mqbu::StorageKey& key : keySet) {
+        ht.insert(bsl::make_pair(key, i++));
     }
     bsls::Types::Int64 end = bsls::TimeUtil::getTimer();
     // </time>
@@ -694,8 +686,6 @@ void testN4_hashTableWithCustomHashBenchmark()
 {
     bmqtst::TestHelper::printTestName("HASH TABLE w/ CUSTOM HASH BENCHMARK");
 
-    typedef bsl::unordered_set<mqbu::StorageKey>::const_iterator CITER;
-
     const size_t                         k_NUM_ELEMS = 10000;  // 10K
     bsl::unordered_set<mqbu::StorageKey> keySet(
         bmqtst::TestHelperUtil::allocator());
@@ -711,8 +701,8 @@ void testN4_hashTableWithCustomHashBenchmark()
 
     // <time>
     bsls::Types::Int64 begin = bsls::TimeUtil::getTimer();
-    for (CITER citer = keySet.cbegin(); citer != keySet.cend(); ++citer) {
-        ht.insert(bsl::make_pair(*citer, i++));
+    for (const mqbu::StorageKey& key : keySet) {
+        ht.insert(bsl::make_pair(key, i++));
     }
     bsls::Types::Int64 end = bsls::TimeUtil::getTimer();
     // </time>
@@ -765,8 +755,8 @@ void testN5_orderedMapWithDefaultHashBenchmark()
 
     // <time>
     bsls::Types::Int64 begin = bsls::TimeUtil::getTimer();
-    for (CITER citer = keySet.cbegin(); citer != keySet.cend(); ++citer) {
-        ht.insert(bsl::make_pair(*citer, i++));
+    for (const mqbu::StorageKey& key : keySet) {
+        ht.insert(bsl::make_pair(key, i++));
     }
     bsls::Types::Int64 end = bsls::TimeUtil::getTimer();
     // </time>
@@ -820,8 +810,8 @@ void testN6_orderedMapWithCustomHashBenchmark()
 
     // <time>
     bsls::Types::Int64 begin = bsls::TimeUtil::getTimer();
-    for (CITER citer = keySet.cbegin(); citer != keySet.cend(); ++citer) {
-        ht.insert(bsl::make_pair(*citer, i++));
+    for (const mqbu::StorageKey& key : keySet) {
+        ht.insert(bsl::make_pair(key, i++));
     }
     bsls::Types::Int64 end = bsls::TimeUtil::getTimer();
     // </time>
@@ -917,8 +907,6 @@ static void testN3_hashTableWithDefaultHashBenchmark_GoogleBenchmark(
 {
     bmqtst::TestHelper::printTestName("HASH TABLE w/ DEFAULT HASH BENCHMARK");
 
-    typedef bsl::unordered_set<mqbu::StorageKey>::const_iterator CITER;
-
     const size_t                         k_NUM_ELEMS = state.range(0);
     bsl::unordered_set<mqbu::StorageKey> keySet(
         bmqtst::TestHelperUtil::allocator());
@@ -933,8 +921,8 @@ static void testN3_hashTableWithDefaultHashBenchmark_GoogleBenchmark(
 
     // <time>
     for (auto _ : state) {
-        for (CITER citer = keySet.cbegin(); citer != keySet.cend(); ++citer) {
-            ht.insert(bsl::make_pair(*citer, i++));
+        for (const mqbu::StorageKey& key : keySet) {
+            ht.insert(bsl::make_pair(key, i++));
         }
     }
     // </time>
@@ -953,8 +941,6 @@ static void testN4_hashTableWithCustomHashBenchmark_GoogleBenchmark(
 {
     bmqtst::TestHelper::printTestName("HASH TABLE w/ CUSTOM HASH BENCHMARK");
 
-    typedef bsl::unordered_set<mqbu::StorageKey>::const_iterator CITER;
-
     const size_t                         k_NUM_ELEMS = state.range(0);
     bsl::unordered_set<mqbu::StorageKey> keySet(
         bmqtst::TestHelperUtil::allocator());
@@ -970,8 +956,8 @@ static void testN4_hashTableWithCustomHashBenchmark_GoogleBenchmark(
 
     // <time>
     for (auto _ : state) {
-        for (CITER citer = keySet.cbegin(); citer != keySet.cend(); ++citer) {
-            ht.insert(bsl::make_pair(*citer, i++));
+        for (const mqbu::StorageKey& key : keySet) {
+            ht.insert(bsl::make_pair(key, i++));
         }
     }
 }
@@ -1013,8 +999,8 @@ static void testN5_orderedMapWithDefaultHashBenchmark_GoogleBenchmark(
 
     // <time>
     for (auto _ : state) {
-        for (CITER citer = keySet.cbegin(); citer != keySet.cend(); ++citer) {
-            ht.insert(bsl::make_pair(*citer, i++));
+        for (const mqbu::StorageKey& key : keySet) {
+            ht.insert(bsl::make_pair(key, i++));
         }
     }
     // </time>
@@ -1057,8 +1043,8 @@ static void testN6_orderedMapWithCustomHashBenchmark_GoogleBenchmark(
 
     // <time>
     for (auto _ : state) {
-        for (CITER citer = keySet.cbegin(); citer != keySet.cend(); ++citer) {
-            ht.insert(bsl::make_pair(*citer, i++));
+        for (const mqbu::StorageKey& key : keySet) {
+            ht.insert(bsl::make_pair(key, i++));
         }
     }
     // </time>
