@@ -26,9 +26,6 @@
 #include <ball_log.h>
 #include <bdlb_stringrefutil.h>
 #include <bdlbb_blobutil.h>
-#include <bdlf_bind.h>
-#include <bdlf_memfn.h>
-#include <bdlf_placeholder.h>
 #include <bsl_cstddef.h>
 #include <bsl_iomanip.h>
 #include <bsl_ios.h>
@@ -562,8 +559,9 @@ void NtcChannel::processConnect(
 
             d_state = e_STATE_CLOSING;
 
-            d_streamSocket_sp->close(
-                bdlf::BindUtil::bind(&NtcChannel::processClose, self, status));
+            d_streamSocket_sp->close([self, status]() {
+                self->processClose(status);
+            });
         }
     }
 }
@@ -758,10 +756,9 @@ void NtcChannel::processReadQueueLowWatermark(
 
         d_state = e_STATE_CLOSING;
 
-        d_streamSocket_sp->close(
-            bdlf::BindUtil::bind(&NtcChannel::processClose,
-                                 self,
-                                 bmqio::Status()));
+        d_streamSocket_sp->close([self]() {
+            self->processClose(bmqio::Status());
+        });
     }
 }
 
@@ -844,9 +841,9 @@ void NtcChannel::processShutdownComplete(
 
     d_state = e_STATE_CLOSING;
 
-    d_streamSocket_sp->close(bdlf::BindUtil::bind(&NtcChannel::processClose,
-                                                  self,
-                                                  bmqio::Status()));
+    d_streamSocket_sp->close([self]() {
+        self->processClose(bmqio::Status());
+    });
 }
 
 void NtcChannel::processClose(const bmqio::Status& status)
@@ -1041,11 +1038,11 @@ int NtcChannel::connect(bmqio::Status*               status,
         endpointString.append(port);
     }
 
-    ntci::ConnectFunction connectCallback = bdlf::BindUtil::bind(
-        &NtcChannel::processConnect,
-        self,
-        bdlf::PlaceHolders::_1,
-        bdlf::PlaceHolders::_2);
+    ntci::ConnectFunction connectCallback =
+        [self](const bsl::shared_ptr<ntci::Connector>& connector,
+               const ntca::ConnectEvent&               event) {
+            self->processConnect(connector, event);
+        };
 
     BMQIO_NTCCHANNEL_LOG_CONNECT_START(this, streamSocket, endpointString);
 
@@ -1120,11 +1117,10 @@ void NtcChannel::read(Status*                   status,
 
         ntci::TimerCallback timerCallback =
             d_streamSocket_sp->createTimerCallback(
-                bdlf::BindUtil::bind(&NtcChannel::processReadTimeout,
-                                     self,
-                                     read,
-                                     bdlf::PlaceHolders::_1,
-                                     bdlf::PlaceHolders::_2),
+                [self, read](const bsl::shared_ptr<ntci::Timer>& firedTimer,
+                             const ntca::TimerEvent&             event) {
+                    self->processReadTimeout(read, firedTimer, event);
+                },
                 d_allocator_p);
 
         timer = d_streamSocket_sp->createTimer(timerOptions,
@@ -1238,8 +1234,9 @@ void NtcChannel::cancel()
     d_state = e_STATE_CLOSING;
 
     bmqio::Status status(bmqio::StatusCategory::e_CANCELED);
-    d_streamSocket_sp->close(
-        bdlf::BindUtil::bind(&NtcChannel::processClose, self, status));
+    d_streamSocket_sp->close([self, status]() {
+        self->processClose(status);
+    });
 }
 
 void NtcChannel::cancelRead()
@@ -1258,10 +1255,9 @@ void NtcChannel::cancelRead()
 
         read->setTimer(bsl::shared_ptr<ntci::Timer>());
 
-        d_streamSocket_sp->execute(
-            bdlf::BindUtil::bind(&NtcChannel::processReadCancelled,
-                                 self,
-                                 read));
+        d_streamSocket_sp->execute([self, read]() {
+            self->processReadCancelled(read);
+        });
     }
 }
 
@@ -1292,8 +1288,9 @@ void NtcChannel::close(const Status& status)
 
     d_state = e_STATE_CLOSING;
 
-    d_streamSocket_sp->close(
-        bdlf::BindUtil::bind(&NtcChannel::processClose, self, status));
+    d_streamSocket_sp->close([self, status]() {
+        self->processClose(status);
+    });
 }
 
 int NtcChannel::execute(const ExecuteCb& cb)
@@ -1465,11 +1462,11 @@ void NtcListener::processAccept(
 
         error = acceptor->accept(
             ntca::AcceptOptions(),
-            bdlf::BindUtil::bind(&NtcListener::processAccept,
-                                 self,
-                                 bdlf::PlaceHolders::_1,
-                                 bdlf::PlaceHolders::_2,
-                                 bdlf::PlaceHolders::_3));
+            [self](const bsl::shared_ptr<ntci::Acceptor>&     nextAcceptor,
+                   const bsl::shared_ptr<ntci::StreamSocket>& nextSocket,
+                   const ntca::AcceptEvent&                   nextEvent) {
+                self->processAccept(nextAcceptor, nextSocket, nextEvent);
+            });
         if (error) {
             bmqio::Status status;
             NtcChannelUtil::fail(&status,
@@ -1481,10 +1478,9 @@ void NtcListener::processAccept(
 
             d_state = e_STATE_CLOSING;
 
-            d_listenerSocket_sp->close(
-                bdlf::BindUtil::bind(&NtcListener::processClose,
-                                     self,
-                                     status));
+            d_listenerSocket_sp->close([self, status]() {
+                self->processClose(status);
+            });
         }
     }
     else {
@@ -1500,8 +1496,9 @@ void NtcListener::processAccept(
 
         d_state = e_STATE_CLOSING;
 
-        d_listenerSocket_sp->close(
-            bdlf::BindUtil::bind(&NtcListener::processClose, self, status));
+        d_listenerSocket_sp->close([self, status]() {
+            self->processClose(status);
+        });
     }
 }
 
@@ -1678,12 +1675,12 @@ int NtcListener::listen(bmqio::Status*              status,
     d_properties.set(bmqio::NtcListenerUtil::listenPortProperty(),
                      static_cast<int>(endpoint.ip().port()));
 
-    ntci::AcceptFunction acceptCallback = bdlf::BindUtil::bind(
-        &NtcListener::processAccept,
-        self,
-        bdlf::PlaceHolders::_1,
-        bdlf::PlaceHolders::_2,
-        bdlf::PlaceHolders::_3);
+    ntci::AcceptFunction acceptCallback =
+        [self](const bsl::shared_ptr<ntci::Acceptor>&     acceptor,
+               const bsl::shared_ptr<ntci::StreamSocket>& streamSocket,
+               const ntca::AcceptEvent&                   event) {
+            self->processAccept(acceptor, streamSocket, event);
+        };
 
     error = listenerSocket->accept(ntca::AcceptOptions(), acceptCallback);
     if (error) {
@@ -1719,8 +1716,9 @@ void NtcListener::cancel()
     d_state = e_STATE_CLOSING;
 
     bmqio::Status status(bmqio::StatusCategory::e_CANCELED);
-    d_listenerSocket_sp->close(
-        bdlf::BindUtil::bind(&NtcListener::processClose, self, status));
+    d_listenerSocket_sp->close([self, status]() {
+        self->processClose(status);
+    });
 }
 
 void NtcListener::onClose(const CloseFn& cb)
