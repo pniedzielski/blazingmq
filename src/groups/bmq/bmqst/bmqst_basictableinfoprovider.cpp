@@ -377,9 +377,9 @@ void BasicTableInfoProvider::setTable(bmqst::BaseTable* table)
 
 void BasicTableInfoProvider::bind()
 {
-    for (size_t i = 0; i < d_columns.size(); ++i) {
-        d_columns[i].d_tableColumnIndex =
-            findColumn(d_table_p, d_columns[i].d_tableColumnName);
+    for (ColumnFormat& column : d_columns) {
+        column.d_tableColumnIndex = findColumn(d_table_p,
+                                               column.d_tableColumnName);
     }
 }
 
