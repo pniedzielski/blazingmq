@@ -36,7 +36,6 @@
 #include <bdlb_scopeexit.h>
 #include <bdlbb_blobutil.h>
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 #include <bsl_algorithm.h>
 #include <bsl_cmath.h>    // for bsl::fabs
 #include <bsl_cstring.h>  // for bsl::strlen
@@ -2325,8 +2324,9 @@ static void testN1_decodeFromFile()
         }
     };
 
-    bdlb::ScopeExitAny guard(
-        bdlf::BindUtil::bind(local::deleteFile, os.str().data()));
+    bdlb::ScopeExitAny guard([filePath = os.str().data()]() {
+        local::deleteFile(filePath);
+    });
 
     // Dump blob into file
     bsl::ofstream ofile(os.str().data(), bsl::ios::binary);
