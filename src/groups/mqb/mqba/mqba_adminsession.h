@@ -101,8 +101,8 @@ struct AdminSessionState {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    AdminSessionState(const AdminSessionState&);             // = delete;
-    AdminSessionState& operator=(const AdminSessionState&);  // = delete;
+    AdminSessionState(const AdminSessionState&)            = delete;
+    AdminSessionState& operator=(const AdminSessionState&) = delete;
 
   public:
     // TRAITS
@@ -163,8 +163,8 @@ class AdminSession : public mqbnet::Session, public mqbi::DispatcherClient {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    AdminSession(const AdminSession&);             // = delete;
-    AdminSession& operator=(const AdminSession&);  // = delete;
+    AdminSession(const AdminSession&)            = delete;
+    AdminSession& operator=(const AdminSession&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

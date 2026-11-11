@@ -141,8 +141,8 @@ class SessionNegotiator : public mqbnet::Negotiator {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator not implemented.
-    SessionNegotiator(const SessionNegotiator&);             // = delete
-    SessionNegotiator& operator=(const SessionNegotiator&);  // = delete
+    SessionNegotiator(const SessionNegotiator&)            = delete;
+    SessionNegotiator& operator=(const SessionNegotiator&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

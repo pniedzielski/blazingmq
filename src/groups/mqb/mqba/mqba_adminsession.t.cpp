@@ -186,8 +186,8 @@ class QueueProcessor {
     bslmt::ThreadUtil::Handle d_handle;
 
     // NOT IMPLEMENTED
-    QueueProcessor(const QueueProcessor&);
-    QueueProcessor& operator=(const QueueProcessor&);
+    QueueProcessor(const QueueProcessor&)            = delete;
+    QueueProcessor& operator=(const QueueProcessor&) = delete;
 
   public:
     // CREATORS

@@ -215,8 +215,8 @@ struct ClientSessionState {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    ClientSessionState(const ClientSessionState&);             // = delete;
-    ClientSessionState& operator=(const ClientSessionState&);  // = delete;
+    ClientSessionState(const ClientSessionState&)            = delete;
+    ClientSessionState& operator=(const ClientSessionState&) = delete;
 
   public:
     // TRAITS
@@ -368,8 +368,8 @@ class ClientSession : public mqbnet::Session,
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    ClientSession(const ClientSession&);             // = delete;
-    ClientSession& operator=(const ClientSession&);  // = delete;
+    ClientSession(const ClientSession&)            = delete;
+    ClientSession& operator=(const ClientSession&) = delete;
 
   private:
     // PRIVATE MANIPULATORS
