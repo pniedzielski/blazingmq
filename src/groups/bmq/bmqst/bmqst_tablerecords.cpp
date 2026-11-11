@@ -22,22 +22,6 @@
 namespace BloombergLP {
 namespace bmqst {
 
-namespace {
-
-// STRUCTS
-struct SortBufferComparator {
-    TableRecords::SortFn* d_sort_p;
-
-    // ACCESSORS
-    bool operator()(const bsl::pair<const StatContext*, bool>& lhs,
-                    const bsl::pair<const StatContext*, bool>& rhs)
-    {
-        return (*d_sort_p)(lhs.first, rhs.first);
-    }
-};
-
-}  // close anonymous namespace
-
 // ------------------------
 // class TableRecordsRecord
 // ------------------------
@@ -134,11 +118,12 @@ void TableRecords::addContext(const StatContext* context,
 
     // Sort
     if (d_sort) {
-        SortBufferComparator cmp;
-        cmp.d_sort_p = &d_sort;
         bsl::sort(d_sortBuffer.begin() + sortBufferStartSize,
                   d_sortBuffer.end(),
-                  cmp);
+                  [this](const bsl::pair<const StatContext*, bool>& lhs,
+                         const bsl::pair<const StatContext*, bool>& rhs) {
+                      return d_sort(lhs.first, rhs.first);
+                  });
     }
 
     for (size_t i = sortBufferStartSize; i < d_sortBuffer.size(); ++i) {
