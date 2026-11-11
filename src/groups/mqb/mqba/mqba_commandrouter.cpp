@@ -75,12 +75,12 @@ int CommandRouter::AllPartitionPrimariesRoutingMode::getRouteTargets(
     int rc;
 
     cluster->dispatcher()->execute(
-        bdlf::BindUtil::bind(&mqbi::Cluster::getPrimaryNodes,
-                             cluster,
-                             &rc,
-                             bsl::ref(errorDescription),
-                             &routeTargets->d_nodes,
-                             &routeTargets->d_self),
+        [cluster, &rc, &errorDescription, routeTargets]() {
+            cluster->getPrimaryNodes(&rc,
+                                     errorDescription,
+                                     &routeTargets->d_nodes,
+                                     &routeTargets->d_self);
+        },
         cluster);
 
     cluster->dispatcher()->synchronize(cluster);
@@ -108,13 +108,18 @@ int CommandRouter::SinglePartitionPrimaryRoutingMode::getRouteTargets(
     int rc;
 
     cluster->dispatcher()->execute(
-        bdlf::BindUtil::bind(&mqbi::Cluster::getPartitionPrimaryNode,
-                             cluster,
-                             &rc,
-                             bsl::ref(errorDescription),
-                             &node,
-                             &routeTargets->d_self,
-                             d_partitionId),
+        [cluster,
+         &rc,
+         &errorDescription,
+         &node,
+         routeTargets,
+         partitionId = d_partitionId]() {
+            cluster->getPartitionPrimaryNode(&rc,
+                                             errorDescription,
+                                             &node,
+                                             &routeTargets->d_self,
+                                             partitionId);
+        },
         cluster);
 
     cluster->dispatcher()->synchronize(cluster);
@@ -219,9 +224,9 @@ int CommandRouter::route(bsl::ostream&  errorDescription,
     BALL_LOG_INFO << os.str();
 
     contextSp->setResponseCb(
-        bdlf::BindUtil::bind(&CommandRouter::onRouteCommandResponse,
-                             this,
-                             bdlf::PlaceHolders::_1));
+        [this](const MultiRequestContextSp& requestContext) {
+            onRouteCommandResponse(requestContext);
+        });
 
     const mqbcfg::AppConfig& config  = mqbcfg::BrokerConfig::get();
     double                   timeout = config.routeCommandTimeoutMs() / 1000.0;
