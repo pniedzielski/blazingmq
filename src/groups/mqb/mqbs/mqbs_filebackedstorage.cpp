@@ -121,10 +121,9 @@ FileBackedStorage::FileBackedStorage(
 , d_capacityMeter(
       bsl::string("queue [", d_allocator_p) + queueUri.asString() + "]",
       domain->capacityMeter(),
-      bdlf::BindUtil::bindS(d_allocator_p,
-                            &FileBackedStorage::logAppsSubscriptionInfoCb,
-                            this,
-                            bdlf::PlaceHolders::_1),  // stream
+      [this](bsl::ostream& stream) -> bsl::ostream& {
+          return logAppsSubscriptionInfoCb(stream);
+      },
       d_allocator_p)
 , d_handles(bsls::TimeInterval()
                 .addMilliseconds(config.deduplicationTimeMs())
@@ -634,11 +633,11 @@ FileBackedStorage::removeAll(const mqbu::StorageKey& appKey)
     if (!appKey.isNull()) {
         rc = d_virtualStorageCatalog.purge(
             appKey,
-            bdlf::BindUtil::bind(&FileBackedStorage::writeAppPurgeRecord,
-                                 this,
-                                 timestamp,
-                                 bdlf::PlaceHolders::_1,
-                                 bdlf::PlaceHolders::_2));
+            [this, timestamp](
+                const mqbu::StorageKey&                          key,
+                const VirtualStorageCatalog::DataStreamIterator& first) {
+                return writeAppPurgeRecord(timestamp, key, first);
+            });
         if (d_handles.empty()) {
             d_isEmpty.storeRelaxed(1);
         }
@@ -678,16 +677,14 @@ bool FileBackedStorage::removeVirtualStorage(const mqbu::StorageKey& appKey,
         const bsls::Types::Uint64 timestamp =
             bdlt::EpochUtil::convertToTimeT64(bdlt::CurrentTime::utc());
 
-        onPurge = bdlf::BindUtil::bind(&FileBackedStorage::writeAppPurgeRecord,
-                                       this,
-                                       timestamp,
-                                       bdlf::PlaceHolders::_1,
-                                       bdlf::PlaceHolders::_2);
-        onRemove = bdlf::BindUtil::bind(
-            &FileBackedStorage::writeAppDeletionRecord,
-            this,
-            timestamp,
-            bdlf::PlaceHolders::_1);
+        onPurge = [this, timestamp](
+                      const mqbu::StorageKey&                          key,
+                      const VirtualStorageCatalog::DataStreamIterator& first) {
+            return writeAppPurgeRecord(timestamp, key, first);
+        };
+        onRemove = [this, timestamp](const mqbu::StorageKey& key) {
+            return writeAppDeletionRecord(timestamp, key);
+        };
     }
 
     mqbi::StorageResult::Enum rc =
