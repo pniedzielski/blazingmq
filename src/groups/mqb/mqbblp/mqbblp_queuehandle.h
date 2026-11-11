@@ -197,18 +197,18 @@ class QueueHandle : public mqbi::QueueHandle {
     StatsSp d_producerStats;
 
     /// Whether the client is still connected (set to false by
-    /// clearClientDispatched).
+    /// detachClient).
     bool d_haveClient;
 
     bslma::Allocator* d_allocator_p;
 
   private:
     // PRIVATE MANIPULATORS
-    void confirmMessageDispatched(const bmqt::MessageGUID& msgGUID,
-                                  unsigned int downstreamSubQueueId);
+    void processConfirm(const bmqt::MessageGUID& msgGUID,
+                        unsigned int             downstreamSubQueueId);
 
-    void rejectMessageDispatched(const bmqt::MessageGUID& msgGUID,
-                                 unsigned int downstreamSubQueueId);
+    void processReject(const bmqt::MessageGUID& msgGUID,
+                       unsigned int             downstreamSubQueueId);
 
     mqbu::ResourceUsageMonitorStateTransition::Enum
     updateMonitor(const bsl::shared_ptr<Downstream>& subStream,
@@ -222,16 +222,16 @@ class QueueHandle : public mqbi::QueueHandle {
                   const bsl::string&    appId);
 
     /// THREAD: this method must be called from the Queue dispatcher thread.
-    void configureDispatched(
+    void applyStreamParameters(
         const bmqp_ctrlmsg::StreamParameters&              streamParameters,
         const mqbi::QueueHandle::HandleConfiguredCallback& configuredCb);
 
     /// THREAD: this method must be called from the Queue dispatcher thread.
-    void deconfigureDispatched(
+    void deconfigureAllSubStreams(
         const mqbi::QueueHandle::VoidFunctor& deconfiguredCb);
 
     /// THREAD: this method is invoked only from queue dispatcher thread.
-    void clearClientDispatched(bool hasLostClient);
+    void detachClient(bool hasLostClient);
 
     /// Called by the `Queue` to deliver the specified `message` with the
     /// specified `msgSize`, `msgGUID`, `attributes` and `isOutOfOrder`
@@ -668,7 +668,7 @@ inline QueueHandle::ConfirmFunctor::ConfirmFunctor(
 
 inline void QueueHandle::ConfirmFunctor::operator()() const
 {
-    d_owner_p->confirmMessageDispatched(d_guid, d_downstreamSubQueueId);
+    d_owner_p->processConfirm(d_guid, d_downstreamSubQueueId);
 }
 
 }  // close package namespace

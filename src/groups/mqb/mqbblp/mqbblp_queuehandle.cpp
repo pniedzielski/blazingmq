@@ -151,8 +151,8 @@ QueueHandle::ConfirmFunctor::~ConfirmFunctor()
 // class QueueHandle
 // -----------------
 
-void QueueHandle::confirmMessageDispatched(const bmqt::MessageGUID& msgGUID,
-                                           unsigned int downstreamSubQueueId)
+void QueueHandle::processConfirm(const bmqt::MessageGUID& msgGUID,
+                                 unsigned int             downstreamSubQueueId)
 {
     // executed by the *QUEUE_DISPATCHER* thread
 
@@ -229,8 +229,8 @@ void QueueHandle::confirmMessageDispatched(const bmqt::MessageGUID& msgGUID,
     d_queue_sp->confirmMessage(msgGUID, upstreamSubQueueId, this);
 }
 
-void QueueHandle::rejectMessageDispatched(const bmqt::MessageGUID& msgGUID,
-                                          unsigned int downstreamSubQueueId)
+void QueueHandle::processReject(const bmqt::MessageGUID& msgGUID,
+                                unsigned int             downstreamSubQueueId)
 {
     // executed by the *QUEUE_DISPATCHER* thread
 
@@ -480,7 +480,7 @@ mqbu::ResourceUsageMonitorStateTransition::Enum QueueHandle::updateMonitor(
     return resourceUsageStateChange;
 }
 
-void QueueHandle::clearClientDispatched(bool hasLostClient)
+void QueueHandle::detachClient(bool hasLostClient)
 {
     // executed by the *QUEUE_DISPATCHER* thread
 
@@ -891,7 +891,7 @@ void QueueHandle::confirmMessage(mqbi::DispatcherEventSource* eventSource_p,
     BSLS_ASSERT_SAFE(eventSource_p);
 
     // NOTE: We don't verify here that the queue was opened with 'e_READ' flag,
-    //       refer to 'confirmMessageDispatched'.
+    //       refer to 'processConfirm'.
 
     // Enqueue an event to process the confirm on the queue thread
 
@@ -921,7 +921,7 @@ void QueueHandle::rejectMessage(const bmqt::MessageGUID& msgGUID,
     // Enqueue an event to process the confirm on the queue thread
     d_queue_sp->dispatcher()->execute(
         [this, msgGUID, downstreamSubQueueId]() {
-            rejectMessageDispatched(msgGUID, downstreamSubQueueId);
+            processReject(msgGUID, downstreamSubQueueId);
         },
         d_queue_sp.get());
 }
@@ -1089,12 +1089,12 @@ void QueueHandle::configure(
 
     d_queue_sp->dispatcher()->execute(
         [this, streamParameters, configuredCb]() {
-            configureDispatched(streamParameters, configuredCb);
+            applyStreamParameters(streamParameters, configuredCb);
         },
         d_queue_sp.get());
 }
 
-void QueueHandle::configureDispatched(
+void QueueHandle::applyStreamParameters(
     const bmqp_ctrlmsg::StreamParameters&              streamParameters,
     const mqbi::QueueHandle::HandleConfiguredCallback& configuredCb)
 {
@@ -1136,7 +1136,7 @@ void QueueHandle::deconfigureAll(
 
     d_queue_sp->dispatcher()->execute(
         [this, deconfiguredCb]() {
-            deconfigureDispatched(deconfiguredCb);
+            deconfigureAllSubStreams(deconfiguredCb);
         },
         d_queue_sp.get(),
         mqbi::DispatcherEventType::e_DISPATCHER);
@@ -1145,7 +1145,7 @@ void QueueHandle::deconfigureAll(
     // 'd_flushList'
 }
 
-void QueueHandle::deconfigureDispatched(
+void QueueHandle::deconfigureAllSubStreams(
     const mqbi::QueueHandle::VoidFunctor& deconfiguredCb)
 {
     // executed by *QUEUE_DISPATCHER* thread
@@ -1164,7 +1164,7 @@ void QueueHandle::deconfigureDispatched(
         nullStreamParameters.appId() = citer->first;
 
         // Not tracking the results.
-        QueueHandle::configureDispatched(
+        QueueHandle::applyStreamParameters(
             nullStreamParameters,
             [context](const bmqp_ctrlmsg::Status&           status,
                       const bmqp_ctrlmsg::StreamParameters& streamParameters) {
@@ -1200,7 +1200,7 @@ void QueueHandle::clearClient(bool hasLostClient)
 
     d_queue_sp->dispatcher()->execute(
         [this, hasLostClient]() {
-            clearClientDispatched(hasLostClient);
+            detachClient(hasLostClient);
         },
         d_queue_sp.get());
 }

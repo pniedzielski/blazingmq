@@ -390,7 +390,7 @@ void QueueSessionManager::onHandleReleased(
         // implementation notes at top of this file for explanation).
 
         if (handle) {
-            // Make sure 'clearClientDispatched' has finished _before_ 'handle'
+            // Make sure 'detachClient' has finished _before_ 'handle'
             // destruction
             BSLS_ASSERT_SAFE(handle->queue());
 

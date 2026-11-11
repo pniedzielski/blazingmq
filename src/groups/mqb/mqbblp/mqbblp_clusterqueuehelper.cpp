@@ -2486,7 +2486,7 @@ void ClusterQueueHelper::onHandleReleasedDispatched(
         requester->clusterNode());
     // Release the handle's ptr in the queue's context to guarantee that the
     // handle will be destroyed after all ongoing queue events are handled.
-    // E.g. clearClientDispatched.
+    // E.g. detachClient.
     // Releasing the handle in the queue's thread allows to keep the handle
     // alive until the check is complete.
 

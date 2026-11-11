@@ -1335,7 +1335,7 @@ mqbi::QueueHandle* RelayQueueEngine::getHandle(
                                        d_queueState_p->handleParameters()));
     // The handle may have 'd_haveClient == false' in the case when in between
     // outgoing OpenQueue request and incoming OpenQueue response, the client
-    // disconnects and calls 'QueueHandle::clearClient'/'clearClientDispatched'
+    // disconnects and calls 'QueueHandle::clearClient'/'detachClient'
     // Should not be a problem because 'QueueHandle::canDeliver' does check for
     // the client presence.
 
