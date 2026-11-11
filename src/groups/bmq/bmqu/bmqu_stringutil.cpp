@@ -80,10 +80,9 @@ bool StringUtil::contains(const bsl::string&       str,
 
 bool StringUtil::isPrintable(const bslstl::StringRef& str)
 {
-    for (bslstl::StringRef::const_iterator it = str.begin(); it != str.end();
-         ++it) {
+    for (char c : str) {
         if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                !bdlb::CharType::isPrint(*it))) {
+                !bdlb::CharType::isPrint(c))) {
             BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
             return false;  // RETURN
         }
@@ -97,11 +96,11 @@ bsl::string& StringUtil::sanitize(bsl::string* str)
     // PRECONDITIONS
     BSLS_ASSERT(str);
 
-    for (bsl::string::iterator it = str->begin(); it != str->end(); ++it) {
+    for (char& c : *str) {
         if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                !bdlb::CharType::isPrint(*it))) {
+                !bdlb::CharType::isPrint(c))) {
             BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-            *it = '?';
+            c = '?';
         }
     }
 
