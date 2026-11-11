@@ -39,7 +39,7 @@ static const char k_DISPATCHER_STAT_NAME[] = "dispatcher";
 // 'mqbstat::DispatcherStats::DispatcherStatsIndex' in sync with
 // 'mqbi::DispatcherEventType'.
 #define STAT_ENUM_SYNC(EVENT_NAME)                                            \
-    BSLMF_ASSERT(                                                             \
+    static_assert(                                                            \
         static_cast<int>(DispatcherStats::DispatcherStatsIndex::              \
                              e_STAT_PROCESSING_TIME_##EVENT_NAME) ==          \
         static_cast<int>(mqbi::DispatcherEventType::e_##EVENT_NAME));

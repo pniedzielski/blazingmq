@@ -21,7 +21,6 @@
 // BDE
 #include <bsl_string.h>
 #include <bsl_vector.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 
 #include <ntsa_error.h>

@@ -33,7 +33,6 @@
 #include <bdlbb_blobutil.h>
 #include <bdlbb_pooledblobbufferfactory.h>
 #include <bsl_ios.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 
 // TEST DRIVER
@@ -741,11 +740,11 @@ static void test6_printing()
 {
     bmqtst::TestHelper::printTestName("PRINT");
 
-    BSLMF_ASSERT(bmqp::EventType::e_CONTROL ==
-                 bmqp::EventType::k_LOWEST_SUPPORTED_EVENT_TYPE);
+    static_assert(bmqp::EventType::e_CONTROL ==
+                  bmqp::EventType::k_LOWEST_SUPPORTED_EVENT_TYPE);
 
-    BSLMF_ASSERT(bmqp::EventType::e_AUTHENTICATION ==
-                 bmqp::EventType::k_HIGHEST_SUPPORTED_EVENT_TYPE);
+    static_assert(bmqp::EventType::e_AUTHENTICATION ==
+                  bmqp::EventType::k_HIGHEST_SUPPORTED_EVENT_TYPE);
 
     bdlbb::PooledBlobBufferFactory bufferFactory(
         1024,

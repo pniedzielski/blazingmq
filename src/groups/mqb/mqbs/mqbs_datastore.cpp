@@ -20,15 +20,14 @@
 #include <bsl_cstddef.h>
 #include <bsl_ostream.h>
 #include <bslim_printer.h>
-#include <bslmf_assert.h>
 
 namespace BloombergLP {
 namespace mqbs {
 
 namespace {
 // Compile-time assertions for size of 'mqbs::DataStoreRecordHandle'.
-BSLMF_ASSERT(sizeof(DataStoreRecordHandle) ==
-             sizeof(DataStoreConfig::RecordIterator));
+static_assert(sizeof(DataStoreRecordHandle) ==
+              sizeof(DataStoreConfig::RecordIterator));
 }  // close unnamed namespace
 
 // ------------------------------

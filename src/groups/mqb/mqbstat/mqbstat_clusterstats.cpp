@@ -32,7 +32,6 @@
 #include <bsl_ostream.h>
 #include <bsl_utility.h>
 #include <bsla_annotations.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 
 namespace BloombergLP {
@@ -98,8 +97,8 @@ bsls::Types::Int64 ClusterStats::getValue(const bmqst::StatContext& context,
         // was unhealthy for 'one snapshot' over the entire period, we should
         // report it as unhealthy, therefore we will report the maximum
         // snapshot value, and hence ensure that 'healthy < un-healty'.
-        BSLMF_ASSERT(ClusterStatus::e_CLUSTER_STATUS_HEALTHY <
-                     ClusterStatus::e_CLUSTER_STATUS_UNHEALTHY);
+        static_assert(ClusterStatus::e_CLUSTER_STATUS_HEALTHY <
+                      ClusterStatus::e_CLUSTER_STATUS_UNHEALTHY);
 
         return STAT_RANGE(rangeMax, e_CLUSTER_STATUS);
     }
@@ -109,7 +108,7 @@ bsls::Types::Int64 ClusterStats::getValue(const bmqst::StatContext& context,
     }
     case Stat::e_LEADER_STATUS: {
         // Favor leader over non follower.
-        BSLMF_ASSERT(LeaderStatus::e_FOLLOWER < LeaderStatus::e_LEADER);
+        static_assert(LeaderStatus::e_FOLLOWER < LeaderStatus::e_LEADER);
 
         return STAT_RANGE(rangeMax, e_LEADER_STATUS);
     }
@@ -144,8 +143,8 @@ bsls::Types::Int64 ClusterStats::getValue(const bmqst::StatContext& context,
     }
     case Stat::e_PARTITION_PRIMARY_STATUS: {
         // Favor primary over replica.
-        BSLMF_ASSERT(PartitionStats::PrimaryStatus::e_REPLICA <
-                     PartitionStats::PrimaryStatus::e_PRIMARY);
+        static_assert(PartitionStats::PrimaryStatus::e_REPLICA <
+                      PartitionStats::PrimaryStatus::e_PRIMARY);
 
         return STAT_RANGE(rangeMax, e_PRIMARY_STATUS);
     }

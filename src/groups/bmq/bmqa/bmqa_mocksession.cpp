@@ -53,7 +53,6 @@
 #include <bsla_annotations.h>
 #include <bslma_default.h>
 #include <bslmf_allocatorargt.h>
-#include <bslmf_assert.h>
 #include <bslmt_lockguard.h>
 #include <bslmt_qlock.h>
 #include <bsls_platform.h>
@@ -100,7 +99,7 @@ bsl::shared_ptr<bmqp::MessageGUIDGenerator> g_guidGenerator_sp;
 /// First call to `initialize` assigns a Allocator to this `g_alloc_p`.
 bslma::Allocator* g_alloc_p = 0;
 
-BSLMF_ASSERT(sizeof(bsl::shared_ptr<bmqimp::Event>) == sizeof(Event));
+static_assert(sizeof(bsl::shared_ptr<bmqimp::Event>) == sizeof(Event));
 // Ensure that that the types are matching
 
 /// Default installed callback on the mocksession: log the specified
@@ -1118,8 +1117,8 @@ MockSession::MockSession(const bmqt::SessionOptions& options,
 , d_sessionOptions(options, allocator)
 , d_allocator_p(bslma::Default::allocator(allocator))
 {
-    BSLMF_ASSERT(k_MAX_SIZEOF_BMQC_TWOKEYHASHMAP >=
-                 sizeof(UriCorrIdToQueueMap));
+    static_assert(k_MAX_SIZEOF_BMQC_TWOKEYHASHMAP >=
+                  sizeof(UriCorrIdToQueueMap));
     // Compile-time assert to keep the hardcoded value of size of an object of
     // type 'bmqc::TwoKeyHashMap' in sync with its actual size.  We need to
     // hard code the size in 'bmqa_mocksession.h' because none of the 'bmqc'

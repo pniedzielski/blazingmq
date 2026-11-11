@@ -28,7 +28,6 @@
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bslma_allocator.h>
-#include <bslmf_assert.h>
 #include <bsls_performancehint.h>
 
 namespace BloombergLP {
@@ -392,8 +391,8 @@ bmqt::EventBuilderResult::Enum
 PushEventBuilder::addMsgGroupIdOption(const Protocol::MsgGroupId& msgGroupId)
 {
     // PRECONDITIONS
-    BSLMF_ASSERT(OptionHeader::k_MAX_SIZE >
-                 Protocol::k_MSG_GROUP_ID_MAX_LENGTH);
+    static_assert(OptionHeader::k_MAX_SIZE >
+                  Protocol::k_MSG_GROUP_ID_MAX_LENGTH);
     // There are two checks below to validate option size.  One deals with
     // 'OptionHeader::k_MAX_SIZE' limit, see
     // 'OptionUtil::OptionsBox::canAdd'.  Another one checks that the

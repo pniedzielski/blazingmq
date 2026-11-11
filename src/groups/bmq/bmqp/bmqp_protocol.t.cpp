@@ -31,7 +31,6 @@
 #include <bsl_ios.h>
 #include <bsl_limits.h>
 #include <bsl_string.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 
 // CONVENIENCE
@@ -1374,11 +1373,11 @@ static void test4_enumPrint()
 
     PV("Test bmqp::EventType printing");
     {
-        BSLMF_ASSERT(bmqp::EventType::e_CONTROL ==
-                     bmqp::EventType::k_LOWEST_SUPPORTED_EVENT_TYPE);
+        static_assert(bmqp::EventType::e_CONTROL ==
+                      bmqp::EventType::k_LOWEST_SUPPORTED_EVENT_TYPE);
 
-        BSLMF_ASSERT(bmqp::EventType::e_AUTHENTICATION ==
-                     bmqp::EventType::k_HIGHEST_SUPPORTED_EVENT_TYPE);
+        static_assert(bmqp::EventType::e_AUTHENTICATION ==
+                      bmqp::EventType::k_HIGHEST_SUPPORTED_EVENT_TYPE);
 
         PrintTestData k_DATA[] = {
             {L_, bmqp::EventType::e_UNDEFINED, "UNDEFINED"},
@@ -1405,11 +1404,11 @@ static void test4_enumPrint()
 
     PV("Test bmqp::EncodingType printing");
     {
-        BSLMF_ASSERT(bmqp::EncodingType::e_BER ==
-                     bmqp::EncodingType::k_LOWEST_SUPPORTED_ENCODING_TYPE);
+        static_assert(bmqp::EncodingType::e_BER ==
+                      bmqp::EncodingType::k_LOWEST_SUPPORTED_ENCODING_TYPE);
 
-        BSLMF_ASSERT(bmqp::EncodingType::e_JSON ==
-                     bmqp::EncodingType::k_HIGHEST_SUPPORTED_ENCODING_TYPE);
+        static_assert(bmqp::EncodingType::e_JSON ==
+                      bmqp::EncodingType::k_HIGHEST_SUPPORTED_ENCODING_TYPE);
 
         PrintTestData k_DATA[] = {
             {L_, bmqp::EncodingType::e_UNKNOWN, "UNKNOWN"},
@@ -1421,11 +1420,11 @@ static void test4_enumPrint()
 
     PV("Test bmqp::OptionType printing");
     {
-        BSLMF_ASSERT(bmqp::OptionType::k_LOWEST_SUPPORTED_TYPE ==
-                     bmqp::OptionType::e_SUB_QUEUE_IDS_OLD);
+        static_assert(bmqp::OptionType::k_LOWEST_SUPPORTED_TYPE ==
+                      bmqp::OptionType::e_SUB_QUEUE_IDS_OLD);
 
-        BSLMF_ASSERT(bmqp::OptionType::k_HIGHEST_SUPPORTED_TYPE ==
-                     bmqp::OptionType::e_SUB_QUEUE_INFOS);
+        static_assert(bmqp::OptionType::k_HIGHEST_SUPPORTED_TYPE ==
+                      bmqp::OptionType::e_SUB_QUEUE_INFOS);
 
         PrintTestData k_DATA[] = {
             {L_, bmqp::OptionType::e_UNDEFINED, "UNDEFINED"},
@@ -1438,14 +1437,14 @@ static void test4_enumPrint()
 
     PV("Test bmqp::PutHeaderFlags printing");
     {
-        BSLMF_ASSERT(bmqp::PutHeaderFlags::k_LOWEST_SUPPORTED_PUT_FLAG ==
-                     bmqp::PutHeaderFlags::e_ACK_REQUESTED);
+        static_assert(bmqp::PutHeaderFlags::k_LOWEST_SUPPORTED_PUT_FLAG ==
+                      bmqp::PutHeaderFlags::e_ACK_REQUESTED);
 
-        BSLMF_ASSERT(bmqp::PutHeaderFlags::k_HIGHEST_SUPPORTED_PUT_FLAG ==
-                     bmqp::PutHeaderFlags::e_MESSAGE_PROPERTIES);
+        static_assert(bmqp::PutHeaderFlags::k_HIGHEST_SUPPORTED_PUT_FLAG ==
+                      bmqp::PutHeaderFlags::e_MESSAGE_PROPERTIES);
 
-        BSLMF_ASSERT(bmqp::PutHeaderFlags::k_HIGHEST_PUT_FLAG ==
-                     bmqp::PutHeaderFlags::e_UNUSED4);
+        static_assert(bmqp::PutHeaderFlags::k_HIGHEST_PUT_FLAG ==
+                      bmqp::PutHeaderFlags::e_UNUSED4);
 
         PrintTestData k_DATA[] = {
             {L_, bmqp::PutHeaderFlags::e_ACK_REQUESTED, "ACK_REQUESTED"},
@@ -1460,14 +1459,14 @@ static void test4_enumPrint()
 
     PV("Test bmqp::PushHeaderFlags printing");
     {
-        BSLMF_ASSERT(bmqp::PushHeaderFlags::k_LOWEST_SUPPORTED_PUSH_FLAG ==
-                     bmqp::PushHeaderFlags::e_IMPLICIT_PAYLOAD);
+        static_assert(bmqp::PushHeaderFlags::k_LOWEST_SUPPORTED_PUSH_FLAG ==
+                      bmqp::PushHeaderFlags::e_IMPLICIT_PAYLOAD);
 
-        BSLMF_ASSERT(bmqp::PushHeaderFlags::k_HIGHEST_SUPPORTED_PUSH_FLAG ==
-                     bmqp::PushHeaderFlags::e_MESSAGE_PROPERTIES);
+        static_assert(bmqp::PushHeaderFlags::k_HIGHEST_SUPPORTED_PUSH_FLAG ==
+                      bmqp::PushHeaderFlags::e_MESSAGE_PROPERTIES);
 
-        BSLMF_ASSERT(bmqp::PushHeaderFlags::k_HIGHEST_PUSH_FLAG ==
-                     bmqp::PushHeaderFlags::e_UNUSED4);
+        static_assert(bmqp::PushHeaderFlags::k_HIGHEST_PUSH_FLAG ==
+                      bmqp::PushHeaderFlags::e_UNUSED4);
 
         PrintTestData k_DATA[] = {
             {L_,
@@ -1484,11 +1483,11 @@ static void test4_enumPrint()
 
     PV("Test bmqp::StorageMessageType printing");
     {
-        BSLMF_ASSERT(
+        static_assert(
             bmqp::StorageMessageType::k_LOWEST_SUPPORTED_STORAGE_MSG_TYPE ==
             bmqp::StorageMessageType::e_DATA);
 
-        BSLMF_ASSERT(
+        static_assert(
             bmqp::StorageMessageType::k_HIGHEST_SUPPORTED_STORAGE_MSG_TYPE ==
             bmqp::StorageMessageType::e_QUEUE_OP);
 
@@ -1506,16 +1505,16 @@ static void test4_enumPrint()
 
     PV("Test bmqp::StorageHeaderFlags printing");
     {
-        BSLMF_ASSERT(
+        static_assert(
             bmqp::StorageHeaderFlags::k_LOWEST_SUPPORTED_STORAGE_FLAG ==
             bmqp::StorageHeaderFlags::e_RECEIPT_REQUESTED);
 
-        BSLMF_ASSERT(
+        static_assert(
             bmqp::StorageHeaderFlags::k_HIGHEST_SUPPORTED_STORAGE_FLAG ==
             bmqp::StorageHeaderFlags::e_RECEIPT_REQUESTED);
 
-        BSLMF_ASSERT(bmqp::StorageHeaderFlags::k_HIGHEST_STORAGE_FLAG ==
-                     bmqp::StorageHeaderFlags::e_UNUSED5);
+        static_assert(bmqp::StorageHeaderFlags::k_HIGHEST_STORAGE_FLAG ==
+                      bmqp::StorageHeaderFlags::e_UNUSED5);
 
         PrintTestData k_DATA[] = {
             {L_,
@@ -1531,13 +1530,13 @@ static void test4_enumPrint()
 
     PV("Test bmqp::RecoveryFileChunkType printing");
     {
-        BSLMF_ASSERT(bmqp::RecoveryFileChunkType::
-                         k_LOWEST_SUPPORTED_RECOVERY_CHUNK_TYPE ==
-                     bmqp::RecoveryFileChunkType::e_DATA);
+        static_assert(bmqp::RecoveryFileChunkType::
+                          k_LOWEST_SUPPORTED_RECOVERY_CHUNK_TYPE ==
+                      bmqp::RecoveryFileChunkType::e_DATA);
 
-        BSLMF_ASSERT(bmqp::RecoveryFileChunkType::
-                         k_HIGHEST_SUPPORTED_RECOVERY_CHUNK_TYPE ==
-                     bmqp::RecoveryFileChunkType::e_QLIST);
+        static_assert(bmqp::RecoveryFileChunkType::
+                          k_HIGHEST_SUPPORTED_RECOVERY_CHUNK_TYPE ==
+                      bmqp::RecoveryFileChunkType::e_QLIST);
 
         PrintTestData k_DATA[] = {
             {L_, bmqp::RecoveryFileChunkType::e_UNDEFINED, "UNDEFINED"},

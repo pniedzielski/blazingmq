@@ -23,7 +23,6 @@
 // BDE
 #include <bsl_iostream.h>
 #include <bsl_string.h>
-#include <bslmf_assert.h>
 #include <bsls_platform.h>
 #include <bsls_protocoltest.h>
 

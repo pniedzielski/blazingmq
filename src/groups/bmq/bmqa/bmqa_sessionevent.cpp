@@ -26,7 +26,6 @@
 // BDE
 #include <bsl_memory.h>
 #include <bsl_ostream.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 
 namespace BloombergLP {
@@ -34,7 +33,7 @@ namespace bmqa {
 
 namespace {
 // Do some compilation time validation
-BSLMF_ASSERT(sizeof(QueueId) == sizeof(bsl::shared_ptr<bmqimp::Queue>));
+static_assert(sizeof(QueueId) == sizeof(bsl::shared_ptr<bmqimp::Queue>));
 }  // close unnamed namespace
 
 // Internal documentation about this component: 'bmqa::SessionEvent' is just a

@@ -130,7 +130,6 @@
 #include <bsl_cstring.h>  // for bsl::memset & bsl::memcpy
 #include <bsl_ostream.h>
 #include <bsla_annotations.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 #include <bsls_types.h>
 

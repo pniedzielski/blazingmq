@@ -186,7 +186,6 @@
 #include <bsl_string.h>  // for bslstl::StringRef
 #include <bsl_type_traits.h>
 #include <bsla_annotations.h>
-#include <bslmf_assert.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
 #include <bsls_types.h>
@@ -3048,7 +3047,7 @@ struct StorageHeaderFlags {
     /// Used by test drivers
     static const int k_VALUE_COUNT = StorageHeader::k_FLAGS_NUM_BITS;
 
-    BSLMF_ASSERT(1 << (k_VALUE_COUNT - 1) == k_HIGHEST_STORAGE_FLAG);
+    static_assert(1 << (k_VALUE_COUNT - 1) == k_HIGHEST_STORAGE_FLAG);
 
     // CLASS METHODS
 

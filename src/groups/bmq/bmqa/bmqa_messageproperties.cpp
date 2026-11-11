@@ -26,7 +26,6 @@
 #include <bsl_ostream.h>
 #include <bsl_vector.h>
 #include <bslma_default.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 
 namespace BloombergLP {
@@ -38,20 +37,20 @@ namespace {
 // Note that this component needs to re-declare these constants because bmqp
 // headers cannot be included in application-facing headers.
 
-BSLMF_ASSERT(MessageProperties::k_MAX_NUM_PROPERTIES ==
-             bmqp::MessageProperties::k_MAX_NUM_PROPERTIES);
+static_assert(MessageProperties::k_MAX_NUM_PROPERTIES ==
+              bmqp::MessageProperties::k_MAX_NUM_PROPERTIES);
 
-BSLMF_ASSERT(MessageProperties::k_MAX_PROPERTIES_AREA_LENGTH ==
-             bmqp::MessageProperties::k_MAX_PROPERTIES_AREA_LENGTH);
+static_assert(MessageProperties::k_MAX_PROPERTIES_AREA_LENGTH ==
+              bmqp::MessageProperties::k_MAX_PROPERTIES_AREA_LENGTH);
 
-BSLMF_ASSERT(MessageProperties::k_MAX_PROPERTY_NAME_LENGTH ==
-             bmqp::MessageProperties::k_MAX_PROPERTY_NAME_LENGTH);
+static_assert(MessageProperties::k_MAX_PROPERTY_NAME_LENGTH ==
+              bmqp::MessageProperties::k_MAX_PROPERTY_NAME_LENGTH);
 
-BSLMF_ASSERT(MessageProperties::k_MAX_PROPERTY_VALUE_LENGTH ==
-             bmqp::MessageProperties::k_MAX_PROPERTY_VALUE_LENGTH);
+static_assert(MessageProperties::k_MAX_PROPERTY_VALUE_LENGTH ==
+              bmqp::MessageProperties::k_MAX_PROPERTY_VALUE_LENGTH);
 
-BSLMF_ASSERT(MessageProperties::k_MAX_PROPERTY_VALUE_LENGTH ==
-             bmqp::MessageProperties::k_MAX_PROPERTY_VALUE_LENGTH);
+static_assert(MessageProperties::k_MAX_PROPERTY_VALUE_LENGTH ==
+              bmqp::MessageProperties::k_MAX_PROPERTY_VALUE_LENGTH);
 }  // close unnamed namespace
 
 // -----------------------
@@ -64,8 +63,8 @@ MessageProperties::MessageProperties(bslma::Allocator* basicAllocator)
 , d_buffer()
 , d_allocator_p(bslma::Default::allocator(basicAllocator))
 {
-    BSLMF_ASSERT(k_MAX_SIZEOF_BMQP_MESSAGEPROPERTIES >=
-                 sizeof(bmqp::MessageProperties));
+    static_assert(k_MAX_SIZEOF_BMQP_MESSAGEPROPERTIES >=
+                  sizeof(bmqp::MessageProperties));
     // Compile-time assert to keep the hardcoded value of size of an object
     // of type 'bmqp::MessageProperties' in sync with its actual size.  We
     // need to hard code the size in 'bmqa_messageproperties.h' because

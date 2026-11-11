@@ -77,7 +77,6 @@
 #include <bsl_ostream.h>
 #include <bslma_allocator.h>
 #include <bslma_usesbslmaallocator.h>
-#include <bslmf_assert.h>
 #include <bslmf_issame.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
@@ -264,7 +263,7 @@ inline ValueOrError<VALUE, ERROR>::ValueOrError(
     bslma::Allocator* basicAllocator)
 : d_variant(basicAllocator)
 {
-    BSLMF_ASSERT((!bsl::is_same<VALUE, ERROR>::value));
+    static_assert((!bsl::is_same<VALUE, ERROR>::value));
     // An assertion that fails if the specified 'VALUE' and 'ERROR' types
     // are the same.
     // NOTE: If you get 'static assertion failed: (!bsl::is_same< VALUE,
@@ -284,14 +283,14 @@ ValueOrError<VALUE, ERROR>::ValueOrError(
     bslma::Allocator*                 basicAllocator)
 : d_variant(original.d_variant, basicAllocator)
 {
-    BSLMF_ASSERT((!bsl::is_same<VALUE, ERROR>::value));
+    static_assert((!bsl::is_same<VALUE, ERROR>::value));
     // See default constructor.
 }
 
 template <class VALUE, class ERROR>
 inline ValueOrError<VALUE, ERROR>::~ValueOrError()
 {
-    BSLMF_ASSERT((!bsl::is_same<VALUE, ERROR>::value));
+    static_assert((!bsl::is_same<VALUE, ERROR>::value));
 
     reset();
 }

@@ -54,7 +54,6 @@
 #include <bsla_annotations.h>
 #include <bslma_default.h>
 #include <bslma_managedptr.h>
-#include <bslmf_assert.h>
 #include <bslmf_ispolymorphic.h>
 #include <bsls_assert.h>
 #include <bsls_atomic.h>
@@ -66,25 +65,25 @@ namespace bmqa {
 namespace {
 
 // Do some compile time validation
-BSLMF_ASSERT(sizeof(MessageEventBuilder) == sizeof(MessageEventBuilderImpl));
-BSLMF_ASSERT(false == bsl::is_polymorphic<MessageEventBuilder>::value);
+static_assert(sizeof(MessageEventBuilder) == sizeof(MessageEventBuilderImpl));
+static_assert(false == bsl::is_polymorphic<MessageEventBuilder>::value);
 
-BSLMF_ASSERT(sizeof(ConfirmEventBuilder) == sizeof(ConfirmEventBuilderImpl));
-BSLMF_ASSERT(false == bsl::is_polymorphic<ConfirmEventBuilder>::value);
+static_assert(sizeof(ConfirmEventBuilder) == sizeof(ConfirmEventBuilderImpl));
+static_assert(false == bsl::is_polymorphic<ConfirmEventBuilder>::value);
 
-BSLMF_ASSERT(sizeof(QueueId) == sizeof(bsl::shared_ptr<bmqimp::Queue>));
-BSLMF_ASSERT(false == bsl::is_polymorphic<QueueId>::value);
+static_assert(sizeof(QueueId) == sizeof(bsl::shared_ptr<bmqimp::Queue>));
+static_assert(false == bsl::is_polymorphic<QueueId>::value);
 
-BSLMF_ASSERT(sizeof(Event) == sizeof(bsl::shared_ptr<bmqimp::Event>));
-BSLMF_ASSERT(false == bsl::is_polymorphic<Event>::value);
+static_assert(sizeof(Event) == sizeof(bsl::shared_ptr<bmqimp::Event>));
+static_assert(false == bsl::is_polymorphic<Event>::value);
 
-BSLMF_ASSERT(sizeof(MessageEvent) == sizeof(bsl::shared_ptr<bmqimp::Event>));
-BSLMF_ASSERT(false == bsl::is_polymorphic<MessageEvent>::value);
+static_assert(sizeof(MessageEvent) == sizeof(bsl::shared_ptr<bmqimp::Event>));
+static_assert(false == bsl::is_polymorphic<MessageEvent>::value);
 
-BSLMF_ASSERT(sizeof(SessionEvent) == sizeof(bsl::shared_ptr<bmqimp::Event>));
-BSLMF_ASSERT(false == bsl::is_polymorphic<SessionEvent>::value);
+static_assert(sizeof(SessionEvent) == sizeof(bsl::shared_ptr<bmqimp::Event>));
+static_assert(false == bsl::is_polymorphic<SessionEvent>::value);
 
-BSLMF_ASSERT(false == bsl::is_polymorphic<MessageProperties>::value);
+static_assert(false == bsl::is_polymorphic<MessageProperties>::value);
 
 // LOG CONFIGURATION
 BALL_LOG_SET_NAMESPACE_CATEGORY("BMQA.SESSION");
@@ -156,15 +155,15 @@ struct ResultCodeType
 : public ResultCodeType_Imp<typename bsl::remove_cv<RESULT_ENUM>::type> {};
 
 // Check that every type maps as we expect.
-BSLMF_ASSERT((bsl::is_same<ResultCodeType<bmqt::GenericResult::Enum>::Type,
-                           bmqt::GenericResult>::value));
-BSLMF_ASSERT((bsl::is_same<ResultCodeType<bmqt::OpenQueueResult::Enum>::Type,
-                           bmqt::OpenQueueResult>::value));
-BSLMF_ASSERT(
+static_assert((bsl::is_same<ResultCodeType<bmqt::GenericResult::Enum>::Type,
+                            bmqt::GenericResult>::value));
+static_assert((bsl::is_same<ResultCodeType<bmqt::OpenQueueResult::Enum>::Type,
+                            bmqt::OpenQueueResult>::value));
+static_assert(
     (bsl::is_same<ResultCodeType<bmqt::ConfigureQueueResult::Enum>::Type,
                   bmqt::ConfigureQueueResult>::value));
-BSLMF_ASSERT((bsl::is_same<ResultCodeType<bmqt::CloseQueueResult::Enum>::Type,
-                           bmqt::CloseQueueResult>::value));
+static_assert((bsl::is_same<ResultCodeType<bmqt::CloseQueueResult::Enum>::Type,
+                            bmqt::CloseQueueResult>::value));
 
 /// This is a templated version of the `fromStatusCode` static member functions
 /// in the types from bmqt_resultcode.

@@ -28,7 +28,6 @@
 // BDE
 #include <bsl_memory.h>
 #include <bslma_managedptr.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 #include <bsls_performancehint.h>
 
@@ -37,9 +36,9 @@ namespace bmqa {
 
 namespace {
 // Compile time sanity checks
-BSLMF_ASSERT(sizeof(Message) == sizeof(MessageImpl));
-BSLMF_ASSERT(sizeof(MessageEvent) == sizeof(bsl::shared_ptr<bmqimp::Event>));
-BSLMF_ASSERT(sizeof(QueueId) == sizeof(bsl::shared_ptr<bmqimp::Queue>));
+static_assert(sizeof(Message) == sizeof(MessageImpl));
+static_assert(sizeof(MessageEvent) == sizeof(bsl::shared_ptr<bmqimp::Event>));
+static_assert(sizeof(QueueId) == sizeof(bsl::shared_ptr<bmqimp::Queue>));
 
 }  // close unnamed namespace
 

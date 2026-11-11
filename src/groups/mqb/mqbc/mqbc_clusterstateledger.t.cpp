@@ -25,7 +25,6 @@
 #include <bsl_iostream.h>
 #include <bsl_string.h>
 #include <bsla_annotations.h>
-#include <bslmf_assert.h>
 #include <bsls_platform.h>
 #include <bsls_protocoltest.h>
 
@@ -207,8 +206,8 @@ static void test1_clusterStateLedger_protocol()
     }
 
     // ClusterStateLedgerConsistency
-    BSLMF_ASSERT(mqbc::ClusterStateLedgerConsistency::e_EVENTUAL !=
-                 mqbc::ClusterStateLedgerConsistency::e_STRONG);
+    static_assert(mqbc::ClusterStateLedgerConsistency::e_EVENTUAL !=
+                  mqbc::ClusterStateLedgerConsistency::e_STRONG);
 }
 
 static void test2_commitStatus_fromAscii()

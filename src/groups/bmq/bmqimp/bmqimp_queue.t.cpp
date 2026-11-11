@@ -28,7 +28,6 @@
 
 // BDE
 #include <bsl_ios.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 
 // TEST DRIVER
@@ -198,11 +197,11 @@ static void test3_printQueueStateTest()
 
     PV("Testing print");
 
-    BSLMF_ASSERT(bmqimp::QueueState::e_OPENING_OPN ==
-                 bmqimp::QueueState::k_LOWEST_SUPPORTED_QUEUE_STATE);
+    static_assert(bmqimp::QueueState::e_OPENING_OPN ==
+                  bmqimp::QueueState::k_LOWEST_SUPPORTED_QUEUE_STATE);
 
-    BSLMF_ASSERT(bmqimp::QueueState::e_PENDING ==
-                 bmqimp::QueueState::k_HIGHEST_SUPPORTED_QUEUE_STATE);
+    static_assert(bmqimp::QueueState::e_PENDING ==
+                  bmqimp::QueueState::k_HIGHEST_SUPPORTED_QUEUE_STATE);
 
     struct Test {
         bmqimp::QueueState::Enum d_type;

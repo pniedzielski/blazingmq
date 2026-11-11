@@ -19,7 +19,6 @@
 #include <bdlb_print.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bmqscm_version.h>
-#include <bslmf_assert.h>
 #include <bsls_alignedbuffer.h>
 #include <bsls_platform.h>
 #include <bsls_stopwatch.h>
@@ -45,9 +44,9 @@ static const char* TIME_INTERVAL_NS_UNITS[] =
 static int       TIME_INTERVAL_NS_SIZES[] = {1000, 1000, 1000, 60, 60, 24, 7};
 static const int NUM_TIME_INTERVAL_NS_UNITS = sizeof(TIME_INTERVAL_NS_UNITS) /
                                               sizeof(*TIME_INTERVAL_NS_UNITS);
-BSLMF_ASSERT(NUM_TIME_INTERVAL_NS_UNITS - 1 ==
-             (sizeof(TIME_INTERVAL_NS_SIZES) /
-              sizeof(*TIME_INTERVAL_NS_SIZES)));
+static_assert(NUM_TIME_INTERVAL_NS_UNITS - 1 ==
+              (sizeof(TIME_INTERVAL_NS_SIZES) /
+               sizeof(*TIME_INTERVAL_NS_SIZES)));
 
 static const bsls::Types::Int64 k_NANOSECS_PER_SEC = 1000000000L;  // 1e9
 

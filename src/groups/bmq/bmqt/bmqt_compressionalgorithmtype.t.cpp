@@ -21,7 +21,6 @@
 #include <bmqtst_testhelper.h>
 
 // BDE
-#include <bslmf_assert.h>
 
 // CONVENIENCE
 using namespace BloombergLP;
@@ -102,10 +101,11 @@ static void test1_enumPrint()
 
     PV("Test bmqt::CompressionAlgorithmType printing");
     {
-        BSLMF_ASSERT(bmqt::CompressionAlgorithmType::k_LOWEST_SUPPORTED_TYPE ==
-                     bmqt::CompressionAlgorithmType::e_NONE);
+        static_assert(
+            bmqt::CompressionAlgorithmType::k_LOWEST_SUPPORTED_TYPE ==
+            bmqt::CompressionAlgorithmType::e_NONE);
 
-        BSLMF_ASSERT(
+        static_assert(
             bmqt::CompressionAlgorithmType::k_HIGHEST_SUPPORTED_TYPE ==
             bmqt::CompressionAlgorithmType::e_ZLIB);
 

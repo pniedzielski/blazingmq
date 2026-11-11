@@ -20,7 +20,6 @@
 // BDE
 #include <bsl_ios.h>
 #include <bsl_string.h>
-#include <bslmf_assert.h>
 
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
@@ -130,11 +129,11 @@ static void test4_printTest()
 
     PV("Testing print");
 
-    BSLMF_ASSERT(bmqt::EncodingType::k_LOWEST_SUPPORTED_ENCODING_TYPE ==
-                 bmqt::EncodingType::e_RAW);
+    static_assert(bmqt::EncodingType::k_LOWEST_SUPPORTED_ENCODING_TYPE ==
+                  bmqt::EncodingType::e_RAW);
 
-    BSLMF_ASSERT(bmqt::EncodingType::k_HIGHEST_SUPPORTED_ENCODING_TYPE ==
-                 bmqt::EncodingType::e_MULTIPARTS);
+    static_assert(bmqt::EncodingType::k_HIGHEST_SUPPORTED_ENCODING_TYPE ==
+                  bmqt::EncodingType::e_MULTIPARTS);
 
     struct Test {
         bmqt::EncodingType::Enum d_type;

@@ -84,7 +84,6 @@
 #include <bslma_default.h>
 #include <bslma_managedptr.h>
 #include <bslmf_allocatorargt.h>
-#include <bslmf_assert.h>
 #include <bsls_timeinterval.h>
 
 namespace BloombergLP {

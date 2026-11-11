@@ -32,7 +32,6 @@
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bslma_allocator.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 #include <bsls_performancehint.h>
 
@@ -41,13 +40,13 @@ namespace bmqp {
 
 namespace {
 
-BSLMF_ASSERT(OptionType::k_HIGHEST_SUPPORTED_TYPE ==
-             OptionType::e_SUB_QUEUE_INFOS);
+static_assert(OptionType::k_HIGHEST_SUPPORTED_TYPE ==
+              OptionType::e_SUB_QUEUE_INFOS);
 // If we add new options (i.e. options other than SubQueueId), we simply
 // need to implement the processing of that particular option inside
 // 'importOptions' below.
 
-BSLMF_ASSERT(Protocol::SubQueueIdsArrayOld::static_size >= 1);
+static_assert(Protocol::SubQueueIdsArrayOld::static_size >= 1);
 // We want the static size of the SubQueueIdsArray to be at least one to
 // have our 'currSubQueueId' array in the 'flattenPushEvent' method not
 // allocate from the heap (that would be inefficient)

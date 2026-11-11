@@ -46,7 +46,6 @@
 #include <bsl_limits.h>
 #include <bslma_default.h>
 #include <bslma_usesbslmaallocator.h>
-#include <bslmf_assert.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_assert.h>
 
@@ -2041,8 +2040,8 @@ static void test7_multiplePackMessage()
                                  "40000000000000000000000000000002",
                                  "40000000000000000000000000000003"};
 
-    BSLMF_ASSERT(k_PAYLOAD_BIGGER_LEN >
-                 bmqp::Protocol::k_COMPRESSION_MIN_APPDATA_SIZE);
+    static_assert(k_PAYLOAD_BIGGER_LEN >
+                  bmqp::Protocol::k_COMPRESSION_MIN_APPDATA_SIZE);
 
     for (int i = 0; i < k_PAYLOAD_BIGGER_LEN; i++) {
         k_PAYLOAD_BIGGER[i] = k_PAYLOAD[i % 26];

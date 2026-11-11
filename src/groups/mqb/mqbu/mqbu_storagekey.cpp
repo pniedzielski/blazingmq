@@ -17,12 +17,11 @@
 
 #include <mqbscm_version.h>
 // BSL
-#include <bslmf_assert.h>
 
 namespace BloombergLP {
 namespace mqbu {
 
-BSLMF_ASSERT(StorageKey::e_KEY_LENGTH_BINARY == sizeof(StorageKey));
+static_assert(StorageKey::e_KEY_LENGTH_BINARY == sizeof(StorageKey));
 
 // ----------------
 // class StorageKey

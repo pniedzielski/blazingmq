@@ -165,7 +165,6 @@
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
 #include <bslma_usesbslmaallocator.h>
-#include <bslmf_assert.h>
 #include <bslmf_decay.h>
 #include <bslmf_integralconstant.h>
 #include <bslmf_isnothrowmoveconstructible.h>
@@ -236,7 +235,7 @@ struct OperationChain_IsOperationCallbackCompatible
 template <class CO_CALLBACK>
 class OperationChain_CompletionCallbackWrapper {
     // PRECONDITIONS
-    BSLMF_ASSERT(
+    static_assert(
         OperationChain_IsCompletionCallbackCompatible<CO_CALLBACK>::value);
 
   public:
@@ -313,9 +312,9 @@ class OperationChain_Job {
     template <class OP_CALLBACK, class CO_CALLBACK>
     class Target : public TargetBase {
         // PRECONDITIONS
-        BSLMF_ASSERT(
+        static_assert(
             OperationChain_IsOperationCallbackCompatible<OP_CALLBACK>::value);
-        BSLMF_ASSERT(
+        static_assert(
             OperationChain_IsCompletionCallbackCompatible<CO_CALLBACK>::value);
 
       private:
@@ -827,9 +826,9 @@ inline OperationChain_Job::Target<OP_CALLBACK, CO_CALLBACK>::Target(
 , d_coCallback(bsl::forward<CO_CALLBACK_ARG>(coCallback), allocator)
 {
     // PRECONDITIONS
-    BSLMF_ASSERT(
+    static_assert(
         OperationChain_IsOperationCallbackCompatible<OP_CALLBACK_ARG>::value);
-    BSLMF_ASSERT(
+    static_assert(
         OperationChain_IsCompletionCallbackCompatible<CO_CALLBACK_ARG>::value);
     BSLS_ASSERT(allocator);
 }
@@ -874,7 +873,7 @@ template <class OP_CALLBACK>
 inline void OperationChain::appendInplace(OP_CALLBACK&& opCallback)
 {
     // PRECONDITIONS
-    BSLMF_ASSERT(
+    static_assert(
         OperationChain_IsOperationCallbackCompatible<OP_CALLBACK>::value);
 
     appendInplace(bsl::forward<OP_CALLBACK>(opCallback), bdlf::noOp);
@@ -885,9 +884,9 @@ inline void OperationChain::appendInplace(OP_CALLBACK&& opCallback,
                                           CO_CALLBACK&& coCallback)
 {
     // PRECONDITIONS
-    BSLMF_ASSERT(
+    static_assert(
         OperationChain_IsOperationCallbackCompatible<OP_CALLBACK>::value);
-    BSLMF_ASSERT(
+    static_assert(
         OperationChain_IsCompletionCallbackCompatible<CO_CALLBACK>::value);
 
     // create a link
@@ -908,7 +907,7 @@ template <class OP_CALLBACK>
 inline void OperationChainLink::insert(OP_CALLBACK&& opCallback)
 {
     // PRECONDITIONS
-    BSLMF_ASSERT(
+    static_assert(
         OperationChain_IsOperationCallbackCompatible<OP_CALLBACK>::value);
 
     insert(bsl::forward<OP_CALLBACK>(opCallback), bdlf::noOp);
@@ -919,9 +918,9 @@ inline void OperationChainLink::insert(OP_CALLBACK&& opCallback,
                                        CO_CALLBACK&& coCallback)
 {
     // PRECONDITIONS
-    BSLMF_ASSERT(
+    static_assert(
         OperationChain_IsOperationCallbackCompatible<OP_CALLBACK>::value);
-    BSLMF_ASSERT(
+    static_assert(
         OperationChain_IsCompletionCallbackCompatible<CO_CALLBACK>::value);
 
     // create a job

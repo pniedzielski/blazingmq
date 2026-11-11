@@ -28,7 +28,6 @@
 #include <bdlf_bind.h>
 #include <bsl_string.h>
 #include <bsl_vector.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 #include <bsls_byteorder.h>
 
@@ -48,7 +47,7 @@ using namespace bmqio;
 namespace {
 
 static const int k_MINIMUM_PACKET_LENGTH = sizeof(bdlb::BigEndianUint32);
-BSLMF_ASSERT(k_MINIMUM_PACKET_LENGTH == sizeof(unsigned int));
+static_assert(k_MINIMUM_PACKET_LENGTH == sizeof(unsigned int));
 
 // FUNCTIONS
 

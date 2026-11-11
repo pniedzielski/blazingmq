@@ -26,7 +26,6 @@
 #include <bsl_ostream.h>
 #include <bsl_utility.h>
 #include <bslma_testallocator.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 
 // CONVENIENCE
@@ -226,10 +225,10 @@ static void test1_creators()
 // ------------------------------------------------------------------------
 {
     // PRECONDITIONS
-    BSLMF_ASSERT(bmqex::Executor_Box_SboImpCanHold<StatExecutor>::value ==
-                 true);
-    BSLMF_ASSERT(bmqex::Executor_Box_SboImpCanHold<
-                     ExecutorElarger<StatExecutor> >::value == false);
+    static_assert(bmqex::Executor_Box_SboImpCanHold<StatExecutor>::value ==
+                  true);
+    static_assert(bmqex::Executor_Box_SboImpCanHold<
+                      ExecutorElarger<StatExecutor> >::value == false);
 
     bslma::TestAllocator     alloc;
     StatExecutor::Statistics estat;
@@ -374,10 +373,10 @@ static void test2_assignment()
 // ------------------------------------------------------------------------
 {
     // PRECONDITIONS
-    BSLMF_ASSERT(bmqex::Executor_Box_SboImpCanHold<StatExecutor>::value ==
-                 true);
-    BSLMF_ASSERT(bmqex::Executor_Box_SboImpCanHold<
-                     ExecutorElarger<StatExecutor> >::value == false);
+    static_assert(bmqex::Executor_Box_SboImpCanHold<StatExecutor>::value ==
+                  true);
+    static_assert(bmqex::Executor_Box_SboImpCanHold<
+                      ExecutorElarger<StatExecutor> >::value == false);
 
     bslma::TestAllocator     alloc;
     StatExecutor::Statistics estat;
@@ -567,10 +566,10 @@ static void test5_swap()
 // ------------------------------------------------------------------------
 {
     // PRECONDITIONS
-    BSLMF_ASSERT(bmqex::Executor_Box_SboImpCanHold<StatExecutor>::value ==
-                 true);
-    BSLMF_ASSERT(bmqex::Executor_Box_SboImpCanHold<
-                     ExecutorElarger<StatExecutor> >::value == false);
+    static_assert(bmqex::Executor_Box_SboImpCanHold<StatExecutor>::value ==
+                  true);
+    static_assert(bmqex::Executor_Box_SboImpCanHold<
+                      ExecutorElarger<StatExecutor> >::value == false);
 
     bslma::TestAllocator alloc;
 

@@ -20,24 +20,23 @@
 #include <bdlb_print.h>
 #include <bsl_cstring.h>
 #include <bsl_ostream.h>
-#include <bslmf_assert.h>
 #include <bsls_alignmentfromtype.h>
 
 namespace BloombergLP {
 namespace bmqt {
 
 namespace {
-BSLMF_ASSERT(16 == MessageGUID::e_SIZE_BINARY);
-BSLMF_ASSERT(sizeof(MessageGUID) == MessageGUID::e_SIZE_BINARY);
+static_assert(16 == MessageGUID::e_SIZE_BINARY);
+static_assert(sizeof(MessageGUID) == MessageGUID::e_SIZE_BINARY);
 // Compile-time assertion of size of MessageGUID (critical it doesn't
 // change).  If its size changes, 'bmqt::MessageGUIDHashAlgo' must also be
 // revisited since it assumes size of '16'.
 
-BSLMF_ASSERT(0 == sizeof(MessageGUID) % 4);
+static_assert(0 == sizeof(MessageGUID) % 4);
 // Compile-time assertion to ensure size of MessageGUID is a multiple of 4
 // (Some structs in bmqp::Protocol rely on it)
 
-BSLMF_ASSERT(1 == bsls::AlignmentFromType<MessageGUID>::VALUE);
+static_assert(1 == bsls::AlignmentFromType<MessageGUID>::VALUE);
 // Compile-time assertion of alignment of MessageGUID
 
 const char k_HEX_INT_TABLE[24] = {0,  1,  2,  3,  4,  5,  6,  7,

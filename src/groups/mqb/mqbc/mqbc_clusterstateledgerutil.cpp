@@ -38,7 +38,6 @@
 #include <bdlbb_pooledblobbufferfactory.h>
 #include <bdlf_bind.h>
 #include <bsl_iosfwd.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 #include <bsls_types.h>
 
@@ -401,7 +400,7 @@ int ClusterStateLedgerUtil::appendRecord(
                                                                blob->length());
 
     // Append CRC32-C
-    BSLMF_ASSERT(
+    static_assert(
         (sizeof(bdlb::BigEndianUint32) % bmqp::Protocol::k_WORD_SIZE) == 0);
     recordHeader->setLeaderAdvisoryWords(
         blobNumWords +

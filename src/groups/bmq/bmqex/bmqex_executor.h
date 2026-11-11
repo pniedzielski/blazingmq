@@ -115,7 +115,6 @@
 #include <bslma_allocator.h>
 #include <bslma_constructionutil.h>
 #include <bslma_default.h>
-#include <bslmf_assert.h>
 #include <bslmf_conditional.h>
 #include <bslmf_util.h>
 #include <bsls_alignedbuffer.h>
@@ -618,7 +617,7 @@ inline Executor_Box_SboImp::Executor_Box_SboImp(
     bslma::Allocator* allocator) noexcept : d_buffer()
 {
     // PRECONDITIONS
-    BSLMF_ASSERT(Executor_Box_SboImpCanHold<EXECUTOR>::value);
+    static_assert(Executor_Box_SboImpCanHold<EXECUTOR>::value);
 
     bslma::ConstructionUtil::construct(
         reinterpret_cast<Executor_Target<EXECUTOR>*>(d_buffer.buffer()),

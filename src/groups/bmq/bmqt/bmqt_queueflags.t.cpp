@@ -23,7 +23,6 @@
 // BDE
 #include <bsl_ios.h>
 #include <bsl_string.h>
-#include <bslmf_assert.h>
 #include <bsls_types.h>
 
 // TEST DRIVER
@@ -42,7 +41,7 @@ const bsls::Types::Uint64 k_ALL_FLAGS_SETTED = bmqt::QueueFlags::e_ACK |
                                                bmqt::QueueFlags::e_WRITE |
                                                bmqt::QueueFlags::e_ADMIN;
 
-BSLMF_ASSERT(k_ALL_FLAGS_SETTED < 1 << 10);
+static_assert(k_ALL_FLAGS_SETTED < 1 << 10);
 // Compile-time assert. Check if k_ALL_FLAGS_SETTED is too big. Given
 // constant variable defines number of iterations needed to test all
 // possible input test vectors. '1 << 10' is arbitrary big enough value.
@@ -169,11 +168,11 @@ static void test3_printTest()
 
     PV("Testing print");
 
-    BSLMF_ASSERT(bmqt::QueueFlags::e_ADMIN ==
-                 bmqt::QueueFlags::k_LOWEST_SUPPORTED_QUEUE_FLAG);
+    static_assert(bmqt::QueueFlags::e_ADMIN ==
+                  bmqt::QueueFlags::k_LOWEST_SUPPORTED_QUEUE_FLAG);
 
-    BSLMF_ASSERT(bmqt::QueueFlags::e_ACK ==
-                 bmqt::QueueFlags::k_HIGHEST_SUPPORTED_QUEUE_FLAG);
+    static_assert(bmqt::QueueFlags::e_ACK ==
+                  bmqt::QueueFlags::k_HIGHEST_SUPPORTED_QUEUE_FLAG);
 
     struct Test {
         bmqt::QueueFlags::Enum d_type;

@@ -25,7 +25,6 @@
 #include <bdlbb_blobutil.h>
 #include <bsl_cstring.h>  // for bsl::memset
 #include <bsla_annotations.h>
-#include <bslmf_assert.h>
 #include <bsls_performancehint.h>
 
 namespace BloombergLP {

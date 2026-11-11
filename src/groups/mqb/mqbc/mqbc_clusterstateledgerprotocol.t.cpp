@@ -186,11 +186,11 @@ static void test2_enumPrint()
 
     PV("Test mqbc::ClusterStateRecordType printing");
     {
-        BSLMF_ASSERT(mqbc::ClusterStateRecordType::k_LOWEST_SUPPORTED_TYPE ==
-                     mqbc::ClusterStateRecordType::e_SNAPSHOT);
+        static_assert(mqbc::ClusterStateRecordType::k_LOWEST_SUPPORTED_TYPE ==
+                      mqbc::ClusterStateRecordType::e_SNAPSHOT);
 
-        BSLMF_ASSERT(mqbc::ClusterStateRecordType::k_HIGHEST_SUPPORTED_TYPE ==
-                     mqbc::ClusterStateRecordType::e_ACK);
+        static_assert(mqbc::ClusterStateRecordType::k_HIGHEST_SUPPORTED_TYPE ==
+                      mqbc::ClusterStateRecordType::e_ACK);
 
         PrintTestData k_DATA[] = {
             {L_, mqbc::ClusterStateRecordType::e_UNDEFINED, "UNDEFINED"},

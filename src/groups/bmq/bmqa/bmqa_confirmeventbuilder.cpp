@@ -22,7 +22,6 @@
 
 // BDE
 #include <bsl_memory.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 #include <bsls_performancehint.h>
 
@@ -35,8 +34,8 @@ namespace bmqa {
 // headers can be included in 'bmqa' headers.  Note that we don't check exact
 // size, but 'enough' size, see comment of the constant in header.
 
-BSLMF_ASSERT(ConfirmEventBuilderImpl::k_MAX_SIZEOF_BMQP_CONFIRMEVENTBUILDER >=
-             sizeof(bmqp::ConfirmEventBuilder));
+static_assert(ConfirmEventBuilderImpl::k_MAX_SIZEOF_BMQP_CONFIRMEVENTBUILDER >=
+              sizeof(bmqp::ConfirmEventBuilder));
 
 // -------------------------
 // class ConfirmEventBuilder

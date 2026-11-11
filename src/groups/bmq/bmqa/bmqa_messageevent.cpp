@@ -24,7 +24,6 @@
 #include <bsl_ostream.h>
 #include <bsl_type_traits.h>
 #include <bsla_annotations.h>
-#include <bslmf_assert.h>
 #include <bslmf_ispolymorphic.h>
 #include <bsls_assert.h>
 
@@ -33,10 +32,10 @@ namespace bmqa {
 
 namespace {
 // Do some compile time validation
-BSLMF_ASSERT(sizeof(MessageIterator) == sizeof(MessageIteratorImpl));
-BSLMF_ASSERT(false == bsl::is_polymorphic<MessageIterator>::value);
-BSLMF_ASSERT(sizeof(Message) == sizeof(MessageImpl));
-BSLMF_ASSERT(false == bsl::is_polymorphic<Message>::value);
+static_assert(sizeof(MessageIterator) == sizeof(MessageIteratorImpl));
+static_assert(false == bsl::is_polymorphic<MessageIterator>::value);
+static_assert(sizeof(Message) == sizeof(MessageImpl));
+static_assert(false == bsl::is_polymorphic<Message>::value);
 }  // close unnamed namespace
 
 // ------------------

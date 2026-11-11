@@ -25,7 +25,6 @@
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_utility.h>
 #include <bsla_annotations.h>
-#include <bslmf_assert.h>
 #include <bslmt_mutexassert.h>
 #include <bsls_assert.h>
 #include <bsls_performancehint.h>
@@ -34,8 +33,8 @@ namespace BloombergLP {
 namespace bmqimp {
 
 namespace {
-BSLMF_ASSERT(bmqp::QueueId::k_DEFAULT_SUBQUEUE_ID <
-             QueueManager::k_INITIAL_SUBQUEUE_ID);
+static_assert(bmqp::QueueId::k_DEFAULT_SUBQUEUE_ID <
+              QueueManager::k_INITIAL_SUBQUEUE_ID);
 // It is assumed the default SubQueueId is smaller than the initial
 // SubQueueId for the purpose of correctly generating an increasing
 // sequence of non-default 'subQueueId' integers that are used when

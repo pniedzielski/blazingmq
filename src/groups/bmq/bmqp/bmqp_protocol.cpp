@@ -24,7 +24,6 @@
 #include <bsl_cstddef.h>
 #include <bsl_limits.h>
 #include <bslim_printer.h>
-#include <bslmf_assert.h>
 #include <bsls_alignmentfromtype.h>
 
 namespace BloombergLP {
@@ -33,44 +32,44 @@ namespace bmqp {
 namespace {
 
 // Compile-time assertions for the range of encodings supported currently
-BSLMF_ASSERT(EncodingType::e_BER ==
-             EncodingType::k_LOWEST_SUPPORTED_ENCODING_TYPE);
-BSLMF_ASSERT(EncodingType::e_JSON ==
-             EncodingType::k_HIGHEST_SUPPORTED_ENCODING_TYPE);
+static_assert(EncodingType::e_BER ==
+              EncodingType::k_LOWEST_SUPPORTED_ENCODING_TYPE);
+static_assert(EncodingType::e_JSON ==
+              EncodingType::k_HIGHEST_SUPPORTED_ENCODING_TYPE);
 
 // Compile-time assertions for alignment of various headers in the protocol
-BSLMF_ASSERT(1 == bsls::AlignmentFromType<RdaInfo>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<SubQueueInfo>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<EventHeader>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<OptionHeader>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<PutHeader>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<AckMessage>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<PushHeader>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<ConfirmMessage>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<RejectMessage>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<StorageHeader>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<RecoveryHeader>::VALUE);
-BSLMF_ASSERT(2 == bsls::AlignmentFromType<MessagePropertiesHeader>::VALUE);
-BSLMF_ASSERT(2 == bsls::AlignmentFromType<MessagePropertyHeader>::VALUE);
+static_assert(1 == bsls::AlignmentFromType<RdaInfo>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<SubQueueInfo>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<EventHeader>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<OptionHeader>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<PutHeader>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<AckMessage>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<PushHeader>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<ConfirmMessage>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<RejectMessage>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<StorageHeader>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<RecoveryHeader>::VALUE);
+static_assert(2 == bsls::AlignmentFromType<MessagePropertiesHeader>::VALUE);
+static_assert(2 == bsls::AlignmentFromType<MessagePropertyHeader>::VALUE);
 
 // These three headers are 1-byte aligned but headers and messages preceding &
 // succeeding them are 4-byte aligned.  So as long as their size is 4 (or a
 // multiple of 4), it is ok.
-BSLMF_ASSERT(1 == bsls::AlignmentFromType<AckHeader>::VALUE);
-BSLMF_ASSERT(1 == bsls::AlignmentFromType<ConfirmHeader>::VALUE);
-BSLMF_ASSERT(1 == bsls::AlignmentFromType<RejectHeader>::VALUE);
-BSLMF_ASSERT(4 == sizeof(AckHeader));
-BSLMF_ASSERT(4 == sizeof(ConfirmHeader));
-BSLMF_ASSERT(4 == sizeof(RejectHeader));
+static_assert(1 == bsls::AlignmentFromType<AckHeader>::VALUE);
+static_assert(1 == bsls::AlignmentFromType<ConfirmHeader>::VALUE);
+static_assert(1 == bsls::AlignmentFromType<RejectHeader>::VALUE);
+static_assert(4 == sizeof(AckHeader));
+static_assert(4 == sizeof(ConfirmHeader));
+static_assert(4 == sizeof(RejectHeader));
 
-BSLMF_ASSERT(PushHeader::k_MAX_PAYLOAD_SIZE_SOFT ==
-             PutHeader::k_MAX_PAYLOAD_SIZE_SOFT);
+static_assert(PushHeader::k_MAX_PAYLOAD_SIZE_SOFT ==
+              PutHeader::k_MAX_PAYLOAD_SIZE_SOFT);
 
-BSLMF_ASSERT(RecoveryHeader::k_MAX_PAYLOAD_SIZE_SOFT <=
-             RecoveryHeader::k_MAX_SIZE);
+static_assert(RecoveryHeader::k_MAX_PAYLOAD_SIZE_SOFT <=
+              RecoveryHeader::k_MAX_SIZE);
 
-BSLMF_ASSERT(Protocol::SubQueueInfosArray::static_size ==
-             Protocol::k_SUBID_ARRAY_STATIC_LEN);
+static_assert(Protocol::SubQueueInfosArray::static_size ==
+              Protocol::k_SUBID_ARRAY_STATIC_LEN);
 // Ensure that the static size of a subQueueInfos array is as defined in
 // the designated constant
 
@@ -153,8 +152,8 @@ SubQueueInfo::print(bsl::ostream& stream, int level, int spacesPerLevel) const
 
 const int Protocol::k_MAX_OPTIONS_SIZE = PutHeader::k_MAX_OPTIONS_SIZE;
 
-BSLMF_ASSERT(PutHeader::k_MAX_OPTIONS_SIZE == PushHeader::k_MAX_OPTIONS_SIZE);
-BSLMF_ASSERT(PutHeader::k_MAX_OPTIONS_SIZE == Protocol::k_MAX_OPTIONS_SIZE);
+static_assert(PutHeader::k_MAX_OPTIONS_SIZE == PushHeader::k_MAX_OPTIONS_SIZE);
+static_assert(PutHeader::k_MAX_OPTIONS_SIZE == Protocol::k_MAX_OPTIONS_SIZE);
 // Ensure that maximum allowed size of options is same for both PUT and
 // PUSH messages.  Having different values for these constants doesn't
 // make much sense.

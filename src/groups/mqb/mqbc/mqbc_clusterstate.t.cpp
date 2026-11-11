@@ -19,7 +19,6 @@
 #include <bsl_iostream.h>
 #include <bsl_string.h>
 #include <bsl_unordered_map.h>
-#include <bslmf_assert.h>
 
 // TEST DRIVER
 #include <bmqtst_testhelper.h>

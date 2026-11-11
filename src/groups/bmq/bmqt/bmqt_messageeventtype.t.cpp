@@ -20,7 +20,6 @@
 // BDE
 #include <bsl_ios.h>
 #include <bsl_string.h>
-#include <bslmf_assert.h>
 
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
@@ -66,11 +65,11 @@ static void test2_printTest()
 
     PV("Testing print");
 
-    BSLMF_ASSERT(bmqt::MessageEventType::k_LOWEST_SUPPORTED_EVENT_TYPE ==
-                 bmqt::MessageEventType::e_PUT);
+    static_assert(bmqt::MessageEventType::k_LOWEST_SUPPORTED_EVENT_TYPE ==
+                  bmqt::MessageEventType::e_PUT);
 
-    BSLMF_ASSERT(bmqt::MessageEventType::k_HIGHEST_SUPPORTED_EVENT_TYPE ==
-                 bmqt::MessageEventType::e_ACK);
+    static_assert(bmqt::MessageEventType::k_HIGHEST_SUPPORTED_EVENT_TYPE ==
+                  bmqt::MessageEventType::e_ACK);
 
     struct Test {
         bmqt::MessageEventType::Enum d_type;

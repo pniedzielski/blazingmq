@@ -66,7 +66,6 @@
 #include <bsl_utility.h>
 #include <bsla_annotations.h>
 #include <bslma_managedptr.h>
-#include <bslmf_assert.h>
 #include <bslmt_latch.h>
 #include <bslmt_threadutil.h>
 #include <bsls_timeinterval.h>

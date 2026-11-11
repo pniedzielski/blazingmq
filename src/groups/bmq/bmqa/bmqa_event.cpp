@@ -21,7 +21,6 @@
 
 // BDE
 #include <bsl_ostream.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 
 namespace BloombergLP {
@@ -29,8 +28,8 @@ namespace bmqa {
 
 namespace {
 // Do some compile time validation
-BSLMF_ASSERT(sizeof(SessionEvent) == sizeof(bsl::shared_ptr<bmqimp::Event>));
-BSLMF_ASSERT(sizeof(MessageEvent) == sizeof(bsl::shared_ptr<bmqimp::Event>));
+static_assert(sizeof(SessionEvent) == sizeof(bsl::shared_ptr<bmqimp::Event>));
+static_assert(sizeof(MessageEvent) == sizeof(bsl::shared_ptr<bmqimp::Event>));
 }  // close unnamed namespace
 
 // -----------

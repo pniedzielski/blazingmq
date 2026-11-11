@@ -24,7 +24,6 @@
 #include <bmqscm_version.h>
 
 // BDE
-#include <bslmf_assert.h>
 
 namespace BloombergLP {
 namespace mqbu {
@@ -37,16 +36,16 @@ const int k_MINIMUM_SDK_VERSION_RECOMMENDED_CPP = BMQ_MAKE_EXT_VERSION(1,
                                                                        12,
                                                                        0);
 
-BSLMF_ASSERT(k_MINIMUM_SDK_VERSION_SUPPORTED_CPP <=
-             k_MINIMUM_SDK_VERSION_RECOMMENDED_CPP);
+static_assert(k_MINIMUM_SDK_VERSION_SUPPORTED_CPP <=
+              k_MINIMUM_SDK_VERSION_RECOMMENDED_CPP);
 
 // Java
 const int k_MINIMUM_SDK_VERSION_SUPPORTED_JAVA = BMQ_MAKE_EXT_VERSION(0, 0, 9);
 const int k_MINIMUM_SDK_VERSION_RECOMMENDED_JAVA = BMQ_MAKE_EXT_VERSION(0,
                                                                         0,
                                                                         9);
-BSLMF_ASSERT(k_MINIMUM_SDK_VERSION_SUPPORTED_JAVA <=
-             k_MINIMUM_SDK_VERSION_RECOMMENDED_JAVA);
+static_assert(k_MINIMUM_SDK_VERSION_SUPPORTED_JAVA <=
+              k_MINIMUM_SDK_VERSION_RECOMMENDED_JAVA);
 
 }  // close unnamed namespace
 

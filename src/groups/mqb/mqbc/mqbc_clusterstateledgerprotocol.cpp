@@ -19,7 +19,6 @@
 // BDE
 #include <bdlb_bitmaskutil.h>
 #include <bdlb_print.h>
-#include <bslmf_assert.h>
 #include <bsls_alignmentfromtype.h>
 
 namespace BloombergLP {
@@ -27,12 +26,12 @@ namespace mqbc {
 
 namespace {
 // Compile-time assertions for alignment of various structs in the protocol
-BSLMF_ASSERT(1 == bsls::AlignmentFromType<ClusterStateFileHeader>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<ClusterStateRecordHeader>::VALUE);
+static_assert(1 == bsls::AlignmentFromType<ClusterStateFileHeader>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<ClusterStateRecordHeader>::VALUE);
 
 // Compile-time assertions for size of various structs in the protocol
-BSLMF_ASSERT(0 == sizeof(ClusterStateFileHeader) % 4);
-BSLMF_ASSERT(0 == sizeof(ClusterStateRecordHeader) % 4);
+static_assert(0 == sizeof(ClusterStateFileHeader) % 4);
+static_assert(0 == sizeof(ClusterStateRecordHeader) % 4);
 }  // close unnamed namespace
 
 /// Force variables/symbols definition so they can be used in other files

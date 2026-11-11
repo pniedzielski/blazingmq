@@ -34,7 +34,6 @@
 #include <bsl_map.h>
 #include <bsl_utility.h>
 #include <bsl_vector.h>
-#include <bslmf_assert.h>
 #include <bsls_types.h>
 
 // TEST DRIVER
@@ -1094,11 +1093,11 @@ static void test8_printTest()
 {
     bmqtst::TestHelper::printTestName("PRINT");
 
-    BSLMF_ASSERT(bmqt::PropertyType::e_BOOL ==
-                 bmqt::PropertyType::k_LOWEST_SUPPORTED_PROPERTY_TYPE);
+    static_assert(bmqt::PropertyType::e_BOOL ==
+                  bmqt::PropertyType::k_LOWEST_SUPPORTED_PROPERTY_TYPE);
 
-    BSLMF_ASSERT(bmqt::PropertyType::e_BINARY ==
-                 bmqt::PropertyType::k_HIGHEST_SUPPORTED_PROPERTY_TYPE);
+    static_assert(bmqt::PropertyType::e_BINARY ==
+                  bmqt::PropertyType::k_HIGHEST_SUPPORTED_PROPERTY_TYPE);
 
     const bsl::string boolN("boolPropName",
                             bmqtst::TestHelperUtil::allocator());

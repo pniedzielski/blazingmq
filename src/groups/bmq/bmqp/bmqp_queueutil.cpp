@@ -28,7 +28,6 @@
 #include <bsl_string.h>
 #include <bsla_annotations.h>
 #include <bslma_default.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 #include <bsls_types.h>
 

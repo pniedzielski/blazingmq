@@ -40,7 +40,6 @@
 #include <bsla_annotations.h>
 #include <bslim_printer.h>
 #include <bslma_default.h>
-#include <bslmf_assert.h>
 #include <bsls_assert.h>
 
 namespace BloombergLP {

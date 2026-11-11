@@ -22,7 +22,6 @@
 #include <bdlb_string.h>
 #include <bdlb_tokenizer.h>
 #include <bslim_printer.h>
-#include <bslmf_assert.h>
 #include <bsls_alignmentfromtype.h>
 
 namespace BloombergLP {
@@ -30,41 +29,41 @@ namespace mqbs {
 
 namespace {
 // Compile-time assertions for alignment of various structs in the protocol
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<FileHeader>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<JournalFileHeader>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<QueueRecordHeader>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<RecordHeader>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<MessageRecord>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<ConfirmRecord>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<DeletionRecord>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<QueueOpRecord>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<JournalOpRecord>::VALUE);
-BSLMF_ASSERT(1 == bsls::AlignmentFromType<DataFileHeader>::VALUE);
-BSLMF_ASSERT(1 == bsls::AlignmentFromType<QlistFileHeader>::VALUE);
-BSLMF_ASSERT(4 == bsls::AlignmentFromType<DataHeader>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<FileHeader>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<JournalFileHeader>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<QueueRecordHeader>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<RecordHeader>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<MessageRecord>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<ConfirmRecord>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<DeletionRecord>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<QueueOpRecord>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<JournalOpRecord>::VALUE);
+static_assert(1 == bsls::AlignmentFromType<DataFileHeader>::VALUE);
+static_assert(1 == bsls::AlignmentFromType<QlistFileHeader>::VALUE);
+static_assert(4 == bsls::AlignmentFromType<DataHeader>::VALUE);
 
 // Compile-time assertions for size of various structs in the protocol
-BSLMF_ASSERT(0 == FileStoreProtocol::k_JOURNAL_RECORD_SIZE % 4);
-BSLMF_ASSERT(0 == sizeof(FileHeader) % 8);
-BSLMF_ASSERT(0 == sizeof(DataFileHeader) % 8);
-BSLMF_ASSERT(0 == sizeof(QlistFileHeader) % 4);
-BSLMF_ASSERT(0 == sizeof(JournalFileHeader) % 4);
-BSLMF_ASSERT(20 == sizeof(RecordHeader));
-BSLMF_ASSERT(60 == sizeof(MessageRecord));
-BSLMF_ASSERT(0 == sizeof(MessageRecord) % 4);
-BSLMF_ASSERT(60 == sizeof(ConfirmRecord));
-BSLMF_ASSERT(0 == sizeof(ConfirmRecord) % 4);
-BSLMF_ASSERT(60 == sizeof(DeletionRecord));
-BSLMF_ASSERT(0 == sizeof(DeletionRecord) % 4);
-BSLMF_ASSERT(60 == sizeof(QueueOpRecord));
-BSLMF_ASSERT(0 == sizeof(QueueOpRecord) % 4);
-BSLMF_ASSERT(60 == sizeof(JournalOpRecord));
-BSLMF_ASSERT(0 == sizeof(JournalOpRecord) % 4);
-BSLMF_ASSERT(0 == sizeof(DataHeader) % 4);
-BSLMF_ASSERT(2 == sizeof(short));
+static_assert(0 == FileStoreProtocol::k_JOURNAL_RECORD_SIZE % 4);
+static_assert(0 == sizeof(FileHeader) % 8);
+static_assert(0 == sizeof(DataFileHeader) % 8);
+static_assert(0 == sizeof(QlistFileHeader) % 4);
+static_assert(0 == sizeof(JournalFileHeader) % 4);
+static_assert(20 == sizeof(RecordHeader));
+static_assert(60 == sizeof(MessageRecord));
+static_assert(0 == sizeof(MessageRecord) % 4);
+static_assert(60 == sizeof(ConfirmRecord));
+static_assert(0 == sizeof(ConfirmRecord) % 4);
+static_assert(60 == sizeof(DeletionRecord));
+static_assert(0 == sizeof(DeletionRecord) % 4);
+static_assert(60 == sizeof(QueueOpRecord));
+static_assert(0 == sizeof(QueueOpRecord) % 4);
+static_assert(60 == sizeof(JournalOpRecord));
+static_assert(0 == sizeof(JournalOpRecord) % 4);
+static_assert(0 == sizeof(DataHeader) % 4);
+static_assert(2 == sizeof(short));
 
-BSLMF_ASSERT(FileStoreProtocol::k_MAX_MSG_REF_COUNT_HARD <=
-             MessageRecord::k_REFCOUNT_MAX_VALUE);
+static_assert(FileStoreProtocol::k_MAX_MSG_REF_COUNT_HARD <=
+              MessageRecord::k_REFCOUNT_MAX_VALUE);
 }  // close unnamed namespace
 
 const unsigned int FileHeader::k_MAGIC1;
