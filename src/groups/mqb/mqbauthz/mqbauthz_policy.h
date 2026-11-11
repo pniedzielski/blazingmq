@@ -154,7 +154,6 @@
 #include <bsl_unordered_map.h>
 #include <bsl_variant.h>
 #include <bsl_vector.h>
-#include <bsla_nodiscard.h>
 
 namespace BloombergLP {
 
@@ -199,7 +198,7 @@ class Policy_UriResource {
   public:
     Policy_UriResource();
 
-    BSLA_NODISCARD
+    [[nodiscard]]
     static int parse(Policy_UriResource* result,
                      bsl::string_view    resourcePattern);
 
@@ -254,7 +253,7 @@ class Policy_Permission {
                          const ResourceList& resources);
 
   public:
-    BSLA_NODISCARD
+    [[nodiscard]]
     static int parse(Policy_Permission*     result,
                      const mqbpoly::Role&   role,
                      const bsl::allocator<> allocator);

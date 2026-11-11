@@ -183,7 +183,7 @@ class SessionNegotiator : public mqbnet::Negotiator {
     /// `context_p`, based on its connection type.  Return true if the
     /// connection is authorized, or false otherwise and populate the
     /// specified `errorDescription` with a description of the error.
-    BSLA_NODISCARD
+    [[nodiscard]]
     bool
     authorizeIncomingConnection(bsl::ostream& errorDescription,
                                 mqbnet::InitialConnectionContext* context_p);

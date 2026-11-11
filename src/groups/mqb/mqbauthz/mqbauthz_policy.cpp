@@ -31,7 +31,6 @@
 #include <bsl_utility.h>
 #include <bsl_variant.h>
 #include <bsl_vector.h>
-#include <bsla_nodiscard.h>
 #include <bslma_constructionutil.h>
 
 // Helpers for writing AA-aware move constructors
@@ -107,7 +106,7 @@ Policy_UriResource::Policy_UriResource()
 {
 }
 
-BSLA_NODISCARD
+[[nodiscard]]
 int Policy_UriResource::parse(Policy_UriResource* result,
                               bsl::string_view    resourcePattern)
 {
@@ -350,7 +349,7 @@ bool Policy_Permission::matchUri(bsl::string_view    uriStr,
     return false;
 }
 
-BSLA_NODISCARD
+[[nodiscard]]
 int Policy_Permission::parse(Policy_Permission*     result,
                              const mqbpoly::Role&   role,
                              const bsl::allocator<> allocator)

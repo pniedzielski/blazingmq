@@ -37,7 +37,6 @@
 #include <ball_log.h>
 #include <bsl_memory.h>
 #include <bsl_string.h>
-#include <bsla_nodiscard.h>
 #include <bslma_managedptr.h>
 
 namespace BloombergLP {
@@ -126,7 +125,7 @@ class DefaultAuthorizerPluginFactory
     create(bslma::Allocator* allocator) override;
 
   private:
-    BSLA_NODISCARD int
+    [[nodiscard]] int
     createPolicy(bslma::ManagedPtr<Policy>*            res,
                  const mqbcfg::AuthorizerPluginConfig& config,
                  bsl::allocator<>                      allocator) const;

@@ -29,7 +29,6 @@
 #include <bsl_string.h>
 #include <bsl_utility.h>
 #include <bsl_vector.h>
-#include <bsla_nodiscard.h>
 #include <bslma_managedptr.h>
 
 // TEST_DRIVER
@@ -64,7 +63,7 @@ class DefaultAuthorizerTest : public ::testing::Test {
   protected:
     DefaultAuthorizerTest() {}
 
-    BSLA_NODISCARD static int
+    [[nodiscard]] static int
     makePolicy(bslma::ManagedPtr<mqbauthz::Policy>* res)
     {
         mqbpoly::Policy policy(bmqtst::TestHelperUtil::allocator());
