@@ -244,10 +244,7 @@ static void printTableRows(bsl::ostream&                   out,
 
     out << bsl::right << bsl::fixed;
 
-    for (bsl::vector<TableRecord>::size_type i = 0; i < tableRecords.size();
-         ++i) {
-        const TableRecord& record = tableRecords[i];
-
+    for (const TableRecord& record : tableRecords) {
         // size
         out << "| " << bsl::setw(headerCols[0].size() + 1) << record.d_size;
         // timeOne
@@ -747,8 +744,8 @@ static void test5_multithreadedCrc32cDefault()
     }
 
     // Delete allocated payloads
-    for (unsigned int i = 0; i < k_NUM_PAYLOADS; ++i) {
-        bmqtst::TestHelperUtil::allocator()->deallocate(payloads[i]);
+    for (char* payload : payloads) {
+        bmqtst::TestHelperUtil::allocator()->deallocate(payload);
     }
 }
 
@@ -1087,9 +1084,7 @@ static void testN2_performanceDefault()
 
     // Measure calculation time and report
     bsl::vector<TableRecord> tableRecords(bmqtst::TestHelperUtil::allocator());
-    for (unsigned i = 0; i < bufferLengths.size(); ++i) {
-        const int length = bufferLengths[i];
-
+    for (const int length : bufferLengths) {
         bsl::cout << "---------------------\n"
                   << " SIZE = " << length << '\n'
                   << " ITERATIONS = " << k_NUM_ITERS << '\n'
@@ -1344,9 +1339,7 @@ static void testN4_calculateSerialDefault()
 
     // Measure calculation time and report
     bsl::vector<TableRecord> tableRecords(bmqtst::TestHelperUtil::allocator());
-    for (unsigned i = 0; i < bufferLengths.size(); ++i) {
-        const int length = bufferLengths[i];
-
+    for (const int length : bufferLengths) {
         bsl::cout << "---------------------\n"
                   << " SIZE = " << length << '\n'
                   << " ITERATIONS = " << k_NUM_ITERS << '\n'
@@ -1429,9 +1422,7 @@ static void testN5_bdldPerformanceSoftware()
 
     // Measure calculation time and report
     bsl::vector<TableRecord> tableRecords(bmqtst::TestHelperUtil::allocator());
-    for (unsigned i = 0; i < bufferLengths.size(); ++i) {
-        const int length = bufferLengths[i];
-
+    for (const int length : bufferLengths) {
         bsl::cout << "---------------------\n"
                   << " SIZE = " << length << '\n'
                   << " ITERATIONS = " << k_NUM_ITERS << '\n'
@@ -1522,9 +1513,7 @@ static void testN6_bmqpPerformanceDefault()
 
     // Measure calculation time and report
     bsl::vector<TableRecord> tableRecords(bmqtst::TestHelperUtil::allocator());
-    for (unsigned i = 0; i < bufferLengths.size(); ++i) {
-        const int length = bufferLengths[i];
-
+    for (const int length : bufferLengths) {
         bsl::cout << "---------------------\n"
                   << " SIZE = " << length << '\n'
                   << " ITERATIONS = " << k_NUM_ITERS << '\n'
@@ -1613,9 +1602,7 @@ static void testN6_bdldPerformanceDefault()
 
     // Measure calculation time and report
     bsl::vector<TableRecord> tableRecords(bmqtst::TestHelperUtil::allocator());
-    for (unsigned i = 0; i < bufferLengths.size(); ++i) {
-        const int length = bufferLengths[i];
-
+    for (const int length : bufferLengths) {
         bsl::cout << "---------------------\n"
                   << " SIZE = " << length << '\n'
                   << " ITERATIONS = " << k_NUM_ITERS << '\n'
