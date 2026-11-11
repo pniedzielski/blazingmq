@@ -215,11 +215,9 @@ InMemoryStorage::put(mqbi::StorageMessageAttributes*     attributes,
         if (!d_autoConfirms.empty()) {
             d_virtualStorageCatalog.setup(dataStreamMessage.get());
             // Move auto confirms to the data record
-            for (AutoConfirms::const_iterator it = d_autoConfirms.begin();
-                 it != d_autoConfirms.end();
-                 ++it) {
+            for (const AutoConfirm& autoConfirm : d_autoConfirms) {
                 d_virtualStorageCatalog.autoConfirm(dataStreamMessage.get(),
-                                                    it->d_appKey);
+                                                    autoConfirm.d_appKey);
             }
             d_autoConfirms.clear();
         }
@@ -659,10 +657,8 @@ InMemoryStorage::logAppsSubscriptionInfoCb(bsl::ostream& stream) const
         mqbi::Storage::AppInfos appInfos(d_allocator_p);
         loadVirtualStorageDetails(&appInfos);
 
-        for (mqbi::Storage::AppInfos::const_iterator cit = appInfos.begin();
-             cit != appInfos.end();
-             ++cit) {
-            queue()->queueEngine()->logAppSubscriptionInfo(stream, cit->first);
+        for (const auto& [appId, appKey] : appInfos) {
+            queue()->queueEngine()->logAppSubscriptionInfo(stream, appId);
         }
     }
 
