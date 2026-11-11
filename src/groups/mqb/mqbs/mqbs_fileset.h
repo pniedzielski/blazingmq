@@ -53,7 +53,7 @@ class FileStore;
 // ==============
 
 /// Value-semantic type representing a set of BlazingMQ data store files.
-struct FileSet BSLS_KEYWORD_FINAL {
+struct FileSet final {
   public:
     // PUBLIC TYPES
 

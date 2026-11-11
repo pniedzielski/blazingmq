@@ -120,7 +120,7 @@ class InMemoryStorage_Item {
 // class InMemoryStorage
 // =====================
 
-class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
+class InMemoryStorage final : public ReplicatedStorage {
     // TBD
 
   private:

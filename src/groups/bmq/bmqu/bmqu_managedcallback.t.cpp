@@ -156,7 +156,7 @@ struct DestructorChecker : public bmqu::ManagedCallback::CallbackFunctor {
     }
 };
 
-class ManagedCallbackBuffer BSLS_KEYWORD_FINAL {
+class ManagedCallbackBuffer final {
   private:
     // DATA
     /// Reusable buffer holding the stored callback.

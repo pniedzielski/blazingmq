@@ -62,8 +62,7 @@ namespace mqbmock {
 
 /// Mock implementation of mqbi::DispatcherEventSource that allocates new
 /// events using bsl::allocate_shared.
-class DispatcherEventSource BSLS_KEYWORD_FINAL
-: public mqbi::DispatcherEventSource {
+class DispatcherEventSource final : public mqbi::DispatcherEventSource {
   private:
     // DATA
     bslma::Allocator* d_allocator_p;

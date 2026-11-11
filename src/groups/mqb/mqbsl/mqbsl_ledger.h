@@ -57,7 +57,7 @@ namespace mqbsl {
 /// Provide a mechanism to store application-defined records.  An object of
 /// this class owns multiple `mqbsi::Log` instances, and records may span
 /// across these multiple instances.
-class Ledger BSLS_KEYWORD_FINAL : public mqbsi::Ledger {
+class Ledger final : public mqbsi::Ledger {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBSL.LEDGER");

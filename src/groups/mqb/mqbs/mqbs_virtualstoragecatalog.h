@@ -75,7 +75,7 @@ namespace mqbs {
 // offset in the consecutive memory ('VirtualStorage::DataStreamMessage')
 // holding all Apps states ('mqbi::AppMessage') for each guid.
 
-class VirtualStorageCatalog BSLS_KEYWORD_FINAL {
+class VirtualStorageCatalog final {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBS.VIRTUALSTORAGE");

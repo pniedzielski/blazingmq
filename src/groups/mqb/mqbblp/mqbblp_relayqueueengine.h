@@ -136,7 +136,7 @@ struct RelayQueueEngine_AppState : QueueEngineUtil_AppState {
 // ======================
 
 /// QueueEngine implementation for a BlazingMQ relay node (replica/proxy).
-class RelayQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
+class RelayQueueEngine final : public mqbi::QueueEngine {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBBLP.RELAYQUEUEENGINE");

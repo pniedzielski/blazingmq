@@ -57,8 +57,7 @@ namespace mqba {
 
 /// Implementation of mqbi::DispatcherEventSource using object pools for
 /// efficient event allocation.
-class DispatcherEventSource BSLS_KEYWORD_FINAL
-: public mqbi::DispatcherEventSource {
+class DispatcherEventSource final : public mqbi::DispatcherEventSource {
   public:
     // PUBLIC TYPES
     typedef bsl::shared_ptr<mqbi::DispatcherEvent> DispatcherEventSp;

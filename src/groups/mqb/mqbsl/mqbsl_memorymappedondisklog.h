@@ -57,8 +57,7 @@ namespace mqbsl {
 // ==================================
 
 /// Factory used to create in-memory log instances.
-class MemoryMappedOnDiskLogFactory BSLS_KEYWORD_FINAL
-: public mqbsi::LogFactory {
+class MemoryMappedOnDiskLogFactory final : public mqbsi::LogFactory {
   private:
     // DATA
     bslma::Allocator* d_allocator_p;
@@ -92,7 +91,7 @@ class MemoryMappedOnDiskLogFactory BSLS_KEYWORD_FINAL
 // ===========================
 
 /// This class implements an on-disk log using the mmap() syscall.
-class MemoryMappedOnDiskLog BSLS_KEYWORD_FINAL : public OnDiskLog {
+class MemoryMappedOnDiskLog final : public OnDiskLog {
   private:
     // PRIVATE TYPES
     typedef mqbsi::LogOpResult LogOpResult;

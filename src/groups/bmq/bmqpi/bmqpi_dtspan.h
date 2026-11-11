@@ -62,7 +62,7 @@ class DTSpan {
     // PUBLIC INNER CLASSES
 
     /// A set of key-values used to describe a `DTSpan`.
-    class Baggage BSLS_KEYWORD_FINAL {
+    class Baggage final {
       private:
         // PRIVATE TYPEDEFS
         typedef bsl::unordered_map<bsl::string, bsl::string> MapType;

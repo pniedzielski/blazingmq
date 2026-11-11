@@ -62,7 +62,7 @@ namespace mqbmock {
 // ================
 
 /// Mock dispatcher implementation of the `mqbi::Dispatcher` protocol.
-class Dispatcher BSLS_KEYWORD_FINAL : public mqbi::Dispatcher {
+class Dispatcher final : public mqbi::Dispatcher {
   private:
     // TYPES
     typedef bsl::unordered_map<const mqbi::DispatcherClient*,

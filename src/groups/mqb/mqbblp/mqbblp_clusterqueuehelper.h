@@ -89,10 +89,9 @@ namespace mqbblp {
 // ========================
 
 /// Mechanism to manage queues on a cluster.
-class ClusterQueueHelper BSLS_KEYWORD_FINAL
-: public mqbc::ClusterStateObserver,
-  public mqbc::ClusterMembershipObserver,
-  public mqbc::ElectorInfoObserver {
+class ClusterQueueHelper final : public mqbc::ClusterStateObserver,
+                                 public mqbc::ClusterMembershipObserver,
+                                 public mqbc::ElectorInfoObserver {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBBLP.CLUSTERQUEUEHELPER");

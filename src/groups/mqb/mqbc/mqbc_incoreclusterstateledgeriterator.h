@@ -57,7 +57,7 @@ namespace mqbc {
 /// @bbref{mqbc::ClusterStateLedgerIterator} interface to iterate through an
 /// @bbref{mqbc::IncoreClusterStateLedger}.  Note that any ledger iterated by
 /// this component *must* support aliasing.
-class IncoreClusterStateLedgerIterator BSLS_KEYWORD_FINAL
+class IncoreClusterStateLedgerIterator final
 : public ClusterStateLedgerIterator {
   private:
     // DATA

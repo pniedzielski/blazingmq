@@ -97,7 +97,7 @@ namespace bmqu {
 // ManagedCallback
 // ===============
 
-class ManagedCallback BSLS_KEYWORD_FINAL {
+class ManagedCallback final {
     /// The class useful for in-place construction and passing of functors
     /// between different actors.
   private:

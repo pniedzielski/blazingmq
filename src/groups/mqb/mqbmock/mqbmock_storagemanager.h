@@ -45,7 +45,7 @@ namespace mqbmock {
 // ====================
 
 /// Mock implementation of `mqbi::StorageManager` interface.
-class StorageManager BSLS_KEYWORD_FINAL : public mqbi::StorageManager {
+class StorageManager final : public mqbi::StorageManager {
   public:
     // CREATORS
 

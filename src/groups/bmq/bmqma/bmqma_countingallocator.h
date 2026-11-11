@@ -107,7 +107,7 @@ namespace bmqma {
 
 /// An allocator reporting its allocations and deallocations to a
 /// `bmqst::StatContext`.
-class CountingAllocator BSLS_KEYWORD_FINAL : public bslma::Allocator {
+class CountingAllocator final : public bslma::Allocator {
   public:
     // PUBLIC TYPES
 

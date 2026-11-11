@@ -257,7 +257,7 @@ class CountingAllocator;
 
 /// Factory and container for `bmqma::CountingAllocator` objects created
 /// from a common allocator.
-class CountingAllocatorStore BSLS_KEYWORD_FINAL {
+class CountingAllocatorStore final {
   private:
     // PRIVATE TYPES
 

@@ -99,7 +99,7 @@ namespace bmqu {
 
 /// Operarion execution and logging context holding the operation description
 /// and start time.
-class OperationLogger BSLS_KEYWORD_FINAL {
+class OperationLogger final {
   private:
     // PRIVATE DATA
 

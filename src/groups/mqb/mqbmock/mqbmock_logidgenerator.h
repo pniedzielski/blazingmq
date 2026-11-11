@@ -46,7 +46,7 @@ namespace mqbmock {
 // ====================
 
 /// Mock implementation of the `mqbsi::LogIdGenerator` interface.
-class LogIdGenerator BSLS_KEYWORD_FINAL : public mqbsi::LogIdGenerator {
+class LogIdGenerator final : public mqbsi::LogIdGenerator {
   private:
     // DATA
     bsl::string                          d_logPrefix;

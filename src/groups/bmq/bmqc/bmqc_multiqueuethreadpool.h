@@ -298,7 +298,7 @@ class MultiQueueThreadPoolConfig {
 /// Set of queues of the parameterized QUEUE type processed by a number of
 /// threads.
 template <typename TYPE>
-class MultiQueueThreadPool BSLS_KEYWORD_FINAL {
+class MultiQueueThreadPool final {
   public:
     // PUBLIC TYPES
     typedef MultiQueueThreadPool<TYPE>       ThisClass;

@@ -83,10 +83,9 @@ namespace mqbblp {
 // class ClusterStateManager
 // =========================
 
-class ClusterStateManager BSLS_KEYWORD_FINAL
-: public mqbc::ClusterStateObserver,
-  public mqbi::ClusterStateManager,
-  public mqbc::ElectorInfoObserver {
+class ClusterStateManager final : public mqbc::ClusterStateObserver,
+                                  public mqbi::ClusterStateManager,
+                                  public mqbc::ElectorInfoObserver {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBBLP.CLUSTERSTATEMANAGER");

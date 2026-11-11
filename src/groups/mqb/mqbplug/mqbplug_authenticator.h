@@ -62,7 +62,7 @@ namespace mqbplug {
 // ========================
 
 /// Data used during authentication in the broker.
-class AuthenticationData BSLS_KEYWORD_FINAL {
+class AuthenticationData final {
   private:
     // DATA
     bsl::vector<char> d_authnPayload;

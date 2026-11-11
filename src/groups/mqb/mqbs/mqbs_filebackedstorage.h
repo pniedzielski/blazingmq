@@ -84,7 +84,7 @@ namespace mqbs {
 // =======================
 
 /// Provide a BlazingMQ storage backed by a file on disk.
-class FileBackedStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
+class FileBackedStorage final : public ReplicatedStorage {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBS.FILEBACKEDSTORAGE");

@@ -70,7 +70,7 @@ class MessagePropertiesIterator;
 /// This VST keeps a knowledge about unique sequence of Properties.  The
 /// goal is to return the index of a given property.
 /// Once created, it is read-only.
-class MessageProperties_Schema BSLS_KEYWORD_FINAL {
+class MessageProperties_Schema final {
   private:
     // PRIVATE TYPES
 

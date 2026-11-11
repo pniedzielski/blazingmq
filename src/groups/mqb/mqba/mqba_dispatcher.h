@@ -147,7 +147,7 @@ class Dispatcher_Executor {
 
 /// This class provides an implementation of the `mqbi::Dispatcher`
 /// protocol, using the bmqc::MultiQueueThreadPool
-class Dispatcher BSLS_KEYWORD_FINAL : public mqbi::Dispatcher {
+class Dispatcher final : public mqbi::Dispatcher {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBA.DISPATCHER");

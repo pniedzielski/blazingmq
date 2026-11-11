@@ -118,7 +118,7 @@ class StorageManagerIterator;
 // ====================
 
 /// Storage Manager, in charge of all the partitions.
-class StorageManager BSLS_KEYWORD_FINAL : public mqbi::StorageManager {
+class StorageManager final : public mqbi::StorageManager {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBBLP.STORAGEMANAGER");
@@ -633,8 +633,7 @@ class StorageManager BSLS_KEYWORD_FINAL : public mqbi::StorageManager {
 /// construction and unlocking it at the iterator's destruction.  This
 /// guarantees that during the life time of an iterator, the partition's
 /// storage map can't be modified.
-class StorageManagerIterator BSLS_KEYWORD_FINAL
-: public mqbi::StorageManagerIterator {
+class StorageManagerIterator final : public mqbi::StorageManagerIterator {
   private:
     // PRIVATE TYPES
     typedef StorageManager::StorageSpMap          StorageSpMap;

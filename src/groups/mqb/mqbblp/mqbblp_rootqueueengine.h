@@ -77,7 +77,7 @@ class QueueState;
 // =======================
 
 /// QueueEngine implementation for use at the primary node.
-class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
+class RootQueueEngine final : public mqbi::QueueEngine {
   private:
     // PRIVATE TYPES
     typedef QueueEngineUtil_AppState AppState;

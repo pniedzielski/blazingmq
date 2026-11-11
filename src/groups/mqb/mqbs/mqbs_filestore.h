@@ -115,7 +115,7 @@ class ReplicatedStorage;
 
 /// Mechanism to store BlazingMQ messages in file. This component is
 /// *const-thread* safe.
-class FileStore BSLS_KEYWORD_FINAL : public DataStore {
+class FileStore final : public DataStore {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBS.FILESTORE");

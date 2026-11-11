@@ -101,9 +101,9 @@ class StorageManagerIterator;
 /// on storage partitions. Every operation including and not limited to change
 /// in partition node ownership and syncing partition info should be routed via
 /// this component.
-class StorageManager BSLS_KEYWORD_FINAL : public mqbi::StorageManager,
-                                          public PartitionStateTableActions,
-                                          public PartitionFSMObserver {
+class StorageManager final : public mqbi::StorageManager,
+                             public PartitionStateTableActions,
+                             public PartitionFSMObserver {
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBC.STORAGEMANAGER");

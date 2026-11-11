@@ -445,7 +445,7 @@ class ClusterState {
     typedef UriToQueueInfoMap::iterator                UriToQueueInfoMapIter;
     typedef UriToQueueInfoMap::const_iterator          UriToQueueInfoMapCIter;
 
-    struct DomainState BSLS_KEYWORD_FINAL {
+    struct DomainState final {
       private:
         // DATA
         int               d_numAssignedQueues;

@@ -29,7 +29,7 @@ namespace bmqp {
 // ============================
 
 /// This struct keeps opaque data associated with each Schema
-struct SchemaLearner::SchemaHandle BSLS_KEYWORD_FINAL {
+struct SchemaLearner::SchemaHandle final {
     LRU::const_iterator d_listIterator;
     // Iterator in the list of keys which assists in
     // selecting least recently used Context.

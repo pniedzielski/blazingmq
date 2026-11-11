@@ -54,7 +54,7 @@ namespace mqbmock {
 // =================================
 
 /// Mock implementation of `mqbc::ClusterStateLedgerIterator` interface.
-class ClusterStateLedgerIterator BSLS_KEYWORD_FINAL
+class ClusterStateLedgerIterator final
 : public mqbc::ClusterStateLedgerIterator {
   public:
     // PUBLIC TYPES

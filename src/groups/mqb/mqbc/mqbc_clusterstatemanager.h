@@ -81,7 +81,7 @@ namespace mqbc {
 // =========================
 
 /// This class provides a mechanism to manage the state of a cluster.
-class ClusterStateManager BSLS_KEYWORD_FINAL
+class ClusterStateManager final
 : public mqbi::ClusterStateManager,
   public ClusterStateTableActions<ClusterFSM::EventWithMetadata>,
   public mqbc::ElectorInfoObserver,
