@@ -141,11 +141,8 @@ static void test2_additionsRemovals()
         {L_, false, 0, k_ADMIN | k_WRITE, 0},
         {L_, false, k_ADMIN | k_WRITE, 0, k_ADMIN | k_WRITE},
     };
-    const int k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
 
-    for (int idx = 0; idx < k_NUM_DATA; ++idx) {
-        const TestData& test = k_DATA[idx];
-
+    for (const TestData& test : k_DATA) {
         bsls::Types::Uint64 diffFlags = 0;
         if (test.d_isAdditions) {
             diffFlags = bmqt::QueueFlagsUtil::additions(test.d_oldFlags,
@@ -182,11 +179,7 @@ static void test3_printTest()
                   {bmqt::QueueFlags::e_WRITE, "WRITE"},
                   {bmqt::QueueFlags::e_ACK, "ACK"}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqu::MemOutStream out(bmqtst::TestHelperUtil::allocator());
         bmqu::MemOutStream expected(bmqtst::TestHelperUtil::allocator());
 

@@ -48,11 +48,7 @@ static void test1_toAscii()
                   {L_, 6, "TEXT"},
                   {L_, 7, "MULTIPARTS"}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bsl::string ascii(bmqtst::TestHelperUtil::allocator());
         ascii = bmqt::EncodingType::toAscii(
             bmqt::EncodingType::Enum(test.d_value));
@@ -80,11 +76,7 @@ static void test2_fromAscii()
     // NOTE: Using the 'integer' value instead of the enum to ensure the
     //       numeric values are *never* changed.
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqu::MemOutStream errorDescription(
             bmqtst::TestHelperUtil::allocator());
 
@@ -147,11 +139,7 @@ static void test4_printTest()
                   {bmqt::EncodingType::e_TEXT, "TEXT"},
                   {bmqt::EncodingType::e_MULTIPARTS, "MULTIPARTS"}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqu::MemOutStream out(bmqtst::TestHelperUtil::allocator());
         bmqu::MemOutStream expected(bmqtst::TestHelperUtil::allocator());
 

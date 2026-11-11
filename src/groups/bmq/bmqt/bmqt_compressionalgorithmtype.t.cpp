@@ -46,9 +46,7 @@ struct PrintTestData {
 template <typename ENUM_TYPE, typename ARRAY, int SIZE>
 static void printEnumHelper(ARRAY (&data)[SIZE])
 {
-    for (size_t idx = 0; idx < SIZE; ++idx) {
-        const PrintTestData& test = data[idx];
-
+    for (const PrintTestData& test : data) {
         PVVV("Line [" << test.d_line << "]");
 
         bmqu::MemOutStream out(bmqtst::TestHelperUtil::allocator());

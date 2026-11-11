@@ -78,11 +78,7 @@ static void test2_printTest()
                   {bmqt::HostHealthState::e_HEALTHY, "HEALTHY"},
                   {bmqt::HostHealthState::e_UNHEALTHY, "UNHEALTHY"}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqu::MemOutStream out(bmqtst::TestHelperUtil::allocator());
         bmqu::MemOutStream expected(bmqtst::TestHelperUtil::allocator());
 

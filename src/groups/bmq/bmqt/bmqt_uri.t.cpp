@@ -298,11 +298,7 @@ static void test1_breathingTest()
              bmqt::UriParser::UriParseResult::e_UNSUPPORTED_CHAR},
         };
 
-        const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-        for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-            const Test& test = k_DATA[idx];
-
+        for (const Test& test : k_DATA) {
             bmqt::Uri obj(bmqtst::TestHelperUtil::allocator());
             rc = bmqt::UriParser::parse(&obj, &error, test.d_input);
             BMQTST_ASSERT_EQ_D(test.d_line, rc, test.d_rc);
