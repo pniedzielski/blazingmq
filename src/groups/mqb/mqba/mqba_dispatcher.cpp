@@ -38,6 +38,7 @@
 #include <bsl_iostream.h>
 #include <bsl_limits.h>
 #include <bsl_string.h>
+#include <bsl_utility.h>
 #include <bsla_annotations.h>
 #include <bslma_managedptr.h>
 #include <bslmt_semaphore.h>
@@ -105,13 +106,11 @@ void Dispatcher_Executor::post(const bsl::function<void()>& f) const
     (*event_sp).callback().set(f);
 
     // C++03 compatibility:
-    bsl::shared_ptr<mqbi::DispatcherEvent> base_sp(
-        bslmf::MovableRefUtil::move(event_sp));
+    bsl::shared_ptr<mqbi::DispatcherEvent> base_sp(bsl::move(event_sp));
 
     // submit the event
-    int rc = d_processorPool_p->enqueueEvent(
-        bslmf::MovableRefUtil::move(base_sp),
-        d_processorHandle);
+    int rc = d_processorPool_p->enqueueEvent(bsl::move(base_sp),
+                                             d_processorHandle);
     BSLS_ASSERT_OPT(rc == 0);
 
     // Update stats
@@ -504,7 +503,7 @@ void Dispatcher::dispatchEvent(mqbi::Dispatcher::DispatcherEventRvRef event,
 
     bslmf::MovableRefUtil::access(event)->setDestination(destination);
 
-    dispatchEvent(bslmf::MovableRefUtil::move(event),
+    dispatchEvent(bsl::move(event),
                   destination->dispatcherClientData().clientType(),
                   destination->dispatcherClientData().processorHandle());
 }
@@ -530,9 +529,8 @@ void Dispatcher::dispatchEvent(mqbi::Dispatcher::DispatcherEventRvRef event,
         bslmf::MovableRefUtil::access(event)->setEnqueueTime(
             bmqu::Time::highResolutionTimer());
 
-        dispatcherContext->d_processorPool_mp->enqueueEvent(
-            bslmf::MovableRefUtil::move(event),
-            handle);
+        dispatcherContext->d_processorPool_mp->enqueueEvent(bsl::move(event),
+                                                            handle);
 
         // Update stats
         mqbstat::DispatcherStats::onEnqueue(
@@ -571,11 +569,9 @@ void Dispatcher::executeOnAllQueues(
     event_sp->finalizeCallback().set(doneCallback);
 
     // C++03 compatibility:
-    bsl::shared_ptr<mqbi::DispatcherEvent> base_sp(
-        bslmf::MovableRefUtil::move(event_sp));
+    bsl::shared_ptr<mqbi::DispatcherEvent> base_sp(bsl::move(event_sp));
 
-    processorPool->enqueueEventOnAllQueues(
-        bslmf::MovableRefUtil::move(base_sp));
+    processorPool->enqueueEventOnAllQueues(bsl::move(base_sp));
 
     // Update stats for all queues
     for (size_t i = 0; i < context_p->d_statContexts.size(); ++i) {
@@ -599,14 +595,14 @@ void Dispatcher::execute(const mqbi::Dispatcher::VoidFunction& functor,
             d_defaultEventSource_sp->getEvent<mqbevt::CallbackEvent>();
         event_sp->setEnqueueTime(bmqu::Time::highResolutionTimer());
         event_sp->callback().set(functor);
-        dispatchEvent(bslmf::MovableRefUtil::move(event_sp), client);
+        dispatchEvent(bsl::move(event_sp), client);
     }
     else {
         bsl::shared_ptr<mqbevt::DispatcherEvent> event_sp =
             d_defaultEventSource_sp->getEvent<mqbevt::DispatcherEvent>();
         event_sp->setEnqueueTime(bmqu::Time::highResolutionTimer());
         event_sp->callback().set(functor);
-        dispatchEvent(bslmf::MovableRefUtil::move(event_sp), client);
+        dispatchEvent(bsl::move(event_sp), client);
     }
 }
 
@@ -621,7 +617,7 @@ void Dispatcher::execute(const mqbi::Dispatcher::VoidFunction& functor,
     event_sp->setEnqueueTime(bmqu::Time::highResolutionTimer());
     event_sp->callback().set(functor);
 
-    dispatchEvent(bslmf::MovableRefUtil::move(event_sp),
+    dispatchEvent(bsl::move(event_sp),
                   client.clientType(),
                   client.processorHandle());
 }
@@ -649,7 +645,7 @@ void Dispatcher::synchronize(mqbi::DispatcherClientType::Enum  type,
     (*event_sp).setCallback(
         bdlf::BindUtil::bind(static_cast<PostFn>(&bslmt::Semaphore::post),
                              &semaphore));
-    dispatchEvent(bslmf::MovableRefUtil::move(event_sp), type, handle);
+    dispatchEvent(bsl::move(event_sp), type, handle);
     semaphore.wait();
 }
 

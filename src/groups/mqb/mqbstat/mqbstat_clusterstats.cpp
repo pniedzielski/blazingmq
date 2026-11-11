@@ -30,6 +30,7 @@
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_limits.h>
 #include <bsl_ostream.h>
+#include <bsl_utility.h>
 #include <bsla_annotations.h>
 #include <bslmf_assert.h>
 #include <bslmf_movableref.h>
@@ -279,8 +280,7 @@ void ClusterStats::initialize(const bsl::string&  name,
         partitionStats_sp.createInplace(allocator, statContext_sp);
         partitionStats_sp->setNodeRole(
             PartitionStats::PrimaryStatus::e_UNKNOWN);
-        d_partitionsStats.emplace_back(
-            bslmf::MovableRefUtil::move(partitionStats_sp));
+        d_partitionsStats.emplace_back(bsl::move(partitionStats_sp));
     }
 }
 

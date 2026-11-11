@@ -479,7 +479,7 @@ static void test3_URIBuilderMultiThreaded()
                                        << i << ", rc=" << rc,
                                    rc,
                                    0);
-                out->emplace_back(bslmf::MovableRefUtil::move(qualifiedUri));
+                out->emplace_back(bsl::move(qualifiedUri));
             }
         }
     };

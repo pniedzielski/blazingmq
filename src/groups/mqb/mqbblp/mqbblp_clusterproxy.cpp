@@ -617,8 +617,7 @@ void ClusterProxy::processEvent(const bmqp::Event&   event,
             d_clusterData.blobSpPool().getObject();
         *blobSp = *(event.blob());
         (*event_sp).setBlob(blobSp).setSource(this);
-        dispatcher()->dispatchEvent(bslmf::MovableRefUtil::move(event_sp),
-                                    this);
+        dispatcher()->dispatchEvent(bsl::move(event_sp), this);
     } break;
     case bmqp::EventType::e_ACK: {
         // TODO(678098): revisit, use per-IO thread event source
@@ -630,8 +629,7 @@ void ClusterProxy::processEvent(const bmqp::Event&   event,
             d_clusterData.blobSpPool().getObject();
         *blobSp = *(event.blob());
         (*event_sp).setBlob(blobSp).setSource(this);
-        dispatcher()->dispatchEvent(bslmf::MovableRefUtil::move(event_sp),
-                                    this);
+        dispatcher()->dispatchEvent(bsl::move(event_sp), this);
     } break;
     case bmqp::EventType::e_AUTHENTICATION: {
         // TODO

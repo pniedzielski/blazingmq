@@ -171,6 +171,7 @@
 // BDE
 #include <bdlb_nullablevalue.h>
 #include <bsl_memory.h>
+#include <bsl_utility.h>
 #include <bslalg_constructorproxy.h>
 #include <bslma_allocator.h>
 #include <bslma_usesbslmaallocator.h>
@@ -2000,8 +2001,7 @@ template <class VALUE>
 inline WeakMemFnResult<VALUE>::WeakMemFnResult(
     bslmf::MovableRef<WeakMemFnResult> original,
     bslma::Allocator*                  basicAllocator)
-: d_value(bslmf::MovableRefUtil::move(
-              bslmf::MovableRefUtil::access(original).d_value.object()),
+: d_value(bsl::move(bslmf::MovableRefUtil::access(original).d_value.object()),
           basicAllocator)
 {
     // NOTHING
@@ -2020,7 +2020,7 @@ template <class VALUE>
 inline WeakMemFnResult<VALUE>&
 WeakMemFnResult<VALUE>::operator=(bslmf::MovableRef<WeakMemFnResult> original)
 {
-    d_value.object() = bslmf::MovableRefUtil::move(
+    d_value.object() = bsl::move(
         bslmf::MovableRefUtil::access(original).d_value.object());
     return *this;
 }

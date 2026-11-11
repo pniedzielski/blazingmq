@@ -917,8 +917,7 @@ int StatController::start(bsl::ostream& errorDescription)
                 bsls::TimeInterval(consumerCfg->publishInterval()));
 
             // Take ownership of the 'StatController'.
-            d_statConsumers.emplace_back(
-                bslmf::MovableRefUtil::move(consumer));
+            d_statConsumers.emplace_back(bsl::move(consumer));
         }
     }
 

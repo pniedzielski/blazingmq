@@ -1187,8 +1187,7 @@ int RemoteQueue::rejectMessage(const bmqt::MessageGUID& msgGUID,
             .setRejectMessage(rejectMessage)
             .setPartitionId(d_state_p->partitionId())
             .setIsRelay(true);
-        dispatcher->dispatchEvent(bslmf::MovableRefUtil::move(event_sp),
-                                  cluster);
+        dispatcher->dispatchEvent(bsl::move(event_sp), cluster);
     } break;
     default: {
         BSLS_ASSERT(false && "Unknown SubStreamContext state.");

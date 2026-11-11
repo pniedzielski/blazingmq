@@ -28,6 +28,7 @@
 #include <bsl_optional.h>
 #include <bsl_string_view.h>
 #include <bsl_unordered_map.h>
+#include <bsl_utility.h>
 #include <bsl_variant.h>
 #include <bsl_vector.h>
 #include <bsla_maybeunused.h>
@@ -39,7 +40,7 @@
 #define COPY_INIT(OBJ, FIELD) FIELD(OBJ.FIELD)
 #define COPY_INIT_ALLOC(OBJ, FIELD, ALLOC) FIELD(OBJ.FIELD, ALLOC)
 #define MOVE_FIELD(OBJ, FIELD)                                                \
-    bslmf::MovableRefUtil::move(bslmf::MovableRefUtil::access(OBJ).FIELD)
+    bsl::move(bslmf::MovableRefUtil::access(OBJ).FIELD)
 #define MOVE_INIT(OBJ, FIELD) FIELD(MOVE_FIELD(OBJ, FIELD))
 #define MOVE_INIT_ALLOC(OBJ, FIELD, ALLOC) FIELD(MOVE_FIELD(OBJ, FIELD), ALLOC)
 
@@ -528,15 +529,16 @@ int Policy::parse(Policy*                 result,
         // Insert the validated permission into the roles map
         RoleMap::const_iterator position   = roles.cend();
         bool                    isInserted = false;
-        bdlb::PairUtil::tie(position, isInserted) =
-            roles.emplace(it->id(), bslmf::MovableRefUtil::move(permission));
+        bdlb::PairUtil::tie(position,
+                            isInserted) = roles.emplace(it->id(),
+                                                        bsl::move(permission));
         if (!isInserted) {
             return k_NON_UNQIUE_IDENTITIES;  // RETURN
         }
     }
 
     bslma::ConstructionUtil::construct(result, allocator);
-    result->d_rolePermissions = bslmf::MovableRefUtil::move(roles);
+    result->d_rolePermissions = bsl::move(roles);
 
     return k_OK;
 }

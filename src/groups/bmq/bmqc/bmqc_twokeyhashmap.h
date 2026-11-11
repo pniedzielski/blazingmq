@@ -140,6 +140,7 @@
 #include <bsl_functional.h>  // bsl::hash
 #include <bsl_iterator.h>
 #include <bsl_unordered_map.h>
+#include <bsl_utility.h>
 #include <bsl_utility.h>  // bsl::pair
 #include <bslma_allocator.h>
 #include <bslma_constructionutil.h>
@@ -1183,7 +1184,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::operator=(
         if (allocator() == bslmf::MovableRefUtil::access(rhs).allocator()) {
             // '*this' and 'rhs' use the same allocator. Move the contents.
             clear();  // release resources
-            TwoKeyHashMap(bslmf::MovableRefUtil::move(rhs),
+            TwoKeyHashMap(bsl::move(rhs),
                           allocator())
                 .swap(*this);  // move-and-swap
         }

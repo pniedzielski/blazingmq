@@ -71,6 +71,7 @@
 #include <bsl_limits.h>
 #include <bsl_sstream.h>
 #include <bsl_string.h>
+#include <bsl_utility.h>
 #include <bsla_annotations.h>
 #include <bslma_allocator.h>
 #include <bslma_usesbslmaallocator.h>
@@ -535,7 +536,7 @@ template <class QUEUE, class QUEUE_TRAITS>
 inline int MonitoredQueue<QUEUE, QUEUE_TRAITS>::tryPushBack(
     bslmf::MovableRef<ElementType> object)
 {
-    if (d_queue.tryPushBack(bslmf::MovableRefUtil::move(object))) {
+    if (d_queue.tryPushBack(bsl::move(object))) {
         // We've filled the queue.  Alarm
         if (!Traits::isPushBackDisabled(d_queue) &&
             setState(MonitoredQueueState::e_QUEUE_FILLED) &&
@@ -592,7 +593,7 @@ inline int MonitoredQueue<QUEUE, QUEUE_TRAITS>::pushBack(
         return -1;  // RETURN
     }
 
-    if (d_queue.pushBack(bslmf::MovableRefUtil::move(value)) != 0) {
+    if (d_queue.pushBack(bsl::move(value)) != 0) {
         return -1;  // RETURN
     }
 

@@ -49,6 +49,7 @@
 #include <bdlf_placeholder.h>
 #include <bsl_algorithm.h>
 #include <bsl_queue.h>
+#include <bsl_utility.h>
 #include <bsla_annotations.h>
 #include <bslmt_once.h>
 #include <bsls_performancehint.h>
@@ -4397,8 +4398,7 @@ void StorageManager::unregisterQueue(const bmqt::Uri& uri, int partitionId)
                              bsl::cref(d_partitionInfoVec[partitionId]),
                              uri));
 
-    d_fileStores[partitionId]->dispatchEvent(
-        bslmf::MovableRefUtil::move(event_sp));
+    d_fileStores[partitionId]->dispatchEvent(bsl::move(event_sp));
 }
 
 int StorageManager::updateQueuePrimary(const bmqt::Uri& uri,

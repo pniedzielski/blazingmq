@@ -19,6 +19,7 @@
 // BDE
 #include <bsl_ostream.h>
 #include <bsl_string.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bslma_allocator.h>
 
@@ -57,12 +58,9 @@ AuthnCredential::AuthnCredential(const AuthnCredential& other,
 
 AuthnCredential::AuthnCredential(bslmf::MovableRef<AuthnCredential> otherRef,
                                  bslma::Allocator*                  allocator)
-: d_mechanism(bslmf::MovableRefUtil::move(
-                  bslmf::MovableRefUtil::access(otherRef).d_mechanism),
+: d_mechanism(bsl::move(bslmf::MovableRefUtil::access(otherRef).d_mechanism),
               allocator)
-, d_data(bslmf::MovableRefUtil::move(
-             bslmf::MovableRefUtil::access(otherRef).d_data),
-         allocator)
+, d_data(bsl::move(bslmf::MovableRefUtil::access(otherRef).d_data), allocator)
 {
     // NOTHING
 }
@@ -83,8 +81,8 @@ AuthnCredential::operator=(bslmf::MovableRef<AuthnCredential> rhsRef)
 {
     AuthnCredential& rhs = bslmf::MovableRefUtil::access(rhsRef);
     if (this != &rhs) {
-        d_mechanism = bslmf::MovableRefUtil::move(rhs.d_mechanism);
-        d_data      = bslmf::MovableRefUtil::move(rhs.d_data);
+        d_mechanism = bsl::move(rhs.d_mechanism);
+        d_data      = bsl::move(rhs.d_data);
     }
     return *this;
 }

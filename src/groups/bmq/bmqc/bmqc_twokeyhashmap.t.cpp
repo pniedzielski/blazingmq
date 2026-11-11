@@ -21,6 +21,7 @@
 #include <bsl_iostream.h>
 #include <bsl_sstream.h>
 #include <bsl_string.h>
+#include <bsl_utility.h>
 #include <bsl_utility.h>  // bsl::pair
 #include <bsl_vector.h>
 #include <bslma_testallocator.h>
@@ -415,7 +416,7 @@ static void test2_copyAndMove()
         Map movedFrom(original, &alloc);
 
         // do move
-        Map movedTo(bslmf::MovableRefUtil::move(movedFrom), &alloc);
+        Map movedTo(bsl::move(movedFrom), &alloc);
 
         // the moved-to object contents is identical to original's
         BMQTST_ASSERT_EQ(movedTo.size(), 5u);
@@ -490,7 +491,7 @@ static void test2_copyAndMove()
         BMQTST_ASSERT_EQ(movedTo.size(), 2u);
 
         // do move
-        movedTo = bslmf::MovableRefUtil::move(movedFrom);
+        movedTo = bsl::move(movedFrom);
 
         // the moved-to object contents is identical to original's
         BMQTST_ASSERT_EQ(movedTo.size(), 5u);

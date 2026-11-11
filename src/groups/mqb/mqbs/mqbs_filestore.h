@@ -891,7 +891,7 @@ class FileStore final : public DataStore {
     {
         mqbi::Dispatcher::DispatcherEventSp base(
             bslmf::MovableRefUtil::access(event));
-        dispatchEvent(bslmf::MovableRefUtil::move(base));
+        dispatchEvent(bsl::move(base));
     }
 #endif
 
@@ -1361,7 +1361,7 @@ inline bool FileStore::needRollover(const MappedFileDescriptor& file,
 inline void
 FileStore::dispatchEvent(mqbi::Dispatcher::DispatcherEventRvRef event)
 {
-    dispatcher()->dispatchEvent(bslmf::MovableRefUtil::move(event), this);
+    dispatcher()->dispatchEvent(bsl::move(event), this);
 }
 
 inline void FileStore::execute(const mqbi::Dispatcher::VoidFunction& functor)

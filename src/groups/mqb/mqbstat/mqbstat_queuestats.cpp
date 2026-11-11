@@ -449,8 +449,7 @@ void QueueStatsDomain::initialize(const bmqt::Uri& uri, mqbi::Domain* domain)
                 bmqst::StatContextConfiguration(*cit, &localAllocator));
 
             d_subContextsLookup.insert(bsl::make_pair(*cit, subContext.get()));
-            d_subContextsHolder.emplace_back(
-                bslmf::MovableRefUtil::move(subContext));
+            d_subContextsHolder.emplace_back(bsl::move(subContext));
         }
     }
 }
@@ -600,8 +599,7 @@ void QueueStatsDomain::updateDomainAppIds(
             bmqst::StatContextConfiguration(*sIt, &localAllocator));
 
         d_subContextsLookup.insert(bsl::make_pair(*sIt, subContext.get()));
-        d_subContextsHolder.emplace_back(
-            bslmf::MovableRefUtil::move(subContext));
+        d_subContextsHolder.emplace_back(bsl::move(subContext));
     }
 }
 

@@ -51,6 +51,7 @@
 #include <bsl_functional.h>  // for bsl::ref()
 #include <bsl_ios.h>
 #include <bsl_iostream.h>
+#include <bsl_utility.h>
 #include <bsla_annotations.h>
 #include <bsls_assert.h>
 
@@ -837,7 +838,7 @@ void Queue::onPushMessage(
         .setCompressionAlgorithmType(compressionAlgorithmType)
         .setOutOfOrderPush(isOutOfOrder);
 
-    dispatcher()->dispatchEvent(bslmf::MovableRefUtil::move(event_sp), this);
+    dispatcher()->dispatchEvent(bsl::move(event_sp), this);
 }
 
 void Queue::confirmMessage(const bmqt::MessageGUID& msgGUID,
@@ -903,7 +904,7 @@ void Queue::onAckMessage(const bmqp::AckMessage& ackMessage)
         domain()->cluster()->getEvent<mqbevt::AckEvent>();
     (*event_sp).setAckMessage(ackMessage);
 
-    dispatcher()->dispatchEvent(bslmf::MovableRefUtil::move(event_sp), this);
+    dispatcher()->dispatchEvent(bsl::move(event_sp), this);
 }
 
 int Queue::processCommand(mqbcmd::QueueResult*        result,

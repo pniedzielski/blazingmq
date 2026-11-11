@@ -579,9 +579,7 @@ void QueueHandle::deliverMessageImpl(
             event_sp->setBlob(message);
         }
 
-        client->dispatcher()->dispatchEvent(
-            bslmf::MovableRefUtil::move(event_sp),
-            client);
+        client->dispatcher()->dispatchEvent(bsl::move(event_sp), client);
         return;  // RETURN
     }
 
@@ -912,9 +910,8 @@ void QueueHandle::confirmMessage(mqbi::DispatcherEventSource* eventSource_p,
         msgGUID,
         downstreamSubQueueId);
 
-    d_queue_sp->dispatcher()->dispatchEvent(
-        bslmf::MovableRefUtil::move(event_sp),
-        d_queue_sp.get());
+    d_queue_sp->dispatcher()->dispatchEvent(bsl::move(event_sp),
+                                            d_queue_sp.get());
 }
 
 void QueueHandle::rejectMessage(const bmqt::MessageGUID& msgGUID,
@@ -1082,9 +1079,8 @@ void QueueHandle::postMessage(const bmqp::PutHeader&              putHeader,
         .setPutHeader(putHeader)
         .setQueueHandle(this);
 
-    d_queue_sp->dispatcher()->dispatchEvent(
-        bslmf::MovableRefUtil::move(event_sp),
-        d_queue_sp.get());
+    d_queue_sp->dispatcher()->dispatchEvent(bsl::move(event_sp),
+                                            d_queue_sp.get());
 }
 
 void QueueHandle::configure(
@@ -1337,9 +1333,7 @@ void QueueHandle::onAckMessage(const bmqp::AckMessage& ackMessage)
             event_sp->ackMessage());
         ackMsg.setQueueId(id());
 
-        client->dispatcher()->dispatchEvent(
-            bslmf::MovableRefUtil::move(event_sp),
-            client);
+        client->dispatcher()->dispatchEvent(bsl::move(event_sp), client);
         return;  // RETURN
     }
 

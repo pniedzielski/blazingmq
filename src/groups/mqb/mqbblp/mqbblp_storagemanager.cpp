@@ -1175,7 +1175,7 @@ void StorageManager::unregisterQueue(const bmqt::Uri& uri, int partitionId)
                              bsl::cref(d_partitionInfoVec[partitionId]),
                              uri));
 
-    fs->dispatchEvent(bslmf::MovableRefUtil::move(event_sp));
+    fs->dispatchEvent(bsl::move(event_sp));
 }
 
 int StorageManager::updateQueuePrimary(const bmqt::Uri& uri,

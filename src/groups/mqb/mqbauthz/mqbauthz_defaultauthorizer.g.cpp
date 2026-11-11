@@ -27,6 +27,7 @@
 // BDE
 #include <bsl_optional.h>
 #include <bsl_string.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bsla_nodiscard.h>
 #include <bslma_managedptr.h>
@@ -102,8 +103,7 @@ TEST_F(DefaultAuthorizerTest, acceptsPolicy)
 {
     bslma::ManagedPtr<mqbauthz::Policy> policy;
     ASSERT_EQ(0, makePolicy(&policy));
-    mqbauthz::DefaultAuthorizer authorizer(
-        bslmf::MovableRefUtil::move(policy));
+    mqbauthz::DefaultAuthorizer authorizer(bsl::move(policy));
 
     bsl::string name(authorizer.name());
     EXPECT_STREQ("DefaultAuthorizer", name.c_str());
@@ -186,8 +186,7 @@ TEST_F(DefaultAuthorizerAccessTest, someActionsAreAllowedWithPolicy)
 
     bslma::ManagedPtr<mqbauthz::Policy> policy;
     ASSERT_EQ(0, makePolicy(&policy));
-    mqbauthz::DefaultAuthorizer authorizer(
-        bslmf::MovableRefUtil::move(policy));
+    mqbauthz::DefaultAuthorizer authorizer(bsl::move(policy));
 
     for (TestCases::const_iterator it = cases.cbegin(), end = cases.cend();
          it != end;

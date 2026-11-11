@@ -16,6 +16,7 @@
 #include <bmqu_managedcallback.h>
 
 #include <bmqscm_version.h>
+#include <bsl_utility.h>
 
 namespace BloombergLP {
 namespace bmqu {
@@ -37,7 +38,7 @@ class VoidCallback : public bmqu::ManagedCallback::CallbackFunctor {
 
     explicit VoidCallback(
         bslmf::MovableRef<bmqu::ManagedCallback::VoidFunctor> callback)
-    : d_callback(bslmf::MovableRefUtil::move(callback))
+    : d_callback(bsl::move(callback))
     {
         // NOTHING
     }
@@ -82,8 +83,7 @@ void ManagedCallback::set(bslmf::MovableRef<VoidFunctor> callback)
 {
     // Preconditions for placement are checked in `place`.
     // Destructor is called by `reset` of the holding DispatcherEvent.
-    new (place<VoidCallback>())
-        VoidCallback(bslmf::MovableRefUtil::move(callback));
+    new (place<VoidCallback>()) VoidCallback(bsl::move(callback));
 }
 
 }  // close package namespace

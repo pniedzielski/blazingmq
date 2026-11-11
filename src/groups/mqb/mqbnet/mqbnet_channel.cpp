@@ -19,6 +19,7 @@
 // BDE
 #include <bdlf_bind.h>
 #include <bsl_memory.h>
+#include <bsl_utility.h>
 #include <bslmt_lockguard.h>
 #include <bslmt_threadattributes.h>
 #include <bsls_assert.h>
@@ -381,7 +382,7 @@ void Channel::wakeUp()
                                  this,
                                  deleteItem);
 
-    d_buffer.pushBack(bslmf::MovableRefUtil::move(item));
+    d_buffer.pushBack(bsl::move(item));
 }
 
 void Channel::onWatermark(const bsl::weak_ptr<bmqio::Channel>& source,

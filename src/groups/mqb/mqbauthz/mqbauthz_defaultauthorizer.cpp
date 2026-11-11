@@ -33,6 +33,7 @@
 #include <ball_log.h>
 #include <bdlsb_fixedmeminstreambuf.h>
 #include <bsl_fstream.h>
+#include <bsl_utility.h>
 #include <bsla_maybeunused.h>
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
@@ -122,7 +123,7 @@ DefaultAuthorizer::DefaultAuthorizer()
 }
 
 DefaultAuthorizer::DefaultAuthorizer(bslmf::MovableRef<PolicyMP> policy)
-: d_policy(bslmf::MovableRefUtil::move(policy))
+: d_policy(bsl::move(policy))
 {
     // NOTHING
 }
@@ -267,7 +268,7 @@ DefaultAuthorizerPluginFactory::create(bslma::Allocator* allocator)
         bslma::ManagedPtr<DefaultAuthorizer> defaultAuthorizer =
             bslma::ManagedPtrUtil::allocateManaged<DefaultAuthorizer>(
                 allocator);
-        authorizer = bslmf::MovableRefUtil::move(defaultAuthorizer);
+        authorizer = bsl::move(defaultAuthorizer);
         return authorizer;  // RETURN
     }
 
@@ -281,8 +282,8 @@ DefaultAuthorizerPluginFactory::create(bslma::Allocator* allocator)
     bslma::ManagedPtr<DefaultAuthorizer> defaultAuthorizer =
         bslma::ManagedPtrUtil::allocateManaged<DefaultAuthorizer>(
             allocator,
-            bslmf::MovableRefUtil::move(policy));
-    authorizer = bslmf::MovableRefUtil::move(defaultAuthorizer);
+            bsl::move(policy));
+    authorizer = bsl::move(defaultAuthorizer);
 
     return authorizer;
 }

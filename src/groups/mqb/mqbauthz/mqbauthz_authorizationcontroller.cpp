@@ -31,6 +31,7 @@
 #include <bsl_ostream.h>
 #include <bsl_string.h>
 #include <bsl_unordered_set.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bslma_managedptr.h>
 #include <bslmf_movableref.h>
@@ -50,7 +51,7 @@ namespace {
 
 AuthorizationController::AuthorizationController(
     bslmf::MovableRef<AuthorizerMp> authorizer)
-: d_authorizer_mp(bslmf::MovableRefUtil::move(authorizer))
+: d_authorizer_mp(bsl::move(authorizer))
 {
     // PRECONDITIONS
     BSLS_ASSERT(d_authorizer_mp);
@@ -118,7 +119,7 @@ int AuthorizationController::createConfiguredAuthorizer(
         AuthorizerMp candidate = candidateFactory->create(
             allocator.mechanism());
         if (candidate && candidate->name() == pluginName) {
-            authorizer = bslmf::MovableRefUtil::move(candidate);
+            authorizer = bsl::move(candidate);
             break;  // BREAK
         }
     }
@@ -131,7 +132,7 @@ int AuthorizationController::createConfiguredAuthorizer(
         return rc_PLUGIN_NOT_FOUND;  // RETURN
     }
 
-    *result = bslmf::MovableRefUtil::move(authorizer);
+    *result = bsl::move(authorizer);
 
     return rc_SUCCESS;
 }
@@ -204,7 +205,7 @@ int AuthorizationController::allocateManaged(
 
     *result = bslma::ManagedPtrUtil::allocateManaged<AuthorizationController>(
         allocator,
-        bslmf::MovableRefUtil::move(authorizer));
+        bsl::move(authorizer));
 
     BALL_LOG_INFO << "Successfully initialized authorizer controller";
 

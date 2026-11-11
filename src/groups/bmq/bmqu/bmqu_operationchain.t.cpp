@@ -28,6 +28,7 @@
 #include <bsl_functional.h>
 #include <bsl_iostream.h>
 #include <bsl_ostream.h>
+#include <bsl_utility.h>
 #include <bsla_annotations.h>
 #include <bslmf_movableref.h>
 #include <bslmt_semaphore.h>
@@ -1189,7 +1190,7 @@ static void test12_link_creators()
         original.insert(NullOperation());
 
         // move-construct another link
-        bmqu::OperationChainLink copy(bslmf::MovableRefUtil::move(original));
+        bmqu::OperationChainLink copy(bsl::move(original));
 
         // the copy now contains the state of the original
         BMQTST_ASSERT_EQ(copy.numOperations(), 2u);
@@ -1232,7 +1233,7 @@ static void test13_link_assignment()
         link2.insert(NullOperation());
 
         // move-assign the second link to the first
-        link1 = bslmf::MovableRefUtil::move(link2);
+        link1 = bsl::move(link2);
 
         // the first link now contains the state of the second one
         BMQTST_ASSERT_EQ(link1.numOperations(), 2u);
@@ -1253,7 +1254,7 @@ static void test13_link_assignment()
         link.insert(NullOperation());
 
         // move-assign to self
-        link = bslmf::MovableRefUtil::move(link);
+        link = bsl::move(link);
 
         // the link is in a valid state
         BMQTST_ASSERT_EQ(link.allocator(),

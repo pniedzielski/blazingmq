@@ -4976,7 +4976,7 @@ BrokerSession::enqueueFsmEvent(bsl::shared_ptr<Event>& event)
         }
     }
 
-    int rc = d_fsmEventQueue.pushBack(bslmf::MovableRefUtil::move(event));
+    int rc = d_fsmEventQueue.pushBack(bsl::move(event));
 
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
@@ -5011,10 +5011,8 @@ void BrokerSession::doStart(
                                      bdlf::PlaceHolders::_1));
 
         // Wrap it in a SignalerConnectionGuard for easy RAII semantics.
-        bdlmt::SignalerConnectionGuard guard(
-            bslmf::MovableRefUtil::move(conn));
-        d_hostHealthSignalerConnectionGuard = bslmf::MovableRefUtil::move(
-            guard);
+        bdlmt::SignalerConnectionGuard guard(bsl::move(conn));
+        d_hostHealthSignalerConnectionGuard = bsl::move(guard);
         // Track SignalerConnectionGuard using internally kept field.
 
         // Derive the initial host health state, and let the client know if the
@@ -7418,7 +7416,7 @@ void BrokerSession::postToFsm(const bsl::function<void()>& f)
         bdlf::BindUtil::bind(&callbackAdapter,
                              f,
                              bdlf::PlaceHolders::_1));  // eventSp
-    int rc = d_fsmEventQueue.pushBack(bslmf::MovableRefUtil::move(event));
+    int rc = d_fsmEventQueue.pushBack(bsl::move(event));
 
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;

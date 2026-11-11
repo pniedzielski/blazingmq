@@ -115,22 +115,22 @@
 //  MQTP::EventSp event;
 //  event.createInplace(allocator);
 //  event->value() = 0;
-//  mfqtp.enqueueEvent(bslmf::MovableRefUtil::move(event), 0);
+//  mfqtp.enqueueEvent(bsl::move(event), 0);
 //
 //  MQTP::EventSp event;
 //  event.createInplace(allocator);
 //  event->value() = 1;
-//  mfqtp.enqueueEvent(bslmf::MovableRefUtil::move(event), 1);
+//  mfqtp.enqueueEvent(bsl::move(event), 1);
 //
 //  MQTP::EventSp event;
 //  event.createInplace(allocator);
 //  event->value() = 2;
-//  mfqtp.enqueueEvent(bslmf::MovableRefUtil::move(event), 2);
+//  mfqtp.enqueueEvent(bsl::move(event), 2);
 //
 //  MQTP::EventSp event;
 //  event.createInplace(allocator);
 //  event->value() = 3;
-//  mfqtp.enqueueEventOnAllQueues(bslmf::MovableRefUtil::move(event));
+//  mfqtp.enqueueEventOnAllQueues(bsl::move(event));
 //..
 // Finally, we stop the MQTP, which will block until all queues are empty, and
 // verify that each of the queues received the right messages.
@@ -161,6 +161,7 @@
 #include <bsl_functional.h>
 #include <bsl_memory.h>
 #include <bsl_string.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bslma_default.h>
@@ -922,8 +923,7 @@ MultiQueueThreadPool<TYPE>::enqueueEvent(bslmf::MovableRef<EventSp> event,
     BSLS_ASSERT_SAFE(isStarted() && "MQTP has not been started");
 
     // [try to] Push back item
-    return d_queues[queueId]->d_queue_p->pushBack(
-        bslmf::MovableRefUtil::move(event));
+    return d_queues[queueId]->d_queue_p->pushBack(bsl::move(event));
 }
 
 template <typename TYPE>
@@ -934,7 +934,7 @@ inline int MultiQueueThreadPool<TYPE>::enqueueEventOnAllQueues(
     BSLS_ASSERT_SAFE(bslmf::MovableRefUtil::access(event));
     BSLS_ASSERT_SAFE(isStarted() && "MQTP has not been started");
 
-    EventSp eventObj(bslmf::MovableRefUtil::move(event));
+    EventSp eventObj(bsl::move(event));
 
     // Enqueue on each selected queue
     int lastError = 0;

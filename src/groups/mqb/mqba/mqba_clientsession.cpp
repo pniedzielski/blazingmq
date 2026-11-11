@@ -206,6 +206,7 @@
 #include <bsl_iostream.h>
 #include <bsl_limits.h>
 #include <bsl_memory.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bslma_managedptr.h>
@@ -364,7 +365,7 @@ void dispatchEvent(const bsl::shared_ptr<bdlbb::Blob>& blob_sp,
     bsl::shared_ptr<EVENT_TYPE> event_sp =
         dispatcher->getDefaultEventSource()->getEvent<EVENT_TYPE>();
     event_sp->setBlob(blob_sp).setSource(source);
-    dispatcher->dispatchEvent(bslmf::MovableRefUtil::move(event_sp), source);
+    dispatcher->dispatchEvent(bsl::move(event_sp), source);
 }
 
 }  // close unnamed namespace

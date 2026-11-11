@@ -242,25 +242,25 @@ static void test1_breathingTest()
         MQTP::EventSp event;
         event.createInplace(allocator);
         event->value() = 0;
-        mfqtp.enqueueEvent(bslmf::MovableRefUtil::move(event), 0);
+        mfqtp.enqueueEvent(bsl::move(event), 0);
     }
     {
         MQTP::EventSp event;
         event.createInplace(allocator);
         event->value() = 1;
-        mfqtp.enqueueEvent(bslmf::MovableRefUtil::move(event), 1);
+        mfqtp.enqueueEvent(bsl::move(event), 1);
     }
     {
         MQTP::EventSp event;
         event.createInplace(allocator);
         event->value() = 2;
-        mfqtp.enqueueEvent(bslmf::MovableRefUtil::move(event), 2);
+        mfqtp.enqueueEvent(bsl::move(event), 2);
     }
     {
         MQTP::EventSp event;
         event.createInplace(allocator);
         event->value() = 3;
-        mfqtp.enqueueEventOnAllQueues(bslmf::MovableRefUtil::move(event));
+        mfqtp.enqueueEventOnAllQueues(bsl::move(event));
     }
 
     mfqtp.stop();
@@ -347,7 +347,7 @@ static void testN1_performance()
         MQTP::EventSp event;
         event.createInplace(bmqtst::TestHelperUtil::allocator());
         event->value() = 0;
-        mfqtp.enqueueEvent(bslmf::MovableRefUtil::move(event), 0);
+        mfqtp.enqueueEvent(bsl::move(event), 0);
     }
     PRINT("Enqueued " << k_NUM_ITERATIONS << " items.");
 
@@ -363,7 +363,7 @@ static void testN1_performance()
         MQTP::EventSp event;
         event.createInplace(bmqtst::TestHelperUtil::allocator());
         event->value() = 0;
-        mfqtp.enqueueEvent(bslmf::MovableRefUtil::move(event), 0);
+        mfqtp.enqueueEvent(bsl::move(event), 0);
     }
     PRINT("Enqueued " << k_NUM_ITERATIONS << " items.");
 
@@ -500,7 +500,7 @@ static void testN1_performance_GoogleBenchmark(benchmark::State& state)
             MQTP::EventSp event;
             event.createInplace(bmqtst::TestHelperUtil::allocator());
             event->value() = 0;
-            mfqtp.enqueueEvent(bslmf::MovableRefUtil::move(event), 0);
+            mfqtp.enqueueEvent(bsl::move(event), 0);
         }
         PRINT("Enqueued " << k_NUM_ITERATIONS << " items.");
 

@@ -48,6 +48,7 @@
 #include <bsl_functional.h>
 #include <bsl_iostream.h>
 #include <bsl_map.h>
+#include <bsl_utility.h>
 #include <bslma_allocator.h>
 #include <bslmt_lockguard.h>
 #include <bslmt_semaphore.h>
@@ -635,7 +636,7 @@ void Domain::unregisterQueue(mqbi::Queue* queue)
             return;  // RETURN
         }
 
-        queueSp = bslmf::MovableRefUtil::move(it->second);
+        queueSp = bsl::move(it->second);
         d_queues.erase(it);
 
         count = d_queues.size();

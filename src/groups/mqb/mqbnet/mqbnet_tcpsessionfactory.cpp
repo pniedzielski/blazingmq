@@ -1345,9 +1345,8 @@ int TCPSessionFactory::start(bsl::ostream& errorDescription)
             .addWith(statChannelFactoryBuilder);
         bslma::ManagedPtr<bmqio::ChannelFactoryPipeline>
             channelFactoryPipeline_mp = bslma::ManagedPtrUtil::allocateManaged<
-                bmqio::ChannelFactoryPipeline>(
-                d_allocator_p,
-                bslmf::MovableRefUtil::move(config));
+                bmqio::ChannelFactoryPipeline>(d_allocator_p,
+                                               bsl::move(config));
 
         d_channelFactoryPipeline_mp = channelFactoryPipeline_mp;
     }

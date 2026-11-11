@@ -24,6 +24,7 @@
 #include <bsl_functional.h>  // bsl::reference_wrapper
 #include <bsl_iostream.h>
 #include <bsl_ostream.h>
+#include <bsl_utility.h>
 #include <bslma_testallocator.h>
 #include <bslmf_assert.h>
 #include <bslmf_movableref.h>
@@ -165,7 +166,7 @@ class ExecutorElarger {
     }
 
     ExecutorElarger(EXECUTOR executor)  // IMPLICIT
-    : d_executor(bslmf::MovableRefUtil::move(executor))
+    : d_executor(bsl::move(executor))
     {
         // NOTHING
     }
@@ -319,20 +320,20 @@ static void test1_creators()
         bmqex::Executor ex3(largeEx, &alloc);  // contains large target
 
         // move an empty executor
-        bmqex::Executor ex1Copy(bslmf::MovableRefUtil::move(ex1));
+        bmqex::Executor ex1Copy(bsl::move(ex1));
 
         // check postconditions
         BMQTST_ASSERT(!ex1Copy);
 
         // move an empty executor specifying an (to be ignored) allocator
-        bmqex::Executor ex1CopyAlloc(bslmf::MovableRefUtil::move(ex1), &alloc);
+        bmqex::Executor ex1CopyAlloc(bsl::move(ex1), &alloc);
 
         // check postconditions, the move constructor should have been selected
         // against the template one
         BMQTST_ASSERT(!ex1CopyAlloc);
 
         // move executor containing a small target
-        bmqex::Executor ex2Copy(bslmf::MovableRefUtil::move(ex2));
+        bmqex::Executor ex2Copy(bsl::move(ex2));
 
         // check postconditions
         BMQTST_ASSERT(ex2.target<StatExecutor>());
@@ -342,7 +343,7 @@ static void test1_creators()
         BMQTST_ASSERT(*ex2Copy.target<StatExecutor>() == smallEx);
 
         // move executor containing a large target
-        bmqex::Executor ex3Copy(bslmf::MovableRefUtil::move(ex3));
+        bmqex::Executor ex3Copy(bsl::move(ex3));
 
         // check postconditions
         BMQTST_ASSERT(ex3Copy.target<ExecutorElarger<StatExecutor> >());
@@ -454,14 +455,14 @@ static void test2_assignment()
 
         // move an empty executor
         bmqex::Executor ex1Copy;
-        ex1Copy = bslmf::MovableRefUtil::move(ex1);
+        ex1Copy = bsl::move(ex1);
 
         // check postconditions
         BMQTST_ASSERT(!ex1Copy);
 
         // move executor containing a small target
         bmqex::Executor ex2Copy;
-        ex2Copy = bslmf::MovableRefUtil::move(ex2);
+        ex2Copy = bsl::move(ex2);
 
         // check postconditions
         BMQTST_ASSERT(ex2Copy.target<StatExecutor>());
@@ -471,7 +472,7 @@ static void test2_assignment()
 
         // move executor containing a large target
         bmqex::Executor ex3Copy;
-        ex3Copy = bslmf::MovableRefUtil::move(ex3);
+        ex3Copy = bsl::move(ex3);
 
         // check postconditions
         BMQTST_ASSERT(ex3Copy.target<ExecutorElarger<StatExecutor> >());

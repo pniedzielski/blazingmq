@@ -2549,8 +2549,7 @@ void StorageUtil::registerQueueAsPrimary(const mqbi::Cluster*    cluster,
                                      appIdKeyPairs,
                                      true /* isFanout */));
 
-            dispatcher->dispatchEvent(bslmf::MovableRefUtil::move(event_sp),
-                                      fs);
+            dispatcher->dispatchEvent(bsl::move(event_sp), fs);
 
             // Wait for 'updateQueuePrimaryDispatched' operation to complete.
             // We need to wait because 'updateQueuePrimaryDispatched' creates
@@ -2586,7 +2585,7 @@ void StorageUtil::registerQueueAsPrimary(const mqbi::Cluster*    cluster,
                                                  appIdKeyPairs,
                                                  domain));
 
-    fs->dispatchEvent(bslmf::MovableRefUtil::move(event_sp));
+    fs->dispatchEvent(bsl::move(event_sp));
 
     // Not checking the result.  If not successful, storage is not in the
     // 'storageMap'.  Subsequent queue configure will then fail.

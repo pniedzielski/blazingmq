@@ -19,6 +19,7 @@
 
 // BDE
 #include <bsl_iterator.h>
+#include <bsl_utility.h>
 #include <bslmt_mutexassert.h>
 
 namespace BloombergLP {
@@ -358,8 +359,7 @@ OperationChainLink::OperationChainLink(bslma::Allocator* basicAllocator)
 
 OperationChainLink::OperationChainLink(
     bslmf::MovableRef<OperationChainLink> original)
-: d_jobList(bslmf::MovableRefUtil::move(
-      bslmf::MovableRefUtil::access(original).d_jobList))
+: d_jobList(bsl::move(bslmf::MovableRefUtil::access(original).d_jobList))
 {
     // NOTE: This constructor is *not* noexcept because the move constructor of
     //       'bsl::list' is allowed to throw.

@@ -57,6 +57,7 @@
 #include <bsl_iostream.h>
 #include <bsl_limits.h>
 #include <bsl_string.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
@@ -262,8 +263,7 @@ bslma::ManagedPtr<bmqio::ChannelFactoryPipeline> makeChannelFactoryPipeline(
                                  bsl::cref(sessionOptions.connectTimeout()),
                                  blobSpPool));
     return bslma::ManagedPtrUtil::allocateManaged<
-        bmqio::ChannelFactoryPipeline>(allocator,
-                                       bslmf::MovableRefUtil::move(builder));
+        bmqio::ChannelFactoryPipeline>(allocator, bsl::move(builder));
 }
 
 }  // close unnamed namespace

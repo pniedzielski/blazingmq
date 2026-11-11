@@ -73,6 +73,7 @@
 #include <bsl_algorithm.h>  // bsl::swap
 #include <bsl_deque.h>
 #include <bsl_type_traits.h>
+#include <bsl_utility.h>
 #include <bslalg_constructorproxy.h>
 #include <bslma_allocator.h>
 #include <bslma_usesbslmaallocator.h>
@@ -406,7 +407,7 @@ inline Strand<EXECUTOR>::Strand(EXECUTOR          executor,
                                 bslma::Allocator* basicAllocator)
 : d_mutex()
 , d_condition()
-, d_innerExecutor(bslmf::MovableRefUtil::move(executor))
+, d_innerExecutor(bsl::move(executor))
 , d_workingThreadId(Strand_ThreadUtil::invalidThreadId())
 , d_isStarted(false)
 , d_isRunning(false)

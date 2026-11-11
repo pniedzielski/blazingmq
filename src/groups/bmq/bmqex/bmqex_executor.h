@@ -111,6 +111,7 @@
 #include <bsl_memory.h>
 #include <bsl_type_traits.h>
 #include <bsl_typeinfo.h>
+#include <bsl_utility.h>
 #include <bslma_allocator.h>
 #include <bslma_constructionutil.h>
 #include <bslma_default.h>
@@ -562,7 +563,7 @@ inline void Executor_Target<EXECUTOR>::move(void* dst) noexcept
     bslma::ConstructionUtil::construct(
         reinterpret_cast<Executor_Target<EXECUTOR>*>(dst),
         static_cast<bslma::Allocator*>(0),
-        bslmf::MovableRefUtil::move(d_executor));
+        bsl::move(d_executor));
 }
 
 // ACCESSORS
@@ -605,9 +606,9 @@ inline void Executor_Target<EXECUTOR>::copy(void* dst) const noexcept
 template <class EXECUTOR>
 inline Executor_Box_DefImp::Executor_Box_DefImp(EXECUTOR          executor,
                                                 bslma::Allocator* allocator)
-: d_target(bsl::allocate_shared<Executor_Target<EXECUTOR> >(
-      allocator,
-      bslmf::MovableRefUtil::move(executor)))
+: d_target(
+      bsl::allocate_shared<Executor_Target<EXECUTOR> >(allocator,
+                                                       bsl::move(executor)))
 {
     // PRECONDITIONS
     BSLS_ASSERT(allocator);
@@ -629,7 +630,7 @@ inline Executor_Box_SboImp::Executor_Box_SboImp(
     bslma::ConstructionUtil::construct(
         reinterpret_cast<Executor_Target<EXECUTOR>*>(d_buffer.buffer()),
         allocator,
-        bslmf::MovableRefUtil::move(executor));
+        bsl::move(executor));
 }
 
 // ------------------

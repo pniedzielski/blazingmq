@@ -5306,7 +5306,7 @@ void FileStore::replicateRecord(bmqp::StorageMessageType::Enum type,
         activeFileSet->d_aliasedChunk_sp,
         journal.mapping() + journalOffset);
     bdlbb::BlobBuffer journalRecordBlobBuffer(
-        bslmf::MovableRefUtil::move(journalRecordBufferSp),
+        bsl::move(journalRecordBufferSp),
         FileStoreProtocol::k_JOURNAL_RECORD_SIZE);
 
     bdlbb::BlobBuffer dataBlobBuffer;
@@ -5318,8 +5318,7 @@ void FileStore::replicateRecord(bmqp::StorageMessageType::Enum type,
 
         bsl::shared_ptr<char> dataBufferSp(activeFileSet->d_aliasedChunk_sp,
                                            mfd.mapping() + dataOffset);
-        dataBlobBuffer.reset(bslmf::MovableRefUtil::move(dataBufferSp),
-                             totalDataLen);
+        dataBlobBuffer.reset(bsl::move(dataBufferSp), totalDataLen);
     }
 
     bmqt::EventBuilderResult::Enum buildRc;
@@ -5492,26 +5491,22 @@ void FileStore::aliasMessage(bsl::shared_ptr<bdlbb::Blob>* appData,
             activeFileSet->d_aliasedChunk_sp,
             activeFileSet->d_data.d_file.block().base() + optionsOffset);
 
-        bdlbb::BlobBuffer optionsBlobBuffer(
-            bslmf::MovableRefUtil::move(optionsBufferSp),
-            optionsSize);
+        bdlbb::BlobBuffer optionsBlobBuffer(bsl::move(optionsBufferSp),
+                                            optionsSize);
 
         *options = d_blobSpPool_p->getObject();
-        (*options)->appendDataBuffer(
-            bslmf::MovableRefUtil::move(optionsBlobBuffer));
+        (*options)->appendDataBuffer(bsl::move(optionsBlobBuffer));
     }
 
     bsl::shared_ptr<char> appDataBufferSp(
         activeFileSet->d_aliasedChunk_sp,
         activeFileSet->d_data.d_file.block().base() + appDataOffset);
 
-    bdlbb::BlobBuffer appDataBlobBuffer(
-        bslmf::MovableRefUtil::move(appDataBufferSp),
-        record.d_appDataUnpaddedLen);
+    bdlbb::BlobBuffer appDataBlobBuffer(bsl::move(appDataBufferSp),
+                                        record.d_appDataUnpaddedLen);
 
     *appData = d_blobSpPool_p->getObject();
-    (*appData)->appendDataBuffer(
-        bslmf::MovableRefUtil::move(appDataBlobBuffer));
+    (*appData)->appendDataBuffer(bsl::move(appDataBlobBuffer));
 }
 
 void FileStore::flushIfNeeded(bool immediateFlush)

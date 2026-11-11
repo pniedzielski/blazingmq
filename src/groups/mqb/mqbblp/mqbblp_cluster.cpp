@@ -2706,7 +2706,7 @@ inline void Cluster::sendToDispatcher(const bmqp::Event&   event,
         .setSource(this)
         .setBlob(blob_sp)
         .setClusterNode(source);
-    dispatcher()->dispatchEvent(bslmf::MovableRefUtil::move(event_sp), this);
+    dispatcher()->dispatchEvent(bsl::move(event_sp), this);
 }
 
 template <typename EVENT_TYPE>
@@ -2721,7 +2721,7 @@ inline void Cluster::sendToDispatcher(const bmqp::Event&   event,
     bsl::shared_ptr<EVENT_TYPE> event_sp =
         dispatcher()->getDefaultEventSource()->getEvent<EVENT_TYPE>();
     (*event_sp).setSource(this).setBlob(blob_sp).setClusterNode(source);
-    dispatcher()->dispatchEvent(bslmf::MovableRefUtil::move(event_sp), this);
+    dispatcher()->dispatchEvent(bsl::move(event_sp), this);
 }
 
 void Cluster::processEvent(const bmqp::Event&   event,

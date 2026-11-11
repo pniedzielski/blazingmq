@@ -32,6 +32,7 @@
 #include <bsl_functional.h>
 #include <bsl_iostream.h>
 #include <bsl_sstream.h>
+#include <bsl_utility.h>
 #include <bslmt_semaphore.h>
 #include <bslmt_threadutil.h>
 #include <bsls_assert.h>
@@ -550,8 +551,7 @@ static void test4_eventSource()
             event->setCallback(
                 bdlf::BindUtil::bindS(alloc, &Local::callbackFn, &done));
 
-            dispatcher.dispatchEvent(bslmf::MovableRefUtil::move(event),
-                                     &client);
+            dispatcher.dispatchEvent(bsl::move(event), &client);
             done.wait();
         }
 
@@ -564,8 +564,7 @@ static void test4_eventSource()
             event->setCallback(
                 bdlf::BindUtil::bindS(alloc, &Local::callbackFn, &done));
 
-            dispatcher.dispatchEvent(bslmf::MovableRefUtil::move(event),
-                                     &client);
+            dispatcher.dispatchEvent(bsl::move(event), &client);
             done.wait();
         }
 
@@ -581,8 +580,7 @@ static void test4_eventSource()
             event->setCallback(
                 bdlf::BindUtil::bindS(alloc, &Local::callbackFn, &done));
 
-            dispatcher.dispatchEvent(bslmf::MovableRefUtil::move(event),
-                                     &client);
+            dispatcher.dispatchEvent(bsl::move(event), &client);
             done.wait();
         }
 

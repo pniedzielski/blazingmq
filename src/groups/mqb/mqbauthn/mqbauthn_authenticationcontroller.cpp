@@ -39,6 +39,7 @@
 #include <bsl_string_view.h>
 #include <bsl_unordered_map.h>
 #include <bsl_unordered_set.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bslmf_movableref.h>
 
@@ -237,7 +238,7 @@ int AuthenticationController::createConfiguredAuthenticators(
             }
             AuthenticatorMp testAuth = candidateFactory->create(d_allocator_p);
             if (testAuth && testAuth->name() == pluginName) {
-                authenticator = bslmf::MovableRefUtil::move(testAuth);
+                authenticator = bsl::move(testAuth);
                 break;
             }
         }
@@ -277,8 +278,7 @@ int AuthenticationController::createConfiguredAuthenticators(
                       << "' with mechanism '" << normMech << "'";
 
         // Add to collection
-        d_authenticators.emplace(normMech,
-                                 bslmf::MovableRefUtil::move(authenticator));
+        d_authenticators.emplace(normMech, bsl::move(authenticator));
     }
 
     return rc_SUCCESS;
@@ -305,8 +305,7 @@ int AuthenticationController::createDefaultAnonAuthenticator()
     // Add the authenticator into the collection
     const bsl::string normMech = normalizeMechanism(authenticator->mechanism(),
                                                     d_allocator_p);
-    d_authenticators.emplace(normMech,
-                             bslmf::MovableRefUtil::move(authenticator));
+    d_authenticators.emplace(normMech, bsl::move(authenticator));
 
     return 0;
 }
@@ -384,8 +383,7 @@ int AuthenticationController::ensureDefaultAuthenticator(
 
     const bsl::string normMech = normalizeMechanism(authenticator->mechanism(),
                                                     d_allocator_p);
-    d_authenticators.emplace(normMech,
-                             bslmf::MovableRefUtil::move(authenticator));
+    d_authenticators.emplace(normMech, bsl::move(authenticator));
 
     return 0;
 }
@@ -430,7 +428,7 @@ int AuthenticationController::initializeCredentialProvider(
         bslma::ManagedPtr<mqbplug::CredentialProvider> provider =
             candidate->create(d_allocator_p);
         if (provider && provider->name() == providerName) {
-            d_credentialProvider_mp = bslmf::MovableRefUtil::move(provider);
+            d_credentialProvider_mp = bsl::move(provider);
             break;  // BREAK
         }
     }

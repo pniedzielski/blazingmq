@@ -18,6 +18,7 @@
 #include <bmqscm_version.h>
 // BDE
 #include <bdlma_localsequentialallocator.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bslim_printer.h>
 #include <bslmf_movableref.h>
@@ -225,7 +226,7 @@ void PropertyBag::loadAll(bsl::vector<bslma::ManagedPtr<Value> >* dest) const
          iter != d_values.end();
          ++iter) {
         bslma::ManagedPtr<Value> value(iter->second.managedPtr());
-        dest->emplace_back(bslmf::MovableRefUtil::move(value));
+        dest->emplace_back(bsl::move(value));
     }
 }
 

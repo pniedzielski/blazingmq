@@ -57,7 +57,7 @@
 //  opLogger.start() << "Pass operation logger";
 //  // Make sure to `move` so we don't have a copy of this shared pointer in
 //  // this scope for accurate results.
-//  doSomething(bslmf::MovableRefUtil::move(opLogger));
+//  doSomething(bsl::move(opLogger));
 //..
 //
 // 3. Use pool for operation loggers
@@ -82,6 +82,7 @@
 // BDE
 #include <ball_log.h>
 #include <bsl_ostream.h>
+#include <bsl_utility.h>
 #include <bslma_allocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 

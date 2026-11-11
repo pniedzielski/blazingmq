@@ -112,6 +112,7 @@
 #include <bsl_memory.h>
 #include <bsl_string.h>
 #include <bsl_string_view.h>
+#include <bsl_utility.h>
 #include <bslma_allocator.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
@@ -393,7 +394,7 @@ class Dispatcher {
                        DispatcherClient* destination)
     {
         DispatcherEventSp base(bslmf::MovableRefUtil::access(event));
-        dispatchEvent(bslmf::MovableRefUtil::move(base), destination);
+        dispatchEvent(bsl::move(base), destination);
     }
 
     template <class EVENT_TYPE>
@@ -402,7 +403,7 @@ class Dispatcher {
                        ProcessorHandle                                 handle)
     {
         DispatcherEventSp base(bslmf::MovableRefUtil::access(event));
-        dispatchEvent(bslmf::MovableRefUtil::move(base), type, handle);
+        dispatchEvent(bsl::move(base), type, handle);
     }
 #endif
 

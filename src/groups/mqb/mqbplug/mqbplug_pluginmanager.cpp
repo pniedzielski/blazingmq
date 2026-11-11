@@ -281,13 +281,11 @@ void PluginManager::loadPluginLibrary(const char*            path,
     if (pluginsProvided.size() > 0) {
         // Keep the library alive in 'd_pluginLibraries' for the lifetime of
         // the 'PluginManager' object.
-        d_pluginLibraries.emplace_back(
-            bslmf::MovableRefUtil::move(pluginLibrary));
+        d_pluginLibraries.emplace_back(bsl::move(pluginLibrary));
 
         // Move the object-handle into 'd_pluginHandles', to be 'dlclose'd at
         // the end of the 'PluginManager' lifetime.
-        d_pluginHandles.emplace_back(
-            bslmf::MovableRefUtil::move(objectHandleMp));
+        d_pluginHandles.emplace_back(bsl::move(objectHandleMp));
     }
 }
 

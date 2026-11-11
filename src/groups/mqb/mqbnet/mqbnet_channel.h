@@ -94,6 +94,7 @@
 #include <bdlma_concurrentpool.h>
 #include <bsl_deque.h>
 #include <bsl_memory.h>
+#include <bsl_utility.h>
 #include <bslma_allocator.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
@@ -1110,7 +1111,7 @@ Channel::enqueue(bslma::ManagedPtr<Item>& item)
 
     d_stats.addItem(item->d_type, item->d_numBytes);
 
-    d_buffer.pushBack(bslmf::MovableRefUtil::move(item));
+    d_buffer.pushBack(bsl::move(item));
 
     return bmqt::GenericResult::e_SUCCESS;
 }

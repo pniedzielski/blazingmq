@@ -21,6 +21,7 @@
 #include <bsl_algorithm.h>
 #include <bsl_cstring.h>
 #include <bsl_memory.h>
+#include <bsl_utility.h>
 #include <bslim_printer.h>
 
 namespace BloombergLP {
@@ -335,14 +336,14 @@ int BlobUtil::appendToBlob(bdlbb::Blob*       dest,
         if (pos.byte() == 0) {
             // Can use the same shared_ptr (start byte is 0)
             bdlbb::BlobBuffer newBuf(srcBuf.buffer(), size);
-            dest->appendDataBuffer(bslmf::MovableRefUtil::move(newBuf));
+            dest->appendDataBuffer(bsl::move(newBuf));
         }
         else {
             // Have to chop off the beginning (needs aliasing)
             bsl::shared_ptr<char> buf(srcBuf.buffer(),
                                       srcBuf.data() + pos.byte());
-            bdlbb::BlobBuffer newBuf(bslmf::MovableRefUtil::move(buf), size);
-            dest->appendDataBuffer(bslmf::MovableRefUtil::move(newBuf));
+            bdlbb::BlobBuffer     newBuf(bsl::move(buf), size);
+            dest->appendDataBuffer(bsl::move(newBuf));
         }
 
         localSection.start().setBuffer(localSection.start().buffer() + 1);
@@ -360,14 +361,13 @@ int BlobUtil::appendToBlob(bdlbb::Blob*       dest,
         if (startPos == 0) {
             // Can use the same shared_ptr (start byte is 0)
             bdlbb::BlobBuffer newBuf(buf.buffer(), size);
-            dest->appendDataBuffer(bslmf::MovableRefUtil::move(newBuf));
+            dest->appendDataBuffer(bsl::move(newBuf));
         }
         else {
             // Have to chop off the beginning (needs aliasing)
             bsl::shared_ptr<char> srcBuf(buf.buffer(), buf.data() + startPos);
-            bdlbb::BlobBuffer     newBuf(bslmf::MovableRefUtil::move(srcBuf),
-                                     size);
-            dest->appendDataBuffer(bslmf::MovableRefUtil::move(newBuf));
+            bdlbb::BlobBuffer     newBuf(bsl::move(srcBuf), size);
+            dest->appendDataBuffer(bsl::move(newBuf));
         }
     }
 

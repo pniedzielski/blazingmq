@@ -16,6 +16,7 @@
 #include <bmqex_executor.h>
 
 #include <bmqscm_version.h>
+#include <bsl_utility.h>
 namespace BloombergLP {
 namespace bmqex {
 
@@ -91,10 +92,10 @@ Executor_Box_SboImp& Executor_Box_SboImp::operator=(
 
 void Executor_Box_SboImp::swap(Executor_Box_SboImp& other) noexcept
 {
-    Executor_Box_SboImp tmp(bslmf::MovableRefUtil::move(other));
+    Executor_Box_SboImp tmp(bsl::move(other));
 
-    other = bslmf::MovableRefUtil::move(*this);
-    *this = bslmf::MovableRefUtil::move(tmp);
+    other = bsl::move(*this);
+    *this = bsl::move(tmp);
 }
 
 // ACCESSORS
@@ -159,8 +160,7 @@ Executor::Executor(const Executor& original, bslma::Allocator*) noexcept
 
 Executor::Executor(bslmf::MovableRef<Executor> original,
                    bslma::Allocator*) noexcept
-: d_box(bslmf::MovableRefUtil::move(
-      bslmf::MovableRefUtil::access(original).d_box))
+: d_box(bsl::move(bslmf::MovableRefUtil::access(original).d_box))
 {
     // NOTHING
 }
@@ -174,8 +174,7 @@ Executor& Executor::operator=(const Executor& rhs) noexcept
 
 Executor& Executor::operator=(bslmf::MovableRef<Executor> rhs) noexcept
 {
-    d_box = bslmf::MovableRefUtil::move(
-        bslmf::MovableRefUtil::access(rhs).d_box);
+    d_box = bsl::move(bslmf::MovableRefUtil::access(rhs).d_box);
     return *this;
 }
 

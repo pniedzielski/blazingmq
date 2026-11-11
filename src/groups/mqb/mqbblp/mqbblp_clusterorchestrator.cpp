@@ -1315,8 +1315,7 @@ void ClusterOrchestrator::processElectorEvent(const bmqp::Event&   event,
                                                                    event,
                                                                    source);
 
-    dispatcher()->dispatchEvent(bslmf::MovableRefUtil::move(event_sp),
-                                d_cluster_p);
+    dispatcher()->dispatchEvent(bsl::move(event_sp), d_cluster_p);
 }
 
 void ClusterOrchestrator::processLeaderSyncStateQuery(

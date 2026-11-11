@@ -95,6 +95,7 @@
 #include <bmqex_systemexecutor.h>
 
 // BDE
+#include <bsl_utility.h>
 #include <bslma_allocator.h>
 #include <bslma_default.h>
 #include <bslmf_movableref.h>
@@ -250,7 +251,7 @@ inline constexpr ExecutionPolicy<EXECUTOR>::ExecutionPolicy(
     EXECUTOR                    executor,
     bslma::Allocator*           allocator)
 : d_blocking(blocking)
-, d_executor(bslmf::MovableRefUtil::move(executor))
+, d_executor(bsl::move(executor))
 , d_allocator_p(allocator)
 {
     // PRECONDITIONS
