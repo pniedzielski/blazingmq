@@ -71,10 +71,7 @@ static void test1_breathingTest()
                   },
                   {L_, bmqp::EncodingType::e_JSON}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
+    for (const Test& test : k_DATA) {
         PVV(test.d_line << ": Testing " << test.d_encodingType << "encoding");
 
         bmqp::SchemaEventBuilder obj(blobSpPool.get(),
@@ -302,10 +299,7 @@ static void testN1_decodeFromFile()
                   },
                   {L_, bmqp::EncodingType::e_JSON}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
+    for (const Test& test : k_DATA) {
         PVV(test.d_line << ": Testing " << test.d_encodingType << " encoding");
 
         bmqp::SchemaEventBuilder obj(blobSpPool.get(),

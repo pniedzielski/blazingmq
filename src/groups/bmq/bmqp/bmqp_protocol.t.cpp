@@ -1100,11 +1100,7 @@ static void test3_flagUtils()
                       {L_, bmqp::PutHeaderFlags::e_UNUSED3, false},
                       {L_, bmqp::PutHeaderFlags::e_UNUSED4, false}};
 
-        const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-        for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-            const Test& test = k_DATA[idx];
-
+        for (const Test& test : k_DATA) {
             int flags = 0;
 
             // 1. Check that the flag is not 'isSet'.
@@ -1167,11 +1163,7 @@ static void test3_flagUtils()
                       {L_, bmqp::PushHeaderFlags::e_OUT_OF_ORDER, true},
                       {L_, bmqp::PushHeaderFlags::e_UNUSED4, false}};
 
-        const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-        for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-            const Test& test = k_DATA[idx];
-
+        for (const Test& test : k_DATA) {
             int flags = 0;
 
             // 1. Check that the flag is not 'isSet'.
@@ -1236,11 +1228,7 @@ static void test3_flagUtils()
             {L_, bmqp::StorageHeaderFlags::e_UNUSED3, false},
             {L_, bmqp::StorageHeaderFlags::e_UNUSED4, false}};
 
-        const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-        for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-            const Test& test = k_DATA[idx];
-
+        for (const Test& test : k_DATA) {
             int flags = 0;
 
             // 1. Check that the flag is not 'isSet'.

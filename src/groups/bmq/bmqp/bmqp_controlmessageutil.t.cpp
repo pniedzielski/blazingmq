@@ -66,11 +66,7 @@ static void test1_validate()
          bmqp_ctrlmsg::ControlMessageChoice::SELECTION_ID_OPEN_QUEUE,
          0}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         PVV(test.d_line << ": Testing:"
                         << " bmqp::ControlMessageUtil::validate({id: "
                         << test.d_id
@@ -124,11 +120,7 @@ static void test2_makeStatusControlMessage()
     } k_DATA[] = {{L_, bmqp_ctrlmsg::StatusCategory::E_SUCCESS, 0, "Success!"},
                   {L_, bmqp_ctrlmsg::StatusCategory::E_NOT_SUPPORTED, -1, ""}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         PVV(test.d_line
             << ": Testing:"
             << " bmqp::ControlMessageUtil::makeStatusControlMessage("

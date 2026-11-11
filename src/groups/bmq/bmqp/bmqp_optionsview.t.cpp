@@ -808,11 +808,7 @@ void test4_invalidOptionsArea()
             {L_, 2, 4},    // payload not a multiple of SubQueueInfo
         };
 
-        const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-        for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-            const Test& test = k_DATA[idx];
-
+        for (const Test& test : k_DATA) {
             PVV(test.d_line << ": typeSpecific "
                             << static_cast<int>(test.d_typeSpecific)
                             << ", words " << test.d_words);

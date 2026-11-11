@@ -1135,10 +1135,7 @@ static void test8_printTest()
          "   FFFFFFFF FFFFFFFF FFFFFFFF FFFFFF "
          "      |............... |\n\" ]"}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test&             test = k_DATA[idx];
+    for (const Test& test : k_DATA) {
         bmqp::MessageProperties obj(bmqtst::TestHelperUtil::allocator());
         bmqu::MemOutStream      out(bmqtst::TestHelperUtil::allocator());
         bmqu::MemOutStream      expected(bmqtst::TestHelperUtil::allocator());

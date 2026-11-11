@@ -476,11 +476,7 @@ static void test1_breathingTest()
                        "\xb0\x34\x0\x0\xa"
                        "\xf7\xd\x2d"}};
 
-        const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-        for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-            const Test& test = k_DATA[idx];
-
+        for (const Test& test : k_DATA) {
             bsl::cout << test.d_line << "'" << test.d_data << "'" << bsl::endl;
             bsls::Types::Int64 compressionTime   = 0;
             bsls::Types::Int64 decompressionTime = 0;
@@ -738,11 +734,7 @@ static void test3_compression_decompression_none()
                        "Hello Hello Hello "
                        "Hello Hello"}};
 
-        const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-        for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-            const Test& test = k_DATA[idx];
-
+        for (const Test& test : k_DATA) {
             PVV(test.d_line << "'" << test.d_data << "'");
             bsls::Types::Int64 compressionTime   = 0;
             bsls::Types::Int64 decompressionTime = 0;

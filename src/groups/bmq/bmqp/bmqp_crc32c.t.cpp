@@ -432,11 +432,7 @@ static void test2_calculateOnBuffer()
                   {L_, "2Wm9bbNDehd", 0x54A11873},
                   {L_, "GamS0NJhAl8y", 0x0044AC66}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         PVV(test.d_line << ": calculating CRC32-C (w/o previous) on '"
                         << test.d_buffer << "'");
 
@@ -532,10 +528,7 @@ static void test3_calculateOnMisalignedBuffer()
                   {L_, "2Wm9bbNDehd", 0x54A11873},
                   {L_, "GamS0NJhAl8y", 0x0044AC66}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test&        test          = k_DATA[idx];
+    for (const Test& test : k_DATA) {
         const unsigned int testBufLength = strlen(test.d_buffer);
 
         for (unsigned int i = 1; i < k_MY_ALIGNMENT; ++i) {
@@ -620,11 +613,7 @@ static void test4_calculateOnBufferWithPreviousCrc()
         {L_, "2Wm9bbNDehd32qf", 11, 0x9F7277C6},
         {L_, "GamS0NJhAl8yw3th", 12, 0x6033D909}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         PVV(test.d_line << ": calculating CRC32-C (with previous CRC) on '"
                         << test.d_buffer << "'");
 

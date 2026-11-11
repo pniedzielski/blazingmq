@@ -60,11 +60,7 @@ static void test1_createQueueIdFromHandleParameters()
         unsigned int d_subId;
     } k_DATA[] = {{L_, 5, true, 16}, {L_, 15, false, 0}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::QueueHandleParameters handleParams(
             bmqtst::TestHelperUtil::allocator());
         handleParams.qId() = test.d_id;
@@ -116,11 +112,7 @@ static void test2_extractSubQueueId()
         unsigned int d_subId;
     } k_DATA[] = {{L_, 5, true, 16}, {L_, 15, false, 0}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::QueueStreamParameters streamParams(
             bmqtst::TestHelperUtil::allocator());
         bmqp_ctrlmsg::QueueHandleParameters handleParams(
@@ -237,11 +229,7 @@ static void test3_extractCanonicalHandleParameters()
          0}                                       // adminCount
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::QueueHandleParameters handleParams(
             bmqtst::TestHelperUtil::allocator());
         handleParams.flags() = test.d_flags;
@@ -347,11 +335,7 @@ static void test4_isEmpty()
          1}  // adminCount
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::QueueHandleParameters handleParams(
             bmqtst::TestHelperUtil::allocator());
         handleParams.readCount()  = test.d_readCount;
@@ -437,11 +421,7 @@ static void test6_isValid()
          1073741818},
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bmqp_ctrlmsg::QueueHandleParameters handleParams(
             bmqtst::TestHelperUtil::allocator());
         handleParams.flags()      = test.d_flags;

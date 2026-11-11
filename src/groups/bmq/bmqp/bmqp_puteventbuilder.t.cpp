@@ -1398,8 +1398,7 @@ static void test1_breathingTest()
         BSLS_ASSERT_OPT(putIter.isValid());
         bdlbb::Blob payloadBlob(bmqtst::TestHelperUtil::allocator());
 
-        for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-            const Test&       test = k_DATA[idx];
+        for (const Test& test : k_DATA) {
             bmqt::MessageGUID guid;
             guid.fromHex(test.d_guidHex);
 

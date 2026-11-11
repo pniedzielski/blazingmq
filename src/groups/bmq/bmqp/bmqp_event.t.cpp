@@ -388,10 +388,7 @@ static void test3_eventTypes()
                    false,
                    false}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test&       test = k_DATA[idx];
+    for (const Test& test : k_DATA) {
         bmqp::EventHeader eh(test.d_type);
 
         PVVV(test.d_line << ": Testing: bmqp::Event [" << test.d_type << "]");
@@ -490,10 +487,7 @@ static void test4_eventLoading()
                   },
                   {L_, bmqp::EncodingType::e_JSON}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
+    for (const Test& test : k_DATA) {
         PVV(test.d_line << ": Testing " << test.d_encodingType << "encoding");
 
         bmqp::SchemaEventBuilder obj(blobSpPool.get(),
@@ -634,10 +628,7 @@ static void test5_iteratorLoading()
                   {L_, bmqp::EventType::e_HEARTBEAT_REQ},
                   {L_, bmqp::EventType::e_HEARTBEAT_RSP}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test&       test = k_DATA[idx];
+    for (const Test& test : k_DATA) {
         bmqp::EventHeader eh(test.d_type);
 
         PVVV(test.d_line << ": Testing: bmqp::Event [" << test.d_type << "]");
@@ -772,10 +763,7 @@ static void test6_printing()
          "[ type = REPLICATION_RECEIPT ]"},
         {bmqp::EventType::e_AUTHENTICATION, "[ type = AUTHENTICATION ]"}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test&        test = k_DATA[idx];
+    for (const Test& test : k_DATA) {
         bmqu::MemOutStream out(bmqtst::TestHelperUtil::allocator());
         bmqu::MemOutStream expected(bmqtst::TestHelperUtil::allocator());
         bmqp::EventHeader  eh(static_cast<bmqp::EventType::Enum>(test.d_type));

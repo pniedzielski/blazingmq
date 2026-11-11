@@ -88,11 +88,7 @@ static void test2_calcNumWordsAndPadding()
         {L_, 1025, 3, 257, 7, 129},
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         int padding = 0;
         int words   = 0;
 
@@ -145,11 +141,7 @@ static void test3_paddingChar()
             {L_, 4, {4, 4, 4, 4, 0x0E}},
         };
 
-        const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-        for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-            const Test& test = k_DATA[idx];
-
+        for (const Test& test : k_DATA) {
             PVV(test.d_line << ": word padding of " << test.d_numPaddingBytes
                             << " bytes");
             char buffer[5] = {0x0A, 0x0B, 0x0C, 0x0D, 0x0E};
@@ -178,11 +170,7 @@ static void test3_paddingChar()
             {L_, 8, {8, 8, 8, 8, 8, 8, 8, 8, 0x34}},
         };
 
-        const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-        for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-            const Test& test = k_DATA[idx];
-
+        for (const Test& test : k_DATA) {
             PVV(test.d_line << ": word padding of " << test.d_numPaddingBytes
                             << " bytes");
             char buffer[9] =
@@ -334,11 +322,7 @@ static void test6_ackResultToCode()
                   {L_, bmqt::AckResult::e_INVALID_ARGUMENT, 5},
                   {L_, bmqt::AckResult::e_NOT_READY, 7}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         PVV(test.d_line << ": Testing: bmqp::ProtocolUti::ackResultToCode("
                         << test.d_ackResult << ") == " << test.d_expectedCode);
 
@@ -379,11 +363,7 @@ static void test7_ackResultFromCode()
         {L_, -1, bmqt::AckResult::e_UNKNOWN},
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         PVV(test.d_line << ": Testing: bmqp::ProtocolUti::ackResultFromCode("
                         << test.d_code << ") == " << test.d_expectedAckResult);
 
