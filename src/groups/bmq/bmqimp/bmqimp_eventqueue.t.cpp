@@ -25,8 +25,6 @@
 
 // BDE
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlmt_threadpool.h>
 #include <bdlt_timeunitratio.h>
 #include <bmqimp_stat.h>
@@ -150,10 +148,9 @@ void queuePerformance(int                       numReaders,
                                     << " numWriters: " << numWriters);
     PRINT_SAFE("===================");
     bmqimp::EventQueue::EventPool eventPool(
-        bdlf::BindUtil::bind(&poolCreateEvent,
-                             bdlf::PlaceHolders::_1,  // address
-                             bufferFactory,
-                             bdlf::PlaceHolders::_2),  // allocator
+        [bufferFactory](void* address, bslma::Allocator* allocator) {
+            poolCreateEvent(address, bufferFactory, allocator);
+        },
         -1,
         bmqtst::TestHelperUtil::allocator());
 
@@ -169,20 +166,16 @@ void queuePerformance(int                       numReaders,
         bmqtst::TestHelperUtil::allocator());
 
     for (int i = 0; i < numReaders; i++) {
-        threadPool.enqueueJob(
-            bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                  &performanceTestQueuePopper,
-                                  &obj,
-                                  numIter / numReaders));
+        threadPool.enqueueJob([&obj, numIter, numReaders]() {
+            performanceTestQueuePopper(&obj, numIter / numReaders);
+        });
     }
 
     bsls::Types::Int64 startTime = bsls::TimeUtil::getTimer();
     for (int i = 0; i < numWriters; i++) {
-        threadPool.enqueueJob(
-            bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                  &performanceTestQueuePusher,
-                                  &obj,
-                                  numIter / numWriters));
+        threadPool.enqueueJob([&obj, numIter, numWriters]() {
+            performanceTestQueuePusher(&obj, numIter / numWriters);
+        });
     }
     threadPool.drain();
     bsls::Types::Int64 endTime = bsls::TimeUtil::getTimer();
@@ -207,10 +200,9 @@ static void test1_breathingTest()
         1024,
         bmqtst::TestHelperUtil::allocator());
     bmqimp::EventQueue::EventPool eventPool(
-        bdlf::BindUtil::bind(&poolCreateEvent,
-                             bdlf::PlaceHolders::_1,  // address
-                             &bufferFactory,
-                             bdlf::PlaceHolders::_2),  // allocator
+        [&bufferFactory](void* address, bslma::Allocator* allocator) {
+            poolCreateEvent(address, &bufferFactory, allocator);
+        },
         -1,
         bmqtst::TestHelperUtil::allocator());
 
@@ -276,10 +268,9 @@ static void test2_capacityTest()
     bmqp::PutEventBuilder         builder(blobSpPool.get(),
                                   bmqtst::TestHelperUtil::allocator());
     bmqimp::EventQueue::EventPool eventPool(
-        bdlf::BindUtil::bind(&poolCreateEvent,
-                             bdlf::PlaceHolders::_1,  // address
-                             &bufferFactory,
-                             bdlf::PlaceHolders::_2),  // allocator
+        [&bufferFactory](void* address, bslma::Allocator* allocator) {
+            poolCreateEvent(address, &bufferFactory, allocator);
+        },
         -1,
         bmqtst::TestHelperUtil::allocator());
 
@@ -339,10 +330,9 @@ static void test3_watermark()
         1024,
         bmqtst::TestHelperUtil::allocator());
     bmqimp::EventQueue::EventPool eventPool(
-        bdlf::BindUtil::bind(&poolCreateEvent,
-                             bdlf::PlaceHolders::_1,  // address
-                             &bufferFactory,
-                             bdlf::PlaceHolders::_2),  // allocator
+        [&bufferFactory](void* address, bslma::Allocator* allocator) {
+            poolCreateEvent(address, &bufferFactory, allocator);
+        },
         -1,
         bmqtst::TestHelperUtil::allocator());
 
@@ -422,23 +412,23 @@ static void test4_basicEventHandlerTest()
         1024,
         bmqtst::TestHelperUtil::allocator());
     bmqimp::EventQueue::EventPool eventPool(
-        bdlf::BindUtil::bind(&poolCreateEvent,
-                             bdlf::PlaceHolders::_1,  // address
-                             &bufferFactory,
-                             bdlf::PlaceHolders::_2),  // allocator
+        [&bufferFactory](void* address, bslma::Allocator* allocator) {
+            poolCreateEvent(address, &bufferFactory, allocator);
+        },
         -1,
         bmqtst::TestHelperUtil::allocator());
 
-    bmqimp::EventQueue obj(&eventPool,
-                           100,  // initialCapacity
-                           3,    // lowWatermark
-                           90,   // highWatermark
-                           bdlf::BindUtil::bind(&eventHandler,
-                                                bdlf::PlaceHolders::_1,
-                                                bsl::ref(eventCounter)),
-                           k_NUM_THREADS,  // numProcessingThreads
-                           bmqimp::SessionId(),
-                           bmqtst::TestHelperUtil::allocator());
+    bmqimp::EventQueue obj(
+        &eventPool,
+        100,  // initialCapacity
+        3,    // lowWatermark
+        90,   // highWatermark
+        [&eventCounter](const bsl::shared_ptr<bmqimp::Event>& event) {
+            eventHandler(event, eventCounter);
+        },
+        k_NUM_THREADS,  // numProcessingThreads
+        bmqimp::SessionId(),
+        bmqtst::TestHelperUtil::allocator());
 
     obj.start();
 
@@ -512,10 +502,9 @@ static void test5_emptyStatsTest()
         1024,
         bmqtst::TestHelperUtil::allocator());
     bmqimp::EventQueue::EventPool eventPool(
-        bdlf::BindUtil::bind(&poolCreateEvent,
-                             bdlf::PlaceHolders::_1,  // address
-                             &bufferFactory,
-                             bdlf::PlaceHolders::_2),  // allocator
+        [&bufferFactory](void* address, bslma::Allocator* allocator) {
+            poolCreateEvent(address, &bufferFactory, allocator);
+        },
         -1,
         bmqtst::TestHelperUtil::allocator());
 
@@ -589,10 +578,9 @@ static void test6_workingStatsTest()
     bmqp::PutEventBuilder         builder(blobSpPool.get(),
                                   bmqtst::TestHelperUtil::allocator());
     bmqimp::EventQueue::EventPool eventPool(
-        bdlf::BindUtil::bind(&poolCreateEvent,
-                             bdlf::PlaceHolders::_1,  // address
-                             &bufferFactory,
-                             bdlf::PlaceHolders::_2),  // allocator
+        [&bufferFactory](void* address, bslma::Allocator* allocator) {
+            poolCreateEvent(address, &bufferFactory, allocator);
+        },
         -1,
         bmqtst::TestHelperUtil::allocator());
 
@@ -614,9 +602,15 @@ static void test6_workingStatsTest()
 
     bmqu::Time::shutdown();
     bmqu::Time::initialize(
-        bdlf::BindUtil::bind(&TestClock::realtimeClock, &testClock),
-        bdlf::BindUtil::bind(&TestClock::monotonicClock, &testClock),
-        bdlf::BindUtil::bind(&TestClock::highResTimer, &testClock),
+        [&testClock]() {
+            return testClock.realtimeClock();
+        },
+        [&testClock]() {
+            return testClock.monotonicClock();
+        },
+        [&testClock]() {
+            return testClock.highResTimer();
+        },
         bmqtst::TestHelperUtil::allocator());
 
     expected << "\n"

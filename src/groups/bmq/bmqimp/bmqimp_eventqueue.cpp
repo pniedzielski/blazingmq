@@ -31,9 +31,6 @@
 // BDE
 #include <ball_log.h>
 #include <bdlb_scopeexit.h>
-#include <bdlf_bind.h>
-#include <bdlf_memfn.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_iostream.h>
 #include <bsl_memory.h>
@@ -315,10 +312,9 @@ EventQueue::EventQueue(EventPool*                  eventPool,
     BALL_LOG_INFO << id() << outStream.str();
 
     d_queue.setWatermarks(lowWatermark, highWatermark);
-    d_queue.setStateCallback(
-        bdlf::BindUtil::bind(&EventQueue::stateCallback,
-                             this,
-                             bdlf::PlaceHolders::_1));  // state
+    d_queue.setStateCallback([this](bmqc::MonitoredQueueState::Enum state) {
+        stateCallback(state);
+    });
 }
 
 EventQueue::~EventQueue()
@@ -447,9 +443,9 @@ int EventQueue::start()
     int rc = 0;
 
     // Guard to auto-delete the thread pool on failure
-    bdlb::ScopeExitAny guard(bdlf::MemFnUtil::memFn(
-        &bslma::ManagedPtr<bdlmt::FixedThreadPool>::reset,
-        &d_threadPool_mp));
+    bdlb::ScopeExitAny guard([this]() {
+        d_threadPool_mp.reset();
+    });
 
     bslmt::ThreadAttributes threadAttributes;
     threadAttributes.setThreadName("bmqEventQueue");
@@ -470,8 +466,9 @@ int EventQueue::start()
 
     // Enqueue 'numProcessingThreads' jobs
     for (int i = 0; i < d_threadPool_mp->numThreads(); ++i) {
-        rc = d_threadPool_mp->tryEnqueueJob(
-            bdlf::MemFnUtil::memFn(&EventQueue::dispatchNextEvent, this));
+        rc = d_threadPool_mp->tryEnqueueJob([this]() {
+            dispatchNextEvent();
+        });
         if (rc != 0) {
             BALL_LOG_ERROR << id()
                            << "Failed to enqueue job to EventQueue ThreadPool "
