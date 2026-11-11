@@ -77,9 +77,9 @@ class QueueConsumptionMonitorTest : public QueueConsumptionMonitor {
 
     // MODIFIERS
 
-    void alarmEventDispatched() override;
+    void processAlarmEvent() override;
 
-    void idleEventDispatched(const bsl::string& appId) override;
+    void processIdleEvent(const bsl::string& appId) override;
 };
 
 QueueConsumptionMonitorTest::QueueConsumptionMonitorTest(
@@ -99,14 +99,14 @@ QueueConsumptionMonitorTest::~QueueConsumptionMonitorTest()
 
 // MODIFIERS
 
-void QueueConsumptionMonitorTest::alarmEventDispatched()
+void QueueConsumptionMonitorTest::processAlarmEvent()
 {
-    QueueConsumptionMonitor::alarmEventDispatched();
+    QueueConsumptionMonitor::processAlarmEvent();
 }
 
-void QueueConsumptionMonitorTest::idleEventDispatched(const bsl::string& appId)
+void QueueConsumptionMonitorTest::processIdleEvent(const bsl::string& appId)
 {
-    QueueConsumptionMonitor::idleEventDispatched(appId);
+    QueueConsumptionMonitor::processIdleEvent(appId);
 }
 
 struct MockStorageIterator : public mqbi::StorageIterator {
@@ -459,7 +459,7 @@ BMQTST_TEST_F(Test, putAliveIdleSendAlive)
     BMQTST_ASSERT(d_monitor.isAlarmScheduled());
 
     // Simulate alarm event dispatching after max idle time
-    d_monitor.alarmEventDispatched();
+    d_monitor.processAlarmEvent();
 
     BMQTST_ASSERT(!d_monitor.isAlarmScheduled());
 
@@ -505,7 +505,7 @@ BMQTST_TEST_F(Test, putAliveIdleEmptyAlive)
     BMQTST_ASSERT(d_monitor.isAlarmScheduled());
 
     // Simulate alarm event dispatching after max idle time
-    d_monitor.alarmEventDispatched();
+    d_monitor.processAlarmEvent();
 
     BMQTST_ASSERT(!d_monitor.isAlarmScheduled());
 
@@ -518,7 +518,7 @@ BMQTST_TEST_F(Test, putAliveIdleEmptyAlive)
     // Simulate message removing due to TTL or queue purge
     d_haveUndelivered.erase(d_id);
 
-    d_monitor.idleEventDispatched(d_id);
+    d_monitor.processIdleEvent(d_id);
 
     BMQTST_ASSERT_EQ(d_monitor.state(d_id),
                      QueueConsumptionMonitor::State::e_ALIVE);
@@ -552,7 +552,7 @@ BMQTST_TEST_F(Test, changeMaxIdleTime)
 
     BMQTST_ASSERT(d_monitor.isAlarmScheduled());
 
-    d_monitor.alarmEventDispatched();
+    d_monitor.processAlarmEvent();
 
     BMQTST_ASSERT_EQ(d_monitor.state(d_id),
                      QueueConsumptionMonitor::State::e_IDLE);
@@ -583,7 +583,7 @@ BMQTST_TEST_F(Test, changeMaxIdleTime)
 
     BMQTST_ASSERT(d_monitor.isAlarmScheduled());
 
-    d_monitor.alarmEventDispatched();
+    d_monitor.processAlarmEvent();
 
     BMQTST_ASSERT_EQ(d_monitor.state(d_id),
                      QueueConsumptionMonitor::State::e_IDLE)
@@ -608,7 +608,7 @@ BMQTST_TEST_F(Test, reset)
 
     BMQTST_ASSERT(d_monitor.isAlarmScheduled());
 
-    d_monitor.alarmEventDispatched();
+    d_monitor.processAlarmEvent();
 
     BMQTST_ASSERT_EQ(d_monitor.state(d_id),
                      QueueConsumptionMonitor::State::e_IDLE);
@@ -663,7 +663,7 @@ BMQTST_TEST_F(Test, putAliveIdleSendAliveTwoSubstreams)
 
     BMQTST_ASSERT(d_monitor.isAlarmScheduled());
 
-    d_monitor.alarmEventDispatched();
+    d_monitor.processAlarmEvent();
 
     BMQTST_ASSERT(!d_monitor.isAlarmScheduled());
 
@@ -741,7 +741,7 @@ BMQTST_TEST_F(Test, usage)
                      QueueConsumptionMonitor::State::e_ALIVE);
 
     // Simulate alarm event dispatching after max idle time
-    monitor.alarmEventDispatched();
+    monitor.processAlarmEvent();
 
     // log ALARM
     BMQTST_ASSERT_EQ(d_monitor.state(d_id),
@@ -756,7 +756,7 @@ BMQTST_TEST_F(Test, usage)
     monitor.onMessageSent(d_id);
 
     // Simulate idle event dispatching
-    monitor.idleEventDispatched(d_id);
+    monitor.processIdleEvent(d_id);
 
     // remain IDLE
     BMQTST_ASSERT_EQ(d_monitor.state(d_id),

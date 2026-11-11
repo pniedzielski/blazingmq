@@ -283,12 +283,12 @@ class QueueConsumptionMonitor {
     /// It checks if there are substreams that meet alarm condition and trigger
     /// the alarm for them.  If there are undelivered messages (among
     /// substreams) it reschedules alarm event.
-    virtual void alarmEventDispatched();
+    virtual void processAlarmEvent();
 
     /// Idle event dispatcher, executed in queue dispatcher thread.
     /// If there are no un-delivered messages the specified `appId`, it calls
     /// onTransitionToAlive(). Otherwise, it reschedules idle event.
-    virtual void idleEventDispatched(const bsl::string& appId);
+    virtual void processIdleEvent(const bsl::string& appId);
 
   public:
     // TRAITS

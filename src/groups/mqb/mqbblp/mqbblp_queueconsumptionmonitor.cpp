@@ -160,15 +160,15 @@ QueueConsumptionMonitor::setMaxIdleTime(bsls::Types::Int64 value)
 
     // If alarm event was already scheduled
     if (d_alarmEventHandle) {
-        // Cancel the event and execute alarmEventDispatched() to reschedule
+        // Cancel the event and execute processAlarmEvent() to reschedule
         // alarm event for the new maxIdleTime. If rc != 0, it means that
         // cancellation was not successful because the event was already
-        // dispatched. So it's not needed to call alarmEventDispatched() again.
+        // dispatched. So it's not needed to call processAlarmEvent() again.
         int rc = d_queueState_p->scheduler()->cancelEventAndWait(
             &d_alarmEventHandle);
         if (rc == 0) {
             if (d_maxIdleTimeSec > 0) {
-                alarmEventDispatched();
+                processAlarmEvent();
             }
         }
     }
@@ -203,7 +203,7 @@ void QueueConsumptionMonitor::unregisterSubStream(const bsl::string& appId)
 
     cancelIdleEvents(&info);
 
-    // The logic allows 'idleEventDispatched' to run after 'appId' removal
+    // The logic allows 'processIdleEvent' to run after 'appId' removal
     // (and re-insertion).
 
     d_subStreamInfos.erase(iter);
@@ -387,7 +387,7 @@ void QueueConsumptionMonitor::executeAlarmInQueueDispatcher()
     // Forward event to the queue dispatcher thread
     d_queueState_p->queue()->dispatcher()->execute(
         [this]() {
-            alarmEventDispatched();
+            processAlarmEvent();
         },
         d_queueState_p->queue());
 }
@@ -403,7 +403,7 @@ void QueueConsumptionMonitor::executeIdleInQueueDispatcher(
     // Forward event to the queue dispatcher thread
     d_queueState_p->queue()->dispatcher()->execute(
         [this, appId]() {
-            idleEventDispatched(appId);
+            processIdleEvent(appId);
         },
         d_queueState_p->queue());
 }
@@ -438,7 +438,7 @@ void QueueConsumptionMonitor::cancelIdleEvents(SubStreamInfo* info)
     }
 }
 
-void QueueConsumptionMonitor::alarmEventDispatched()
+void QueueConsumptionMonitor::processAlarmEvent()
 {
     // executed by the *QUEUE DISPATCHER* thread
 
@@ -507,7 +507,7 @@ void QueueConsumptionMonitor::alarmEventDispatched()
     }
 }
 
-void QueueConsumptionMonitor::idleEventDispatched(const bsl::string& appId)
+void QueueConsumptionMonitor::processIdleEvent(const bsl::string& appId)
 {
     // executed by the *QUEUE DISPATCHER* thread
 
