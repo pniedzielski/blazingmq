@@ -142,7 +142,7 @@ Cluster::ValidationResult::toAscii(Cluster::ValidationResult::Enum value)
 // -------------
 
 // PRIVATE MANIPULATORS
-void Cluster::startDispatched(bsl::ostream* errorDescription, int* rc)
+void Cluster::startImpl(bsl::ostream* errorDescription, int* rc)
 {
     // executed by the *DISPATCHER* thread
 
@@ -341,7 +341,7 @@ void Cluster::startDispatched(bsl::ostream* errorDescription, int* rc)
     *rc = rc_SUCCESS;
 }
 
-void Cluster::stopDispatched()
+void Cluster::stopImpl()
 {
     // executed by the *DISPATCHER* thread
 
@@ -384,7 +384,7 @@ void Cluster::stopDispatched()
     d_storageManager_mp->stop();
 
     d_clusterData.membership().selfNodeSession()->removeAllPartitions();
-    // TBD: perform above in initiateShutdownDispatched() ?
+    // TBD: perform above in initiateShutdownImpl() ?
 
     d_clusterOrchestrator.stop();
 
@@ -516,8 +516,8 @@ void Cluster::sendAck(bmqt::AckResult::Enum    status,
     sendAck(status, correlationId, messageGUID, queueId, source, nodeSession);
 }
 
-void Cluster::processCommandDispatched(mqbcmd::ClusterResult*        result,
-                                       const mqbcmd::ClusterCommand& command)
+void Cluster::processCommandImpl(mqbcmd::ClusterResult*        result,
+                                 const mqbcmd::ClusterCommand& command)
 {
     // executed by the *DISPATCHER* thread
     // PRECONDITIONS
@@ -574,7 +574,7 @@ void Cluster::processCommandDispatched(mqbcmd::ClusterResult*        result,
     result->makeError().message() = os.str();
 }
 
-void Cluster::initiateShutdownDispatched(const VoidFunctor& callback)
+void Cluster::initiateShutdownImpl(const VoidFunctor& callback)
 {
     // executed by the *DISPATCHER* thread
 
@@ -632,14 +632,13 @@ void Cluster::continueShutdown(bsls::Types::Int64        startTimeNs,
 
     dispatcher()->execute(
         [this, startTimeNs, completionCb]() {
-            continueShutdownDispatched(startTimeNs, completionCb);
+            continueShutdownImpl(startTimeNs, completionCb);
         },
         this);
 }
 
-void Cluster::continueShutdownDispatched(
-    bsls::Types::Int64        startTimeNs,
-    const CompletionCallback& completionCb)
+void Cluster::continueShutdownImpl(bsls::Types::Int64        startTimeNs,
+                                   const CompletionCallback& completionCb)
 {
     // executed by the *DISPATCHER* thread
 
@@ -682,7 +681,7 @@ void Cluster::continueShutdownDispatched(
     // Note that requests did go out (from the cluster thread) because
     //  1) 'ClientSession::tearDownImpl' waits for 'tearDownAllQueuesDone'
     //      before triggering 'Cluster::continueShutdown'
-    //  2) 'Cluster::continueShutdown' executes 'continueShutdownDispatched'
+    //  2) 'Cluster::continueShutdown' executes 'continueShutdownImpl'
 
     // Indicate the StorageMgr that self node is stopping.  For all the
     // partitions for which self is primary, self will issue last syncPt and
@@ -1645,12 +1644,12 @@ void Cluster::onRecoveryStatus(
 
     dispatcher()->execute(
         [this, status, primaryLeaseIds, statRecorder]() {
-            onRecoveryStatusDispatched(status, primaryLeaseIds, statRecorder);
+            processRecoveryStatus(status, primaryLeaseIds, statRecorder);
         },
         this);
 }
 
-void Cluster::onRecoveryStatusDispatched(
+void Cluster::processRecoveryStatus(
     int                                         status,
     const bsl::vector<unsigned int>&            primaryLeaseIds,
     const mqbstat::StatMonitorSnapshotRecorder& statRecorder)
@@ -1756,7 +1755,7 @@ void Cluster::onRecoveryStatusDispatched(
                                  static_cast<int>(pid));
 
                 // TODO:  wrong thread to call 'loadVirtualStorageDetails'
-                // but 'onRecoveryStatusDispatched' should not be concurrent
+                // but 'processRecoveryStatus' should not be concurrent
                 // with any of 'add/removeVirtualStorage' calls.
                 AppInfos appIdInfos;
                 itMp->storage()->loadVirtualStorageDetails(&appIdInfos);
@@ -1799,19 +1798,14 @@ void Cluster::gcExpiredQueues()
 
     dispatcher()->execute(
         [this]() {
-            gcExpiredQueuesDispatched();
+            // executed by the *DISPATCHER* thread
+
+            // PRECONDITIONS
+            BSLS_ASSERT_SAFE(inDispatcherThread());
+
+            d_clusterOrchestrator.queueHelper().gcExpiredQueues();
         },
         this);
-}
-
-void Cluster::gcExpiredQueuesDispatched()
-{
-    // executed by the *DISPATCHER* thread
-
-    // PRECONDITIONS
-    BSLS_ASSERT_SAFE(inDispatcherThread());
-
-    d_clusterOrchestrator.queueHelper().gcExpiredQueues();
 }
 
 void Cluster::logSummaryState()
@@ -1820,12 +1814,12 @@ void Cluster::logSummaryState()
 
     dispatcher()->execute(
         [this]() {
-            logSummaryStateDispatched();
+            logSummaryStateImpl();
         },
         this);
 }
 
-void Cluster::logSummaryStateDispatched() const
+void Cluster::logSummaryStateImpl() const
 {
     // executed by the *DISPATCHER* thread
 
@@ -1882,7 +1876,7 @@ void Cluster::logSummaryStateDispatched() const
     BALL_LOG_INFO << os.str();
 }
 
-void Cluster::onProxyConnectionUpDispatched(
+void Cluster::processProxyConnectionUp(
     const bsl::shared_ptr<bmqio::Channel>& channel,
     const bmqp_ctrlmsg::ClientIdentity&    identity,
     const bsl::string&                     description)
@@ -1912,9 +1906,8 @@ void Cluster::onProxyConnectionUpDispatched(
     }
 }
 
-void Cluster::processResponseDispatched(
-    const bmqp_ctrlmsg::ControlMessage& response,
-    mqbnet::ClusterNode*                source)
+void Cluster::applyResponse(const bmqp_ctrlmsg::ControlMessage& response,
+                            mqbnet::ClusterNode*                source)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -2204,23 +2197,23 @@ int Cluster::start(bsl::ostream& errorDescription)
     int rc;
     dispatcher()->execute(
         [this, errorDescriptionP = &errorDescription, rcP = &rc]() {
-            startDispatched(errorDescriptionP, rcP);
+            startImpl(errorDescriptionP, rcP);
         },
         this);
 
     // We synchronize twice here.  1st synchronize() is needed to ensure that
-    // 'startDispatched' has been executed.  The 2nd synchronize() is needed to
-    // ensure that any event that 'startDispatched' may have enqueued back to
-    // cluster's dispatcher thread has also been executed.  'startDispatched'
+    // 'startImpl' has been executed.  The 2nd synchronize() is needed to
+    // ensure that any event that 'startImpl' may have enqueued back to
+    // cluster's dispatcher thread has also been executed.  'startImpl'
     // was (indirectly) enqueuing an event back in cluster's dispatcher thread
     // when it was stopping the elector (as a result of a failure of some part
-    // of 'startDispatched' routine).  While stopping, elector invokes elector-
+    // of 'startImpl' routine).  While stopping, elector invokes elector-
     // state-callback in elector's internal scheduler thread.  But cluster (or
     // ClusterStateMgr) ends up enqueuing an event back to the dispatcher
     // thread in this elector-state-callback.  The 2nd call to 'synchronize'
     // below guarantees that this event has been executed.
 
-    // Another way to think of this is that 'startDispatched' is async, which
+    // Another way to think of this is that 'startImpl' is async, which
     // itself performs some async operations, so we need to synchronize twice.
 
     dispatcher()->synchronize(this);
@@ -2236,7 +2229,7 @@ void Cluster::initiateShutdown(const VoidFunctor& callback)
 
     dispatcher()->execute(
         [this, callback]() {
-            initiateShutdownDispatched(callback);
+            initiateShutdownImpl(callback);
         },
         this);
 }
@@ -2255,7 +2248,7 @@ void Cluster::stop()
 
     dispatcher()->execute(
         [this]() {
-            stopDispatched();
+            stopImpl();
         },
         this);
 
@@ -2415,7 +2408,7 @@ int Cluster::processCommand(mqbcmd::ClusterResult*        result,
 
     dispatcher()->execute(
         [this, result, &command]() {
-            processCommandDispatched(result, command);
+            processCommandImpl(result, command);
         },
         this);
     dispatcher()->synchronize(this);
@@ -2440,7 +2433,7 @@ void Cluster::processControlMessage(
 
         dispatcher()->execute(
             [this, message, source]() {
-                processResponseDispatched(message, source);
+                applyResponse(message, source);
             },
             this);
     } break;  // BREAK
@@ -2548,7 +2541,7 @@ void Cluster::processClusterControlMessage(
 
         dispatcher()->execute(
             [this, message, source]() {
-                processResponseDispatched(message, source);
+                applyResponse(message, source);
             },
             this);
     } break;  // BREAK
@@ -2964,7 +2957,7 @@ void Cluster::onProxyConnectionUp(
          channel,
          identity,
          descriptionStr = bsl::string(description, d_allocator_p)]() {
-            onProxyConnectionUpDispatched(channel, identity, descriptionStr);
+            processProxyConnectionUp(channel, identity, descriptionStr);
         },
         this);
 }
@@ -3147,15 +3140,15 @@ void Cluster::purgeAndGCQueueOnDomain(mqbcmd::ClusterResult* result,
 
     dispatcher()->execute(
         [this, result, domainName]() {
-            purgeAndGCQueueOnDomainDispatched(result, domainName);
+            purgeAndGCQueueOnDomainImpl(result, domainName);
         },
         this);
 
     dispatcher()->synchronize(this);
 }
 
-void Cluster::purgeAndGCQueueOnDomainDispatched(mqbcmd::ClusterResult* result,
-                                                const bsl::string& domainName)
+void Cluster::purgeAndGCQueueOnDomainImpl(mqbcmd::ClusterResult* result,
+                                          const bsl::string&     domainName)
 {
     // executed by the *DISPATCHER* thread
 
@@ -3292,10 +3285,10 @@ void Cluster::processResponse(const bmqp_ctrlmsg::ControlMessage& response)
     // A response must have an associated request Id
     BSLS_ASSERT_SAFE(!response.rId().isNull());
 
-    // Call `processResponseDispatched` directly since we are already in the
+    // Call `applyResponse` directly since we are already in the
     // dispatcher thread.
-    processResponseDispatched(response,
-                              static_cast<mqbnet::ClusterNode*>(0));  // source
+    applyResponse(response,
+                  static_cast<mqbnet::ClusterNode*>(0));  // source
 }
 
 void Cluster::getPrimaryNodes(int*          rc,

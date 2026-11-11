@@ -175,7 +175,7 @@ void ClusterProxy::continueShutdown(const VoidFunctor& completionCb)
     BSLS_ASSERT_SAFE(inDispatcherThread());
 
     // Delete and unregister all queues which have no handles from the domain.
-    // Symmetric with 'Cluster::continueShutdownDispatched'.
+    // Symmetric with 'Cluster::continueShutdownImpl'.
     d_queueHelper.processShutdownEvent();
 
     completionCb();
@@ -215,7 +215,7 @@ void ClusterProxy::stopImpl()
     // 'processEvent' method on that now destroyed cluster proxy instance.
     // While we should revisit this, closing the channel at this time here is a
     // working *probably temporary* fix.  Note that similar workaround exists
-    // in 'Cluster::stopDispatched'.
+    // in 'Cluster::stopImpl'.
     //
     // NOTE: channel.close() will not flush the channel's buffer, so there
     //       is a risk that any last message(s) may not be delivered.

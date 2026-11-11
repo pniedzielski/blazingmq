@@ -308,10 +308,10 @@ class Cluster : public mqbi::Cluster,
     /// Start the `Cluster` and populate the specified `rc` with the result
     /// of the operation, 0 on success and non-zero otherwise populating the
     /// specified `errorDescription` with the reason of the error.
-    void startDispatched(bsl::ostream* errorDescription, int* rc);
+    void startImpl(bsl::ostream* errorDescription, int* rc);
 
     /// Stop the `Cluster`.
-    void stopDispatched();
+    void stopImpl();
 
     /// Append an ACK message to the session's ack builder, with the
     /// specified `status`, `correlationId`, `messageGUID` and `queueId` to
@@ -336,17 +336,17 @@ class Cluster : public mqbi::Cluster,
                  const bslstl::StringRef&        source,
                  const mqbc::ClusterNodeSession* nodeSession);
 
-    void processCommandDispatched(mqbcmd::ClusterResult*        result,
-                                  const mqbcmd::ClusterCommand& command);
+    void processCommandImpl(mqbcmd::ClusterResult*        result,
+                            const mqbcmd::ClusterCommand& command);
 
     /// Executed by dispatcher thread.
-    void initiateShutdownDispatched(const VoidFunctor& callback);
+    void initiateShutdownImpl(const VoidFunctor& callback);
 
     /// Continue shutting down upon receipt of all StopResponses.
     void continueShutdown(bsls::Types::Int64        startTimeNs,
                           const CompletionCallback& completionCb);
-    void continueShutdownDispatched(bsls::Types::Int64        startTimeNs,
-                                    const CompletionCallback& completionCb);
+    void continueShutdownImpl(bsls::Types::Int64        startTimeNs,
+                              const CompletionCallback& completionCb);
 
     void processControlMessage(const bmqp_ctrlmsg::ControlMessage& message,
                                mqbnet::ClusterNode*                source);
@@ -408,7 +408,7 @@ class Cluster : public mqbi::Cluster,
                      const mqbstat::StatMonitorSnapshotRecorder& statRecorder);
 
     /// Executes in cluster's dispatcher thread.
-    void onRecoveryStatusDispatched(
+    void processRecoveryStatus(
         int                                         status,
         const bsl::vector<unsigned int>&            primaryLeaseIds,
         const mqbstat::StatMonitorSnapshotRecorder& statRecorder);
@@ -416,31 +416,27 @@ class Cluster : public mqbi::Cluster,
     /// Executes in the scheduler thread.
     void gcExpiredQueues();
 
-    /// Executes in the cluster dispatcher thread.
-    void gcExpiredQueuesDispatched();
-
     void logSummaryState();
 
     /// Process incoming proxy connection by sending self status to the
     /// specified `channel` and using the specified `description` if the
     /// specified `identity` supports broadcastring advisories to proxies.
-    void onProxyConnectionUpDispatched(
-        const bsl::shared_ptr<bmqio::Channel>& channel,
-        const bmqp_ctrlmsg::ClientIdentity&    identity,
-        const bsl::string&                     description);
+    void
+    processProxyConnectionUp(const bsl::shared_ptr<bmqio::Channel>& channel,
+                             const bmqp_ctrlmsg::ClientIdentity&    identity,
+                             const bsl::string& description);
 
     /// Apply the specified `response` from the specified `source` to the
     /// request manager.  This method is invoked in the cluster-dispatcher
     /// thread.
-    void
-    processResponseDispatched(const bmqp_ctrlmsg::ControlMessage& response,
-                              mqbnet::ClusterNode*                source);
+    void applyResponse(const bmqp_ctrlmsg::ControlMessage& response,
+                       mqbnet::ClusterNode*                source);
 
     // PRIVATE ACCESSORS
 
     /// Log a short summary of the core vital information about this
     /// cluster.
-    void logSummaryStateDispatched() const;
+    void logSummaryStateImpl() const;
 
     void loadNodesInfo(mqbcmd::NodeStatuses* out) const;
     void loadElectorInfo(mqbcmd::ElectorInfo* out) const;
@@ -604,8 +600,8 @@ class Cluster : public mqbi::Cluster,
                                  const bsl::string&     domainName) override;
 
     /// Executed by dispatcher thread.
-    void purgeAndGCQueueOnDomainDispatched(mqbcmd::ClusterResult* result,
-                                           const bsl::string&     domainName);
+    void purgeAndGCQueueOnDomainImpl(mqbcmd::ClusterResult* result,
+                                     const bsl::string&     domainName);
 
     /// PFSM signals when it is `e_DONE_RECEIVING_DATA_CHUNKS`.  Previously
     /// buffered PrimaryStatusAdvisories should be reread.

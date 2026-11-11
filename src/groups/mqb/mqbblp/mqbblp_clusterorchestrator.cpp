@@ -1166,7 +1166,7 @@ void ClusterOrchestrator::processNodeStateChangeEvent(
     BSLS_ASSERT_SAFE(d_cluster_p->inDispatcherThread());
 
     // IMPORTANT: Handling of this event must remain idempotent.  See notes in
-    // Cluster.startDispatched() for details.
+    // Cluster.startImpl() for details.
 
     BALL_LOG_INFO << d_clusterData_p->identity().description()
                   << ": received node state change notification for node "
