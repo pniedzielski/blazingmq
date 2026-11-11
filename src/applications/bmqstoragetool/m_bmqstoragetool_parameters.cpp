@@ -198,22 +198,17 @@ void CommandLineArguments::validateCslModeArgs(bsl::ostream& stream)
     }
     if (!d_seqNum.empty()) {
         bmqu::MemOutStream errorDescr(d_allocator_p);
-        for (bsl::vector<bsl::string>::const_iterator cit = d_seqNum.begin();
-             cit != d_seqNum.end();
-             ++cit) {
-            if (!isValidSequenceNumber(errorDescr, *cit)) {
+        for (const bsl::string& seqNum : d_seqNum) {
+            if (!isValidSequenceNumber(errorDescr, seqNum)) {
                 stream << "--seqnum: " << errorDescr.str() << "\n";
                 errorDescr.reset();
             }
         }
     }
     if (!d_offset.empty()) {
-        for (bsl::vector<bsls::Types::Int64>::const_iterator cit =
-                 d_offset.begin();
-             cit != d_offset.end();
-             ++cit) {
-            if (*cit < 0) {
-                stream << "--offset: " << *cit << " cannot be negative\n";
+        for (const bsls::Types::Int64 offset : d_offset) {
+            if (offset < 0) {
+                stream << "--offset: " << offset << " cannot be negative\n";
             }
         }
     }
@@ -228,10 +223,9 @@ void CommandLineArguments::validateCslModeArgs(bsl::ostream& stream)
                   "calculates and outputs statistics\n";
     }
 
-    bsl::vector<bsl::string>::const_iterator it = d_queueKey.cbegin();
-    for (; it != d_queueKey.cend(); ++it) {
-        if (!isValidQueueKeyHexRepresentation(it->c_str())) {
-            stream << *it << " is not a valid Queue Key\n";
+    for (const bsl::string& queueKey : d_queueKey) {
+        if (!isValidQueueKeyHexRepresentation(queueKey.c_str())) {
+            stream << queueKey << " is not a valid Queue Key\n";
         }
     }
 
@@ -273,11 +267,10 @@ void CommandLineArguments::validateJournalModeArgs(bsl::ostream& stream)
             bsl::vector<bsl::string> result;
             bdls::FilesystemUtil::findMatchingPaths(&result,
                                                     d_journalPath.c_str());
-            bsl::vector<bsl::string>::const_iterator it = result.cbegin();
-            for (; it != result.cend(); ++it) {
-                if (it->ends_with(".bmq_journal")) {
+            for (const bsl::string& path : result) {
+                if (path.ends_with(".bmq_journal")) {
                     if (d_journalFile.empty()) {
-                        d_journalFile = *it;
+                        d_journalFile = path;
                     }
                     else {
                         stream << "Several journal files match the pattern, "
@@ -286,9 +279,9 @@ void CommandLineArguments::validateJournalModeArgs(bsl::ostream& stream)
                         break;
                     }
                 }
-                if (it->ends_with(".bmq_data")) {
+                if (path.ends_with(".bmq_data")) {
                     if (d_dataFile.empty()) {
-                        d_dataFile = *it;
+                        d_dataFile = path;
                     }
                     else {
                         stream
@@ -349,22 +342,17 @@ void CommandLineArguments::validateJournalModeArgs(bsl::ostream& stream)
     }
     if (!d_seqNum.empty()) {
         bmqu::MemOutStream errorDescr(d_allocator_p);
-        for (bsl::vector<bsl::string>::const_iterator cit = d_seqNum.begin();
-             cit != d_seqNum.end();
-             ++cit) {
-            if (!isValidSequenceNumber(errorDescr, *cit)) {
+        for (const bsl::string& seqNum : d_seqNum) {
+            if (!isValidSequenceNumber(errorDescr, seqNum)) {
                 stream << "--seqnum: " << errorDescr.str() << "\n";
                 errorDescr.reset();
             }
         }
     }
     if (!d_offset.empty()) {
-        for (bsl::vector<bsls::Types::Int64>::const_iterator cit =
-                 d_offset.begin();
-             cit != d_offset.end();
-             ++cit) {
-            if (*cit < 0) {
-                stream << "--offset: " << *cit << " cannot be negative\n";
+        for (const bsls::Types::Int64 offset : d_offset) {
+            if (offset < 0) {
+                stream << "--offset: " << offset << " cannot be negative\n";
             }
         }
     }
@@ -384,17 +372,15 @@ void CommandLineArguments::validateJournalModeArgs(bsl::ostream& stream)
                "them\n";
     }
 
-    bsl::vector<bsl::string>::const_iterator it = d_guid.cbegin();
-    for (; it != d_guid.cend(); ++it) {
-        if (!bmqt::MessageGUID::isValidHexRepresentation(it->c_str())) {
-            stream << *it << " is not a valid GUID\n";
+    for (const bsl::string& guid : d_guid) {
+        if (!bmqt::MessageGUID::isValidHexRepresentation(guid.c_str())) {
+            stream << guid << " is not a valid GUID\n";
         }
     }
 
-    it = d_queueKey.cbegin();
-    for (; it != d_queueKey.cend(); ++it) {
-        if (!isValidQueueKeyHexRepresentation(it->c_str())) {
-            stream << *it << " is not a valid Queue Key\n";
+    for (const bsl::string& queueKey : d_queueKey) {
+        if (!isValidQueueKeyHexRepresentation(queueKey.c_str())) {
+            stream << queueKey << " is not a valid Queue Key\n";
         }
     }
 
@@ -616,23 +602,20 @@ Parameters::Parameters(const CommandLineArguments& arguments,
             d_processCslRecordTypes.setAll();
         }
         else {
-            for (bsl::vector<bsl::string>::const_iterator cit =
-                     arguments.d_cslRecordType.begin();
-                 cit != arguments.d_cslRecordType.end();
-                 ++cit) {
-                if (*cit == k_CSL_ALL_TYPE) {
+            for (const bsl::string& recordType : arguments.d_cslRecordType) {
+                if (recordType == k_CSL_ALL_TYPE) {
                     d_processCslRecordTypes.setAll();
                 }
-                else if (*cit == k_CSL_SNAPSHOT_TYPE) {
+                else if (recordType == k_CSL_SNAPSHOT_TYPE) {
                     d_processCslRecordTypes.d_snapshot = true;
                 }
-                else if (*cit == k_CSL_UPDATE_TYPE) {
+                else if (recordType == k_CSL_UPDATE_TYPE) {
                     d_processCslRecordTypes.d_update = true;
                 }
-                else if (*cit == k_CSL_COMMIT_TYPE) {
+                else if (recordType == k_CSL_COMMIT_TYPE) {
                     d_processCslRecordTypes.d_commit = true;
                 }
-                else if (*cit == k_CSL_ACK_TYPE) {
+                else if (recordType == k_CSL_ACK_TYPE) {
                     d_processCslRecordTypes.d_ack = true;
                 }
                 else {
@@ -647,21 +630,18 @@ Parameters::Parameters(const CommandLineArguments& arguments,
             d_processRecordTypes.setAll();
         }
         else {
-            for (bsl::vector<bsl::string>::const_iterator cit =
-                     arguments.d_recordType.begin();
-                 cit != arguments.d_recordType.end();
-                 ++cit) {
-                if (*cit == k_ALL_TYPE) {
+            for (const bsl::string& recordType : arguments.d_recordType) {
+                if (recordType == k_ALL_TYPE) {
                     d_processRecordTypes.setAll();
                     break;  // BREAK
                 }
-                else if (*cit == k_MESSAGE_TYPE) {
+                else if (recordType == k_MESSAGE_TYPE) {
                     d_processRecordTypes.d_message = true;
                 }
-                else if (*cit == k_QUEUEOP_TYPE) {
+                else if (recordType == k_QUEUEOP_TYPE) {
                     d_processRecordTypes.d_queueOp = true;
                 }
-                else if (*cit == k_JOURNALOP_TYPE) {
+                else if (recordType == k_JOURNALOP_TYPE) {
                     d_processRecordTypes.d_journalOp = true;
                 }
                 else {
@@ -716,11 +696,8 @@ Parameters::Parameters(const CommandLineArguments& arguments,
         CompositeSequenceNumber seqNum;
         bmqu::MemOutStream      errorDescr(allocator);
         bool                    success = false;
-        for (bsl::vector<bsl::string>::const_iterator cit =
-                 arguments.d_seqNum.begin();
-             cit != arguments.d_seqNum.end();
-             ++cit) {
-            seqNum.fromString(&success, errorDescr, *cit);
+        for (const bsl::string& seqNumStr : arguments.d_seqNum) {
+            seqNum.fromString(&success, errorDescr, seqNumStr);
             BSLS_ASSERT(success);
             d_seqNum.push_back(seqNum);
         }
@@ -735,11 +712,10 @@ Parameters::Parameters(const CommandLineArguments& arguments,
 void Parameters::validateQueueNames() const
 {
     // Validate given queue names agains existing in csl file
-    bmqu::MemOutStream                       ss(d_allocator_p);
-    bsl::vector<bsl::string>::const_iterator it = d_queueName.cbegin();
-    for (; it != d_queueName.cend(); ++it) {
-        if (!d_queueMap.findKeyByUri(*it).has_value()) {
-            ss << "Queue name: '" << *it << "' is not found in Csl file."
+    bmqu::MemOutStream ss(d_allocator_p);
+    for (const bsl::string& queueName : d_queueName) {
+        if (!d_queueMap.findKeyByUri(queueName).has_value()) {
+            ss << "Queue name: '" << queueName << "' is not found in Csl file."
                << bsl::endl;
         }
     }
