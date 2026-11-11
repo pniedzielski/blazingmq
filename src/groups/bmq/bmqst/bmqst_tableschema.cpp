@@ -15,7 +15,6 @@
 
 #include <bmqst_tableschema.h>
 
-#include <bdlf_bind.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bmqscm_version.h>
 #include <bsl_functional.h>
@@ -27,36 +26,12 @@ namespace bmqst {
 
 namespace {
 
-// TYPEDEFS
-typedef bsl::function<bsls::Types::Int64(const StatValue& value)> IntFunc;
-typedef bsl::function<double(const StatValue& value)>             DoubleFunc;
-
 // CONSTANTS
 const char DIRECT_NAME[]  = "*direct*";
 const char EXPIRED_NAME[] = "*expired*";
 const char UNKNOWN_NAME[] = "*unknown*";
 
 // FUNCTIONS
-void intFuncWrapper(Value*                 value,
-                    const StatContext&     context,
-                    StatContext::ValueType type,
-                    int                    statIndex,
-                    const IntFunc&         fn)
-{
-    const StatValue& sv = context.value(type, statIndex);
-    value->set(fn(sv));
-}
-
-void doubleFuncWrapper(Value*                 value,
-                       const StatContext&     context,
-                       StatContext::ValueType type,
-                       int                    statIndex,
-                       const DoubleFunc&      fn)
-{
-    const StatValue& sv = context.value(type, statIndex);
-    value->set(fn(sv));
-}
-
 void defaultIdColumn(Value*                 value,
                      const StatContext&     context,
                      int                    level,
@@ -170,12 +145,12 @@ TableSchemaColumn& TableSchema::addColumn(const bslstl::StringRef& name,
 
 void TableSchema::addDefaultIdColumn(const bslstl::StringRef& name)
 {
-    Column::ValueFn columnFn = bdlf::BindUtil::bindS(d_allocator_p,
-                                                     defaultIdColumn,
-                                                     bdlf::PlaceHolders::_1,
-                                                     bdlf::PlaceHolders::_2,
-                                                     bdlf::PlaceHolders::_3,
-                                                     bdlf::PlaceHolders::_4);
+    Column::ValueFn columnFn = [](Value*                 value,
+                                  const StatContext&     context,
+                                  int                    level,
+                                  StatContext::ValueType type) {
+        defaultIdColumn(value, context, level, type);
+    };
 
     addColumn(name, columnFn);
 }
@@ -185,13 +160,12 @@ TableSchema::addColumn(const bslstl::StringRef& name,
                        int                      statIndex,
                        bsls::Types::Int64 (*func)(const StatValue&))
 {
-    IntFunc         intFn = bdlf::BindUtil::bind(func, bdlf::PlaceHolders::_1);
-    Column::ValueFn columnFn = bdlf::BindUtil::bind(&intFuncWrapper,
-                                                    bdlf::PlaceHolders::_1,
-                                                    bdlf::PlaceHolders::_2,
-                                                    bdlf::PlaceHolders::_4,
-                                                    statIndex,
-                                                    intFn);
+    Column::ValueFn columnFn = [statIndex, func](Value*             value,
+                                                 const StatContext& context,
+                                                 int,
+                                                 StatContext::ValueType type) {
+        value->set(func(context.value(type, statIndex)));
+    };
 
     return addColumn(name, columnFn);
 }
@@ -203,15 +177,13 @@ TableSchemaColumn& TableSchema::addColumn(
                                const StatValue::SnapshotLocation&),
     const StatValue::SnapshotLocation& snapshot)
 {
-    IntFunc         intFn    = bdlf::BindUtil::bind(func,
-                                         bdlf::PlaceHolders::_1,
-                                         snapshot);
-    Column::ValueFn columnFn = bdlf::BindUtil::bind(&intFuncWrapper,
-                                                    bdlf::PlaceHolders::_1,
-                                                    bdlf::PlaceHolders::_2,
-                                                    bdlf::PlaceHolders::_4,
-                                                    statIndex,
-                                                    intFn);
+    Column::ValueFn columnFn =
+        [statIndex, func, snapshot](Value*             value,
+                                    const StatContext& context,
+                                    int,
+                                    StatContext::ValueType type) {
+            value->set(func(context.value(type, statIndex), snapshot));
+        };
 
     return addColumn(name, columnFn);
 }
@@ -225,16 +197,13 @@ TableSchemaColumn& TableSchema::addColumn(
     const StatValue::SnapshotLocation& snapshot1,
     const StatValue::SnapshotLocation& snapshot2)
 {
-    IntFunc         intFn    = bdlf::BindUtil::bind(func,
-                                         bdlf::PlaceHolders::_1,
-                                         snapshot1,
-                                         snapshot2);
-    Column::ValueFn columnFn = bdlf::BindUtil::bind(&intFuncWrapper,
-                                                    bdlf::PlaceHolders::_1,
-                                                    bdlf::PlaceHolders::_2,
-                                                    bdlf::PlaceHolders::_4,
-                                                    statIndex,
-                                                    intFn);
+    Column::ValueFn columnFn = [statIndex, func, snapshot1, snapshot2](
+                                   Value*             value,
+                                   const StatContext& context,
+                                   int,
+                                   StatContext::ValueType type) {
+        value->set(func(context.value(type, statIndex), snapshot1, snapshot2));
+    };
 
     return addColumn(name, columnFn);
 }
@@ -243,13 +212,12 @@ TableSchemaColumn& TableSchema::addColumn(const bslstl::StringRef& name,
                                           int                      statIndex,
                                           double (*func)(const StatValue&))
 {
-    DoubleFunc doubleFn = bdlf::BindUtil::bind(func, bdlf::PlaceHolders::_1);
-    Column::ValueFn columnFn = bdlf::BindUtil::bind(&doubleFuncWrapper,
-                                                    bdlf::PlaceHolders::_1,
-                                                    bdlf::PlaceHolders::_2,
-                                                    bdlf::PlaceHolders::_4,
-                                                    statIndex,
-                                                    doubleFn);
+    Column::ValueFn columnFn = [statIndex, func](Value*             value,
+                                                 const StatContext& context,
+                                                 int,
+                                                 StatContext::ValueType type) {
+        value->set(func(context.value(type, statIndex)));
+    };
 
     return addColumn(name, columnFn);
 }
@@ -260,15 +228,13 @@ TableSchemaColumn& TableSchema::addColumn(
     double (*func)(const StatValue&, const StatValue::SnapshotLocation&),
     const StatValue::SnapshotLocation& snapshot)
 {
-    DoubleFunc      doubleFn = bdlf::BindUtil::bind(func,
-                                               bdlf::PlaceHolders::_1,
-                                               snapshot);
-    Column::ValueFn columnFn = bdlf::BindUtil::bind(&doubleFuncWrapper,
-                                                    bdlf::PlaceHolders::_1,
-                                                    bdlf::PlaceHolders::_2,
-                                                    bdlf::PlaceHolders::_4,
-                                                    statIndex,
-                                                    doubleFn);
+    Column::ValueFn columnFn =
+        [statIndex, func, snapshot](Value*             value,
+                                    const StatContext& context,
+                                    int,
+                                    StatContext::ValueType type) {
+            value->set(func(context.value(type, statIndex), snapshot));
+        };
 
     return addColumn(name, columnFn);
 }
@@ -282,16 +248,13 @@ TableSchema::addColumn(const bslstl::StringRef& name,
                        const StatValue::SnapshotLocation& snapshot1,
                        const StatValue::SnapshotLocation& snapshot2)
 {
-    DoubleFunc      doubleFn = bdlf::BindUtil::bind(func,
-                                               bdlf::PlaceHolders::_1,
-                                               snapshot1,
-                                               snapshot2);
-    Column::ValueFn columnFn = bdlf::BindUtil::bind(&doubleFuncWrapper,
-                                                    bdlf::PlaceHolders::_1,
-                                                    bdlf::PlaceHolders::_2,
-                                                    bdlf::PlaceHolders::_4,
-                                                    statIndex,
-                                                    doubleFn);
+    Column::ValueFn columnFn = [statIndex, func, snapshot1, snapshot2](
+                                   Value*             value,
+                                   const StatContext& context,
+                                   int,
+                                   StatContext::ValueType type) {
+        value->set(func(context.value(type, statIndex), snapshot1, snapshot2));
+    };
 
     return addColumn(name, columnFn);
 }
