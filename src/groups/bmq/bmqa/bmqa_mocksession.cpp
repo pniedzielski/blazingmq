@@ -45,9 +45,6 @@
 
 // BDE
 #include <bdlbb_blobutil.h>
-#include <bdlf_bind.h>
-#include <bdlf_memfn.h>
-#include <bdlf_placeholder.h>
 #include <bsl_iostream.h>
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
@@ -666,9 +663,10 @@ MockSession::Call::emitting(const OpenQueueStatus& openQueueResult)
 
     d_openQueueResult = openQueueResult;
 
-    const CallbackFn callbackFn = bdlf::BindUtil::bindS(d_allocator_p,
-                                                        d_openQueueCallback,
-                                                        openQueueResult);
+    const CallbackFn callbackFn = [callback = d_openQueueCallback,
+                                   openQueueResult]() {
+        callback(openQueueResult);
+    };
     bmqa::QueueId    queueId    = openQueueResult.queueId();
     QueueImplSp      queue = reinterpret_cast<bsl::shared_ptr<bmqimp::Queue>&>(
         queueId);
@@ -694,10 +692,10 @@ MockSession::Call::emitting(const ConfigureQueueStatus& configureQueueResult)
 
     d_configureQueueResult = configureQueueResult;
 
-    const CallbackFn callbackFn = bdlf::BindUtil::bindS(
-        d_allocator_p,
-        d_configureQueueCallback,
-        configureQueueResult);
+    const CallbackFn callbackFn = [callback = d_configureQueueCallback,
+                                   configureQueueResult]() {
+        callback(configureQueueResult);
+    };
 
     bmqa::QueueId queueId = configureQueueResult.queueId();
     QueueImplSp   queue   = reinterpret_cast<bsl::shared_ptr<bmqimp::Queue>&>(
@@ -724,9 +722,10 @@ MockSession::Call::emitting(const CloseQueueStatus& closeQueueResult)
 
     d_closeQueueResult = closeQueueResult;
 
-    const CallbackFn callbackFn = bdlf::BindUtil::bindS(d_allocator_p,
-                                                        d_closeQueueCallback,
-                                                        closeQueueResult);
+    const CallbackFn callbackFn = [callback = d_closeQueueCallback,
+                                   closeQueueResult]() {
+        callback(closeQueueResult);
+    };
 
     bmqa::QueueId queueId = closeQueueResult.queueId();
     QueueImplSp   queue   = reinterpret_cast<bsl::shared_ptr<bmqimp::Queue>&>(
@@ -1097,11 +1096,9 @@ MockSession::MockSession(const bmqt::SessionOptions& options,
 , d_eventsAndJobs(allocator)
 , d_unconfirmedGUIDs(allocator)
 , d_twoKeyHashMapBuffer()
-, d_failureCb(bdlf::BindUtil::bindS(bslma::Default::allocator(allocator),
-                                    &defaultFailureCallback,
-                                    bdlf::PlaceHolders::_1,
-                                    bdlf::PlaceHolders::_2,
-                                    bdlf::PlaceHolders::_3))
+, d_failureCb([](const char* description, const char* file, int line) {
+    defaultFailureCallback(description, file, line);
+})
 , d_lastQueueId(0)
 , d_corrIdContainer_sp(new (*bslma::Default::allocator(allocator))
                            bmqimp::MessageCorrelationIdContainer(
@@ -1143,11 +1140,9 @@ MockSession::MockSession(bslma::ManagedPtr<SessionEventHandler> eventHandler,
 , d_eventsAndJobs(bslma::Default::allocator(allocator))
 , d_unconfirmedGUIDs(bslma::Default::allocator(allocator))
 , d_twoKeyHashMapBuffer()
-, d_failureCb(bdlf::BindUtil::bindS(bslma::Default::allocator(allocator),
-                                    &defaultFailureCallback,
-                                    bdlf::PlaceHolders::_1,
-                                    bdlf::PlaceHolders::_2,
-                                    bdlf::PlaceHolders::_3))
+, d_failureCb([](const char* description, const char* file, int line) {
+    defaultFailureCallback(description, file, line);
+})
 , d_lastQueueId(0)
 , d_corrIdContainer_sp(new (*bslma::Default::allocator(allocator))
                            bmqimp::MessageCorrelationIdContainer(
@@ -1653,8 +1648,9 @@ void MockSession::loadMessageEventBuilder(MessageEventBuilder* builder)
 
     builderImplRef.d_guidGenerator_sp = g_guidGenerator_sp;
 
-    builderImplRef.d_messageEventFactory =
-        bdlf::BindUtil::bind(&MockSession::createMessageEvent, this);
+    builderImplRef.d_messageEventFactory = [this]() {
+        return createMessageEvent();
+    };
 
     builder->reset();
 }
