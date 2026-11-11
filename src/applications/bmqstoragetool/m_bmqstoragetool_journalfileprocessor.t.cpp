@@ -388,14 +388,12 @@ static void test1_breathingTest()
 
     Sequence s;
     // Prepare expected output with list of message GUIDs in Journal file
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.begin();
     bsl::size_t foundMessagesCount = 0;
-    for (; recordIter != records.end(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
-                recordIter->second.buffer());
+                record.second.buffer());
             EXPECT_CALL(*printer, printGuid(msg.messageGUID())).InSequence(s);
             foundMessagesCount++;
         }
@@ -438,17 +436,15 @@ static void test2_searchGuidTest()
     Parameters params = createTestParameters();
     // Get list of message GUIDs for searching
     bsl::vector<bsl::string>& searchGuids = params.d_guid;
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.begin();
     bsl::size_t msgCnt = 0;
     Sequence    s;
-    for (; recordIter != records.end(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             if (msgCnt++ % 2 != 0)
                 continue;  // Skip odd messages for test purposes
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
-                recordIter->second.buffer());
+                record.second.buffer());
             bmqu::MemOutStream ss(bmqtst::TestHelperUtil::allocator());
             ss << msg.messageGUID();
             searchGuids.push_back(
@@ -587,18 +583,16 @@ static void test4_searchExistingAndNonExistingGuidTest()
     bsl::vector<bsl::string>& searchGuids = params.d_guid;
 
     // Get two existing message GUIDs
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.begin();
     size_t   msgCnt        = 0;
     size_t   foundGuidsCnt = 0;
     Sequence s;
-    for (; recordIter != records.end(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             if (msgCnt++ == 2)
                 break;  // Take two GUIDs
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
-                recordIter->second.buffer());
+                record.second.buffer());
             bmqu::MemOutStream ss(bmqtst::TestHelperUtil::allocator());
             ss << msg.messageGUID();
             searchGuids.push_back(
@@ -697,12 +691,9 @@ static void test5_searchOutstandingMessagesTest()
     const int    outstandingRatio = static_cast<int>(bsl::floor(
         float(outstandingGUIDS.size()) / float(messageCount) * 100.0f + 0.5f));
 
-    JournalFile::GuidVectorType::const_iterator guidIt =
-        outstandingGUIDS.cbegin();
-
     Sequence s;
-    for (; guidIt != outstandingGUIDS.cend(); ++guidIt) {
-        EXPECT_CALL(*printer, printGuid(*guidIt)).InSequence(s);
+    for (const bmqt::MessageGUID& guid : outstandingGUIDS) {
+        EXPECT_CALL(*printer, printGuid(guid)).InSequence(s);
     }
     EXPECT_CALL(*printer,
                 printFooter(outstandingGUIDS.size(),
@@ -773,12 +764,10 @@ static void test6_searchConfirmedMessagesTest()
     const size_t outstandingCount = messageCount - confirmedGUIDS.size();
     const int    outstandingRatio = static_cast<int>(bsl::floor(
         float(outstandingCount) / float(messageCount) * 100.0f + 0.5f));
-    JournalFile::GuidVectorType::const_iterator guidIt =
-        confirmedGUIDS.cbegin();
 
     Sequence s;
-    for (; guidIt != confirmedGUIDS.cend(); ++guidIt) {
-        EXPECT_CALL(*printer, printGuid(*guidIt)).InSequence(s);
+    for (const bmqt::MessageGUID& guid : confirmedGUIDS) {
+        EXPECT_CALL(*printer, printGuid(guid)).InSequence(s);
     }
     EXPECT_CALL(
         *printer,
@@ -850,12 +839,10 @@ static void test7_searchPartiallyConfirmedMessagesTest()
     const size_t outstandingCount = partiallyConfirmedGUIDS.size() + 1;
     const int    outstandingRatio = static_cast<int>(bsl::floor(
         float(outstandingCount) / float(messageCount) * 100.0f + 0.5f));
-    JournalFile::GuidVectorType::const_iterator guidIt =
-        partiallyConfirmedGUIDS.cbegin();
 
     Sequence s;
-    for (; guidIt != partiallyConfirmedGUIDS.cend(); ++guidIt) {
-        EXPECT_CALL(*printer, printGuid(*guidIt)).InSequence(s);
+    for (const bmqt::MessageGUID& guid : partiallyConfirmedGUIDS) {
+        EXPECT_CALL(*printer, printGuid(guid)).InSequence(s);
     }
     EXPECT_CALL(*printer,
                 printFooter(partiallyConfirmedGUIDS.size(),
@@ -925,11 +912,9 @@ static void test8_searchMessagesByQueueKeyTest()
                                resultStream,
                                bmqtst::TestHelperUtil::allocator());
 
-    JournalFile::GuidVectorType::const_iterator guidIt =
-        queueKey1GUIDS.cbegin();
     Sequence s;
-    for (; guidIt != queueKey1GUIDS.cend(); ++guidIt) {
-        EXPECT_CALL(*printer, printGuid(*guidIt)).InSequence(s);
+    for (const bmqt::MessageGUID& guid : queueKey1GUIDS) {
+        EXPECT_CALL(*printer, printGuid(guid)).InSequence(s);
     }
     EXPECT_CALL(
         *printer,
@@ -1001,11 +986,9 @@ static void test9_searchMessagesByQueueNameTest()
                                resultStream,
                                bmqtst::TestHelperUtil::allocator());
 
-    JournalFile::GuidVectorType::const_iterator guidIt =
-        queueKey1GUIDS.cbegin();
     Sequence s;
-    for (; guidIt != queueKey1GUIDS.cend(); ++guidIt) {
-        EXPECT_CALL(*printer, printGuid(*guidIt)).InSequence(s);
+    for (const bmqt::MessageGUID& guid : queueKey1GUIDS) {
+        EXPECT_CALL(*printer, printGuid(guid)).InSequence(s);
     }
     EXPECT_CALL(
         *printer,
@@ -1081,11 +1064,9 @@ static void test10_searchMessagesByQueueNameAndQueueKeyTest()
                                resultStream,
                                bmqtst::TestHelperUtil::allocator());
 
-    JournalFile::GuidVectorType::const_iterator guidIt =
-        queueKey1GUIDS.cbegin();
     Sequence s;
-    for (; guidIt != queueKey1GUIDS.cend(); ++guidIt) {
-        EXPECT_CALL(*printer, printGuid(*guidIt)).InSequence(s);
+    for (const bmqt::MessageGUID& guid : queueKey1GUIDS) {
+        EXPECT_CALL(*printer, printGuid(guid)).InSequence(s);
     }
     EXPECT_CALL(
         *printer,
@@ -1143,16 +1124,14 @@ static void test11_searchMessagesByTimestamp()
                                resultStream,
                                bmqtst::TestHelperUtil::allocator());
 
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.begin();
     bsl::size_t msgCnt = 0;
 
     Sequence s;
-    for (; recordIter != records.end(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
-                recordIter->second.buffer());
+                record.second.buffer());
             const bsls::Types::Uint64& ts = msg.header().timestamp();
             // Get GUIDs of messages with matching timestamps
             if (ts > ts1 && ts < ts2) {
@@ -1227,9 +1206,8 @@ static void test12_printMessagesDetailsTest()
 
     Sequence s;
 
-    JournalFile::GuidVectorType::const_iterator it = confirmedGUIDS.cbegin();
-    for (; it != confirmedGUIDS.cend(); ++it) {
-        EXPECT_CALL(*printer, printMessage(ConfirmedGuidMatcher(*it)))
+    for (const bmqt::MessageGUID& guid : confirmedGUIDS) {
+        EXPECT_CALL(*printer, printMessage(ConfirmedGuidMatcher(guid)))
             .InSequence(s);
     }
     EXPECT_CALL(*printer, printMessage(NotConfirmedGuidMatcher()))
@@ -1657,11 +1635,7 @@ static void test16_sequenceNumberLowerBoundTest()
                                 // inside last leaseId)
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         // Simulate journal file
         JournalFile::RecordsListType records(
             bmqtst::TestHelperUtil::allocator());
@@ -1789,15 +1763,13 @@ static void test17_searchMessagesBySequenceNumbersRange()
 
     // Get GUIDs of messages inside sequence numbers range and prepare
     // expected calls
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.begin();
     bsl::size_t msgCnt = 0;
     Sequence    s;
-    for (; recordIter != records.end(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
-                recordIter->second.buffer());
+                record.second.buffer());
             const CompositeSequenceNumber seqNum(
                 msg.header().primaryLeaseId(),
                 msg.header().sequenceNumber());
@@ -1868,15 +1840,13 @@ static void test18_searchMessagesByOffsetsRange()
 
     // Get GUIDs of messages within offsets range and prepare expected
     // calls
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.begin();
     bsl::size_t msgCnt = 0;
     Sequence    s;
-    for (; recordIter != records.end(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
-                recordIter->second.buffer());
+                record.second.buffer());
             const bsls::Types::Uint64 offset = recordOffset(msg);
             if (offset > offsetGt && offset < offsetLt) {
                 EXPECT_CALL(*printer, printGuid(msg.messageGUID()))
@@ -1946,16 +1916,14 @@ static void test19_searchQueueOpRecords()
 
     // Get queueOp records content within offsets range and prepare
     // expected calls
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.cbegin();
     Sequence            s;
     bsls::Types::Uint64 queueOpCount = 0;
-    for (; recordIter != records.cend(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_QUEUE_OP) {
             const QueueOpRecord& queueOp =
                 *reinterpret_cast<const QueueOpRecord*>(
-                    recordIter->second.buffer());
+                    record.second.buffer());
             const bsls::Types::Uint64 offset = recordOffset(queueOp);
             if (offset > offsetGt && offset < offsetLt) {
                 ++queueOpCount;
@@ -2026,16 +1994,14 @@ static void test20_searchJournalOpRecords()
 
     // Get journalOp records content within offsets range and prepare
     // expected calls
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.cbegin();
     Sequence            s;
     bsls::Types::Uint64 journalOpCount = 0;
-    for (; recordIter != records.cend(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_JOURNAL_OP) {
             const JournalOpRecord& journalOp =
                 *reinterpret_cast<const JournalOpRecord*>(
-                    recordIter->second.buffer());
+                    record.second.buffer());
             const bsls::Types::Uint64 offset = recordOffset(journalOp);
             if (offset > offsetGt && offset < offsetLt) {
                 ++journalOpCount;
@@ -2109,17 +2075,15 @@ static void test21_searchAllTypesRecords()
     // output
     bmqu::MemOutStream expectedStream(bmqtst::TestHelperUtil::allocator());
 
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.cbegin();
     bsl::size_t msgCnt       = 0;
     bsl::size_t queueOpCnt   = 0;
     bsl::size_t journalOpCnt = 0;
     Sequence    s;
-    for (; recordIter != records.cend(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
-                recordIter->second.buffer());
+                record.second.buffer());
             const bsls::Types::Uint64 offset = recordOffset(msg);
             if (offset > offsetGt && offset < offsetLt) {
                 msgCnt++;
@@ -2130,7 +2094,7 @@ static void test21_searchAllTypesRecords()
         else if (rtype == RecordType::e_QUEUE_OP) {
             const QueueOpRecord& queueOp =
                 *reinterpret_cast<const QueueOpRecord*>(
-                    recordIter->second.buffer());
+                    record.second.buffer());
             const bsls::Types::Uint64 offset = recordOffset(queueOp);
             if (offset > offsetGt && offset < offsetLt) {
                 queueOpCnt++;
@@ -2142,7 +2106,7 @@ static void test21_searchAllTypesRecords()
         else if (rtype == RecordType::e_JOURNAL_OP) {
             const JournalOpRecord& journalOp =
                 *reinterpret_cast<const JournalOpRecord*>(
-                    recordIter->second.buffer());
+                    record.second.buffer());
             const bsls::Types::Uint64 offset = recordOffset(journalOp);
             if (offset > offsetGt && offset < offsetLt) {
                 journalOpCnt++;
@@ -2202,17 +2166,15 @@ static void test22_searchQueueOpRecordsByOffset()
 
     // Get queueOp records content and prepare expected
     // calls
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.cbegin();
     bsl::size_t resCnt     = 0;
     bsl::size_t queueOpCnt = 0;
     Sequence    s;
-    for (; recordIter != records.cend(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_QUEUE_OP) {
             const QueueOpRecord& queueOp =
                 *reinterpret_cast<const QueueOpRecord*>(
-                    recordIter->second.buffer());
+                    record.second.buffer());
             const bsls::Types::Uint64 offset = recordOffset(queueOp);
             if (queueOpCnt++ % 3 == 0) {
                 params.d_offset.push_back(offset);
@@ -2281,17 +2243,15 @@ static void test23_searchJournalOpRecordsBySeqNumber()
     // Get journalOp records content and prepare expected
     // calls
 
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.begin();
     bsl::size_t resCnt = 0;
     bsl::size_t jOpCnt = 0;
     Sequence    s;
-    for (; recordIter != records.end(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_JOURNAL_OP) {
             const JournalOpRecord& journalOp =
                 *reinterpret_cast<const JournalOpRecord*>(
-                    recordIter->second.buffer());
+                    record.second.buffer());
             if (jOpCnt++ % 3 == 0) {
                 CompositeSequenceNumber expectedComposite(
                     journalOp.header().primaryLeaseId(),
@@ -2364,20 +2324,18 @@ static void test24_searchConfirmAndDeletionRecordsByOffset()
     // Get records content and prepare expected
     // calls
 
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.begin();
     bsl::size_t confirmCnt       = 0;
     bsl::size_t deletionCnt      = 0;
     bsl::size_t foundConfirmCnt  = 0;
     bsl::size_t foundDeletionCnt = 0;
     Sequence    s;
-    for (; recordIter != records.end(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_CONFIRM) {
             if (++confirmCnt % 5 == 0) {
                 const ConfirmRecord& confirm =
                     *reinterpret_cast<const ConfirmRecord*>(
-                        recordIter->second.buffer());
+                        record.second.buffer());
                 const bsls::Types::Uint64 offset = recordOffset(confirm);
                 params.d_offset.emplace_back(offset);
 
@@ -2390,7 +2348,7 @@ static void test24_searchConfirmAndDeletionRecordsByOffset()
             if (++deletionCnt % 5 == 0) {
                 const DeletionRecord& deletion =
                     *reinterpret_cast<const DeletionRecord*>(
-                        recordIter->second.buffer());
+                        record.second.buffer());
                 const bsls::Types::Uint64 offset = recordOffset(deletion);
                 params.d_offset.emplace_back(offset);
 
@@ -2463,20 +2421,18 @@ static void test25_searchConfirmAndDeletionRecordsBySeqNumber()
     // Get records content and prepare expected
     // calls
 
-    bsl::list<JournalFile::NodeType>::const_iterator recordIter =
-        records.begin();
     bsl::size_t confirmCnt       = 0;
     bsl::size_t deletionCnt      = 0;
     bsl::size_t foundConfirmCnt  = 0;
     bsl::size_t foundDeletionCnt = 0;
     Sequence    s;
-    for (; recordIter != records.end(); ++recordIter) {
-        RecordType::Enum rtype = recordIter->first;
+    for (const JournalFile::NodeType& record : records) {
+        RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_CONFIRM) {
             if (++confirmCnt % 5 == 0) {
                 const ConfirmRecord& confirm =
                     *reinterpret_cast<const ConfirmRecord*>(
-                        recordIter->second.buffer());
+                        record.second.buffer());
                 CompositeSequenceNumber expectedComposite(
                     confirm.header().primaryLeaseId(),
                     confirm.header().sequenceNumber());
@@ -2490,7 +2446,7 @@ static void test25_searchConfirmAndDeletionRecordsBySeqNumber()
             if (++deletionCnt % 5 == 0) {
                 const DeletionRecord& deletion =
                     *reinterpret_cast<const DeletionRecord*>(
-                        recordIter->second.buffer());
+                        record.second.buffer());
                 CompositeSequenceNumber expectedComposite(
                     deletion.header().primaryLeaseId(),
                     deletion.header().sequenceNumber());
