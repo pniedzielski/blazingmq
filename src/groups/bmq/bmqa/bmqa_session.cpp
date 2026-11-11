@@ -41,9 +41,6 @@
 // BDE
 #include <bdlb_string.h>
 #include <bdlbb_blob.h>
-#include <bdlf_bind.h>
-#include <bdlf_memfn.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdls_processutil.h>
 #include <bdlt_timeunitratio.h>
@@ -351,10 +348,10 @@ int SessionUtil::createApplication(SessionImpl* sessionImpl)
     // EventHandlerCB
     bmqimp::EventQueue::EventHandlerCallback eventHandler;
     if (sessionImpl->d_eventHandler_mp.get() != 0) {
-        eventHandler = bdlf::BindUtil::bind(
-            &SessionUtil::eventHandlerCB,
-            bdlf::PlaceHolders::_1,  // eventImpl,
-            sessionImpl);
+        eventHandler =
+            [sessionImpl](const bsl::shared_ptr<bmqimp::Event>& eventImpl) {
+                SessionUtil::eventHandlerCB(eventImpl, sessionImpl);
+            };
     }
 
     // Override session options from the environment.
@@ -1070,11 +1067,11 @@ OpenQueueStatus Session::openQueueSync(QueueId*                  queueId,
     d_impl.d_application_mp->brokerSession().openQueueSync(
         queue,
         time,
-        bdlf::BindUtil::bind(&SessionUtil::operationResultSyncWrapper<
-                                 bmqa::OpenQueueStatus,
-                                 bmqt::OpenQueueResult::Enum>,
-                             &status,
-                             bdlf::PlaceHolders::_1));  // eventImpl
+        [&status](const bsl::shared_ptr<bmqimp::Event>& eventImpl) {
+            SessionUtil::operationResultSyncWrapper<
+                bmqa::OpenQueueStatus,
+                bmqt::OpenQueueResult::Enum>(&status, eventImpl);
+        });
 
     return status;
 }
@@ -1143,12 +1140,12 @@ void Session::openQueueAsync(bmqa::QueueId*            queueId,
 
     // Wrap the user-specified callback
     const bmqimp::BrokerSession::EventCallback eventCallback =
-        bdlf::BindUtil::bind(&SessionUtil::operationResultCallbackWrapper<
-                                 bmqa::OpenQueueStatus,
-                                 bmqt::OpenQueueResult::Enum,
-                                 OpenQueueCallback>,
-                             bdlf::PlaceHolders::_1,  // eventImpl
-                             callback);
+        [callback](const bsl::shared_ptr<bmqimp::Event>& eventImpl) {
+            SessionUtil::operationResultCallbackWrapper<
+                bmqa::OpenQueueStatus,
+                bmqt::OpenQueueResult::Enum,
+                OpenQueueCallback>(eventImpl, callback);
+        };
 
     // Validate parameters
     bmqu::MemOutStream          error;
@@ -1274,11 +1271,11 @@ Session::configureQueueSync(QueueId*                  queueId,
         queue,
         options,
         time,
-        bdlf::BindUtil::bind(&SessionUtil::operationResultSyncWrapper<
-                                 bmqa::ConfigureQueueStatus,
-                                 bmqt::ConfigureQueueResult::Enum>,
-                             &status,
-                             bdlf::PlaceHolders::_1));  // eventImpl
+        [&status](const bsl::shared_ptr<bmqimp::Event>& eventImpl) {
+            SessionUtil::operationResultSyncWrapper<
+                bmqa::ConfigureQueueStatus,
+                bmqt::ConfigureQueueResult::Enum>(&status, eventImpl);
+        });
 
     return status;
 }
@@ -1334,12 +1331,12 @@ void Session::configureQueueAsync(QueueId*                      queueId,
 
     // Wrap the user-specified callback
     const bmqimp::BrokerSession::EventCallback eventCallback =
-        bdlf::BindUtil::bind(&SessionUtil::operationResultCallbackWrapper<
-                                 bmqa::ConfigureQueueStatus,
-                                 bmqt::ConfigureQueueResult::Enum,
-                                 ConfigureQueueCallback>,
-                             bdlf::PlaceHolders::_1,  // eventImpl
-                             callback);
+        [callback](const bsl::shared_ptr<bmqimp::Event>& eventImpl) {
+            SessionUtil::operationResultCallbackWrapper<
+                bmqa::ConfigureQueueStatus,
+                bmqt::ConfigureQueueResult::Enum,
+                ConfigureQueueCallback>(eventImpl, callback);
+        };
 
     // Validate parameters
     bmqu::MemOutStream               error;
@@ -1450,11 +1447,11 @@ CloseQueueStatus Session::closeQueueSync(QueueId*                  queueId,
     d_impl.d_application_mp->brokerSession().closeQueueSync(
         queue,
         time,
-        bdlf::BindUtil::bind(&SessionUtil::operationResultSyncWrapper<
-                                 bmqa::CloseQueueStatus,
-                                 bmqt::CloseQueueResult::Enum>,
-                             &status,
-                             bdlf::PlaceHolders::_1));  // eventImpl
+        [&status](const bsl::shared_ptr<bmqimp::Event>& eventImpl) {
+            SessionUtil::operationResultSyncWrapper<
+                bmqa::CloseQueueStatus,
+                bmqt::CloseQueueResult::Enum>(&status, eventImpl);
+        });
 
     return status;
 }
@@ -1510,12 +1507,12 @@ void Session::closeQueueAsync(QueueId*                  queueId,
 
     // Wrap the user-specified callback
     const bmqimp::BrokerSession::EventCallback eventCallback =
-        bdlf::BindUtil::bind(&SessionUtil::operationResultCallbackWrapper<
-                                 bmqa::CloseQueueStatus,
-                                 bmqt::CloseQueueResult::Enum,
-                                 CloseQueueCallback>,
-                             bdlf::PlaceHolders::_1,  // eventImpl
-                             callback);
+        [callback](const bsl::shared_ptr<bmqimp::Event>& eventImpl) {
+            SessionUtil::operationResultCallbackWrapper<
+                bmqa::CloseQueueStatus,
+                bmqt::CloseQueueResult::Enum,
+                CloseQueueCallback>(eventImpl, callback);
+        };
 
     // Validate parameters
     bmqu::MemOutStream           error;
