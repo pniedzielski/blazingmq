@@ -19,9 +19,6 @@
 
 #include <bmqu_time.h>
 
-// BDE
-#include <bdlf_memfn.h>
-
 namespace BloombergLP {
 namespace bmqtst {
 
@@ -35,9 +32,15 @@ MockTime::MockTime()
 , d_highResTimer(0)
 {
     bmqu::Time::initialize(
-        bdlf::MemFnUtil::memFn(&MockTime::realtimeClock, this),
-        bdlf::MemFnUtil::memFn(&MockTime::monotonicClock, this),
-        bdlf::MemFnUtil::memFn(&MockTime::highResTimer, this));
+        [this]() {
+            return realtimeClock();
+        },
+        [this]() {
+            return monotonicClock();
+        },
+        [this]() {
+            return highResTimer();
+        });
 }
 
 MockTime::~MockTime()
