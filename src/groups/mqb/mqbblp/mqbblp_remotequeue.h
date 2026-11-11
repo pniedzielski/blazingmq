@@ -278,13 +278,13 @@ class RemoteQueue {
     /// Iterate all pending (unACKed) messages.  NACK and erase all expired
     /// messages (past `d_pendingPutsTimeoutNs`).  For non-broadcast queues
     /// only.
-    void expirePendingMessagesDispatched();
+    void nackExpiredPendingMessages();
 
     /// Retransmit all pending (unACKed) messages.
-    void retransmitPendingMessagesDispatched(bsls::Types::Uint64 genCount);
+    void retransmitPendingMessages(bsls::Types::Uint64 genCount);
 
     /// Retransmit all pending CONFIRMS.
-    void retransmitPendingConfirmsDispatched(unsigned int upstreamSubQueueId);
+    void retransmitPendingConfirms(unsigned int upstreamSubQueueId);
 
     void            cleanPendingMessages(mqbi::QueueHandle* handle);
     Puts::iterator& nack(Puts::iterator& it, bmqp::AckMessage& ackMessage);
@@ -423,7 +423,7 @@ class RemoteQueue {
     /// THREAD: This method is called from the Queue's dispatcher thread.
     size_t iteratePendingConfirms(const ConfirmsVisitor& visitor);
 
-    void onAckMessageDispatched(const mqbevt::AckEvent& event);
+    void processAckEvent(const mqbevt::AckEvent& event);
 
     /// Notify the queue that the upstream is not ready to receive
     /// PUTs/CONFIRMs.

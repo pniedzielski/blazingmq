@@ -567,7 +567,7 @@ void RemoteQueue::resetState()
     d_self.invalidate();
     if (d_pendingMessagesTimerEventHandle) {
         scheduler()->cancelEventAndWait(&d_pendingMessagesTimerEventHandle);
-        // 'expirePendingMessagesDispatched' does not restart timer if
+        // 'nackExpiredPendingMessages' does not restart timer if
         // 'd_pendingMessages' is empty
     }
     d_queueEngine_mp->resetState();
@@ -604,7 +604,7 @@ void RemoteQueue::close()
 
     if (d_pendingMessagesTimerEventHandle) {
         scheduler()->cancelEventAndWait(&d_pendingMessagesTimerEventHandle);
-        // 'expirePendingMessagesDispatched' does not restart timer if
+        // 'nackExpiredPendingMessages' does not restart timer if
         // 'd_pendingMessages' is empty
     }
 }
@@ -810,7 +810,7 @@ void RemoteQueue::onDispatcherEvent(const mqbi::DispatcherEvent& event)
                     realEvent->queueHandle());
     } break;
     case mqbi::DispatcherEventType::e_ACK: {
-        onAckMessageDispatched(*(event.the<mqbevt::AckEvent>()));
+        processAckEvent(*(event.the<mqbevt::AckEvent>()));
     } break;
     case mqbi::DispatcherEventType::e_CONFIRM: {
         BSLS_ASSERT_OPT(false && "'CONFIRM' type dispatcher event unexpected");
@@ -1236,7 +1236,7 @@ void RemoteQueue::sendConfirmMessage(const bmqt::MessageGUID& msgGUID,
     }
 }
 
-void RemoteQueue::onAckMessageDispatched(const mqbevt::AckEvent& event)
+void RemoteQueue::processAckEvent(const mqbevt::AckEvent& event)
 {
     // executed by the *DISPATCHER* thread
 
@@ -1392,12 +1392,12 @@ void RemoteQueue::expirePendingMessages()
     // executed by the *SCHEDULER* thread
     d_state_p->queue()->dispatcher()->execute(
         bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-            &RemoteQueue::expirePendingMessagesDispatched,
+            &RemoteQueue::nackExpiredPendingMessages,
             d_self.acquireWeak())),
         d_state_p->queue());
 }
 
-void RemoteQueue::expirePendingMessagesDispatched()
+void RemoteQueue::nackExpiredPendingMessages()
 {
     // executed by the *DISPATCHER* thread
 
@@ -1469,8 +1469,7 @@ void RemoteQueue::expirePendingMessagesDispatched()
     }
 }
 
-void RemoteQueue::retransmitPendingMessagesDispatched(
-    bsls::Types::Uint64 genCount)
+void RemoteQueue::retransmitPendingMessages(bsls::Types::Uint64 genCount)
 {
     // executed by the *DISPATCHER* thread
 
@@ -1538,8 +1537,7 @@ void RemoteQueue::retransmitPendingMessagesDispatched(
     }
 }
 
-void RemoteQueue::retransmitPendingConfirmsDispatched(
-    unsigned int upstreamSubQueueId)
+void RemoteQueue::retransmitPendingConfirms(unsigned int upstreamSubQueueId)
 {
     // executed by the *DISPATCHER* thread
 
@@ -1597,7 +1595,7 @@ void RemoteQueue::cleanPendingMessages(mqbi::QueueHandle* handle)
 
     if (d_pendingMessages.size() == 0 && d_pendingMessagesTimerEventHandle) {
         scheduler()->cancelEventAndWait(&d_pendingMessagesTimerEventHandle);
-        // 'expirePendingMessagesDispatched' does not restart timer if
+        // 'nackExpiredPendingMessages' does not restart timer if
         // 'd_pendingMessages' is empty
     }
 
@@ -1666,7 +1664,7 @@ void RemoteQueue::onOpenFailure(unsigned int upstreamSubQueueId)
         if (d_pendingMessagesTimerEventHandle) {
             scheduler()->cancelEventAndWait(
                 &d_pendingMessagesTimerEventHandle);
-            // 'expirePendingMessagesDispatched' does not restart timer if
+            // 'nackExpiredPendingMessages' does not restart timer if
             // 'd_pendingMessages' is empty
         }
     }
@@ -1788,9 +1786,9 @@ void RemoteQueue::onOpenUpstream(bsls::Types::Uint64 genCount,
             d_producerState.d_genCount = genCount;
             d_producerState.d_state    = SubStreamContext::e_OPENED;
 
-            retransmitPendingMessagesDispatched(genCount);
+            retransmitPendingMessages(genCount);
         }
-        retransmitPendingConfirmsDispatched(upstreamSubQueueId);
+        retransmitPendingConfirms(upstreamSubQueueId);
     }
 }
 
