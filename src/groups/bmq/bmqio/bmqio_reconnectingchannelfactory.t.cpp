@@ -24,7 +24,6 @@
 #include <bmqu_printutil.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bdlmt_eventscheduler.h>
 #include <bsl_cstdlib.h>
 #include <bsl_ctime.h>
@@ -231,16 +230,16 @@ Tester::Tester()
         &d_scheduler,
         bmqtst::TestHelperUtil::allocator());
     config
-        .setEndpointResolveFn(bdlf::BindUtil::bind(&Tester::resolverFn,
-                                                   this,
-                                                   bdlf::PlaceHolders::_1,
-                                                   bdlf::PlaceHolders::_2))
+        .setEndpointResolveFn([this](bsl::vector<bsl::string>* out,
+                                     const ConnectOptions&     options) {
+            resolverFn(out, options);
+        })
         .setReconnectIntervalFn(
-            bdlf::BindUtil::bind(&Tester::connectIntervalFn,
-                                 this,
-                                 bdlf::PlaceHolders::_1,
-                                 bdlf::PlaceHolders::_2,
-                                 bdlf::PlaceHolders::_3));
+            [this](bsls::TimeInterval*       interval,
+                   const ConnectOptions&     options,
+                   const bsls::TimeInterval& timeSinceLastAttempt) {
+                connectIntervalFn(interval, options, timeSinceLastAttempt);
+            });
 
     new (d_reconnectingFactory.buffer())
         ReconnectingChannelFactory(config,
@@ -310,11 +309,11 @@ void Tester::connect(const ConnectOptions& options)
     obj().connect(&status,
                   &d_connectHandle,
                   options,
-                  bdlf::BindUtil::bind(&Tester::connectResultCb,
-                                       this,
-                                       bdlf::PlaceHolders::_1,
-                                       bdlf::PlaceHolders::_2,
-                                       bdlf::PlaceHolders::_3));
+                  [this](ChannelFactoryEvent::Enum       event,
+                         const Status&                   resultStatus,
+                         const bsl::shared_ptr<Channel>& channel) {
+                      connectResultCb(event, resultStatus, channel);
+                  });
     BMQTST_ASSERT(status);
 }
 
