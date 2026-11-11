@@ -496,8 +496,8 @@ void Application::stopTransportAndClusters()
         BALL_LOG_INFO << "Initiating " << clusters.size()
                       << " cluster(s) shutdown...";
 
-        for (size_t i = 0; i < clusters.size(); ++i) {
-            clusters[i]->initiateShutdown([&latch]() {
+        for (const auto& cluster : clusters) {
+            cluster->initiateShutdown([&latch]() {
                 latch.arrive();
             });
         }
@@ -668,9 +668,8 @@ bool Application::initiateShutdown()
     BALL_LOG_INFO << "Shutting down " << clients.size()
                   << " clients; timeout is " << shutdownTimeout << " ms";
 
-    for (Sessions::const_iterator cit = clients.begin(); cit != clients.end();
-         ++cit) {
-        (*cit)->initiateShutdown([&latchDownstreams]() {
+    for (const auto& client : clients) {
+        client->initiateShutdown([&latchDownstreams]() {
             latchDownstreams.arrive();
         });
     }
