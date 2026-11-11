@@ -122,7 +122,7 @@ BALL_LOG_SET_NAMESPACE_CATEGORY("MQBNET.TCPSESSIONFACTORY");
 
 void setCurrentThreadNameOnce(const bsl::string& value)
 {
-    static BSLS_KEYWORD_THREAD_LOCAL bool s_named = false;
+    static thread_local bool s_named = false;
 
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!s_named)) {
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
