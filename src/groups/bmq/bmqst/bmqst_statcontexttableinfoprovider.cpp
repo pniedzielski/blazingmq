@@ -258,10 +258,10 @@ void StatContextTableInfoProvider::addContext(const StatContext* context,
         bsl::sort(contexts.begin(), contexts.end(), cmp);
     }
 
-    for (size_t i = 0; i < contexts.size(); ++i) {
-        addContext(contexts[i].d_context_p,
+    for (const SubcontextInfo& subcontext : contexts) {
+        addContext(subcontext.d_context_p,
                    level + 1,
-                   contexts[i].d_filteredOut);
+                   subcontext.d_filteredOut);
     }
 }
 
@@ -451,8 +451,8 @@ bool StatContextTableInfoProvider::hasTitle() const
 int StatContextTableInfoProvider::numHeaderLevels() const
 {
     // Don't include second header row if no column group has a name
-    for (size_t i = 0; i < d_columnGroups.size(); ++i) {
-        if (d_columnGroups[i].length() > 0) {
+    for (const bsl::string& columnGroup : d_columnGroups) {
+        if (columnGroup.length() > 0) {
             return 2;
         }
     }
