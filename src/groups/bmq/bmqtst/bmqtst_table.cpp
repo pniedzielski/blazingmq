@@ -97,10 +97,8 @@ void Table::print(bsl::ostream& os) const
         // Print horizontal line after the initial row
         if (rowId == 0) {
             size_t lineWidth = 0;
-            for (bsl::vector<size_t>::const_iterator it = paddings.cbegin();
-                 it != paddings.cend();
-                 ++it) {
-                lineWidth += *it;
+            for (size_t padding : paddings) {
+                lineWidth += padding;
             }
             lineWidth += separator.size() * (paddings.size() - 1);
             os << bsl::string(lineWidth, '=', d_allocator_p) << bsl::endl;
