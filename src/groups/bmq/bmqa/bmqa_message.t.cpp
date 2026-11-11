@@ -302,9 +302,8 @@ static void test3_messageProperties()
         bmqtst::TestHelperUtil::allocator());
 
     // For the ScheamLearner
-    bsl::shared_ptr<bmqimp::Queue> queue =
-        bsl::allocate_shared<bmqimp::Queue, bslma::Allocator>(
-            bmqtst::TestHelperUtil::allocator());
+    auto queue = bsl::allocate_shared<bmqimp::Queue, bslma::Allocator>(
+        bmqtst::TestHelperUtil::allocator());
     queue->setId(queueId);
     implPtr->insertQueue(subQueueId, queue);
 
@@ -415,7 +414,7 @@ static void test4_subscriptionHandle()
     const int                 flags   = 0;
     const bmqt::CorrelationId cId(queueId);
 
-    bsl::shared_ptr<bmqimp::Queue> queueSp = bsl::make_shared<bmqimp::Queue>(
+    auto queueSp = bsl::make_shared<bmqimp::Queue>(
         bmqtst::TestHelperUtil::allocator());
     bdlbb::PooledBlobBufferFactory bufferFactory(
         4 * 1024,
