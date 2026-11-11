@@ -107,8 +107,9 @@ class EventsStats {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented
-    EventsStats(const EventsStats& other, bslma::Allocator* allocator = 0);
-    EventsStats& operator=(const EventsStats& other);
+    EventsStats(const EventsStats& other,
+                bslma::Allocator*  allocator = 0)    = delete;
+    EventsStats& operator=(const EventsStats& other) = delete;
 
   public:
     // TRAITS

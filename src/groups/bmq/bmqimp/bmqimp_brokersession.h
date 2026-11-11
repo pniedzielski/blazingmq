@@ -902,8 +902,8 @@ class BrokerSession final {
 
   private:
     // NOT IMPLEMENTED
-    BrokerSession(const BrokerSession&);
-    BrokerSession& operator=(const BrokerSession&);
+    BrokerSession(const BrokerSession&)            = delete;
+    BrokerSession& operator=(const BrokerSession&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

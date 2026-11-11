@@ -110,8 +110,8 @@ class TestContext {
 
   private:
     // NOT IMPLEMENTED
-    TestContext(const TestContext&);
-    TestContext& operator=(const TestContext&);
+    TestContext(const TestContext&)            = delete;
+    TestContext& operator=(const TestContext&) = delete;
 
     /// Callback supplied to the `connect` call.
     void connectResultCb(ChannelFactoryEvent::Enum       event,

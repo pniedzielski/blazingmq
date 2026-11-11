@@ -260,8 +260,8 @@ class Queue {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented
-    Queue(const Queue& other, bslma::Allocator* allocator = 0);
-    Queue& operator=(const Queue& other);
+    Queue(const Queue& other, bslma::Allocator* allocator = 0) = delete;
+    Queue& operator=(const Queue& other)                       = delete;
 
   public:
     // TRAITS

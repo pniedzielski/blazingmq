@@ -60,8 +60,8 @@ struct Stat {
     // NOT IMPLEMENTED
 
     /// Not implemented
-    Stat(const Stat&);
-    Stat& operator=(const Stat&);
+    Stat(const Stat&)            = delete;
+    Stat& operator=(const Stat&) = delete;
 
   public:
     // PUBLIC DATA
