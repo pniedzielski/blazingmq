@@ -91,18 +91,16 @@ void StorageUtil::mergeQueueMessagesCountMap(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(out);
 
-    for (QueueMessagesCountMap::const_iterator it = other.cbegin();
-         it != other.cend();
-         ++it) {
+    for (const auto& queueEntry : other) {
         const bsl::pair<QueueMessagesCountMap::iterator, bool> insertRC =
-            out->insert(*it);
+            out->insert(queueEntry);
         if (!insertRC.second) {
             // Entry for that queueUri already existed, need to merge new
             // values.
             //
             // Note: Even though we don't expect a queue to appear in more than
             //       one partition, this logic handles that scenario.
-            insertRC.first->second += it->second;
+            insertRC.first->second += queueEntry.second;
         }
     }
 }
@@ -114,17 +112,16 @@ void StorageUtil::mergeDomainQueueMessagesCountMap(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(out);
 
-    for (DomainQueueMessagesCountMap::const_iterator it = other.cbegin();
-         it != other.cend();
-         ++it) {
+    for (const auto& domainEntry : other) {
         const bsl::pair<DomainQueueMessagesCountMap::iterator, bool> insertRC =
-            out->insert(*it);
+            out->insert(domainEntry);
         if (insertRC.second) {
             continue;  // CONTINUE
         }
 
         // Entry for that domain already existed, need to merge new values.
-        mergeQueueMessagesCountMap(&(insertRC.first->second), it->second);
+        mergeQueueMessagesCountMap(&(insertRC.first->second),
+                                   domainEntry.second);
     }
 }
 
