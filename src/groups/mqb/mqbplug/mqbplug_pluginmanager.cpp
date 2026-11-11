@@ -260,16 +260,16 @@ void PluginManager::loadPluginLibrary(const char*            path,
         summaryBuilder << "Successfully loaded plugin library (" << path
                        << "): \n\n";
 
-        bsl::vector<PluginInfo>::const_iterator it =
-            pluginLibrary->plugins().cbegin();
-        for (; it != pluginLibrary->plugins().cend(); ++it) {
+        for (const PluginInfo& pluginInfo : pluginLibrary->plugins()) {
             bool enabled = bsl::find(pluginsProvided.cbegin(),
                                      pluginsProvided.cend(),
-                                     it->name()) != pluginsProvided.cend();
+                                     pluginInfo.name()) !=
+                           pluginsProvided.cend();
 
             summaryBuilder << "[" << (enabled ? "*" : " ") << "] "
-                           << it->name() << " (version: " << it->version()
-                           << ")\n    " << it->description() << "\n";
+                           << pluginInfo.name()
+                           << " (version: " << pluginInfo.version()
+                           << ")\n    " << pluginInfo.description() << "\n";
         }
         BALL_LOG_INFO << summaryBuilder.str();
     }
@@ -302,10 +302,8 @@ int PluginManager::start(const mqbcfg::Plugins& pluginsConfig,
     // Initialize working list of required plugins.
     RequiredPluginsRecord requiredPlugins(d_allocator_p);
     {
-        bsl::vector<bsl::string>::const_iterator it =
-            pluginsConfig.enabled().cbegin();
-        for (; it != pluginsConfig.enabled().cend(); ++it) {
-            requiredPlugins[*it] = 0;
+        for (const bsl::string& pluginName : pluginsConfig.enabled()) {
+            requiredPlugins[pluginName] = 0;
         }
     }
 
@@ -325,9 +323,8 @@ int PluginManager::start(const mqbcfg::Plugins& pluginsConfig,
 
     const bsl::vector<bsl::string>* libraries = &pluginsConfig.libraries();
 
-    bsl::vector<bsl::string>::const_iterator libraryIt = libraries->cbegin();
-    for (; libraryIt != libraries->cend(); ++libraryIt) {
-        bsl::string pattern(*libraryIt);
+    for (const bsl::string& library : *libraries) {
+        bsl::string pattern(library);
         if (int status = bdls::PathUtil::appendIfValid(&pattern, "*.so")) {
             errorDescription
                 << "Plugin library directory was invalid [path: " << pattern
@@ -346,7 +343,7 @@ int PluginManager::start(const mqbcfg::Plugins& pluginsConfig,
                      })) {
             BALL_LOG_INFO << "Found no shared-object files in plugin library "
                              "path [path: '"
-                          << *libraryIt << "']";
+                          << library << "']";
             continue;  // CONTINUE
         }
         else if (rc) {
@@ -407,10 +404,8 @@ void PluginManager::stop()
     d_enabledPlugins.clear();
 
     // Deactivate all plugin-libraries.
-    bsl::vector<bslma::ManagedPtr<PluginLibrary> >::const_iterator it =
-        d_pluginLibraries.cbegin();
-    for (; it != d_pluginLibraries.cend(); ++it) {
-        (*it)->deactivate();
+    for (const auto& pluginLibrary : d_pluginLibraries) {
+        pluginLibrary->deactivate();
     }
 
     // Destroy all 'PluginLibrary' objects, which closes handles returned by
@@ -422,11 +417,9 @@ void PluginManager::stop()
 void PluginManager::get(bsl::unordered_set<mqbplug::PluginFactory*>* result,
                         mqbplug::PluginType::Enum type) const
 {
-    bsl::multimap<PluginType::Enum, const PluginInfo*>::const_iterator it =
-        d_enabledPlugins.cbegin();
-    for (; it != d_enabledPlugins.cend(); ++it) {
-        if (it->first == type) {
-            result->insert(it->second->factory().get());
+    for (const auto& [pluginType, pluginInfo] : d_enabledPlugins) {
+        if (pluginType == type) {
+            result->insert(pluginInfo->factory().get());
         }
     }
 }

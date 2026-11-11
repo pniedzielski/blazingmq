@@ -73,12 +73,9 @@ AuthenticatorUtil::findAuthenticatorConfig(bsl::string_view name)
     // 1. This is typically called during startup phase, not hot path
     // 2. Number of configured authenticators is usually small (< 10)
     // 3. The cost of maintaining a persistent cache would outweigh benefits
-    for (bsl::vector<mqbcfg::AuthenticatorPluginConfig>::const_iterator cit =
-             authenticatorsCfg.cbegin();
-         cit != authenticatorsCfg.cend();
-         ++cit) {
-        if (cit->name() == name) {
-            return &(*cit);
+    for (const mqbcfg::AuthenticatorPluginConfig& config : authenticatorsCfg) {
+        if (config.name() == name) {
+            return &config;
         }
     }
     return 0;
