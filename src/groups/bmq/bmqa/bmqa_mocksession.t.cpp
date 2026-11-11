@@ -33,8 +33,6 @@
 #include <bdlbb_blob.h>
 #include <bdlbb_blobutil.h>
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
-#include <bdlf_memfn.h>
 #include <bslmt_threadutil.h>
 #include <bsls_platform.h>
 #include <bsls_protocoltest.h>
@@ -482,12 +480,11 @@ static void test2_call()
         // Only used for the custom callback
         EventHandler eventHandler(bmqtst::TestHelperUtil::allocator());
 
-        mockSession.setFailureCallback(
-            bdlf::BindUtil::bind(&EventHandler::incrementAsserts,
-                                 &eventHandler,
-                                 bdlf::PlaceHolders::_1,    // description
-                                 bdlf::PlaceHolders::_2,    // file
-                                 bdlf::PlaceHolders::_3));  // line
+        mockSession.setFailureCallback([&eventHandler](const char* description,
+                                                       const char* file,
+                                                       int         line) {
+            eventHandler.incrementAsserts(description, file, line);
+        });
 
         BMQA_EXPECT_CALL(mockSession, startAsync(bsls::TimeInterval(10)))
             .returning(0);
@@ -534,16 +531,19 @@ static void test3_queueManagement()
     bmqa::QueueId queueId2(corrId2, bmqtst::TestHelperUtil::allocator());
 
     bmqa::MockSession::OpenQueueCallback openQueueCallback =
-        bdlf::MemFnUtil::memFn(&EventHandler::onOpenQueueStatus,
-                               &eventHandler);
+        [&eventHandler](const bmqa::OpenQueueStatus& result) {
+            eventHandler.onOpenQueueStatus(result);
+        };
 
     bmqa::MockSession::ConfigureQueueCallback configureQueueCallback =
-        bdlf::MemFnUtil::memFn(&EventHandler::onConfigureQueueResult,
-                               &eventHandler);
+        [&eventHandler](const bmqa::ConfigureQueueStatus& result) {
+            eventHandler.onConfigureQueueResult(result);
+        };
 
     bmqa::MockSession::CloseQueueCallback closeQueueCallback(
-        bdlf::MemFnUtil::memFn(&EventHandler::onCloseQueueStatus,
-                               &eventHandler));
+        [&eventHandler](const bmqa::CloseQueueStatus& result) {
+            eventHandler.onCloseQueueStatus(result);
+        });
 
     {
         PVV("Verify state changes");
@@ -1081,16 +1081,19 @@ static void test6_runThrough()
 
     // Callback setup
     bmqa::MockSession::OpenQueueCallback openQueueCallback =
-        bdlf::MemFnUtil::memFn(&EventHandler::onOpenQueueStatus,
-                               &eventHandler);
+        [&eventHandler](const bmqa::OpenQueueStatus& result) {
+            eventHandler.onOpenQueueStatus(result);
+        };
 
     bmqa::MockSession::ConfigureQueueCallback configureQueueCallback =
-        bdlf::MemFnUtil::memFn(&EventHandler::onConfigureQueueResult,
-                               &eventHandler);
+        [&eventHandler](const bmqa::ConfigureQueueStatus& result) {
+            eventHandler.onConfigureQueueResult(result);
+        };
 
     bmqa::MockSession::CloseQueueCallback closeQueueCallback(
-        bdlf::MemFnUtil::memFn(&EventHandler::onCloseQueueStatus,
-                               &eventHandler));
+        [&eventHandler](const bmqa::CloseQueueStatus& result) {
+            eventHandler.onCloseQueueStatus(result);
+        });
 
     {
         PVV("Functions requiring BMQA_EXPECT_CALL, rc and event emission");
