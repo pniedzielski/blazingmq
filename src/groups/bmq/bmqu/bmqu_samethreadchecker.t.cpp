@@ -19,7 +19,6 @@
 #include <bmqtst_testhelper.h>
 
 // BDE
-#include <bdlf_memfn.h>
 #include <bsl_iostream.h>
 #include <bsl_ostream.h>
 #include <bslmt_threadutil.h>
@@ -61,8 +60,9 @@ static void test1_breathingTest()
     bslmt::ThreadUtil::Handle thread;
     int                       rc = bslmt::ThreadUtil::createWithAllocator(
         &thread,
-        bdlf::MemFnUtil::memFn(&bmqu::SameThreadChecker::inSameThread,
-                               &sameThreadChecker),
+        [&sameThreadChecker]() {
+            sameThreadChecker.inSameThread();
+        },
         bmqtst::TestHelperUtil::allocator());
     BSLS_ASSERT_OPT(rc == 0);
 
