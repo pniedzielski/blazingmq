@@ -98,10 +98,7 @@ static void test1_decodeHexDumpTest()
          ""},
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         bsl::istringstream input(
             bsl::string(test.d_hexdumpStr,
                         bmqtst::TestHelperUtil::allocator()),
@@ -269,10 +266,7 @@ static void test2_loadMessageFromFileTest()
         BMQTST_ASSERT_EQ(error.str(), "Failed to open file: wrongFilePath");
     }
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         // Create temp file and write content
         bmqtst::TempFile  tempFile(bmqtst::TestHelperUtil::allocator());
         const bsl::string filePath = tempFile.path();
