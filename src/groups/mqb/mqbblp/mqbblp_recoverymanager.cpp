@@ -272,7 +272,7 @@ void RecoveryManager_ChunkDeleter::operator()(
 
         rm->d_dispatcher_p->execute(
             [rm, pid]() {
-                rm->partitionSyncCleanupDispatched(pid);
+                rm->cleanupPartitionSync(pid);
             },
             dispData);
 
@@ -369,12 +369,12 @@ void RecoveryManager::recoveryStartupWaitCb(int partitionId)
 
     d_dispatcher_p->execute(
         [this, partitionId]() {
-            recoveryStartupWaitDispatched(partitionId);
+            checkPeersAfterStartupWait(partitionId);
         },
         d_cluster_p);
 }
 
-void RecoveryManager::recoveryStartupWaitDispatched(int partitionId)
+void RecoveryManager::checkPeersAfterStartupWait(int partitionId)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -428,13 +428,12 @@ void RecoveryManager::recoveryStartupWaitDispatched(int partitionId)
     const mqbi::DispatcherClientData& dispData = pinfo.dispatcherClientData();
     d_dispatcher_p->execute(
         [this, partitionId, availableNodes]() {
-            recoveryStartupWaitPartitionDispatched(partitionId,
-                                                   availableNodes);
+            processStartupWaitForPartition(partitionId, availableNodes);
         },
         dispData);
 }
 
-void RecoveryManager::recoveryStartupWaitPartitionDispatched(
+void RecoveryManager::processStartupWaitForPartition(
     int                 partitionId,
     const ClusterNodes& availableNodes)
 {
@@ -579,12 +578,12 @@ void RecoveryManager::recoveryStatusCb(int partitionId)
         d_partitionsInfo[partitionId].dispatcherClientData();
     d_dispatcher_p->execute(
         [this, partitionId]() {
-            recoveryStatusDispatched(partitionId);
+            checkRecoveryStatus(partitionId);
         },
         dispData);
 }
 
-void RecoveryManager::recoveryStatusDispatched(int partitionId)
+void RecoveryManager::checkRecoveryStatus(int partitionId)
 {
     // executed by each of the *STORAGE (QUEUE) DISPATCHER* threads
 
@@ -633,12 +632,12 @@ void RecoveryManager::primarySyncStatusCb(int partitionId)
         d_partitionsInfo[partitionId].dispatcherClientData();
     d_dispatcher_p->execute(
         [this, partitionId]() {
-            primarySyncStatusDispatched(partitionId);
+            checkPrimarySyncStatus(partitionId);
         },
         dispData);
 }
 
-void RecoveryManager::primarySyncStatusDispatched(int partitionId)
+void RecoveryManager::checkPrimarySyncStatus(int partitionId)
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(0 <= partitionId &&
@@ -665,8 +664,8 @@ void RecoveryManager::primarySyncStatusDispatched(int partitionId)
     onPartitionPrimarySyncStatus(partitionId, -1 /* status */);
 }
 
-void RecoveryManager::onNodeDownDispatched(int                  partitionId,
-                                           mqbnet::ClusterNode* node)
+void RecoveryManager::processNodeDown(int                  partitionId,
+                                      mqbnet::ClusterNode* node)
 {
     // executed by *STORAGE (QUEUE) DISPATCHER* thread
 
@@ -713,7 +712,7 @@ void RecoveryManager::onNodeDownDispatched(int                  partitionId,
     // else: no action needed by recovery manager.
 }
 
-void RecoveryManager::partitionSyncCleanupDispatched(int partitionId)
+void RecoveryManager::cleanupPartitionSync(int partitionId)
 {
     // executed by *STORAGE (QUEUE) DISPATCHER* thread
 
@@ -876,12 +875,12 @@ void RecoveryManager::onStorageSyncResponse(
         d_partitionsInfo[partitionId].dispatcherClientData();
     d_dispatcher_p->execute(
         [this, partitionId, context, responder]() {
-            onStorageSyncResponseDispatched(partitionId, context, responder);
+            processStorageSyncResponse(partitionId, context, responder);
         },
         dispData);
 }
 
-void RecoveryManager::onStorageSyncResponseDispatched(
+void RecoveryManager::processStorageSyncResponse(
     int                        partitionId,
     const RequestSp&           context,
     const mqbnet::ClusterNode* responder)
@@ -1465,12 +1464,12 @@ void RecoveryManager::onPartitionPrimarySyncStatus(int partitionId, int status)
     if (primarySyncCtx.fileTransferInfo().areFilesMapped()) {
         // Don't clear the 'primarySyncCtx' at this time because files are
         // still mapped.  It will be cleaned up when the chunk deleter
-        // eventually invokes 'partitionSyncCleanupDispatched' routine.
+        // eventually invokes 'cleanupPartitionSync' routine.
 
         // However, we have already received all sync data chunks from the sync
         // peer, so we can reset our sync peer to *null*.  This prevents false
         // alarm of primary sync failure if that peer happens to go down before
-        // 'partitionSyncCleanupDispatched' is invoked.
+        // 'cleanupPartitionSync' is invoked.
         primarySyncCtx.setPrimarySyncPeer(0);
 
         return;  // RETURN
@@ -1480,7 +1479,7 @@ void RecoveryManager::onPartitionPrimarySyncStatus(int partitionId, int status)
     primarySyncCtx.clear();
 }
 
-void RecoveryManager::stopDispatched(int partitionId, bslmt::Latch* latch)
+void RecoveryManager::stopPartition(int partitionId, bslmt::Latch* latch)
 {
     // executed by each of the *STORAGE (QUEUE) DISPATCHER* threads
 
@@ -2448,13 +2447,13 @@ void RecoveryManager::onPartitionSyncStateQueryResponse(
 
     d_dispatcher_p->execute(
         [this, partitionId = req.partitionId(), requestContext]() {
-            onPartitionSyncStateQueryResponseDispatched(partitionId,
-                                                        requestContext);
+            processPartitionSyncStateQueryResponse(partitionId,
+                                                   requestContext);
         },
         dispData);
 }
 
-void RecoveryManager::onPartitionSyncStateQueryResponseDispatched(
+void RecoveryManager::processPartitionSyncStateQueryResponse(
     int                     partitionId,
     const RequestContextSp& requestContext)
 {
@@ -2723,14 +2722,14 @@ void RecoveryManager::onPartitionSyncDataQueryResponse(
         d_partitionsInfo[req.partitionId()].dispatcherClientData();
     d_dispatcher_p->execute(
         [this, partitionId = req.partitionId(), context, responder]() {
-            onPartitionSyncDataQueryResponseDispatched(partitionId,
-                                                       context,
-                                                       responder);
+            processPartitionSyncDataQueryResponse(partitionId,
+                                                  context,
+                                                  responder);
         },
         dispData);
 }
 
-void RecoveryManager::onPartitionSyncDataQueryResponseDispatched(
+void RecoveryManager::processPartitionSyncDataQueryResponse(
     int                        partitionId,
     const RequestSp&           context,
     const mqbnet::ClusterNode* responder)
@@ -2960,7 +2959,7 @@ void RecoveryManager::stop()
             d_partitionsInfo[i].dispatcherClientData();
         d_dispatcher_p->execute(
             [this, partitionId = static_cast<int>(i), latchP = &latch]() {
-                stopDispatched(partitionId, latchP);
+                stopPartition(partitionId, latchP);
             },
             dispData);
     }
@@ -5002,7 +5001,7 @@ void RecoveryManager::onNodeStateChange(mqbnet::ClusterNode* node,
                 pinfo.dispatcherClientData();
             d_dispatcher_p->execute(
                 [this, partitionId = static_cast<int>(pid), node]() {
-                    onNodeDownDispatched(partitionId, node);
+                    processNodeDown(partitionId, node);
                 },
                 disp);
         }

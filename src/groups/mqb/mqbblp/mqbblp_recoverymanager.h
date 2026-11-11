@@ -815,30 +815,29 @@ class RecoveryManager : public mqbnet::ClusterObserver {
     void recoveryStartupWaitCb(int partitionId);
 
     /// Executed by the cluster's dispatcher thread.
-    void recoveryStartupWaitDispatched(int partitionId);
+    void checkPeersAfterStartupWait(int partitionId);
 
     /// Executed by the storage (queue) dispatcher thread.
-    void
-    recoveryStartupWaitPartitionDispatched(int                 partitionId,
-                                           const ClusterNodes& availableNodes);
+    void processStartupWaitForPartition(int                 partitionId,
+                                        const ClusterNodes& availableNodes);
 
     /// Executed by the scheduler's dispatcher thread.
     void recoveryStatusCb(int partitionId);
 
     /// Executed by the storage (queue) dispatcher thread.
-    void recoveryStatusDispatched(int partitionId);
+    void checkRecoveryStatus(int partitionId);
 
     /// Executed by the scheduler's dispatcher thread.
     void primarySyncStatusCb(int partitionId);
 
     /// Executed by the storage (queue) dispatcher thread.
-    void primarySyncStatusDispatched(int partitionId);
+    void checkPrimarySyncStatus(int partitionId);
 
     /// Executed by the storage (queue) dispatcher thread.
-    void onNodeDownDispatched(int partitionId, mqbnet::ClusterNode* node);
+    void processNodeDown(int partitionId, mqbnet::ClusterNode* node);
 
     /// Executed by the storage (queue) dispatcher thread.
-    void partitionSyncCleanupDispatched(int partitionId);
+    void cleanupPartitionSync(int partitionId);
 
     void sendStorageSyncRequesterHelper(RecoveryContext* context,
                                         int              partitionId);
@@ -849,9 +848,9 @@ class RecoveryManager : public mqbnet::ClusterObserver {
 
     /// Executed by the dispatcher thread identified by the specified
     /// `processorId` assigned to the specified `partitionId`.
-    void onStorageSyncResponseDispatched(int              partitionId,
-                                         const RequestSp& context,
-                                         const mqbnet::ClusterNode* responder);
+    void processStorageSyncResponse(int                        partitionId,
+                                    const RequestSp&           context,
+                                    const mqbnet::ClusterNode* responder);
 
     /// Executed by the dispatcher thread associated with the specified
     /// `partitionId`.
@@ -861,7 +860,10 @@ class RecoveryManager : public mqbnet::ClusterObserver {
     /// `partitionId`.
     void onPartitionPrimarySyncStatus(int partitionId, int status);
 
-    void stopDispatched(int partitionId, bslmt::Latch* latch);
+    /// Stop any ongoing recovery or primary sync of the specified
+    /// `partitionId`, and arrive on the specified `latch`.  Executed by the
+    /// storage (queue) dispatcher thread.
+    void stopPartition(int partitionId, bslmt::Latch* latch);
 
     int sendFile(RequestContext*                   context,
                  bsls::Types::Uint64               beginOffset,
@@ -894,7 +896,7 @@ class RecoveryManager : public mqbnet::ClusterObserver {
     ///
     /// THREAD: This method is invoked in the associated partition's dispatcher
     ///         thread.
-    void onPartitionSyncStateQueryResponseDispatched(
+    void processPartitionSyncStateQueryResponse(
         int                     partitionId,
         const RequestContextSp& requestContext);
 
@@ -911,7 +913,7 @@ class RecoveryManager : public mqbnet::ClusterObserver {
     ///
     /// THREAD: This method is invoked in the associated partition's dispatcher
     ///         thread.
-    void onPartitionSyncDataQueryResponseDispatched(
+    void processPartitionSyncDataQueryResponse(
         int                        partitionId,
         const RequestSp&           context,
         const mqbnet::ClusterNode* responder);
