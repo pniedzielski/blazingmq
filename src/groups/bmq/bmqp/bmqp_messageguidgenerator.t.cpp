@@ -571,8 +571,7 @@ static void test3_multithreadUseIP()
 
     // Check uniqueness across all threads
     bsl::set<bmqt::MessageGUID> allGUIDs(bmqtst::TestHelperUtil::allocator());
-    for (int tIt = 0; tIt < k_NUM_THREADS; ++tIt) {
-        const bsl::vector<bmqt::MessageGUID>& guids = threadsData[tIt];
+    for (const bsl::vector<bmqt::MessageGUID>& guids : threadsData) {
         for (int gIt = 0; gIt < k_NUM_GUIDS; ++gIt) {
             BMQTST_ASSERT_EQ(allGUIDs.insert(guids[gIt]).second, true);
         }
@@ -650,8 +649,7 @@ static void test4_multithreadUseHostname()
 
     // Check uniqueness across all threads
     bsl::set<bmqt::MessageGUID> allGUIDs(bmqtst::TestHelperUtil::allocator());
-    for (int tIt = 0; tIt < k_NUM_THREADS; ++tIt) {
-        const bsl::vector<bmqt::MessageGUID>& guids = threadsData[tIt];
+    for (const bsl::vector<bmqt::MessageGUID>& guids : threadsData) {
         for (int gIt = 0; gIt < k_NUM_GUIDS; ++gIt) {
             BMQTST_ASSERT_EQ(allGUIDs.insert(guids[gIt]).second, true);
         }
@@ -852,9 +850,9 @@ static void test6_defaultHashUniqueness()
              << "GUIDs with the highest collisions..: " << endl;
 
         Guids& guids = hashes[maxDuplicatesHash];
-        for (size_t i = 0; i < guids.size(); ++i) {
+        for (const bmqt::MessageGUID& guid : guids) {
             cout << "  ";
-            bmqp::MessageGUIDGenerator::print(cout, guids[i]);
+            bmqp::MessageGUIDGenerator::print(cout, guid);
             cout << endl;
         }
     }
@@ -942,9 +940,9 @@ static void test7_customHashUniqueness()
              << "GUIDs with the highest collisions..: " << endl;
 
         Guids& guids = hashes[maxCollisionsHash];
-        for (size_t i = 0; i < guids.size(); ++i) {
+        for (const bmqt::MessageGUID& guid : guids) {
             cout << "  ";
-            bmqp::MessageGUIDGenerator::print(cout, guids[i]);
+            bmqp::MessageGUIDGenerator::print(cout, guid);
             cout << endl;
         }
     }
@@ -1440,8 +1438,7 @@ static void testN9_hashBenchmarkComparison()
         benchmarkHash<bslh::Hash<bmqt::MessageGUIDHashAlgo> >("mxm"));
 
     bmqtst::Table table(bmqtst::TestHelperUtil::allocator());
-    for (size_t i = 0; i < stats.size(); i++) {
-        const HashBenchmarkStats& st = stats[i];
+    for (const HashBenchmarkStats& st : stats) {
         table.column("Name").insertValue(st.d_caseName);
         table.column("Iters").insertValue(st.d_numIterations);
         table.column("Total time (ns)").insertValue(st.d_timeDeltaNs);
@@ -1671,8 +1668,6 @@ static void testN10_hashCollisionsComparison()
          "Init the uint32_t block of GUID as 'counter', set all other to 0: "
          "uint32_t[0] <- counter++, uint32_t[1..3] <- 0"},
     };
-    const size_t k_NUM_GENERATORS = sizeof(k_GENERATORS) /
-                                    sizeof(*k_GENERATORS);
 
     struct HashCheckerContext {
         // PUBLIC DATA
@@ -1685,19 +1680,15 @@ static void testN10_hashCollisionsComparison()
         {calcCollisions<bslh::Hash<LegacyHash> >, "legacy(djb2)"},
         {calcCollisions<bslh::Hash<Mx3Hash> >, "mx3"},
         {calcCollisions<bslh::Hash<bmqt::MessageGUIDHashAlgo> >, "mxm"}};
-    const size_t k_NUM_HASH_CHECKERS = sizeof(k_HASH_CHECKERS) /
-                                       sizeof(*k_HASH_CHECKERS);
 
     bmqtst::Table table(bmqtst::TestHelperUtil::allocator());
-    for (size_t checkerId = 0; checkerId < k_NUM_HASH_CHECKERS; checkerId++) {
-        const HashCheckerContext& checker = k_HASH_CHECKERS[checkerId];
+    for (const HashCheckerContext& checker : k_HASH_CHECKERS) {
         table.column("Name").insertValue(checker.d_name);
     }
 
     bsl::vector<bmqt::MessageGUID> guids(bmqtst::TestHelperUtil::allocator());
     guids.reserve(k_NUM_GUIDS);
-    for (size_t genId = 0; genId < k_NUM_GENERATORS; genId++) {
-        const GeneratorContext& gen = k_GENERATORS[genId];
+    for (const GeneratorContext& gen : k_GENERATORS) {
         gen.d_func(&guids, k_NUM_GUIDS);
 
         bsl::string sample(bmqtst::TestHelperUtil::allocator());
@@ -1708,10 +1699,8 @@ static void testN10_hashCollisionsComparison()
         bsl::cout << gen.d_description << bsl::endl;
         bsl::cout << "Sample: " << sample << bsl::endl << bsl::endl;
 
-        for (size_t checkerId = 0; checkerId < k_NUM_HASH_CHECKERS;
-             checkerId++) {
-            const HashCheckerContext& checker    = k_HASH_CHECKERS[checkerId];
-            const int                 collisions = checker.d_func(guids);
+        for (const HashCheckerContext& checker : k_HASH_CHECKERS) {
+            const int collisions = checker.d_func(guids);
             table.column(gen.d_name).insertValue(collisions);
         }
     }
