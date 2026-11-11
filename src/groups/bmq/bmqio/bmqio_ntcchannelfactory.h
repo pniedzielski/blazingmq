@@ -298,10 +298,8 @@ void NtcChannelFactory::visitChannels(VISITOR& visitor)
         }
     }
 
-    for (ChannelVector::const_iterator it = channels.begin();
-         it != channels.end();
-         ++it) {
-        visitor(*it);
+    for (const bsl::shared_ptr<bmqio::NtcChannel>& channel : channels) {
+        visitor(channel);
     }
 }
 
