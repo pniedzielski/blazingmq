@@ -46,7 +46,6 @@
 // BDE
 #include <bdlb_print.h>
 #include <bdlb_string.h>
-#include <bdlf_bind.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_functional.h>  // for bsl::ref()
 #include <bsl_ios.h>
@@ -312,13 +311,13 @@ void Queue::dropHandleDispatched(mqbi::QueueHandle* handle, bool doDeconfigure)
 
             // Do not send CloseQueue request without waiting for deconfigure
             // response.
-            configureHandle(handle,
-                            nullStreamParameters,
-                            bdlf::BindUtil::bind(&Queue::onHandleDeconfigured,
-                                                 this,
-                                                 bdlf::PlaceHolders::_1,
-                                                 bdlf::PlaceHolders::_2,
-                                                 handle));
+            configureHandle(
+                handle,
+                nullStreamParameters,
+                [this, handle](const bmqp_ctrlmsg::Status&           status,
+                               const bmqp_ctrlmsg::StreamParameters& params) {
+                    onHandleDeconfigured(status, params, handle);
+                });
         }
         else {
             // 'releaseHandle' erases from 'handle->subStreamInfos()'
@@ -437,19 +436,20 @@ void Queue::convertToLocalDispatched()
     }
 
     remoteQueue->iteratePendingMessages(
-        bdlf::BindUtil::bind(&LocalQueue::postMessage,
-                             d_localQueue_mp.get(),
-                             bdlf::PlaceHolders::_1,    // putHeader
-                             bdlf::PlaceHolders::_2,    // appData
-                             bdlf::PlaceHolders::_3,    // options
-                             bdlf::PlaceHolders::_4));  // source
+        [localQueue = d_localQueue_mp.get()](
+            const bmqp::PutHeader&              putHeader,
+            const bsl::shared_ptr<bdlbb::Blob>& appData,
+            const bsl::shared_ptr<bdlbb::Blob>& options,
+            mqbi::QueueHandle*                  source) {
+            localQueue->postMessage(putHeader, appData, options, source);
+        });
 
     remoteQueue->iteratePendingConfirms(
-        bdlf::BindUtil::bind(&LocalQueue::confirmMessage,
-                             d_localQueue_mp.get(),
-                             bdlf::PlaceHolders::_1,    // GUID
-                             bdlf::PlaceHolders::_2,    // subQueueId
-                             bdlf::PlaceHolders::_3));  // source
+        [localQueue = d_localQueue_mp.get()](const bmqt::MessageGUID& msgGUID,
+                                             unsigned int       subQueueId,
+                                             mqbi::QueueHandle* source) {
+            localQueue->confirmMessage(msgGUID, subQueueId, source);
+        });
 
     remoteQueue->resetState();  // ResetState to prevent assert at destruction
     remoteQueue.clear();
@@ -602,7 +602,9 @@ void Queue::convertToLocal()
     // executed by *ANY* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&Queue::convertToLocalDispatched, this),
+        [this]() {
+            convertToLocalDispatched();
+        },
         this);
 }
 
@@ -701,22 +703,27 @@ int Queue::configure(bsl::ostream* errorDescription_p,
         // NOTE: Use the e_DISPATCHER type to prevent adding the queue to the
         // dispatcher flush list because the queue may fail to configure
         dispatcher()->execute(
-            bdlf::BindUtil::bind(&Queue::configureDispatchedAndPost,
-                                 this,
-                                 &result,
-                                 errorDescription_p,
-                                 isReconfigure,
-                                 &sync),
+            [this,
+             resultP = &result,
+             errorDescription_p,
+             isReconfigure,
+             syncP = &sync]() {
+                configureDispatchedAndPost(resultP,
+                                           errorDescription_p,
+                                           isReconfigure,
+                                           syncP);
+            },
             this,
             mqbi::DispatcherEventType::e_DISPATCHER);
 
         sync.wait();
     }
     else {
-        dispatcher()->execute(bdlf::BindUtil::bind(&Queue::configureDispatched,
-                                                   this,
-                                                   isReconfigure),
-                              this);
+        dispatcher()->execute(
+            [this, isReconfigure]() {
+                configureDispatched(isReconfigure);
+            },
+            this);
     }
 
     return result;
@@ -734,14 +741,20 @@ void Queue::getHandle(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_state.domain()->cluster()->inDispatcherThread());
 
-    dispatcher()->execute(bdlf::BindUtil::bind(&Queue::getHandleDispatched,
-                                               this,
-                                               context,
-                                               clientContext,
-                                               handleParameters,
-                                               upstreamSubQueueId,
-                                               callback),
-                          this);
+    dispatcher()->execute(
+        [this,
+         context,
+         clientContext,
+         handleParameters,
+         upstreamSubQueueId,
+         callback]() {
+            getHandleDispatched(context,
+                                clientContext,
+                                handleParameters,
+                                upstreamSubQueueId,
+                                callback);
+        },
+        this);
 }
 
 void Queue::configureHandle(
@@ -777,24 +790,25 @@ void Queue::releaseHandle(
 {
     // executed by *ANY* thread
 
-    dispatcher()->execute(bdlf::BindUtil::bind(&Queue::releaseHandleDispatched,
-                                               this,
-                                               handle,
-                                               handleParameters,
-                                               isFinal,
-                                               releasedCb),
-                          this);
+    dispatcher()->execute(
+        [this, handle, handleParameters, isFinal, releasedCb]() {
+            releaseHandleDispatched(handle,
+                                    handleParameters,
+                                    isFinal,
+                                    releasedCb);
+        },
+        this);
 }
 
 void Queue::dropHandle(mqbi::QueueHandle* handle, bool doDeconfigure)
 {
     // executed by *ANY* thread
 
-    dispatcher()->execute(bdlf::BindUtil::bind(&Queue::dropHandleDispatched,
-                                               this,
-                                               handle,
-                                               doDeconfigure),
-                          this);
+    dispatcher()->execute(
+        [this, handle, doDeconfigure]() {
+            dropHandleDispatched(handle, doDeconfigure);
+        },
+        this);
 }
 
 void Queue::close(const bsl::function<void(void)>& callback)
@@ -802,7 +816,9 @@ void Queue::close(const bsl::function<void(void)>& callback)
     // executed by *ANY* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&Queue::closeDispatched, this, callback),
+        [this, callback]() {
+            closeDispatched(callback);
+        },
         this);
 }
 
@@ -919,19 +935,22 @@ int Queue::processCommand(mqbcmd::QueueResult*        result,
     else if (command.isInternalsValue()) {
         mqbcmd::QueueInternals& queueInternals = result->makeQueueInternals();
         dispatcher()->execute(
-            bdlf::BindUtil::bind(&Queue::loadInternals, this, &queueInternals),
+            [this, out = &queueInternals]() {
+                loadInternals(out);
+            },
             this);
         dispatcher()->synchronize(this);
         return 0;  // RETURN
     }
     else if (command.isMessagesValue()) {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(&Queue::listMessagesDispatched,
-                                 this,
-                                 result,
-                                 command.messages().appId().valueOr(""),
-                                 command.messages().offset(),
-                                 command.messages().count()),
+            [this,
+             result,
+             appId  = command.messages().appId().valueOr(""),
+             offset = command.messages().offset(),
+             count  = command.messages().count()]() {
+                listMessagesDispatched(result, appId, offset, count);
+            },
             this);
         dispatcher()->synchronize(this);
         return (result->isQueueContentsValue() ? 0 : -1);  // RETURN
