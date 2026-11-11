@@ -48,7 +48,6 @@
 // BDE
 #include <bdlbb_pooledblobbufferfactory.h>
 #include <bdlcc_deque.h>
-#include <bdlf_memfn.h>
 #include <bdlmt_eventscheduler.h>
 #include <bsl_memory.h>
 #include <bslma_managedptr.h>
@@ -813,12 +812,9 @@ void TestSession::advanceTime(const bsls::TimeInterval& step)
 
     bslmt::Semaphore sem;
 
-    typedef void (bslmt::Semaphore::*PostFn)();
-
-    d_scheduler.scheduleEvent(
-        d_testClock_p->d_timeSource.now(),
-        bdlf::BindUtil::bind(static_cast<PostFn>(&bslmt::Semaphore::post),
-                             &sem));
+    d_scheduler.scheduleEvent(d_testClock_p->d_timeSource.now(), [&sem]() {
+        sem.post();
+    });
     sem.wait();
 }
 
@@ -853,11 +849,15 @@ TestSession::TestSession(const bmqt::SessionOptions& sessionOptions,
                   d_blobSpPool_sp.get(),
                   sessionOptions,
                   useEventHandler
-                      ? bdlf::BindUtil::bind(&sessionEventHandler,
-                                             &d_eventQueue,
-                                             bdlf::PlaceHolders::_1)  // event
+                      ? [this](const bsl::shared_ptr<bmqimp::Event>& event) {
+                            sessionEventHandler(&d_eventQueue, event);
+                        }
                       : bmqimp::EventQueue::EventHandlerCallback(),
-                  bdlf::MemFnUtil::memFn(&TestSession::stateCb, this),
+                  [this](bmqimp::BrokerSession::State::Enum    oldState,
+                         bmqimp::BrokerSession::State::Enum    newState,
+                         bmqimp::BrokerSession::FsmEvent::Enum event) {
+                      return stateCb(oldState, newState, event);
+                  },
                   bmqimp::SessionId(),
                   d_allocator_p)
 , d_testClock_p(0)
@@ -866,8 +866,9 @@ TestSession::TestSession(const bmqt::SessionOptions& sessionOptions,
 {
     // Set peer uri for the sake of better logging
     d_testChannel.setPeerUri("tcp://testHost:1234");
-    d_testChannel.onClose(
-        bdlf::MemFnUtil::memFn(&TestSession::onChannelClose, this));
+    d_testChannel.onClose([this](const bmqio::Status& status) {
+        onChannelClose(status);
+    });
 
     int rc = d_scheduler.start();
     BMQTST_ASSERT_EQ(rc, 0);
@@ -890,11 +891,15 @@ TestSession::TestSession(const bmqt::SessionOptions& sessionOptions,
                   d_blobSpPool_sp.get(),
                   sessionOptions,
                   useEventHandler
-                      ? bdlf::BindUtil::bind(&sessionEventHandler,
-                                             &d_eventQueue,
-                                             bdlf::PlaceHolders::_1)  // event
+                      ? [this](const bsl::shared_ptr<bmqimp::Event>& event) {
+                            sessionEventHandler(&d_eventQueue, event);
+                        }
                       : bmqimp::EventQueue::EventHandlerCallback(),
-                  bdlf::MemFnUtil::memFn(&TestSession::stateCb, this),
+                  [this](bmqimp::BrokerSession::State::Enum    oldState,
+                         bmqimp::BrokerSession::State::Enum    newState,
+                         bmqimp::BrokerSession::FsmEvent::Enum event) {
+                      return stateCb(oldState, newState, event);
+                  },
                   bmqimp::SessionId(),
                   d_allocator_p)
 , d_testClock_p(&testClock)
@@ -903,14 +908,21 @@ TestSession::TestSession(const bmqt::SessionOptions& sessionOptions,
 {
     // Set peer uri for the sake of better logging
     d_testChannel.setPeerUri("tcp://testHost:1234");
-    d_testChannel.onClose(
-        bdlf::MemFnUtil::memFn(&TestSession::onChannelClose, this));
+    d_testChannel.onClose([this](const bmqio::Status& status) {
+        onChannelClose(status);
+    });
 
     bmqu::Time::shutdown();
     bmqu::Time::initialize(
-        bdlf::BindUtil::bind(&TestClock::realtimeClock, d_testClock_p),
-        bdlf::BindUtil::bind(&TestClock::monotonicClock, d_testClock_p),
-        bdlf::BindUtil::bind(&TestClock::highResTimer, d_testClock_p),
+        [testClockPtr = d_testClock_p]() {
+            return testClockPtr->realtimeClock();
+        },
+        [testClockPtr = d_testClock_p]() {
+            return testClockPtr->monotonicClock();
+        },
+        [testClockPtr = d_testClock_p]() {
+            return testClockPtr->highResTimer();
+        },
         d_allocator_p);
 
     int rc = d_scheduler.start();
@@ -1118,9 +1130,9 @@ void TestSession::configureQueueSync(bsl::shared_ptr<bmqimp::Queue>& queue,
         queue,
         options,
         timeout,
-        bdlf::BindUtil::bind(&sessionEventHandler,
-                             &d_eventQueue,
-                             bdlf::PlaceHolders::_1));  // event
+        [this](const bsl::shared_ptr<bmqimp::Event>& event) {
+            sessionEventHandler(&d_eventQueue, event);
+        });
     // This uses 'd_eventQueue' for 'configureQueueSync' result
 }
 
@@ -2440,11 +2452,12 @@ static void test1_breathingTest()
         blobSpPool.get(),
         sessionOptions,
         emptyEventHandler,  // emptyEventHandler,
-        bdlf::BindUtil::bind(&stateCb,
-                             bdlf::PlaceHolders::_1,  // old state
-                             bdlf::PlaceHolders::_2,  // new state
-                             &startCounter,
-                             &stopCounter),
+        [&startCounter,
+         &stopCounter](bmqimp::BrokerSession::State::Enum oldState,
+                       bmqimp::BrokerSession::State::Enum newState,
+                       bmqimp::BrokerSession::FsmEvent::Enum) {
+            return stateCb(oldState, newState, &startCounter, &stopCounter);
+        },
         bmqimp::SessionId(),
         bmqtst::TestHelperUtil::allocator());
     PVV_SAFE("Starting session...");
@@ -2564,14 +2577,15 @@ static void test3_nullChannelTest()
         &blobBufferFactory,
         blobSpPool.get(),
         sessionOptions,
-        bdlf::BindUtil::bind(&channelEventHandler,
-                             bdlf::PlaceHolders::_1,
-                             &eventSemaphore),
-        bdlf::BindUtil::bind(&stateCb,
-                             bdlf::PlaceHolders::_1,  // old state
-                             bdlf::PlaceHolders::_2,  // new state
-                             &startCounter,
-                             &stopCounter),
+        [&eventSemaphore](const bsl::shared_ptr<bmqimp::Event>& event) {
+            channelEventHandler(event, &eventSemaphore);
+        },
+        [&startCounter,
+         &stopCounter](bmqimp::BrokerSession::State::Enum oldState,
+                       bmqimp::BrokerSession::State::Enum newState,
+                       bmqimp::BrokerSession::FsmEvent::Enum) {
+            return stateCb(oldState, newState, &startCounter, &stopCounter);
+        },
         bmqimp::SessionId(),
         bmqtst::TestHelperUtil::allocator());
 
@@ -2701,10 +2715,9 @@ static void queueErrorsTest(bsls::Types::Uint64 queueFlags)
     sessionOptions.setNumProcessingThreads(1);
 
     const bmqimp::EventQueue::EventHandlerCallback& eventCallback =
-        bdlf::BindUtil::bind(&eventHandler,
-                             &eventSp,
-                             bsl::ref(semaphore),
-                             bdlf::PlaceHolders::_1);  // event
+        [&eventSp, &semaphore](const bsl::shared_ptr<bmqimp::Event>& event) {
+            eventHandler(&eventSp, semaphore, event);
+        };
 
     bmqimp::BrokerSession session(
         &scheduler,
@@ -2712,11 +2725,12 @@ static void queueErrorsTest(bsls::Types::Uint64 queueFlags)
         blobSpPool.get(),
         sessionOptions,
         eventCallback,
-        bdlf::BindUtil::bind(&stateCb,
-                             bdlf::PlaceHolders::_1,  // old state
-                             bdlf::PlaceHolders::_2,  // new state
-                             &startCounter,
-                             &stopCounter),
+        [&startCounter,
+         &stopCounter](bmqimp::BrokerSession::State::Enum oldState,
+                       bmqimp::BrokerSession::State::Enum newState,
+                       bmqimp::BrokerSession::FsmEvent::Enum) {
+            return stateCb(oldState, newState, &startCounter, &stopCounter);
+        },
         bmqimp::SessionId(),
         bmqtst::TestHelperUtil::allocator());
 
@@ -2936,16 +2950,19 @@ static void test6_setChannelTest()
         &blobBufferFactory,
         blobSpPool.get(),
         sessionOptions,
-        bdlf::BindUtil::bind(&channelSetEventHandler,
-                             bdlf::PlaceHolders::_1,
-                             bsl::ref(eventCounter),
-                             bsl::ref(eventSemaphore),
-                             k_NUM_EVENTS),
-        bdlf::BindUtil::bind(&stateCb,
-                             bdlf::PlaceHolders::_1,  // old state
-                             bdlf::PlaceHolders::_2,  // new state
-                             &startCounter,
-                             &stopCounter),
+        [&eventCounter,
+         &eventSemaphore](const bsl::shared_ptr<bmqimp::Event>& event) {
+            channelSetEventHandler(event,
+                                   eventCounter,
+                                   eventSemaphore,
+                                   k_NUM_EVENTS);
+        },
+        [&startCounter,
+         &stopCounter](bmqimp::BrokerSession::State::Enum oldState,
+                       bmqimp::BrokerSession::State::Enum newState,
+                       bmqimp::BrokerSession::FsmEvent::Enum) {
+            return stateCb(oldState, newState, &startCounter, &stopCounter);
+        },
         bmqimp::SessionId(),
         bmqtst::TestHelperUtil::allocator());
 
@@ -3622,14 +3639,18 @@ static void test11_disconnect()
             &blobBufferFactory,
             blobSpPool.get(),
             options,
-            bdlf::BindUtil::bind(&sessionEventHandler,
-                                 &eventQueue,
-                                 bdlf::PlaceHolders::_1),
-            bdlf::BindUtil::bind(&stateCb,
-                                 bdlf::PlaceHolders::_1,  // old state
-                                 bdlf::PlaceHolders::_2,  // new state
-                                 &startCounter,
-                                 &stopCounter),
+            [&eventQueue](const bsl::shared_ptr<bmqimp::Event>& event) {
+                sessionEventHandler(&eventQueue, event);
+            },
+            [&startCounter,
+             &stopCounter](bmqimp::BrokerSession::State::Enum oldState,
+                           bmqimp::BrokerSession::State::Enum newState,
+                           bmqimp::BrokerSession::FsmEvent::Enum) {
+                return stateCb(oldState,
+                               newState,
+                               &startCounter,
+                               &stopCounter);
+            },
             bmqimp::SessionId(),
             bmqtst::TestHelperUtil::allocator());
 
@@ -3733,11 +3754,15 @@ static void test11_disconnect()
             blobSpPool.get(),
             options,
             bmqimp::EventQueue::EventHandlerCallback(),
-            bdlf::BindUtil::bind(&stateCb,
-                                 bdlf::PlaceHolders::_1,  // old state
-                                 bdlf::PlaceHolders::_2,  // new state
-                                 &startCounter,
-                                 &stopCounter),
+            [&startCounter,
+             &stopCounter](bmqimp::BrokerSession::State::Enum oldState,
+                           bmqimp::BrokerSession::State::Enum newState,
+                           bmqimp::BrokerSession::FsmEvent::Enum) {
+                return stateCb(oldState,
+                               newState,
+                               &startCounter,
+                               &stopCounter);
+            },
             bmqimp::SessionId(),
             bmqtst::TestHelperUtil::allocator());
 
@@ -4368,11 +4393,11 @@ static void test21_post_Limit()
     BMQTST_ASSERT_EQ(obj.channel().numWriteCalls(), 0u);
 
     PVV_SAFE("Step 7. Schedule LWM and post PUT again");
-    scheduler.scheduleEvent(
-        bmqu::Time::nowMonotonicClock() + lwmTimeout,
-        bdlf::BindUtil::bind(&TestSession::setChannelLowWaterMark,
-                             &obj,
-                             bmqio::StatusCategory::e_SUCCESS));
+    scheduler.scheduleEvent(bmqu::Time::nowMonotonicClock() + lwmTimeout,
+                            [&obj]() {
+                                obj.setChannelLowWaterMark(
+                                    bmqio::StatusCategory::e_SUCCESS);
+                            });
 
     bsl::shared_ptr<bmqimp::Event> lwmEvent = obj.getInboundEvent();
 
@@ -4502,11 +4527,11 @@ static void test22_confirm_Limit()
 
     // LWM handler will set write status to e_SUCCESS
     // LWM event arrives before channelWriteTimeoutMs.
-    scheduler.scheduleEvent(
-        bmqu::Time::nowMonotonicClock() + lwmTimeout,
-        bdlf::BindUtil::bind(&TestSession::setChannelLowWaterMark,
-                             &obj,
-                             bmqio::StatusCategory::e_SUCCESS));
+    scheduler.scheduleEvent(bmqu::Time::nowMonotonicClock() + lwmTimeout,
+                            [&obj]() {
+                                obj.setChannelLowWaterMark(
+                                    bmqio::StatusCategory::e_SUCCESS);
+                            });
 
     bsl::shared_ptr<bmqimp::Event> lwmEvent = obj.getInboundEvent();
 
@@ -5387,12 +5412,16 @@ static void test25_sessionFsmTable()
         blobSpPool.get(),
         sessionOptions,
         emptyEventHandler,  // emptyEventHandler,
-        bdlf::BindUtil::bind(&transitionCb,
-                             bdlf::PlaceHolders::_1,  // old state
-                             bdlf::PlaceHolders::_2,  // new state
-                             &table,
-                             &tcpRc,
-                             &doneSemaphore),
+        [&table, &tcpRc, &doneSemaphore](
+            bmqimp::BrokerSession::State::Enum oldState,
+            bmqimp::BrokerSession::State::Enum newState,
+            bmqimp::BrokerSession::FsmEvent::Enum) {
+            return transitionCb(oldState,
+                                newState,
+                                &table,
+                                &tcpRc,
+                                &doneSemaphore);
+        },
         bmqimp::SessionId(),
         bmqtst::TestHelperUtil::allocator());
 
@@ -6891,12 +6920,13 @@ static void test_syncOpenConfigureClose(bool withHandler)
     bsl::shared_ptr<bmqimp::Queue> queueSp =
         obj.createQueue(k_URI, bmqt::QueueFlags::e_READ, queueOptions);
     int                                calls = 0;
-    const bmqimp::Event::EventCallback cb    = bdlf::BindUtil::bind(
-        &eventCallbackMockup,
-        &eventSp,
-        &calls,
-        static_cast<bmqimp::BrokerSession*>(0),
-        bdlf::PlaceHolders::_1);  // event
+    const bmqimp::Event::EventCallback cb =
+        [&eventSp, &calls](const bsl::shared_ptr<bmqimp::Event>& event) {
+            eventCallbackMockup(&eventSp,
+                                &calls,
+                                static_cast<bmqimp::BrokerSession*>(0),
+                                event);
+        };
 
     bslmt::ThreadUtil::Handle threadHandle;
     TestSession::RequestType  requestType[] = {TestSession::e_REQ_OPEN_QUEUE,
@@ -6907,7 +6937,9 @@ static void test_syncOpenConfigureClose(bool withHandler)
                                                TestSession::e_REQ_DISCONNECT};
     bslmt::ThreadUtil::createWithAllocator(
         &threadHandle,
-        bdlf::BindUtil::bind(&responderMockup, &obj, 6, requestType),
+        [&obj, &requestType]() {
+            responderMockup(&obj, 6, requestType);
+        },
         bmqtst::TestHelperUtil::allocator());
 
     obj.session().openQueueSync(queueSp, timeout, cb);
@@ -7011,12 +7043,11 @@ static void test_asyncOpenConfigureClose(bool withHandler)
         bmqt::QueueFlags::e_READ | bmqt::QueueFlags::e_WRITE,
         queueOptions);
     int                                calls = 0;
-    const bmqimp::Event::EventCallback cb    = bdlf::BindUtil::bind(
-        &eventCallbackMockup,
-        &eventSp,
-        &calls,
-        &obj.session(),
-        bdlf::PlaceHolders::_1);  // event
+    const bmqimp::Event::EventCallback cb =
+        [&eventSp, &calls, session = &obj.session()](
+            const bsl::shared_ptr<bmqimp::Event>& event) {
+            eventCallbackMockup(&eventSp, &calls, session, event);
+        };
 
     bmqp_ctrlmsg::ControlMessage request(bmqtst::TestHelperUtil::allocator());
 
@@ -7232,17 +7263,16 @@ static void test40_syncCalledFromEventHandler()
         &blobBufferFactory,
         blobSpPool.get(),
         sessionOptions,
-        bdlf::BindUtil::bind(&eventHandlerSyncCall,
-                             &eventSp,
-                             &session,
-                             pQueue,
-                             bsl::ref(semaphore),
-                             bdlf::PlaceHolders::_1),
-        bdlf::BindUtil::bind(&stateCb,
-                             bdlf::PlaceHolders::_1,  // old state
-                             bdlf::PlaceHolders::_2,  // new state
-                             &startCounter,
-                             &stopCounter),
+        [&eventSp, &session, pQueue, &semaphore](
+            const bsl::shared_ptr<bmqimp::Event>& event) {
+            eventHandlerSyncCall(&eventSp, &session, pQueue, semaphore, event);
+        },
+        [&startCounter,
+         &stopCounter](bmqimp::BrokerSession::State::Enum oldState,
+                       bmqimp::BrokerSession::State::Enum newState,
+                       bmqimp::BrokerSession::FsmEvent::Enum) {
+            return stateCb(oldState, newState, &startCounter, &stopCounter);
+        },
         bmqimp::SessionId(),
         bmqtst::TestHelperUtil::allocator());
 
@@ -8414,11 +8444,9 @@ static void test49_controlsBuffering()
     PVV_SAFE("Step 4. Schedule LWM and check control requests");
 
     // LWM arrives but the channel still returns e_LIMIT
-    scheduler.scheduleEvent(
-        bmqu::Time::nowMonotonicClock(),
-        bdlf::BindUtil::bind(&TestSession::setChannelLowWaterMark,
-                             &obj,
-                             bmqio::StatusCategory::e_LIMIT));
+    scheduler.scheduleEvent(bmqu::Time::nowMonotonicClock(), [&obj]() {
+        obj.setChannelLowWaterMark(bmqio::StatusCategory::e_LIMIT);
+    });
 
     // Only one write attempt happened
     obj.verifyRequestSent(TestSession::e_REQ_OPEN_QUEUE);
@@ -8427,11 +8455,9 @@ static void test49_controlsBuffering()
     PVV_SAFE("Step 5. Schedule LWM and check all requests proceeded");
 
     // Set write status to e_SUCCESS
-    scheduler.scheduleEvent(
-        bmqu::Time::nowMonotonicClock(),
-        bdlf::BindUtil::bind(&TestSession::setChannelLowWaterMark,
-                             &obj,
-                             bmqio::StatusCategory::e_SUCCESS));
+    scheduler.scheduleEvent(bmqu::Time::nowMonotonicClock(), [&obj]() {
+        obj.setChannelLowWaterMark(bmqio::StatusCategory::e_SUCCESS);
+    });
 
     bsl::shared_ptr<bmqimp::Event> lwmEvent = obj.getInboundEvent();
 
@@ -9421,8 +9447,6 @@ static void test54_distributedTrace()
 //   - stop
 //   ----------------------------------------------------------------------
 {
-    using namespace bdlf::PlaceHolders;
-
     bmqtst::TestHelper::printTestName("DISTRIBUTED TRACE TEST");
 
     struct localFns {
