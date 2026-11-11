@@ -534,7 +534,7 @@ void Interactive::processCommand(const ConfirmCommand& command)
         return;  // RETURN
     }
 
-    UrisMaps::iterator mapIter = d_uris.find(command.uri());
+    auto mapIter = d_uris.find(command.uri());
     BSLS_ASSERT_SAFE(mapIter != d_uris.end());
     const UriEntryPtr& entry = mapIter->second;
     // The status must indicate that the queue is opened.
@@ -571,8 +571,8 @@ void Interactive::processCommand(const ConfirmCommand& command)
         else {
             // Newest guids
             value *= -1;
-            int toSkip = static_cast<int>(messages.size()) - value;
-            MessagesMap::const_iterator it = messages.begin();
+            int  toSkip = static_cast<int>(messages.size()) - value;
+            auto it     = messages.begin();
             while (toSkip > 0) {
                 ++it;
                 toSkip--;
@@ -593,7 +593,7 @@ void Interactive::processCommand(const ConfirmCommand& command)
         bmqt::MessageGUID guid;
         guid.fromHex(command.guid().c_str());
 
-        MessagesMap::const_iterator it = messages.find(guid);
+        auto it = messages.find(guid);
         if (it == messages.end()) {
             BALL_LOG_ERROR << "'" << guid << "' NOT found";
             return;  // RETURN
@@ -609,7 +609,7 @@ void Interactive::processCommand(const ConfirmCommand& command)
 
     // Retrieve the message from the map
     for (const bmqt::MessageGUID& guid : guids) {
-        MessagesMap::const_iterator itMsg = messages.find(guid);
+        auto itMsg = messages.find(guid);
         BSLS_ASSERT_SAFE(itMsg != messages.end());
 
         BALL_LOG_INFO << "--> Confirming message with GUID " << guid;
@@ -659,7 +659,7 @@ void Interactive::processCommand(const ListCommand& command)
     }
     else {
         // Iterate over messages from the user-provided queue uri
-        UrisMaps::const_iterator mapCiter = d_uris.find(command.uri().value());
+        auto mapCiter = d_uris.find(command.uri().value());
         if (mapCiter == d_uris.end()) {
             BALL_LOG_ERROR << "unknown queue '" << command.uri() << "'";
             return;  // RETURN
@@ -814,7 +814,7 @@ Interactive::createUriEntry(const bsl::string&          uri,
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // MUTEX LOCKED
 
-    UrisMaps::const_iterator it = d_uris.find(uri);
+    auto it = d_uris.find(uri);
 
     if (it == d_uris.end()) {
         UriEntryPtr ptr(new (*d_allocator_p) UriEntry, d_allocator_p);
@@ -830,7 +830,7 @@ void Interactive::removeUriEntry(const bsl::string& uri)
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // MUTEX LOCKED
 
-    UrisMaps::iterator mapIter = d_uris.find(uri);
+    auto mapIter = d_uris.find(uri);
     if (mapIter == d_uris.end()) {
         BALL_LOG_ERROR << "'uri' " << uri << " was not found.";
         return;  // RETURN
@@ -1034,8 +1034,7 @@ void Interactive::onMessage(const bmqa::Message& message)
     {
         bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // MUTEX LOCKED
 
-        UrisMaps::iterator mapIter = d_uris.find(
-            message.queueId().uri().asString());
+        auto mapIter = d_uris.find(message.queueId().uri().asString());
         BSLS_ASSERT_SAFE(mapIter != d_uris.end());
 
         entry = mapIter->second;  // increment reference counter
