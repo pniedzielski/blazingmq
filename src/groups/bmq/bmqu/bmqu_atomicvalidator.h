@@ -66,14 +66,14 @@
 //     d_validator_sp->invalidate();
 //  }
 //..
-// Now, let's make an asynchronous call.  We bind the validator to the callback
-// method, so that we can check whether the object is still valid:
+// Now, let's make an asynchronous call.  We capture the validator in the
+// callback, so that we can check whether the object is still valid:
 //..
 //  void MyResource::callingCallback()
 //  {
-//     makeAsyncCall(bdlf::BindUtil::bind(&MyResource::myCallbackFunction,
-//                                        this,
-//                                        d_validator_sp));
+//     makeAsyncCall([this, validator = d_validator_sp]() {
+//         myCallbackFunction(validator);
+//     });
 //  }
 //..
 // Finally, in the callback method, before using the resource object, we first
