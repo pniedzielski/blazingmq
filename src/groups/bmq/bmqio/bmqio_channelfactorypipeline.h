@@ -160,11 +160,8 @@ inline ChannelFactoryPipeline::~ChannelFactoryPipeline() noexcept
 template <typename T>
 inline T* ChannelFactoryPipeline::get()
 {
-    for (bsl::vector<ChannelFactorySP>::iterator it  = d_pipeline.begin(),
-                                                 end = d_pipeline.end();
-         it != end;
-         ++it) {
-        T* test = dynamic_cast<T*>(it->get());
+    for (const ChannelFactorySP& factory : d_pipeline) {
+        T* test = dynamic_cast<T*>(factory.get());
         if (test != NULL) {
             return test;
         }
