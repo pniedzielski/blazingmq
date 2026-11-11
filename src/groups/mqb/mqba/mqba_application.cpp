@@ -55,8 +55,6 @@
 // BDE
 #include <baljsn_encoder.h>
 #include <baljsn_encoderoptions.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlmt_eventscheduler.h>
 #include <bdls_memoryutil.h>
 #include <bdls_osutil.h>
@@ -150,12 +148,12 @@ Application::Application(bdlmt::EventScheduler* scheduler,
                   bsls::BlockGrowth::BSLS_CONSTANT,
                   d_allocators.get("BufferFactory"))
 
-, d_blobSpPool(bdlf::BindUtil::bind(&createBlob,
-                                    &d_bufferFactory,
-                                    bdlf::PlaceHolders::_1,   // arena
-                                    bdlf::PlaceHolders::_2),  // allocator
-               k_BLOB_POOL_GROWTH_STRATEGY,
-               d_allocators.get("BlobSpPool"))
+, d_blobSpPool(
+      [this](void* arena, bslma::Allocator* blobAllocator) {
+          createBlob(&d_bufferFactory, arena, blobAllocator);
+      },
+      k_BLOB_POOL_GROWTH_STRATEGY,
+      d_allocators.get("BlobSpPool"))
 , d_pushElementsPool_sp(bsl::allocate_shared<bdlma::ConcurrentPool>(
       d_allocators.get("PushElementsPool"),
       sizeof(mqbblp::PushStream::Element),
@@ -281,12 +279,11 @@ int Application::start(bsl::ostream& errorDescription)
     // Start the StatController
     d_statController_mp.load(
         new (*d_allocator_p) mqbstat::StatController(
-            bdlf::BindUtil::bind(&Application::processCommand,
-                                 this,
-                                 bdlf::PlaceHolders::_1,  // source
-                                 bdlf::PlaceHolders::_2,  // cmd
-                                 bdlf::PlaceHolders::_3,  // os
-                                 false),                  // fromReroute
+            [this](const bslstl::StringRef& source,
+                   const bsl::string&       cmd,
+                   bsl::ostream&            os) {
+                return processCommand(source, cmd, os, false);
+            },
             d_pluginManager_mp.get(),
             &d_bufferFactory,
             d_allocatorsStatContext_p,
@@ -366,12 +363,13 @@ int Application::start(bsl::ostream& errorDescription)
 
     (*sessionNegotiator)
         .setAdminCommandEnqueueCallback(
-            bdlf::BindUtil::bind(&Application::enqueueCommand,
-                                 this,
-                                 bdlf::PlaceHolders::_1,    // source
-                                 bdlf::PlaceHolders::_2,    // cmd
-                                 bdlf::PlaceHolders::_3,    // onProcessedCb
-                                 bdlf::PlaceHolders::_4));  // fromReroute
+            [this](
+                const bsl::string&                              source,
+                const bsl::string&                              cmd,
+                const mqbnet::Session::AdminCommandProcessedCb& onProcessedCb,
+                bool                                            fromReroute) {
+                enqueueCommand(source, cmd, onProcessedCb, fromReroute);
+            });
 
     bslma::ManagedPtr<mqbnet::Negotiator> negotiatorMp(sessionNegotiator,
                                                        d_allocator_p);
@@ -410,13 +408,12 @@ int Application::start(bsl::ostream& errorDescription)
                              d_allocator_p);
 
     d_clusterCatalog_mp->setAdminCommandEnqueueCallback(
-        bdlf::BindUtil::bind(&Application::enqueueCommand,
-                             this,
-                             bdlf::PlaceHolders::_1,  // source
-                             bdlf::PlaceHolders::_2,  // cmd
-                             bdlf::PlaceHolders::_3,  // onProcessedCb
-                             bdlf::PlaceHolders::_4   // fromReroute
-                             ));
+        [this](const bsl::string&                              source,
+               const bsl::string&                              cmd,
+               const mqbnet::Session::AdminCommandProcessedCb& onProcessedCb,
+               bool                                            fromReroute) {
+            enqueueCommand(source, cmd, onProcessedCb, fromReroute);
+        });
 
     // Register the ClusterCatalog and TransportManager to the
     // SessionNegotiator.  Must be done before starting the ClusterCatalog
@@ -500,8 +497,9 @@ void Application::stopTransportAndClusters()
                       << " cluster(s) shutdown...";
 
         for (size_t i = 0; i < clusters.size(); ++i) {
-            clusters[i]->initiateShutdown(
-                bdlf::BindUtil::bind(&bslmt::Latch::arrive, &latch));
+            clusters[i]->initiateShutdown([&latch]() {
+                latch.arrive();
+            });
         }
         latch.wait();
 
@@ -672,8 +670,9 @@ bool Application::initiateShutdown()
 
     for (Sessions::const_iterator cit = clients.begin(); cit != clients.end();
          ++cit) {
-        (*cit)->initiateShutdown(
-            bdlf::BindUtil::bind(&bslmt::Latch::arrive, &latchDownstreams));
+        (*cit)->initiateShutdown([&latchDownstreams]() {
+            latchDownstreams.arrive();
+        });
     }
 
     // Need to wait for peers to update this node status to guarantee no new
@@ -689,7 +688,9 @@ bool Application::initiateShutdown()
         d_dispatcher_mp->executeOnAllQueues(
             mqbi::Dispatcher::VoidFunction(),
             mqbi::DispatcherClientType::e_QUEUE,
-            bdlf::BindUtil::bind(&bslmt::Latch::arrive, &latch));
+            [&latch]() {
+                latch.arrive();
+            });
         latch.wait();
     }
     {
@@ -697,7 +698,9 @@ bool Application::initiateShutdown()
         d_dispatcher_mp->executeOnAllQueues(
             mqbi::Dispatcher::VoidFunction(),
             mqbi::DispatcherClientType::e_CLUSTER,
-            bdlf::BindUtil::bind(&bslmt::Latch::arrive, &latch));
+            [&latch]() {
+                latch.arrive();
+            });
         latch.wait();
     }
 
@@ -737,7 +740,10 @@ void Application::sendStopRequests(bslmt::Latch*   latch,
     contextSp->setDestinationNodes(brokers);
 
     contextSp->setResponseCb(
-        bdlf::BindUtil::bind(&bslmt::Latch::arrive, latch));
+        [latch](const mqbblp::ClusterCatalog::StopRequestManagerType::
+                    RequestContextSp&) {
+            latch->arrive();
+        });
 
     BALL_LOG_INFO << "Sending StopRequest V2 to " << brokers.size()
                   << " brokers; timeout is " << shutdownTimeout << " ms";
@@ -1030,12 +1036,9 @@ int Application::enqueueCommand(
                    << threadPool->numPendingJobs() << "]";
 
     return threadPool->enqueueJob(
-        bdlf::BindUtil::bind(&Application::processCommandCb,
-                             this,
-                             source,
-                             cmd,
-                             onProcessedCb,
-                             fromReroute));
+        [this, source, cmd, onProcessedCb, fromReroute]() {
+            processCommandCb(source, cmd, onProcessedCb, fromReroute);
+        });
 }
 
 }  // close package namespace
