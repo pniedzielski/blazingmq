@@ -261,8 +261,8 @@ class DispatcherClient : public mqbi::DispatcherClient {
     bsl::string                d_description;
 
     // NOT IMPLEMENTED
-    DispatcherClient(const DispatcherClient&);
-    DispatcherClient& operator=(const DispatcherClient&);
+    DispatcherClient(const DispatcherClient&)            = delete;
+    DispatcherClient& operator=(const DispatcherClient&) = delete;
 
   public:
     // TRAITS
