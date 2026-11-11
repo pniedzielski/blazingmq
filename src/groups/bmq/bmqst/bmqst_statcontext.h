@@ -1166,15 +1166,14 @@ inline StatContextIterator StatContext::subcontextIterator() const
 inline const StatContext*
 StatContext::getSubcontext(const bslstl::StringRef& key) const
 {
-    StatContextMap::const_iterator iter = d_subcontexts.find(
-        Id(bsl::string(key)));
+    auto iter = d_subcontexts.find(Id(bsl::string(key)));
     return iter == d_subcontexts.end() ? 0 : iter->second;
 }
 
 inline const StatContext*
 StatContext::getSubcontext(bsls::Types::Int64 key) const
 {
-    StatContextMap::const_iterator iter = d_subcontexts.find(Id(key));
+    auto iter = d_subcontexts.find(Id(key));
     return iter == d_subcontexts.end() ? 0 : iter->second;
 }
 

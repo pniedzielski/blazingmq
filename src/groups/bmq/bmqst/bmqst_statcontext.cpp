@@ -173,21 +173,20 @@ StatContext::StatContextUserData::~StatContextUserData()
 // PRIVATE CLASS METHODS
 void StatContext::statContextDeleter(void* context_vp, void* allocator_vp)
 {
-    StatContext* context = static_cast<StatContext*>(context_vp);
+    auto* context        = static_cast<StatContext*>(context_vp);
     context->d_isDeleted = true;
     if (context->d_released.swap(true)) {
         // Context was already release by its parent context, therefore we are
         // responsible for deallocating it.
 
-        bslma::Allocator* allocator = static_cast<bslma::Allocator*>(
-            allocator_vp);
+        auto* allocator = static_cast<bslma::Allocator*>(allocator_vp);
         allocator->deleteObject(context);
     }
 }
 
 void StatContext::datumDeleter(void* /*datum_vp*/, void* datumLock_vp)
 {
-    bsls::SpinLock* lock = static_cast<bsls::SpinLock*>(datumLock_vp);
+    auto* lock = static_cast<bsls::SpinLock*>(datumLock_vp);
     lock->unlock();
 }
 
@@ -477,8 +476,7 @@ void StatContext::applyUpdate(const bmqstm::StatContextUpdate& update)
             context->d_released = true;
         }
         else {
-            StatContextIdMap::iterator si = d_subcontextsById.find(
-                subUpdate.id());
+            auto si = d_subcontextsById.find(subUpdate.id());
             if (si == d_subcontextsById.end()) {
                 continue;  // CONTINUE
             }
