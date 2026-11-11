@@ -357,9 +357,8 @@ static void test2_setterGetterTest()
     BMQTST_ASSERT_EQ(8, input);
 
     // insertQueue / queues
-    bsl::shared_ptr<bmqimp::Queue> queue =
-        bsl::allocate_shared<bmqimp::Queue, bslma::Allocator>(
-            bmqtst::TestHelperUtil::allocator());
+    auto queue = bsl::allocate_shared<bmqimp::Queue, bslma::Allocator>(
+        bmqtst::TestHelperUtil::allocator());
 
     const char         k_URI[] = "bmq://ts.trades.myapp/my.queue?id=my.app";
     bmqt::Uri          uri(k_URI, bmqtst::TestHelperUtil::allocator());
@@ -964,9 +963,8 @@ static void test7_printing()
                 .setErrorDescription(data.d_errorDescription);
 
             bmqt::Uri uri(data.d_uri, bmqtst::TestHelperUtil::allocator());
-            bsl::shared_ptr<bmqimp::Queue> queue =
-                bsl::allocate_shared<bmqimp::Queue, bslma::Allocator>(
-                    bmqtst::TestHelperUtil::allocator());
+            auto queue = bsl::allocate_shared<bmqimp::Queue, bslma::Allocator>(
+                bmqtst::TestHelperUtil::allocator());
             queue->setUri(uri);
             obj.insertQueue(queue);
         } break;
@@ -987,9 +985,8 @@ static void test7_printing()
             }
 
             bmqt::Uri uri(data.d_uri, bmqtst::TestHelperUtil::allocator());
-            bsl::shared_ptr<bmqimp::Queue> queue =
-                bsl::allocate_shared<bmqimp::Queue, bslma::Allocator>(
-                    bmqtst::TestHelperUtil::allocator());
+            auto queue = bsl::allocate_shared<bmqimp::Queue, bslma::Allocator>(
+                bmqtst::TestHelperUtil::allocator());
             queue->setUri(uri);
             obj.insertQueue(queue);
         } break;
