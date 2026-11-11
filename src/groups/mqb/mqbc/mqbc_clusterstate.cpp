@@ -63,10 +63,8 @@ bool ClusterStateQueueInfo::hasTheSameAppIds(const AppInfos& appInfos) const
         return false;  // RETURN
     }
 
-    for (AppInfos::const_iterator cit = d_appInfos.cbegin();
-         cit != d_appInfos.cend();
-         ++cit) {
-        if (appInfos.count(cit->first) != 1) {
+    for (const auto& appInfo : d_appInfos) {
+        if (appInfos.count(appInfo.first) != 1) {
             return false;  // RETURN
         }
     }
@@ -80,17 +78,14 @@ void ClusterStateQueueInfo::setApps(const bmqp_ctrlmsg::QueueInfo& advisory)
 
     d_appInfos.clear();
 
-    for (bsl::vector<bmqp_ctrlmsg::AppIdInfo>::const_iterator cit =
-             advisory.appIds().cbegin();
-         cit != advisory.appIds().cend();
-         ++cit) {
-        BSLS_ASSERT_SAFE(!cit->appId().empty());
-        BSLS_ASSERT_SAFE(!cit->appKey().empty());
+    for (const auto& appIdInfo : advisory.appIds()) {
+        BSLS_ASSERT_SAFE(!appIdInfo.appId().empty());
+        BSLS_ASSERT_SAFE(!appIdInfo.appKey().empty());
 
         d_appInfos.insert(mqbi::ClusterStateManager::AppInfo(
-            bsl::string(cit->appId(), d_allocator_p),
+            bsl::string(appIdInfo.appId(), d_allocator_p),
             mqbu::StorageKey(mqbu::StorageKey::BinaryRepresentation(),
-                             cit->appKey().data())));
+                             appIdInfo.appKey().data())));
     }
 }
 
@@ -111,11 +106,8 @@ bool ClusterStateQueueInfo::equal(
         return false;
     }
 
-    for (bsl::vector<bmqp_ctrlmsg::AppIdInfo>::const_iterator cit =
-             advisory.appIds().cbegin();
-         cit != advisory.appIds().cend();
-         ++cit) {
-        if (appInfos().count(cit->appId()) == 0) {
+    for (const auto& appIdInfo : advisory.appIds()) {
+        if (appInfos().count(appIdInfo.appId()) == 0) {
             return false;
         }
     }
@@ -368,14 +360,13 @@ ClusterState& ClusterState::setPartitionPrimary(int          partitionId,
                                      : "** NULL **")
                   << "], oldLeaseId: [" << oldLeaseId << "].";
 
-    for (ObserversSetIter it = d_observers.begin(); it != d_observers.end();
-         ++it) {
-        (*it)->onPartitionPrimaryAssignment(partitionId,
-                                            node,
-                                            leaseId,
-                                            pinfo.primaryStatus(),
-                                            oldPrimaryNode,
-                                            oldLeaseId);
+    for (const auto& observer : d_observers) {
+        observer->onPartitionPrimaryAssignment(partitionId,
+                                               node,
+                                               leaseId,
+                                               pinfo.primaryStatus(),
+                                               oldPrimaryNode,
+                                               oldLeaseId);
     }
 
     return *this;
@@ -423,15 +414,13 @@ ClusterState& ClusterState::setPartitionPrimaryStatus(
         // Notify observers if primary is transitioning to another state, and
         // only the first time this occurs.
 
-        for (ObserversSetIter it = d_observers.begin();
-             it != d_observers.end();
-             ++it) {
-            (*it)->onPartitionPrimaryAssignment(partitionId,
-                                                node,
-                                                pinfo.primaryLeaseId(),
-                                                value,
-                                                node,
-                                                pinfo.primaryLeaseId());
+        for (const auto& observer : d_observers) {
+            observer->onPartitionPrimaryAssignment(partitionId,
+                                                   node,
+                                                   pinfo.primaryLeaseId(),
+                                                   value,
+                                                   node,
+                                                   pinfo.primaryLeaseId());
         }
     }
 
@@ -580,9 +569,8 @@ void ClusterState::assignQueue(const bmqp_ctrlmsg::QueueInfo& advisory)
                   << "] to Partition [" << partitionId
                   << "] with appIdInfos: [" << printer << "].";
 
-    for (ObserversSetIter it = d_observers.begin(); it != d_observers.end();
-         ++it) {
-        (*it)->onQueueAssigned(queue);
+    for (const auto& observer : d_observers) {
+        observer->onQueueAssigned(queue);
     }
 
     // POSTCONDITIONS
@@ -618,9 +606,8 @@ bool ClusterState::unassignQueue(const bmqt::Uri& uri)
                   << uri << "], queueKey: [" << key << "] from Partition ["
                   << partitionId << "].";
 
-    for (ObserversSetIter it = d_observers.begin(); it != d_observers.end();
-         ++it) {
-        (*it)->onQueueUnassigned(cit->second);
+    for (const auto& observer : d_observers) {
+        observer->onQueueUnassigned(cit->second);
     }
 
     domIt->second->queuesInfo().erase(cit);
@@ -699,14 +686,11 @@ int ClusterState::updateQueue(const bmqp_ctrlmsg::QueueInfoUpdate& update)
         }
         AppInfos& appInfos = iter->second->appInfos();
 
-        for (bsl::vector<bmqp_ctrlmsg::AppIdInfo>::const_iterator citer =
-                 update.addedAppIds().cbegin();
-             citer != update.addedAppIds().cend();
-             ++citer) {
+        for (const auto& appIdInfo : update.addedAppIds()) {
             const AppInfo appInfo = bsl::make_pair(
-                citer->appId(),
+                appIdInfo.appId(),
                 mqbu::StorageKey(mqbu::StorageKey::BinaryRepresentation(),
-                                 citer->appKey().data()));
+                                 appIdInfo.appKey().data()));
 
             if (!appInfos.insert(appInfo).second) {
                 return rc_APPID_ALREADY_EXISTS;  // RETURN
@@ -714,16 +698,13 @@ int ClusterState::updateQueue(const bmqp_ctrlmsg::QueueInfoUpdate& update)
             addedAppIds.insert(appInfo);
         }
 
-        for (bsl::vector<bmqp_ctrlmsg::AppIdInfo>::const_iterator citer =
-                 update.removedAppIds().cbegin();
-             citer != update.removedAppIds().cend();
-             ++citer) {
+        for (const auto& appIdInfo : update.removedAppIds()) {
             const AppInfo appInfo = bsl::make_pair(
-                citer->appId(),
+                appIdInfo.appId(),
                 mqbu::StorageKey(mqbu::StorageKey::BinaryRepresentation(),
-                                 citer->appKey().data()));
+                                 appIdInfo.appKey().data()));
 
-            if (appInfos.erase(citer->appId()) == 0) {
+            if (appInfos.erase(appIdInfo.appId()) == 0) {
                 return rc_APPID_NOT_FOUND;  // RETURN
             }
 
@@ -752,9 +733,8 @@ int ClusterState::updateQueue(const bmqp_ctrlmsg::QueueInfoUpdate& update)
                       << ", removedAppIds: " << printer2 << ".";
     }
 
-    for (ObserversSetIter it = d_observers.begin(); it != d_observers.end();
-         ++it) {
-        (*it)->onQueueUpdated(uri, domain, addedAppIds, removedAppIds);
+    for (const auto& observer : d_observers) {
+        observer->onQueueUpdated(uri, domain, addedAppIds, removedAppIds);
     }
 
     return rc_SUCCESS;
@@ -804,10 +784,7 @@ void ClusterState::iterateDoubleAssignments(
 {
     const bsl::unordered_set<bmqt::Uri>& uris = partitionAssignments->second;
 
-    for (bsl::unordered_set<bmqt::Uri>::const_iterator cit = uris.cbegin();
-         cit != uris.cend();
-         ++cit) {
-        const bmqt::Uri& problematicUri   = *cit;
+    for (const bmqt::Uri& problematicUri : uris) {
         const int        wrongPartitionId = partitionAssignments->first;
 
         BALL_LOG_WARN << "Cluster [" << name()
@@ -816,7 +793,7 @@ void ClusterState::iterateDoubleAssignments(
                       << "' by unregistering it from the partition ["
                       << wrongPartitionId << "].";
 
-        visitor(*cit, wrongPartitionId);
+        visitor(problematicUri, wrongPartitionId);
     }
 }
 

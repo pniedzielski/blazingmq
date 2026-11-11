@@ -1147,10 +1147,7 @@ inline bool ClusterState::isSelfPrimary() const
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(cluster()->inDispatcherThread());
 
-    for (PartitionsInfo::const_iterator cit = d_partitionsInfo.begin();
-         cit != d_partitionsInfo.end();
-         ++cit) {
-        const ClusterStatePartitionInfo& pinfo = *cit;
+    for (const ClusterStatePartitionInfo& pinfo : d_partitionsInfo) {
         if (pinfo.primaryNode() == cluster()->netCluster().selfNode()) {
             return true;  // RETURN
         }
@@ -1164,10 +1161,7 @@ inline bool ClusterState::isSelfActivePrimary() const
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(cluster()->inDispatcherThread());
 
-    for (PartitionsInfo::const_iterator cit = d_partitionsInfo.begin();
-         cit != d_partitionsInfo.end();
-         ++cit) {
-        const ClusterStatePartitionInfo& pinfo = *cit;
+    for (const ClusterStatePartitionInfo& pinfo : d_partitionsInfo) {
         if ((pinfo.primaryNode() == cluster()->netCluster().selfNode()) &&
             (bmqp_ctrlmsg::PrimaryStatus::E_ACTIVE == pinfo.primaryStatus())) {
             return true;  // RETURN
