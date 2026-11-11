@@ -40,9 +40,7 @@
 #include <ntsa_error.h>
 #include <ntsa_ipaddress.h>
 
-#ifdef BSLS_LIBRARYFEATURES_HAS_CPP11_BASELINE_LIBRARY
 #include <bsl_random.h>
-#endif
 #include <bsl_memory.h>
 
 namespace BloombergLP {
@@ -659,13 +657,9 @@ void ReconnectingChannelFactoryUtil::resolveEndpointFn(
         return;  // RETURN
     }
 
-#ifdef BSLS_LIBRARYFEATURES_HAS_CPP11_BASELINE_LIBRARY
     bsl::random_device rd;
     bsl::mt19937       generator(rd());
     bsl::shuffle(out->begin(), out->end(), generator);
-#else
-    bsl::random_shuffle(out->begin(), out->end());
-#endif
     // After resolving the hosts from the endpoints, we then randomize the
     // vector of hosts, in order to help getting a better load distribution
     // from all the clients using the same list of hosts.
