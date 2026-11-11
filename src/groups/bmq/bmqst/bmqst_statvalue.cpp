@@ -254,8 +254,8 @@ void StatValue::clear(bsls::Types::Int64 snapshotTime)
     d_currentStats.reset(d_type == e_DISCRETE, 0);
     d_curSnapshotIndices.assign(d_curSnapshotIndices.size(), 0);
 
-    for (size_t i = 0; i < d_history.size(); ++i) {
-        d_history[i].reset(d_type == e_DISCRETE, snapshotTime);
+    for (Snapshot& snapshot : d_history) {
+        snapshot.reset(d_type == e_DISCRETE, snapshotTime);
     }
 
     if (d_type == e_DISCRETE) {
@@ -289,8 +289,8 @@ void StatValue::init(const bsl::vector<int>& sizes,
     d_history.clear();
     d_history.resize(historySize);
 
-    for (size_t i = 0; i < d_history.size(); ++i) {
-        d_history[i].reset(d_type == e_DISCRETE, snapshotTime);
+    for (Snapshot& snapshot : d_history) {
+        snapshot.reset(d_type == e_DISCRETE, snapshotTime);
     }
 }
 
