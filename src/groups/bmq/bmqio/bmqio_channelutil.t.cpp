@@ -25,7 +25,6 @@
 #include <bdlbb_blob.h>
 #include <bdlbb_blobutil.h>
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 #include <bsl_string.h>
 #include <bsl_vector.h>
 #include <bsls_assert.h>
@@ -227,11 +226,9 @@ static void test2_handleRead_multiplePackets()
         appendToInputBlob(&input, totalLength, totalLength);
 
         const int rc = bmqio::ChannelUtil::handleRead(
-            bdlf::BindUtil::bind(readOneBlob,
-                                 &packets,
-                                 bdlf::PlaceHolders::_1,
-                                 bdlf::PlaceHolders::_2,
-                                 bdlf::PlaceHolders::_3),
+            [&packets](const bdlbb::Blob& source, int offset, int length) {
+                readOneBlob(&packets, source, offset, length);
+            },
             &numNeeded,
             &input);
         BMQTST_ASSERT_EQ(rc, 0);
@@ -254,11 +251,9 @@ static void test2_handleRead_multiplePackets()
         appendToInputBlob(&input, totalLength, totalLength);
         appendToInputBlob(&input, 3, totalLength);
         const int rc = bmqio::ChannelUtil::handleRead(
-            bdlf::BindUtil::bind(readOneBlob,
-                                 &packets,
-                                 bdlf::PlaceHolders::_1,
-                                 bdlf::PlaceHolders::_2,
-                                 bdlf::PlaceHolders::_3),
+            [&packets](const bdlbb::Blob& source, int offset, int length) {
+                readOneBlob(&packets, source, offset, length);
+            },
             &numNeeded,
             &input);
         BMQTST_ASSERT_EQ(rc, -1);
@@ -281,11 +276,9 @@ static void test2_handleRead_multiplePackets()
         appendToInputBlob(&input, totalLength, totalLength);
         appendToInputBlob(&input, totalLength, totalLength - 1);
         const int rc = bmqio::ChannelUtil::handleRead(
-            bdlf::BindUtil::bind(readOneBlob,
-                                 &packets,
-                                 bdlf::PlaceHolders::_1,
-                                 bdlf::PlaceHolders::_2,
-                                 bdlf::PlaceHolders::_3),
+            [&packets](const bdlbb::Blob& source, int offset, int length) {
+                readOneBlob(&packets, source, offset, length);
+            },
             &numNeeded,
             &input);
         BMQTST_ASSERT_EQ(rc, 0);
@@ -309,11 +302,9 @@ static void test2_handleRead_multiplePackets()
         appendToInputBlob(&input, totalLength - 1, totalLength - 1);
         appendToInputBlob(&input, totalLength - 2, totalLength - 2);
         const int rc = bmqio::ChannelUtil::handleRead(
-            bdlf::BindUtil::bind(readOneBlob,
-                                 &packets,
-                                 bdlf::PlaceHolders::_1,
-                                 bdlf::PlaceHolders::_2,
-                                 bdlf::PlaceHolders::_3),
+            [&packets](const bdlbb::Blob& source, int offset, int length) {
+                readOneBlob(&packets, source, offset, length);
+            },
             &numNeeded,
             &input);
         BMQTST_ASSERT_EQ(rc, 0);
@@ -338,11 +329,9 @@ static void test2_handleRead_multiplePackets()
         appendToInputBlob(&input, totalLength, totalLength);
         appendToInputBlob(&input, totalLength - 2, totalLength - 2);
         const int rc = bmqio::ChannelUtil::handleRead(
-            bdlf::BindUtil::bind(readOneBlob,
-                                 &packets,
-                                 bdlf::PlaceHolders::_1,
-                                 bdlf::PlaceHolders::_2,
-                                 bdlf::PlaceHolders::_3),
+            [&packets](const bdlbb::Blob& source, int offset, int length) {
+                readOneBlob(&packets, source, offset, length);
+            },
             &numNeeded,
             &input);
         BMQTST_ASSERT_EQ(rc, 0);
@@ -366,11 +355,9 @@ static void test2_handleRead_multiplePackets()
         appendToInputBlob(&input, totalLength, totalLength);
         appendToInputBlob(&input, totalLength, k_MINIMUM_PACKET_LENGTH);
         const int rc = bmqio::ChannelUtil::handleRead(
-            bdlf::BindUtil::bind(readOneBlob,
-                                 &packets,
-                                 bdlf::PlaceHolders::_1,
-                                 bdlf::PlaceHolders::_2,
-                                 bdlf::PlaceHolders::_3),
+            [&packets](const bdlbb::Blob& source, int offset, int length) {
+                readOneBlob(&packets, source, offset, length);
+            },
             &numNeeded,
             &input);
         BMQTST_ASSERT_EQ(rc, 0);
