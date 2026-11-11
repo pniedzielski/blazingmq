@@ -383,44 +383,6 @@ struct Caller {
     }
 };
 
-/// @brief Response callback recording the identifier of every request it is
-/// invoked for, in invocation order.
-///
-/// Note that this functor is declared at namespace scope because a local
-/// class may not be used as a template argument in C++03.
-class OrderRecorder {
-  private:
-    // DATA
-
-    /// Sequence of recorded identifiers, held not owned.
-    bsl::vector<int>* d_order_p;
-
-  public:
-    // CREATORS
-
-    /// @brief Create an object appending to the specified `order`.
-    ///
-    /// @param order The sequence to append recorded identifiers to.  Must
-    ///              remain valid for the lifetime of this object.
-    explicit OrderRecorder(bsl::vector<int>* order)
-    : d_order_p(order)
-    {
-        // PRECONDITIONS
-        BSLS_ASSERT_SAFE(d_order_p);
-    }
-
-    // ACCESSORS
-
-    /// @brief Append the identifier of the specified `request` to the
-    /// recorded sequence.
-    ///
-    /// @param request The request whose response callback is being invoked.
-    void operator()(const ReqSp& request) const
-    {
-        d_order_p->push_back(request->request().rId().value());
-    }
-};
-
 // ============================================================================
 //                                    TESTS
 // ----------------------------------------------------------------------------
@@ -1188,7 +1150,9 @@ static void test9_cancelRequestsOrderTest()
         for (bsl::size_t i = 0; i < k_NUM_REQUESTS; ++i) {
             ReqSp request = context.createRequest();
             context.populateRequest(request);
-            request->setResponseCb(OrderRecorder(&order));
+            request->setResponseCb([&order](const ReqSp& req) {
+                order.push_back(req->request().rId().value());
+            });
             context.sendChannelRequest(request);
             expected.push_back(request->request().rId().value());
         }
@@ -1216,7 +1180,9 @@ static void test9_cancelRequestsOrderTest()
             ReqSp request = context.createRequest();
             context.populateRequest(request);
             request->setGroupId(groupId);
-            request->setResponseCb(OrderRecorder(&order));
+            request->setResponseCb([&order](const ReqSp& req) {
+                order.push_back(req->request().rId().value());
+            });
             context.sendChannelRequest(request);
             if (groupId == k_GROUP_CANCELED) {
                 expected.push_back(request->request().rId().value());
@@ -1249,7 +1215,9 @@ static void test9_cancelRequestsOrderTest()
             ReqSp request = context.createRequest();
             context.populateRequest(request);
             request->setComponentId(componentId);
-            request->setResponseCb(OrderRecorder(&order));
+            request->setResponseCb([&order](const ReqSp& req) {
+                order.push_back(req->request().rId().value());
+            });
             context.sendChannelRequest(request);
             if (componentId == k_COMPONENT_CANCELED) {
                 expected.push_back(request->request().rId().value());
