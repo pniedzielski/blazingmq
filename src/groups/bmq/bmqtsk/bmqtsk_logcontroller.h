@@ -575,14 +575,11 @@ int LogControllerConfig::fromObj(bsl::ostream& errorDescription,
         return -1;  // RETURN
     }
 
-    for (bsl::vector<bsl::string>::const_iterator it =
-             obj.categories().begin();
-         it != obj.categories().end();
-         ++it) {
-        const int rc = addCategoryProperties(*it);
+    for (const bsl::string& category : obj.categories()) {
+        const int rc = addCategoryProperties(category);
         if (rc != 0) {
             errorDescription << "Invalid string format for categories entry '"
-                             << *it << "' (rc: " << rc << ")";
+                             << category << "' (rc: " << rc << ")";
             return -2;  // RETURN
         }
     }

@@ -415,8 +415,8 @@ int LogController::tryRegisterObserver(ball::Observer* observer)
     int rc = d_multiplexObserver.registerObserver(observer);
 
     if (rc != 0) {
-        for (size_t i = 0; i < d_registeredObservers.size(); i++) {
-            d_multiplexObserver.deregisterObserver(d_registeredObservers[i]);
+        for (ball::Observer* registeredObserver : d_registeredObservers) {
+            d_multiplexObserver.deregisterObserver(registeredObserver);
         }
         d_registeredObservers.clear();
     }
@@ -594,12 +594,9 @@ int LogController::initialize(bsl::ostream&              errorDescription,
 
     const LogControllerConfig::CategoryPropertiesMap& categories =
         config.categoriesProperties();
-    for (LogControllerConfig::CategoryPropertiesMap::const_iterator it =
-             categories.begin();
-         it != categories.end();
-         ++it) {
-        setCategoryVerbosity(it->first, it->second.d_verbosity);
-        d_consoleObserver.setCategoryColor(it->first, it->second.d_color);
+    for (const auto& [category, properties] : categories) {
+        setCategoryVerbosity(category, properties.d_verbosity);
+        d_consoleObserver.setCategoryColor(category, properties.d_color);
     }
 
     // ----------
