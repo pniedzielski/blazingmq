@@ -79,8 +79,8 @@ class TempFile {
 
   private:
     // NOT IMPLEMENTED
-    TempFile(const TempFile&);
-    TempFile& operator=(const TempFile&);
+    TempFile(const TempFile&)            = delete;
+    TempFile& operator=(const TempFile&) = delete;
 
   public:
     // TRAITS
