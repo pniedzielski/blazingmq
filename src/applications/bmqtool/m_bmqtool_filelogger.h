@@ -94,8 +94,8 @@ class FileLogger {
 
   private:
     // NOT IMPLEMENTED
-    FileLogger(const FileLogger&);
-    FileLogger& operator=(const FileLogger&);
+    FileLogger(const FileLogger&)            = delete;
+    FileLogger& operator=(const FileLogger&) = delete;
 
   public:
     // CREATORS

@@ -45,8 +45,8 @@ const bsl::string_view k_CSI = "\x1b[";
 /// restores the original terminal settings on destruction.
 class RawModeGuard {
     // NOT IMPLEMENTED
-    RawModeGuard(const RawModeGuard&);             // = delete
-    RawModeGuard& operator=(const RawModeGuard&);  // = delete
+    RawModeGuard(const RawModeGuard&)            = delete;
+    RawModeGuard& operator=(const RawModeGuard&) = delete;
 
     // DATA
     struct termios d_orig;    ///< Original terminal settings.
