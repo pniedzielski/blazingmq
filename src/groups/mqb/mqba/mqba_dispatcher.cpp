@@ -151,12 +151,9 @@ Dispatcher::DispatcherContext::DispatcherContext(
 , d_clientStatContext_mp()
 , d_statContexts(config.numProcessors(), allocator)
 {
-    typedef bsl::vector<bsl::shared_ptr<mqbi::DispatcherEventSource> >
-        EventSources;
-    for (EventSources::iterator it = d_eventSources.begin();
-         it != d_eventSources.end();
-         ++it) {
-        *it = bsl::allocate_shared<mqba::DispatcherEventSource>(allocator);
+    for (auto& eventSource : d_eventSources) {
+        eventSource = bsl::allocate_shared<mqba::DispatcherEventSource>(
+            allocator);
     }
 }
 
@@ -580,9 +577,8 @@ void Dispatcher::executeOnAllQueues(
     processorPool->enqueueEventOnAllQueues(bsl::move(base_sp));
 
     // Update stats for all queues
-    for (size_t i = 0; i < context_p->d_statContexts.size(); ++i) {
-        mqbstat::DispatcherStats::onEnqueue(
-            context_p->d_statContexts[i].get());
+    for (const auto& statContext : context_p->d_statContexts) {
+        mqbstat::DispatcherStats::onEnqueue(statContext.get());
     }
 }
 
