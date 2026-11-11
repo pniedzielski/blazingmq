@@ -49,8 +49,6 @@
 #include <bdlb_string.h>
 #include <bdld_datum.h>
 #include <bdld_datummapbuilder.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdlmt_eventscheduler.h>
 #include <bdlt_timeunitratio.h>
@@ -113,8 +111,9 @@ void ClusterProxy::startDispatched()
     d_clusterData.membership().netCluster()->enableRead();
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&ClusterProxy::refreshActiveNodeManagerDispatched,
-                             this),
+        [this]() {
+            refreshActiveNodeManagerDispatched();
+        },
         this);
 
     // Schedule an event, to ensure we will eventually use a connection - refer
@@ -125,8 +124,9 @@ void ClusterProxy::startDispatched()
     d_clusterData.scheduler().scheduleEvent(
         &d_activeNodeLookupEventHandle,
         interval,
-        bdlf::BindUtil::bind(&ClusterProxy::onActiveNodeLookupTimerExpired,
-                             this));
+        [this]() {
+            onActiveNodeLookupTimerExpired();
+        });
 }
 
 void ClusterProxy::initiateShutdownDispatched(const VoidFunctor& callback)
@@ -152,16 +152,16 @@ void ClusterProxy::initiateShutdownDispatched(const VoidFunctor& callback)
         d_clusterData.clusterConfig().queueOperations().shutdownTimeoutMs());
 
     d_shutdownChain.appendInplace(
-        bdlf::BindUtil::bind(&ClusterQueueHelper::checkUnconfirmedV2,
-                             &d_queueHelper,
-                             whenToStop,
-                             bdlf::PlaceHolders::_1));  // completionCb
+        [queueHelper = &d_queueHelper,
+         whenToStop](const bsl::function<void()>& completionCb) {
+            queueHelper->checkUnconfirmedV2(whenToStop, completionCb);
+        });
 
     // Add callback to be invoked once V2 finishes waiting for unconfirmed
     d_shutdownChain.appendInplace(
-        bdlf::BindUtil::bind(&ClusterProxy::continueShutdown,
-                             this,
-                             bdlf::PlaceHolders::_1),
+        [this](const VoidFunctor& completionCb) {
+            continueShutdown(completionCb);
+        },
         callback);
 
     d_shutdownChain.start();
@@ -257,9 +257,9 @@ void ClusterProxy::onActiveNodeLookupTimerExpired()
 {
     // executed by the *SCHEDULER* thread
     dispatcher()->execute(
-        bdlf::BindUtil::bind(
-            &ClusterProxy::onActiveNodeLookupTimerExpiredDispatched,
-            this),
+        [this]() {
+            onActiveNodeLookupTimerExpiredDispatched();
+        },
         this);
 }
 
@@ -558,29 +558,27 @@ void ClusterProxy::processEvent(const bmqp::Event&   event,
 
             if (clusterMessage.choice().isStopRequestValue()) {
                 dispatcher()->execute(
-                    bdlf::BindUtil::bind(&ClusterProxy::processPeerStopRequest,
-                                         this,
-                                         source,
-                                         controlMessage),
+                    [this, source, controlMessage]() {
+                        processPeerStopRequest(source, controlMessage);
+                    },
                     this);
                 return;  // RETURN
             }
             if (clusterMessage.choice().isStopResponseValue()) {
                 dispatcher()->execute(
-                    bdlf::BindUtil::bind(
-                        &ClusterProxy::processPeerStopResponse,
-                        this,
-                        controlMessage),
+                    [this, controlMessage]() {
+                        processPeerStopResponse(controlMessage);
+                    },
                     this);
                 return;  // RETURN
             }
             if (clusterMessage.choice().isNodeStatusAdvisoryValue()) {
                 dispatcher()->execute(
-                    bdlf::BindUtil::bind(
-                        &ClusterProxy::processNodeStatusAdvisory,
-                        this,
-                        clusterMessage.choice().nodeStatusAdvisory(),
-                        source),
+                    [this,
+                     advisory = clusterMessage.choice().nodeStatusAdvisory(),
+                     source]() {
+                        processNodeStatusAdvisory(advisory, source);
+                    },
                     this);
                 return;  // RETURN
             }
@@ -591,9 +589,9 @@ void ClusterProxy::processEvent(const bmqp::Event&   event,
             // Forward it to the cluster-dispatcher thread.
 
             dispatcher()->execute(
-                bdlf::BindUtil::bind(&ClusterProxy::processResponseDispatched,
-                                     this,
-                                     controlMessage),
+                [this, controlMessage]() {
+                    processResponseDispatched(controlMessage);
+                },
                 this);
             return;  // RETURN
         }
@@ -703,10 +701,10 @@ ClusterProxy::sendRequest(const RequestManagerType::RequestSp& request,
 
     return d_clusterData.requestManager().sendRequest(
         request,
-        bdlf::BindUtil::bind(&mqbnet::ClusterNode::write,
-                             d_activeNode_p,
-                             bdlf::PlaceHolders::_1,
-                             bmqp::EventType::e_CONTROL),
+        [activeNode = d_activeNode_p](
+            const bsl::shared_ptr<bdlbb::Blob>& blob) {
+            return activeNode->write(blob, bmqp::EventType::e_CONTROL);
+        },
         d_activeNode_p->nodeDescription(),
         timeout);
 }
@@ -743,13 +741,13 @@ void ClusterProxy::processPeerStopRequest(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(inDispatcherThread());
 
-    d_queueHelper.processNodeStoppingNotification(
-        clusterNode,
-        &request,
-        0,
-        bdlf::BindUtil::bind(&ClusterProxy::finishStopSequence,
-                             this,
-                             clusterNode));
+    d_queueHelper.processNodeStoppingNotification(clusterNode,
+                                                  &request,
+                                                  0,
+                                                  [this, clusterNode]() {
+                                                      finishStopSequence(
+                                                          clusterNode);
+                                                  });
 }
 
 void ClusterProxy::finishStopSequence(
@@ -973,9 +971,11 @@ ClusterProxy::~ClusterProxy()
 //   (virtual: mqbi::Cluster)
 int ClusterProxy::start([[maybe_unused]] bsl::ostream& errorDescription)
 {
-    dispatcher()->execute(bdlf::BindUtil::bind(&ClusterProxy::startDispatched,
-                                               this),
-                          this);
+    dispatcher()->execute(
+        [this]() {
+            startDispatched();
+        },
+        this);
     dispatcher()->synchronize(this);
 
     return 0;
@@ -991,9 +991,9 @@ void ClusterProxy::initiateShutdown(const VoidFunctor& callback)
     // we can't execute from any of the cluster's dispatcher thread).
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&ClusterProxy::initiateShutdownDispatched,
-                             this,
-                             callback),
+        [this, callback]() {
+            initiateShutdownDispatched(callback);
+        },
         this);
 
     dispatcher()->synchronize(this);
@@ -1011,9 +1011,11 @@ void ClusterProxy::stop()
 
     d_isStarted = false;
 
-    dispatcher()->execute(bdlf::BindUtil::bind(&ClusterProxy::stopDispatched,
-                                               this),
-                          this);
+    dispatcher()->execute(
+        [this]() {
+            stopDispatched();
+        },
+        this);
     dispatcher()->synchronize(this);
 
     // We synchronize twice here.  1st synchronize() is needed to ensure that
@@ -1040,14 +1042,20 @@ void ClusterProxy::openQueue(
     // executed by *ANY* thread
 
     // Enqueue an event to process in the dispatcher thread
-    dispatcher()->execute(bdlf::BindUtil::bind(&ClusterQueueHelper::openQueue,
-                                               &d_queueHelper,
-                                               uri,
-                                               domain,
-                                               handleParameters,
-                                               clientContext,
-                                               callback),
-                          this);
+    dispatcher()->execute(
+        [queueHelper = &d_queueHelper,
+         uri,
+         domain,
+         handleParameters,
+         clientContext,
+         callback]() {
+            queueHelper->openQueue(uri,
+                                   domain,
+                                   handleParameters,
+                                   clientContext,
+                                   callback);
+        },
+        this);
 }
 
 void ClusterProxy::configureQueue(
@@ -1116,10 +1124,9 @@ int ClusterProxy::processCommand(mqbcmd::ClusterResult*        result,
 {
     // executed by *ANY* thread
     dispatcher()->execute(
-        bdlf::BindUtil::bind(&ClusterProxy::processCommandDispatched,
-                             this,
-                             result,
-                             bsl::ref(command)),
+        [this, result, &command]() {
+            processCommandDispatched(result, command);
+        },
         this);
     dispatcher()->synchronize(this);
 
@@ -1366,17 +1373,16 @@ void ClusterProxy::onNodeStateChange(mqbnet::ClusterNode* node,
         // 'mqbnet::ClusterNode::channel' and 'negotiationMessage'
 
         dispatcher()->execute(
-            bdlf::BindUtil::bind(&ClusterProxy::onNodeUpDispatched,
-                                 this,
-                                 node,
-                                 node->identity()),
+            [this, node, identity = node->identity()]() {
+                onNodeUpDispatched(node, identity);
+            },
             this);
     }
     else {
         dispatcher()->execute(
-            bdlf::BindUtil::bind(&ClusterProxy::onNodeDownDispatched,
-                                 this,
-                                 node),
+            [this, node]() {
+                onNodeDownDispatched(node);
+            },
             this);
     }
 }
