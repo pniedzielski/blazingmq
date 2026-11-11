@@ -27,7 +27,6 @@
 // BDE
 #include <ball_log.h>
 #include <bdlb_scopeexit.h>
-#include <bdlf_bind.h>
 #include <bdls_filesystemutil.h>
 #include <bdls_pathutil.h>
 #include <bdlt_datetime.h>
@@ -294,10 +293,9 @@ int Ledger::rollOver()
     if (!d_config.keepOldLogs()) {
         d_config.scheduler()->scheduleEvent(
             bmqu::Time::nowMonotonicClock(),
-            bdlf::BindUtil::bind(&Ledger::closeAndCleanup,
-                                 this,
-                                 lastLog,
-                                 lastLogIndex));
+            [this, log = lastLog, lastLogIndex]() {
+                closeAndCleanup(log, lastLogIndex);
+            });
     }
 
     return LedgerOpResult::e_SUCCESS;
@@ -433,8 +431,9 @@ int Ledger::open(int flags)
     }
 
     d_state = LedgerState::e_OPENED;
-    bdlb::ScopeExitAny guard(
-        bdlf::BindUtil::bind(openFailureCleanup, &d_state, &d_logs));
+    bdlb::ScopeExitAny guard([this]() {
+        openFailureCleanup(&d_state, &d_logs);
+    });
 
     // Look for files matching the location and pattern specified in the config
     bsl::string pattern;

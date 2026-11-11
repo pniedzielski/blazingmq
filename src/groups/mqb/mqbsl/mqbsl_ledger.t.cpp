@@ -26,7 +26,6 @@
 #include <bdlbb_blob.h>
 #include <bdlbb_blobutil.h>
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 #include <bdls_pathutil.h>
 #include <bsl_cstring.h>  // for memcmp
 #include <bsl_memory.h>
@@ -194,11 +193,11 @@ struct Tester {
             .setLogIdGenerator(d_logIdGenerator_sp)
             .setKeepOldLogs(keepOldLogs)
             .setLogFactory(d_logFactory_sp)
-            .setExtractLogIdCallback(
-                bdlf::BindUtil::bind(&extractLogIdCallback,
-                                     bdlf::PlaceHolders::_1,  // logId
-                                     bdlf::PlaceHolders::_2,  // logPath
-                                     d_logIdGenerator_sp))
+            .setExtractLogIdCallback([logIdGenerator = d_logIdGenerator_sp](
+                                         mqbu::StorageKey*  logId,
+                                         const bsl::string& logPath) {
+                return extractLogIdCallback(logId, logPath, logIdGenerator);
+            })
             .setValidateLogCallback(&validateLogCallback)
             .setRolloverCallback(&onRolloverCallback)
             .setCleanupCallback(&cleanupCallback);
