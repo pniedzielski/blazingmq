@@ -122,7 +122,7 @@ void Domain::unregisterQueue(mqbi::Queue* queue)
     BSLS_ASSERT_SAFE(lookupQueue(0, queue->uri()) == 0 &&
                      "'queue' was not registered with the domain");
 
-    QueueMap::iterator it = d_queues.find(queue->uri().queue());
+    auto it = d_queues.find(queue->uri().queue());
     if (it == d_queues.end()) {
         return;  // RETURN
     }
@@ -156,7 +156,7 @@ int Domain::processCommand(mqbcmd::DomainResult*        result,
 int Domain::lookupQueue(bsl::shared_ptr<mqbi::Queue>* out,
                         const bmqt::Uri&              uri) const
 {
-    QueueMap::const_iterator it = d_queues.find(uri.queue());
+    auto it = d_queues.find(uri.queue());
     if (it == d_queues.end()) {
         return -1;  // RETURN
     }
