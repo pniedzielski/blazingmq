@@ -72,8 +72,6 @@
 #include <bdlb_scopeexit.h>
 #include <bdlb_string.h>
 #include <bdlbb_blobutil.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_algorithm.h>
@@ -286,9 +284,12 @@ struct ChannelFactoryBuilders {
             bsl::allocate_shared<bmqio::NtcChannelFactory>(allocator,
                                                            interfaceConfig,
                                                            blobBufferFactory);
-        factory->onCreate(bdlf::BindUtil::bind(&ntcChannelPreCreation,
-                                               bdlf::PlaceHolders::_1,
-                                               bdlf::PlaceHolders::_2));
+        factory->onCreate(
+            [](const bsl::shared_ptr<bmqio::NtcChannel>& channel,
+               const bsl::shared_ptr<bmqio::ChannelFactoryOperationHandle>&
+                   handle) {
+                ntcChannelPreCreation(channel, handle);
+            });
         return factory;
     }
 
@@ -303,11 +304,10 @@ struct ChannelFactoryBuilders {
                 prev.get(),
                 bmqex::ExecutionPolicyUtil::neverBlocking().useExecutor(
                     resolutionContext_sp->executor()))
-                .resolutionFn(bdlf::BindUtil::bind(
-                    &monitoredDNSResolution,
-                    bdlf::PlaceHolders::_1,   // resolvedUri
-                    bdlf::PlaceHolders::_2))  // channel
-        );
+                .resolutionFn([](bsl::string*          resolvedUri,
+                                 const bmqio::Channel& baseChannel) {
+                    monitoredDNSResolution(resolvedUri, baseChannel);
+                }));
     }
 
     static ChannelFactorySP
@@ -318,15 +318,18 @@ struct ChannelFactoryBuilders {
         return bsl::allocate_shared<bmqio::ReconnectingChannelFactory>(
             allocator,
             bmqio::ReconnectingChannelFactoryConfig(prev.get(), scheduler)
-                .setReconnectIntervalFn(bdlf::BindUtil::bind(
-                    &bmqio::ReconnectingChannelFactoryUtil::
-                        defaultConnectIntervalFn,
-                    bdlf::PlaceHolders::_1,        // interval
-                    bdlf::PlaceHolders::_2,        // options
-                    bdlf::PlaceHolders::_3,        // timeSinceLastAttempt
-                    bsls::TimeInterval(3 * 60.0),  // resetReconnectTime
-                    bsls::TimeInterval(30.0)))     // maxInterval
-        );
+                .setReconnectIntervalFn(
+                    [](bsls::TimeInterval*          interval,
+                       const bmqio::ConnectOptions& options,
+                       const bsls::TimeInterval&    timeSinceLastAttempt) {
+                        bmqio::ReconnectingChannelFactoryUtil::
+                            defaultConnectIntervalFn(
+                                interval,
+                                options,
+                                timeSinceLastAttempt,
+                                bsls::TimeInterval(3 * 60.0),  // reset time
+                                bsls::TimeInterval(30.0));     // maxInterval
+                    }));
     }
 
     static ChannelFactorySP statChannelFactory(
@@ -443,15 +446,17 @@ void TCPSessionFactory::handleInitialConnection(
             context->d_negotiationUserData_sp,
             context->d_resultState_p,
             channel,
-            bdlf::BindUtil::bindS(
-                d_allocator_p,
-                &TCPSessionFactory::initialConnectionComplete,
-                this,
-                bdlf::PlaceHolders::_1,  // status
-                bdlf::PlaceHolders::_2,  // errorDescription
-                bdlf::PlaceHolders::_3,  // session
-                bdlf::PlaceHolders::_4,  // channel
-                context));
+            [this, context](
+                int                                    status,
+                const bsl::string&                     errorDescription,
+                const bsl::shared_ptr<Session>&        session,
+                const bsl::shared_ptr<bmqio::Channel>& negotiatedChannel) {
+                initialConnectionComplete(status,
+                                          errorDescription,
+                                          session,
+                                          negotiatedChannel,
+                                          context);
+            });
 
     // Register the context.  It will be removed in
     // 'initialConnectionComplete'.
@@ -462,12 +467,9 @@ void TCPSessionFactory::handleInitialConnection(
     }
 
     // Register as observer of the channel to get the 'onClose'
-    channel->onClose(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &TCPSessionFactory::onClose,
-                              this,
-                              channel,
-                              bdlf::PlaceHolders::_1 /* bmqio::Status */));
+    channel->onClose([this, channel](const bmqio::Status& status) {
+        onClose(channel, status);
+    });
 
     initialConnectionContext_sp->handleInitialConnection();
 }
@@ -661,11 +663,10 @@ void TCPSessionFactory::initialConnectionComplete(
         tmpSession.release();
     bsl::shared_ptr<Session> monitoredSession(
         rawSession.first,
-        bdlf::BindUtil::bind(&TCPSessionFactory::onSessionDestroyed,
-                             this,
-                             d_self.acquireWeak(),
-                             bdlf::PlaceHolders::_1,  // ptr
-                             rawSession.second));     // rep
+        [this, self = d_self.acquireWeak(), rep = rawSession.second](
+            Session* ptr) {
+            onSessionDestroyed(self, ptr, rep);
+        });
 
     ChannelInfoSp info;
     bool          isChannelClosed = false;
@@ -713,9 +714,9 @@ void TCPSessionFactory::initialConnectionComplete(
                 // is established, 'onClose' will disable heartbeat.
                 d_scheduler_p->scheduleEvent(
                     bsls::SystemTime::nowMonotonicClock(),
-                    bdlf::BindUtil::bind(&TCPSessionFactory::enableHeartbeat,
-                                         this,
-                                         info));
+                    [this, info]() {
+                        enableHeartbeat(info);
+                    });
             }
         }
     }  // close mutex lock guard                                      // UNLOCK
@@ -740,12 +741,11 @@ void TCPSessionFactory::initialConnectionComplete(
             monitoredSession,
             initialConnectionContext_sp->negotiationContext()->cluster(),
             initialConnectionContext_sp->resultState(),
-            bdlf::BindUtil::bind(&TCPSessionFactory::readCallback,
-                                 this,
-                                 bdlf::PlaceHolders::_1,  // status
-                                 bdlf::PlaceHolders::_2,  // numNeeded
-                                 bdlf::PlaceHolders::_3,  // blob
-                                 info.get()));
+            [this, channelInfo = info.get()](const bmqio::Status& status,
+                                             int*                 numNeeded,
+                                             bdlbb::Blob*         blob) {
+                readCallback(status, numNeeded, blob, channelInfo);
+            });
     }
 
     if (!result) {
@@ -927,11 +927,12 @@ void TCPSessionFactory::onClose(const bsl::shared_ptr<bmqio::Channel>& channel,
                 //       'disableHeartbeat' in this case.
                 d_scheduler_p->scheduleEvent(
                     bsls::SystemTime::nowMonotonicClock(),
-                    bdlf::BindUtil::bind(
-                        bmqu::WeakMemFnUtil::weakMemFn(
-                            &TCPSessionFactory::disableHeartbeat,
-                            d_self.acquireWeak()),
-                        channel.get()));
+                    [weakFn = bmqu::WeakMemFnUtil::weakMemFn(
+                         &TCPSessionFactory::disableHeartbeat,
+                         d_self.acquireWeak()),
+                     channelPtr = channel.get()]() {
+                        weakFn(channelPtr);
+                    });
             }
         }
 
@@ -1306,11 +1307,11 @@ int TCPSessionFactory::start(bsl::ostream& errorDescription)
     }
 
     bmqio::StatChannelFactoryConfig::StatContextCreatorFn statContextCreator(
-        bdlf::BindUtil::bind(&TCPSessionFactory::channelStatContextCreator,
-                             this,
-                             bdlf::PlaceHolders::_1,  // channel
-                             bdlf::PlaceHolders::_2)  // handle
-    );
+        [this](
+            const bsl::shared_ptr<bmqio::Channel>&                  channel,
+            const bsl::shared_ptr<bmqio::StatChannelFactoryHandle>& handle) {
+            return channelStatContextCreator(channel, handle);
+        });
 
     typedef bmqio::ChannelFactoryPipeline::Config::ChannelFactoryBuilder
         ChannelFactoryBuilder;
@@ -1320,21 +1321,30 @@ int TCPSessionFactory::start(bsl::ostream& errorDescription)
                                                   interfaceConfig,
                                                   d_blobBufferFactory_p);
     ChannelFactoryBuilder resolvingChannelFactoryBuilder =
-        bdlf::BindUtil::bind(ChannelFactoryBuilders::resolvingChannelFactory,
-                             d_allocator_p,
-                             bdlf::PlaceHolders::_1,
-                             d_resolutionContext_sp);
+        [allocator            = d_allocator_p,
+         resolutionContext_sp = d_resolutionContext_sp](
+            ChannelFactoryBuilders::ChannelFactorySP& prev) {
+            return ChannelFactoryBuilders::resolvingChannelFactory(
+                allocator,
+                prev,
+                resolutionContext_sp);
+        };
     ChannelFactoryBuilder reconnectingChannelFactoryBuilder =
-        bdlf::BindUtil::bind(
-            ChannelFactoryBuilders::reconnectingChannelFactory,
-            d_allocator_p,
-            bdlf::PlaceHolders::_1,
-            d_scheduler_p);
-    ChannelFactoryBuilder statChannelFactoryBuilder = bdlf::BindUtil::bind(
-        ChannelFactoryBuilders::statChannelFactory,
-        d_allocator_p,
-        bdlf::PlaceHolders::_1,
-        statContextCreator);
+        [allocator = d_allocator_p, scheduler = d_scheduler_p](
+            ChannelFactoryBuilders::ChannelFactorySP& prev) {
+            return ChannelFactoryBuilders::reconnectingChannelFactory(
+                allocator,
+                prev,
+                scheduler);
+        };
+    ChannelFactoryBuilder statChannelFactoryBuilder =
+        [allocator = d_allocator_p,
+         statContextCreator](ChannelFactoryBuilders::ChannelFactorySP& prev) {
+            return ChannelFactoryBuilders::statChannelFactory(
+                allocator,
+                prev,
+                statContextCreator);
+        };
 
     {
         bmqio::ChannelFactoryPipeline::Config config(ntcChannelFactory,
@@ -1607,12 +1617,11 @@ int TCPSessionFactory::listen(const mqbcfg::TcpInterfaceListener& listener,
         &status,
         &listeningHandle_mp,
         listenOptions,
-        bdlf::BindUtil::bind(&TCPSessionFactory::channelStateCallback,
-                             this,
-                             bdlf::PlaceHolders::_1,  // event
-                             bdlf::PlaceHolders::_2,  // status
-                             bdlf::PlaceHolders::_3,  // channel
-                             context));
+        [this, context](bmqio::ChannelFactoryEvent::Enum       event,
+                        const bmqio::Status&                   channelStatus,
+                        const bsl::shared_ptr<bmqio::Channel>& channel) {
+            channelStateCallback(event, channelStatus, channel, context);
+        });
     if (!status) {
         BALL_LOG_ERROR << "#TCP_LISTEN_FAILED " << d_name
                        << ": failed listening to '" << endpoint.str()
@@ -1663,12 +1672,11 @@ int TCPSessionFactory::connect(
         &status,
         0,  // no handle ..
         options,
-        bdlf::BindUtil::bind(&TCPSessionFactory::channelStateCallback,
-                             this,
-                             bdlf::PlaceHolders::_1,  // event
-                             bdlf::PlaceHolders::_2,  // status
-                             bdlf::PlaceHolders::_3,  // channel
-                             context));
+        [this, context](bmqio::ChannelFactoryEvent::Enum       event,
+                        const bmqio::Status&                   channelStatus,
+                        const bsl::shared_ptr<bmqio::Channel>& channel) {
+            channelStateCallback(event, channelStatus, channel, context);
+        });
 
     if (!status) {
         BALL_LOG_ERROR << "#TCP_CONNECT_FAILED " << d_name

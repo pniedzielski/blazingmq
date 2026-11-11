@@ -166,11 +166,13 @@ class TCPSessionFactoryTest : public ::testing::Test {
         return 0;
     }
 
-    mqbstat::StatController::CommandProcessorFn
-    processCommandFn(bslma::Allocator* allocator)
+    mqbstat::StatController::CommandProcessorFn processCommandFn()
     {
-        using namespace bdlf::PlaceHolders;
-        return bdlf::BindUtil::bindS(allocator, processCommand, _1, _2, _3);
+        return [](const bslstl::StringRef& source,
+                  const bsl::string&       cmd,
+                  bsl::ostream&            os) {
+            return processCommand(source, cmd, os);
+        };
     }
 
     TCPSessionFactoryTest()
@@ -182,7 +184,7 @@ class TCPSessionFactoryTest : public ::testing::Test {
     , d_authenticator()
     , d_negotiator()
     , d_pluginManager(d_allocator)
-    , d_statController(processCommandFn(d_allocator),
+    , d_statController(processCommandFn(),
                        &d_pluginManager,
                        &d_blobBufferFactory,
                        0,  // no allocatorsStatContext
