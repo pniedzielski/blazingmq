@@ -172,8 +172,7 @@ Event createAckEventImpl(bmqp::AckEventBuilder& ackBuilder,
                               bmqimp::Event(bufferFactory, allocator),
                           allocator);
 
-    for (size_t i = 0; i != acks.size(); ++i) {
-        const MockSessionUtil::AckParams& params = acks[i];
+    for (const MockSessionUtil::AckParams& params : acks) {
         const QueueImplSp& impQueue = reinterpret_cast<const QueueImplSp&>(
             params.d_queueId);
 
@@ -187,8 +186,8 @@ Event createAckEventImpl(bmqp::AckEventBuilder& ackBuilder,
 
     implPtr->configureAsMessageEvent(
         bmqp::Event(ackBuilder.blob(), allocator));
-    for (size_t i = 0; i != acks.size(); ++i) {
-        implPtr->addContext(acks[i].d_correlationId);
+    for (const MockSessionUtil::AckParams& params : acks) {
+        implPtr->addContext(params.d_correlationId);
     }
 
     return event;
@@ -218,12 +217,10 @@ Event createPushEventImpl(
                               bmqimp::Event(bufferFactory, allocator),
                           allocator);
 
-    for (size_t i = 0; i != pushEventParams.size(); ++i) {
+    for (const MockSessionUtil::PushMessageParams& pushMessageParams :
+         pushEventParams) {
         const QueueImplSp& queueImplPtr = reinterpret_cast<const QueueImplSp&>(
-            static_cast<const QueueId&>(pushEventParams[i].d_queueId));
-
-        const MockSessionUtil::PushMessageParams& pushMessageParams =
-            pushEventParams[i];
+            static_cast<const QueueId&>(pushMessageParams.d_queueId));
 
         // By default, no flags are set; i.e. 0.
 

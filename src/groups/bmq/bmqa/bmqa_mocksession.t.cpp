@@ -178,15 +178,15 @@ struct EventHandler : public bmqa::SessionEventHandler {
             bsl::cout << "Un-popped events:\n";
         }
 
-        for (size_t i = 0; i != d_receivedMessageEvents.size(); ++i) {
-            bsl::cout << d_receivedMessageEvents[i] << "\n";
+        for (const auto& item : d_receivedMessageEvents) {
+            bsl::cout << item << "\n";
         }
-        for (size_t i = 0; i != d_receivedSessionEvents.size(); ++i) {
-            bsl::cout << d_receivedSessionEvents[i] << "\n";
+        for (const auto& item : d_receivedSessionEvents) {
+            bsl::cout << item << "\n";
         }
 
-        for (size_t i = 0; i != d_receivedResults.size(); ++i) {
-            bsl::cout << d_receivedResults[i] << "\n";
+        for (const auto& item : d_receivedResults) {
+            bsl::cout << item << "\n";
         }
 
         BSLS_ASSERT((unpoppedEvents == 0) &&
