@@ -37,7 +37,6 @@
 #include <ball_log.h>
 #include <bdlbb_blob.h>
 #include <bdlbb_blobutil.h>
-#include <bdlf_memfn.h>
 #include <bdls_processutil.h>
 #include <bdlt_currenttime.h>
 #include <bsl_algorithm.h>
@@ -185,10 +184,9 @@ void Interactive::processCommand(const StartCommand& command)
         BALL_LOG_INFO << "Creating processing threads";
         for (int i = 0; i < d_parameters.numProcessingThreads(); ++i) {
             bslmt::ThreadUtil::Handle threadHandle;
-            rc = bslmt::ThreadUtil::create(
-                &threadHandle,
-                bdlf::MemFnUtil::memFn(&Interactive::eventHandlerThread,
-                                       this));
+            rc = bslmt::ThreadUtil::create(&threadHandle, [this]() {
+                eventHandlerThread();
+            });
             BSLS_ASSERT_SAFE(rc == 0);
             d_eventHandlerThreads.push_back(threadHandle);
         }
@@ -273,7 +271,9 @@ void Interactive::processCommand(const OpenQueueCommand& command)
             &queueId,
             uri,
             flags,
-            bdlf::MemFnUtil::memFn(&Interactive::onOpenQueueStatus, this),
+            [this](const bmqa::OpenQueueStatus& status) {
+                onOpenQueueStatus(status);
+            },
             queueOptions);
         return;  // RETURN
     }
@@ -365,8 +365,9 @@ void Interactive::processCommand(const ConfigureQueueCommand& command)
         d_session_p->configureQueueAsync(
             &queueId,
             queueOptions,
-            bdlf::MemFnUtil::memFn(&Interactive::onConfigureQueueStatus,
-                                   this));
+            [this](const bmqa::ConfigureQueueStatus& status) {
+                onConfigureQueueStatus(status);
+            });
 
         return;  // RETURN
     }
@@ -405,7 +406,9 @@ void Interactive::processCommand(const CloseQueueCommand& command)
         // Logging and response handling will be done in the callback
         d_session_p->closeQueueAsync(
             &queueId,
-            bdlf::MemFnUtil::memFn(&Interactive::onCloseQueueStatus, this));
+            [this](const bmqa::CloseQueueStatus& status) {
+                onCloseQueueStatus(status);
+            });
         return;  // RETURN
     }
 
