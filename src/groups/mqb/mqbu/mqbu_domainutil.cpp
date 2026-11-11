@@ -55,8 +55,8 @@ bool isValidTier(bsl::string_view tier)
         return false;
     }
 
-    for (size_t pos = 0; pos < tier.length(); ++pos) {
-        if (!isAlnumOrDash(tier[pos])) {
+    for (char ch : tier) {
+        if (!isAlnumOrDash(ch)) {
             return false;
         }
     }
