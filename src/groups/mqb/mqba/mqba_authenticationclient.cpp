@@ -30,7 +30,6 @@
 #include <bmqu_time.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bsl_optional.h>
 #include <bslmt_lockguard.h>
 #include <bsls_timeinterval.h>
@@ -236,8 +235,9 @@ int AuthenticationClient::handleResponse(
                 &d_reauthHandle,
                 bsls::TimeInterval(bmqu::Time::nowMonotonicClock())
                     .addMilliseconds(reauthMs),
-                bdlf::BindUtil::bind(&AuthenticationClient::onReauthenticate,
-                                     this));
+                [this]() {
+                    onReauthenticate();
+                });
         }
 
         BALL_LOG_INFO << "Scheduled reauthentication"

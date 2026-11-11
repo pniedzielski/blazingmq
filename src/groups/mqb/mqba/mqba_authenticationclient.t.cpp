@@ -32,7 +32,6 @@
 // BDE
 #include <ball_severity.h>
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 #include <bdlmt_eventscheduler.h>
 #include <bsl_memory.h>
 #include <bsl_optional.h>
@@ -160,15 +159,15 @@ class TestBench {
     {
         bmqu::Time::shutdown();
         bmqu::Time::initialize(
-            bdlf::BindUtil::bindS(allocator,
-                                  &TestClock::realtimeClock,
-                                  &d_testClock),
-            bdlf::BindUtil::bindS(allocator,
-                                  &TestClock::monotonicClock,
-                                  &d_testClock),
-            bdlf::BindUtil::bindS(allocator,
-                                  &TestClock::highResTimer,
-                                  &d_testClock),
+            [this]() {
+                return d_testClock.realtimeClock();
+            },
+            [this]() {
+                return d_testClock.monotonicClock();
+            },
+            [this]() {
+                return d_testClock.highResTimer();
+            },
             d_allocator_p);
 
         int rc = d_scheduler.start();
