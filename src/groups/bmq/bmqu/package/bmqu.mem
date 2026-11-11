@@ -21,4 +21,5 @@ bmqu_temputil
 bmqu_throttledaction
 bmqu_time
 bmqu_todo
+bmqu_uniqueptr
 bmqu_weakmemfn
