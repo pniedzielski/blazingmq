@@ -258,12 +258,12 @@ void StorageManager::onWatchdog(int partitionId, int generation)
 
     dispatcher()->execute(
         [this, partitionId, generation]() {
-            onWatchdogDispatched(partitionId, generation);
+            processWatchdog(partitionId, generation);
         },
         d_cluster_p);
 }
 
-void StorageManager::onWatchdogDispatched(int partitionId, int generation)
+void StorageManager::processWatchdog(int partitionId, int generation)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -396,16 +396,16 @@ void StorageManager::enqueuePartitionFSMEvent(
     mqbs::FileStore* fs = d_fileStores[partitionId].get();
     BSLS_ASSERT_SAFE(fs);
     if (fs->inDispatcherThread()) {
-        enqueuePartitionFSMEventDispatched(event, eventData);
+        verifyAndEnqueuePartitionFSMEvent(event, eventData);
     }
     else {
         fs->execute([this, event, eventData]() {
-            enqueuePartitionFSMEventDispatched(event, eventData);
+            verifyAndEnqueuePartitionFSMEvent(event, eventData);
         });
     }
 }
 
-void StorageManager::enqueuePartitionFSMEventDispatched(
+void StorageManager::verifyAndEnqueuePartitionFSMEvent(
     PartitionFSM::Event::Enum    event,
     const PartitionFSMEventData& eventData)
 {
@@ -507,7 +507,7 @@ void StorageManager::enqueuePartitionFSMEventDispatched(
     d_partitionFSMVec[partitionId]->enqueueEvent(event, eventData);
 }
 
-void StorageManager::setPrimaryStatusForPartitionDispatched(
+void StorageManager::applyPrimaryStatusForPartition(
     int                                partitionId,
     bmqp_ctrlmsg::PrimaryStatus::Value value)
 {
@@ -566,7 +566,7 @@ void StorageManager::setPrimaryStatusForPartitionDispatched(
     }
 }
 
-void StorageManager::clearPrimaryForPartitionDispatched(
+void StorageManager::clearPrimaryForPartitionIfCurrent(
     int                  partitionId,
     mqbnet::ClusterNode* primary)
 {
@@ -1332,9 +1332,8 @@ void StorageManager::processReplicaDataRequestDrop(
                              eventData);
 }
 
-void StorageManager::processPrimaryStateResponseDispatched(
-    const RequestSp&     context,
-    mqbnet::ClusterNode* responder)
+void StorageManager::applyPrimaryStateResponse(const RequestSp&     context,
+                                               mqbnet::ClusterNode* responder)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -1459,20 +1458,19 @@ void StorageManager::processPrimaryStateResponse(
     // dispatch to the CLUSTER DISPATCHER
 
     if (d_cluster_p->inDispatcherThread()) {
-        processPrimaryStateResponseDispatched(context, responder);
+        applyPrimaryStateResponse(context, responder);
     }
     else {
         d_dispatcher_p->execute(
             [this, context, responder]() {
-                processPrimaryStateResponseDispatched(context, responder);
+                applyPrimaryStateResponse(context, responder);
             },
             d_cluster_p);
     }
 }
 
-void StorageManager::processReplicaStateResponseDispatched(
-    const RequestSp&     requestContext,
-    mqbnet::ClusterNode* responder)
+void StorageManager::applyReplicaStateResponse(const RequestSp& requestContext,
+                                               mqbnet::ClusterNode* responder)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -1580,14 +1578,13 @@ void StorageManager::processReplicaStateResponse(
     // dispatch to the CLUSTER DISPATCHER
     d_dispatcher_p->execute(
         [this, requestContext, responder]() {
-            processReplicaStateResponseDispatched(requestContext, responder);
+            applyReplicaStateResponse(requestContext, responder);
         },
         d_cluster_p);
 }
 
-void StorageManager::processReplicaDataResponseDispatched(
-    const RequestSp&     context,
-    mqbnet::ClusterNode* responder)
+void StorageManager::applyReplicaDataResponse(const RequestSp&     context,
+                                              mqbnet::ClusterNode* responder)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -1770,12 +1767,12 @@ void StorageManager::processReplicaDataResponse(const RequestSp&     context,
     // dispatch to the CLUSTER DISPATCHER
     d_dispatcher_p->execute(
         [this, context, responder]() {
-            processReplicaDataResponseDispatched(context, responder);
+            applyReplicaDataResponse(context, responder);
         },
         d_cluster_p);
 }
 
-void StorageManager::processShutdownEventDispatched(int partitionId)
+void StorageManager::processPartitionShutdownEvent(int partitionId)
 {
     // executed by *QUEUE_DISPATCHER* thread with the specified 'partitionId'
 
@@ -1819,7 +1816,7 @@ void StorageManager::do_startWatchdog(
     // prevents resetting the timer during error retries (e.g.,
     // ERROR_RECEIVING_DATA_CHUNKS transitions that enqueue
     // REAPPLY_SELF_PRIMARY without stopping the watchdog).  After a
-    // watchdog fires, `onWatchdogDispatched` sets `d_active` to false,
+    // watchdog fires, `processWatchdog` sets `d_active` to false,
     // so a subsequent call here will start a fresh timer for the retry.
     if (!ctx.d_active) {
         ctx.d_eventHandle.release();
@@ -3072,7 +3069,7 @@ void StorageManager::do_processBufferedPrimaryStatusAdvisories(
     PartitionInfo& pinfo = d_partitionInfoVec[partitionId];
 
     // we check this either upon transition to HEALED (this action) or after
-    // (in setPrimaryStatusForPartitionDispatched)
+    // (in applyPrimaryStatusForPartition)
 
     // TODO: is it possible to have buffered advisories and E_ACTIVE status?
     if (pinfo.primaryStatus() == bmqp_ctrlmsg::PrimaryStatus::E_ACTIVE) {
@@ -4448,7 +4445,7 @@ void StorageManager::clearPrimaryForPartition(int                  partitionId,
     BSLS_ASSERT_SAFE(fs);
 
     fs->execute([this, partitionId, primary]() {
-        clearPrimaryForPartitionDispatched(partitionId, primary);
+        clearPrimaryForPartitionIfCurrent(partitionId, primary);
     });
 }
 
@@ -4467,7 +4464,7 @@ void StorageManager::setPrimaryStatusForPartition(
     BSLS_ASSERT_SAFE(fs);
 
     fs->execute([this, partitionId, value]() {
-        setPrimaryStatusForPartitionDispatched(partitionId, value);
+        applyPrimaryStatusForPartition(partitionId, value);
     });
 }
 
@@ -4979,7 +4976,7 @@ void StorageManager::processShutdownEvent()
         mqbs::FileStore* fs = d_fileStores[i].get();
 
         fs->execute([this, partitionId = static_cast<int>(i)]() {
-            processShutdownEventDispatched(partitionId);
+            processPartitionShutdownEvent(partitionId);
         });
     }
 }

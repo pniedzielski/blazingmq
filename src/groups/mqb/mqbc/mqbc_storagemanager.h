@@ -463,7 +463,7 @@ class StorageManager final : public mqbi::StorageManager,
     /// generation, the event is ignored as stale.
     ///
     /// THREAD: Executed by the cluster's dispatcher thread.
-    void onWatchdogDispatched(int partitionId, int generation);
+    void processWatchdog(int partitionId, int generation);
 
     /// Callback invoked when the recovery for the specified `paritionId` is
     /// complete.
@@ -486,22 +486,25 @@ class StorageManager final : public mqbi::StorageManager,
     /// THREAD: This method is invoked in the associated Queue dispatcher
     ///         thread for the partitionId in the specified `eventData`.
     void
-    enqueuePartitionFSMEventDispatched(PartitionFSM::Event::Enum    event,
-                                       const PartitionFSMEventData& eventData);
+    verifyAndEnqueuePartitionFSMEvent(PartitionFSM::Event::Enum    event,
+                                      const PartitionFSMEventData& eventData);
 
     /// Set the primary status of the specified `partitionId` to the specified
     /// `value`.
     ///
     /// THREAD: This method is invoked in the associated Queue dispatcher
     ///         thread for the specified `partitionId`.
-    void setPrimaryStatusForPartitionDispatched(
-        int                                partitionId,
-        bmqp_ctrlmsg::PrimaryStatus::Value value);
+    void
+    applyPrimaryStatusForPartition(int partitionId,
+                                   bmqp_ctrlmsg::PrimaryStatus::Value value);
 
+    /// Clear the primary of the specified `partitionId` if it is the
+    /// specified `primary`.
+    ///
     /// THREAD: This method is invoked in the associated Queue dispatcher
     ///         thread for the specified `partitionId`.
-    void clearPrimaryForPartitionDispatched(int                  partitionId,
-                                            mqbnet::ClusterNode* primary);
+    void clearPrimaryForPartitionIfCurrent(int                  partitionId,
+                                           mqbnet::ClusterNode* primary);
 
     /// Determine which nodes to send ReplicaDataRequestPush/Drop based on the
     /// `event`, and populate the specified `destinations`.
@@ -590,8 +593,8 @@ class StorageManager final : public mqbi::StorageManager,
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void processPrimaryStateResponseDispatched(const RequestSp&     context,
-                                               mqbnet::ClusterNode* responder);
+    void applyPrimaryStateResponse(const RequestSp&     context,
+                                   mqbnet::ClusterNode* responder);
 
     /// Process the PrimaryStateResponse contained in the specified
     /// `context` from the specified `responder`.
@@ -606,8 +609,8 @@ class StorageManager final : public mqbi::StorageManager,
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void processReplicaStateResponseDispatched(const RequestSp& requestContext,
-                                               mqbnet::ClusterNode* responder);
+    void applyReplicaStateResponse(const RequestSp&     requestContext,
+                                   mqbnet::ClusterNode* responder);
 
     /// Process the ReplicaStateResponse contained in the specified
     /// `requestContext` from the specified `responder`.
@@ -622,8 +625,8 @@ class StorageManager final : public mqbi::StorageManager,
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void processReplicaDataResponseDispatched(const RequestSp&     context,
-                                              mqbnet::ClusterNode* responder);
+    void applyReplicaDataResponse(const RequestSp&     context,
+                                  mqbnet::ClusterNode* responder);
 
     /// Process the ReplicaDataResponse contained in the specified
     /// `requestContext` from the specified `responder`.
@@ -633,9 +636,11 @@ class StorageManager final : public mqbi::StorageManager,
     void processReplicaDataResponse(const RequestSp&     context,
                                     mqbnet::ClusterNode* responder);
 
+    /// Process the shutdown event for the specified `partitionId`.
+    ///
     /// THREAD: Executed by the dispatcher thread for the specified
     ///         `partitionId`.
-    void processShutdownEventDispatched(int partitionId);
+    void processPartitionShutdownEvent(int partitionId);
 
     /// Explicitly call `flush` on all FileStores to enforce their GC.
     void forceFlushFileStores();
