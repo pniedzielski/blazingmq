@@ -260,21 +260,17 @@ static void test4_subscriptionsTest()
         bmqtst::TestHelperUtil::allocator());
     obj.loadSubscriptions(&snapshot);
 
-    for (bmqt::QueueOptions::SubscriptionsSnapshot::const_iterator citOut =
-             snapshot.begin();
-         citOut != snapshot.end();
-         ++citOut) {
+    for (const auto& [handleOut, subscriptionOut] : snapshot) {
         bsl::set<bmqt::SubscriptionHandle>::const_iterator citIn =
-            handles.find(citOut->first);
+            handles.find(handleOut);
         BMQTST_ASSERT(citIn != handles.end());
 
-        BMQTST_ASSERT_EQ(citOut->first.correlationId(),
-                         citIn->correlationId());
-        BMQTST_ASSERT(citOut->first == *citIn);
+        BMQTST_ASSERT_EQ(handleOut.correlationId(), citIn->correlationId());
+        BMQTST_ASSERT(handleOut == *citIn);
 
-        BMQTST_ASSERT_EQ(msgs, citOut->second.maxUnconfirmedMessages());
-        BMQTST_ASSERT_EQ(bytes, citOut->second.maxUnconfirmedBytes());
-        BMQTST_ASSERT_EQ(priority, citOut->second.consumerPriority());
+        BMQTST_ASSERT_EQ(msgs, subscriptionOut.maxUnconfirmedMessages());
+        BMQTST_ASSERT_EQ(bytes, subscriptionOut.maxUnconfirmedBytes());
+        BMQTST_ASSERT_EQ(priority, subscriptionOut.consumerPriority());
     }
     BMQTST_ASSERT_EQ(handles.size(), snapshot.size());
 }
