@@ -161,18 +161,6 @@ class TwoKeyHashMap;
 template <class>
 class TwoKeyHashMapValue;
 
-// ==========================
-// struct TwoKeyHashMap_Erase
-// ==========================
-
-/// Erase the specified `value` from the specified `container` via a call to
-/// `container->erase(*value)`.
-struct TwoKeyHashMap_Erase {
-    // MANIPULATORS
-    template <class CONTAINER, class VALUE>
-    void operator()(CONTAINER* container, const VALUE* value) const;
-};
-
 // =========================
 // struct TwoKeyHashMap_Node
 // =========================
@@ -774,18 +762,6 @@ bool operator!=(const TwoKeyHashMapValue<MAP>& lhs,
 //                             INLINE DEFINITIONS
 // ============================================================================
 
-// --------------------------
-// struct TwoKeyHashMap_Erase
-// --------------------------
-
-// MANIPULATORS
-template <class CONTAINER, class VALUE>
-inline void TwoKeyHashMap_Erase::operator()(CONTAINER*   container,
-                                            const VALUE* value) const
-{
-    container->erase(*value);
-}
-
 // -------------------------
 // struct TwoKeyHashMap_Node
 // -------------------------
@@ -1241,7 +1217,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(K1_T&&    k1,
 
     // rollback k1Map insertion on failure
     BDLB_SCOPEEXIT_PROCTOR(k1MapGuard, [&]() {
-        TwoKeyHashMap_Erase()(&d_k1Map, &k1MapIter);
+        d_k1Map.erase(k1MapIter);
     });
 
     // try inserting in k2Map
@@ -1257,7 +1233,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(K1_T&&    k1,
 
     // rollback k2Map insertion on failure
     BDLB_SCOPEEXIT_PROCTOR(k2MapGuard, [&]() {
-        TwoKeyHashMap_Erase()(&d_k2Map, &k2MapIter);
+        d_k2Map.erase(k2MapIter);
     });
 
     // store the value
