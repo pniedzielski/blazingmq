@@ -623,10 +623,8 @@ static void test4_sendRequestTest()
             // ------------------------------------------------------------
             {
                 barrier->wait();
-                for (ReqVec::const_iterator it = requests.begin();
-                     it != requests.end();
-                     ++it) {
-                    context->sendChannelRequest(*it);
+                for (const ReqSp& request : requests) {
+                    context->sendChannelRequest(request);
                 }
             }
         };

@@ -532,10 +532,8 @@ void RequestManager::cancelAllRequestsImpl(
         return;  // RETURN
     }
 
-    for (RequestVec::const_iterator it = requestsCopy.begin();
-         it != requestsCopy.end();
-         ++it) {
-        applyResponse(*it, reason);
+    for (const RequestSp& request : requestsCopy) {
+        applyResponse(request, reason);
     }
 }
 
