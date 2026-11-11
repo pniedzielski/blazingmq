@@ -701,36 +701,6 @@ bmqt::CloseQueueResult::Enum SessionUtil::validateAndSetCloseQueueParameters(
     return bmqt::CloseQueueResult::e_SUCCESS;
 }
 
-class MessageEventCreator {
-    bmqp::BlobPoolUtil::BlobSpPool* d_blobSpPool_p;
-    bmqimp::BrokerSession*          d_brokerSession_p;
-
-  public:
-    MessageEventCreator(bmqp::BlobPoolUtil::BlobSpPool* blobSpPool_p,
-                        bmqimp::BrokerSession*          brokerSession_p)
-    : d_blobSpPool_p(blobSpPool_p)
-    , d_brokerSession_p(brokerSession_p)
-    {
-        // PRECONDITIONS
-        BSLS_ASSERT_OPT(d_blobSpPool_p);
-        BSLS_ASSERT_OPT(d_brokerSession_p);
-    }
-
-    MessageEvent operator()()
-    {
-        MessageEvent result;
-
-        // MessageEvent::d_impl is private
-        bsl::shared_ptr<bmqimp::Event>& eventImplSpRef =
-            reinterpret_cast<bsl::shared_ptr<bmqimp::Event>&>(result);
-
-        eventImplSpRef = d_brokerSession_p->createEvent();
-        eventImplSpRef->configureAsMessageEvent(d_blobSpPool_p);
-
-        return result;
-    }
-};
-
 }  // close unnamed namespace
 
 // -------------------------
@@ -772,9 +742,24 @@ void SessionImpl::loadMessageEventBuilder(MessageEventBuilder* builder)
 
     builderImplRef.d_guidGenerator_sp = d_guidGenerator_sp;
 
-    builderImplRef.d_messageEventFactory = MessageEventCreator(
-        d_application_mp->blobSpPool(),
-        &d_application_mp->brokerSession());
+    bmqp::BlobPoolUtil::BlobSpPool* blobSpPool =
+        d_application_mp->blobSpPool();
+    bmqimp::BrokerSession* brokerSession = &d_application_mp->brokerSession();
+    BSLS_ASSERT_OPT(blobSpPool);
+    BSLS_ASSERT_OPT(brokerSession);
+
+    builderImplRef.d_messageEventFactory = [blobSpPool, brokerSession]() {
+        MessageEvent result;
+
+        // MessageEvent::d_impl is private
+        bsl::shared_ptr<bmqimp::Event>& eventImplSpRef =
+            reinterpret_cast<bsl::shared_ptr<bmqimp::Event>&>(result);
+
+        eventImplSpRef = brokerSession->createEvent();
+        eventImplSpRef->configureAsMessageEvent(blobSpPool);
+
+        return result;
+    };
 
     builder->reset();
 }
