@@ -112,11 +112,9 @@ PropertyBag& PropertyBag::operator=(const PropertyBag& rhs)
 
         {  //   rhs LOCK
             bsls::SpinLockGuard guard(&rhs.d_lock);
-            for (ValueMap::const_iterator iter = rhs.d_values.begin();
-                 iter != rhs.d_values.end();
-                 ++iter) {
+            for (const auto& [name, value] : rhs.d_values) {
                 ValueSPtr newVal;
-                newVal.createInplace(allocator(), *iter->second, allocator());
+                newVal.createInplace(allocator(), *value, allocator());
                 localValues[newVal->name()] = newVal;
             }
         }  // rhs UNLOCK
@@ -144,9 +142,9 @@ PropertyBag::import(const bsl::vector<bslma::ManagedPtr<Value> >& values)
 {
     bsls::SpinLockGuard guard(&d_lock);  // LOCK
 
-    for (size_t i = 0; i < values.size(); ++i) {
+    for (const bslma::ManagedPtr<Value>& value : values) {
         ValueSPtr newVal;
-        newVal.createInplace(allocator(), *values[i], allocator());
+        newVal.createInplace(allocator(), *value, allocator());
         insertValueImp(newVal);
     }
 
@@ -221,10 +219,8 @@ void PropertyBag::loadAll(bsl::vector<bslma::ManagedPtr<Value> >* dest) const
 {
     bsls::SpinLockGuard guard(&d_lock);  // LOCK
     dest->reserve(dest->size() + d_values.size());
-    for (ValueMap::const_iterator iter = d_values.begin();
-         iter != d_values.end();
-         ++iter) {
-        bslma::ManagedPtr<Value> value(iter->second.managedPtr());
+    for (const auto& [name, valueSp] : d_values) {
+        bslma::ManagedPtr<Value> value(valueSp.managedPtr());
         dest->emplace_back(bsl::move(value));
     }
 }
@@ -294,11 +290,8 @@ PropertyBag::print(bsl::ostream& stream, int level, int spacesPerLevel) const
 
     bslim::Printer printer(&stream, level, spacesPerLevel);
     printer.start();
-    for (ValueMap::const_iterator iter = d_values.begin();
-         iter != d_values.end();
-         ++iter) {
-        printer.printAttribute(iter->second->name().c_str(),
-                               iter->second->d_value);
+    for (const auto& [name, value] : d_values) {
+        printer.printAttribute(value->name().c_str(), value->d_value);
     }
     printer.end();
 
