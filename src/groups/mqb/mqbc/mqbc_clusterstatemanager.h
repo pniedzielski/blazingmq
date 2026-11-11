@@ -168,106 +168,90 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
   private:
     // PRIVATE MANIPULATORS
     //   (virtual: mqbc::ClusterStateTableActions)
-    void do_abort(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
+    void do_abort(const EventWithMetadata& event) override;
+
+    void do_startWatchdog(const EventWithMetadata& event) override;
+
+    void do_stopWatchdog(const EventWithMetadata& event) override;
+
+    void do_triggerWatchdog(const EventWithMetadata& event) override;
+
+    void do_applyCSLSelf(const EventWithMetadata& event) override;
+
+    void do_initializeQueueKeyInfoMap(const EventWithMetadata& event) override;
+
+    void do_stopPFSMs(const EventWithMetadata& event) override;
+
+    void do_updatePrimaryInPFSMs(const EventWithMetadata& event) override;
+
+    void do_sendFollowerLSNRequests(const EventWithMetadata& event) override;
+
+    void do_sendFollowerLSNResponse(const EventWithMetadata& event) override;
 
     void
-    do_startWatchdog(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
+    do_sendFailureFollowerLSNResponse(const EventWithMetadata& event) override;
 
-    void do_stopWatchdog(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
+    void do_findHighestLSN(const EventWithMetadata& event) override;
 
-    void
-    do_triggerWatchdog(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
+    void do_sendFollowerClusterStateRequest(
+        const EventWithMetadata& event) override;
 
-    void do_applyCSLSelf(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
-
-    void do_initializeQueueKeyInfoMap(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_stopPFSMs(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
-
-    void do_updatePrimaryInPFSMs(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_sendFollowerLSNRequests(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_sendFollowerLSNResponse(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_sendFailureFollowerLSNResponse(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void
-    do_findHighestLSN(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
-
-    void do_sendFollowerClusterStateRequest(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_sendFollowerClusterStateResponse(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
+    void do_sendFollowerClusterStateResponse(
+        const EventWithMetadata& event) override;
 
     void do_sendFailureFollowerClusterStateResponse(
-        const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
+        const EventWithMetadata& event) override;
 
-    void do_storeSelfLSN(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
+    void do_storeSelfLSN(const EventWithMetadata& event) override;
+
+    void do_storeFollowerLSNs(const EventWithMetadata& event) override;
+
+    void do_removeFollowerLSN(const EventWithMetadata& event) override;
+
+    void do_checkLSNQuorum(const EventWithMetadata& event) override;
+
+    void do_sendRegistrationRequest(const EventWithMetadata& event) override;
+
+    void do_sendRegistrationResponse(const EventWithMetadata& event) override;
+
+    void do_sendFailureRegistrationResponse(
+        const EventWithMetadata& event) override;
+
+    void do_logUnexpectedCSLCommit(const EventWithMetadata& event) override;
 
     void
-    do_storeFollowerLSNs(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
-
-    void
-    do_removeFollowerLSN(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
-
-    void
-    do_checkLSNQuorum(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
-
-    void do_sendRegistrationRequest(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_sendRegistrationResponse(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_sendFailureRegistrationResponse(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_logUnexpectedCSLCommit(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_logStaleFollowerLSNResponse(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
+    do_logStaleFollowerLSNResponse(const EventWithMetadata& event) override;
 
     void do_logStaleFollowerClusterStateResponse(
-        const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
+        const EventWithMetadata& event) override;
 
     void do_logStaleFailureFollowerClusterStateResponse(
-        const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
-
-    void do_logFailFollowerLSNResponses(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_logFailFollowerClusterStateResponse(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_logFailRegistrationResponse(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_logUnexpectedRegistrationResponse(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_logUnexpectedFailureRegistrationResponse(
-        const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
-
-    void do_reapplyEvent(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
-
-    void do_reapplySelectLeader(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_reapplySelectFollower(const EventWithMetadata& event)
-        BSLS_KEYWORD_OVERRIDE;
-
-    void do_cleanupLSNs(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
+        const EventWithMetadata& event) override;
 
     void
-    do_cancelRequests(const EventWithMetadata& event) BSLS_KEYWORD_OVERRIDE;
+    do_logFailFollowerLSNResponses(const EventWithMetadata& event) override;
+
+    void do_logFailFollowerClusterStateResponse(
+        const EventWithMetadata& event) override;
+
+    void
+    do_logFailRegistrationResponse(const EventWithMetadata& event) override;
+
+    void do_logUnexpectedRegistrationResponse(
+        const EventWithMetadata& event) override;
+
+    void do_logUnexpectedFailureRegistrationResponse(
+        const EventWithMetadata& event) override;
+
+    void do_reapplyEvent(const EventWithMetadata& event) override;
+
+    void do_reapplySelectLeader(const EventWithMetadata& event) override;
+
+    void do_reapplySelectFollower(const EventWithMetadata& event) override;
+
+    void do_cleanupLSNs(const EventWithMetadata& event) override;
+
+    void do_cancelRequests(const EventWithMetadata& event) override;
 
     // PRIVATE MANIPULATORS
     //   (virtual: mqbc::ClusterStateObserver)
@@ -282,13 +266,13 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void onPartitionPrimaryAssignment(
-        int                                partitionId,
-        mqbnet::ClusterNode*               primary,
-        unsigned int                       leaseId,
-        bmqp_ctrlmsg::PrimaryStatus::Value status,
-        mqbnet::ClusterNode*               oldPrimary,
-        unsigned int                       oldLeaseId) BSLS_KEYWORD_OVERRIDE;
+    void
+    onPartitionPrimaryAssignment(int                  partitionId,
+                                 mqbnet::ClusterNode* primary,
+                                 unsigned int         leaseId,
+                                 bmqp_ctrlmsg::PrimaryStatus::Value status,
+                                 mqbnet::ClusterNode*               oldPrimary,
+                                 unsigned int oldLeaseId) override;
 
     // PRIVATE MANIPULATORS
 
@@ -384,7 +368,7 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
 
     /// Destroy this instance.  Behavior is undefined unless this instance
     /// is stopped.
-    ~ClusterStateManager() BSLS_KEYWORD_OVERRIDE;
+    ~ClusterStateManager() override;
 
     // MANIPULATORS
     //   (virtual: mqbi::ClusterStateManager)
@@ -395,23 +379,23 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    int start(bsl::ostream& errorDescription) BSLS_KEYWORD_OVERRIDE;
+    int start(bsl::ostream& errorDescription) override;
 
     /// Stop this instance.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 
     /// Set the storage manager to the specified `value`.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void setStorageManager(mqbi::StorageManager* value) BSLS_KEYWORD_OVERRIDE;
+    void setStorageManager(mqbi::StorageManager* value) override;
     /// Set the after partition primary assignment callback to the specified
     /// `value`.
     void setAfterPartitionPrimaryAssignmentCb(
-        const AfterPartitionPrimaryAssignmentCb& value) BSLS_KEYWORD_OVERRIDE;
+        const AfterPartitionPrimaryAssignmentCb& value) override;
 
     /// Set the primary for the specified `partitionId` to be the specified
     /// `primary` with the specified `leaseId`.
@@ -420,7 +404,7 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     ///         dispatcher thread.
     void setPrimary(int                  partitionId,
                     unsigned int         leaseId,
-                    mqbnet::ClusterNode* primary) BSLS_KEYWORD_OVERRIDE;
+                    mqbnet::ClusterNode* primary) override;
 
     /// Set the primary status of the specified `partitionId` to the
     /// specified `status`.
@@ -428,8 +412,7 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
     void setPrimaryStatus(int                                partitionId,
-                          bmqp_ctrlmsg::PrimaryStatus::Value status)
-        BSLS_KEYWORD_OVERRIDE;
+                          bmqp_ctrlmsg::PrimaryStatus::Value status) override;
 
     /// Mark the specified `partitions` as orphaned partitions, due to the
     /// loss of the specified `primary`.
@@ -437,7 +420,7 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
     void markOrphan(const bsl::vector<int>& partitions,
-                    mqbnet::ClusterNode*    primary) BSLS_KEYWORD_OVERRIDE;
+                    mqbnet::ClusterNode*    primary) override;
 
     /// Assign an available node to each partition which is currently
     /// orphan or is assigned to a node which is not available, and load the
@@ -446,8 +429,8 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void assignPartitions(bsl::vector<bmqp_ctrlmsg::PartitionPrimaryInfo>*
-                              partitions) BSLS_KEYWORD_OVERRIDE;
+    void assignPartitions(
+        bsl::vector<bmqp_ctrlmsg::PartitionPrimaryInfo>* partitions) override;
 
     /// Perform the actual assignment of the queue represented by the
     /// specified `uri` for a cluster member queue, that is assign it a
@@ -460,7 +443,7 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
     bool assignQueue(const bmqt::Uri&      uri,
-                     bmqp_ctrlmsg::Status* status) BSLS_KEYWORD_OVERRIDE;
+                     bmqp_ctrlmsg::Status* status) override;
 
     /// Register a queue info for the queue with the specified `advisory`.
     /// If the specified `forceUpdate` flag is true, update queue info even if
@@ -469,15 +452,15 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
     void registerQueueInfo(const bmqp_ctrlmsg::QueueInfo& advisory,
-                           bool forceUpdate) BSLS_KEYWORD_OVERRIDE;
+                           bool forceUpdate) override;
 
     /// Unassign the queue in the specified `advisory` by applying the
     /// advisory to the cluster state ledger owned by this object.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void unassignQueue(const bmqp_ctrlmsg::QueueUnAssignmentAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE;
+    void unassignQueue(
+        const bmqp_ctrlmsg::QueueUnAssignmentAdvisory& advisory) override;
 
     /// Send the current cluster state to follower nodes.  If the specified
     /// `sendPartitionPrimaryInfo` is true, the specified partition-primary
@@ -496,8 +479,7 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
         bool                 sendQueuesInfo,
         mqbnet::ClusterNode* node = 0,
         const bsl::vector<bmqp_ctrlmsg::PartitionPrimaryInfo>& partitions =
-            bsl::vector<bmqp_ctrlmsg::PartitionPrimaryInfo>())
-        BSLS_KEYWORD_OVERRIDE;
+            bsl::vector<bmqp_ctrlmsg::PartitionPrimaryInfo>()) override;
 
     /// Unregister the specified 'removed' and register the specified `added`
     /// for the specified  `domainName` and optionally specified `uri`.
@@ -509,32 +491,32 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     updateAppIds(const bsl::vector<bsl::string>& added,
                  const bsl::vector<bsl::string>& removed,
                  const bsl::string&              domainName,
-                 const bsl::string&              uri) BSLS_KEYWORD_OVERRIDE;
+                 const bsl::string&              uri) override;
 
     /// Invoked when a newly elected (i.e. passive) leader node initiates a
     /// sync with followers before transitioning to active leader.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void initiateLeaderSync(bool wait) BSLS_KEYWORD_OVERRIDE;
+    void initiateLeaderSync(bool wait) override;
 
     /// Process the specified leader-sync-state-query `message` from the
     /// specified `source`.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void processLeaderSyncStateQuery(
-        const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source) BSLS_KEYWORD_OVERRIDE;
+    void
+    processLeaderSyncStateQuery(const bmqp_ctrlmsg::ControlMessage& message,
+                                mqbnet::ClusterNode* source) override;
 
     /// Process the specified leader-sync-data-query `message` from the
     /// specified `source`.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void processLeaderSyncDataQuery(
-        const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source) BSLS_KEYWORD_OVERRIDE;
+    void
+    processLeaderSyncDataQuery(const bmqp_ctrlmsg::ControlMessage& message,
+                               mqbnet::ClusterNode* source) override;
 
     /// Process the specified follower-LSN-request `message` from the
     /// specified `source`.
@@ -542,8 +524,7 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
     void processFollowerLSNRequest(const bmqp_ctrlmsg::ControlMessage& message,
-                                   mqbnet::ClusterNode*                source)
-        BSLS_KEYWORD_OVERRIDE;
+                                   mqbnet::ClusterNode* source) override;
 
     /// Process the specified follower-cluster-state-request `message` from
     /// the specified `source`.
@@ -552,55 +533,55 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     ///         dispatcher thread.
     void processFollowerClusterStateRequest(
         const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source) BSLS_KEYWORD_OVERRIDE;
+        mqbnet::ClusterNode*                source) override;
 
     /// Process the specified leader-CSL-request `message` from the
     /// specified `source`.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void processRegistrationRequest(
-        const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source) BSLS_KEYWORD_OVERRIDE;
+    void
+    processRegistrationRequest(const bmqp_ctrlmsg::ControlMessage& message,
+                               mqbnet::ClusterNode* source) override;
 
     /// Process the specified cluster state `event`.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void processClusterStateEvent(const mqbevt::ClusterStateEvent& event)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    processClusterStateEvent(const mqbevt::ClusterStateEvent& event) override;
 
     /// Process the queue assignment in the specified `request`, received
     /// from the specified `requester`.  Return the queue assignment result.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void processQueueAssignmentRequest(
-        const bmqp_ctrlmsg::ControlMessage& request,
-        mqbnet::ClusterNode*                requester) BSLS_KEYWORD_OVERRIDE;
+    void
+    processQueueAssignmentRequest(const bmqp_ctrlmsg::ControlMessage& request,
+                                  mqbnet::ClusterNode* requester) override;
 
     /// Process the shutdown event.
     ///
     /// THREAD: Executed by any thread.
-    void processShutdownEvent() BSLS_KEYWORD_OVERRIDE;
+    void processShutdownEvent() override;
 
     /// Invoked when the specified `node` becomes unavailable.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void onNodeUnavailable(mqbnet::ClusterNode* node) BSLS_KEYWORD_OVERRIDE;
+    void onNodeUnavailable(mqbnet::ClusterNode* node) override;
 
     /// Invoked when this node is stopping.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void onNodeStopping() BSLS_KEYWORD_OVERRIDE;
+    void onNodeStopping() override;
 
     /// Invoked when this node is stopped.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void onNodeStopped() BSLS_KEYWORD_OVERRIDE;
+    void onNodeStopped() override;
 
     // MANIPULATORS
     //   (virtual: mqbc::ElectorInfoObserver)
@@ -614,12 +595,11 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
     void onClusterLeader(mqbnet::ClusterNode*          node,
-                         ElectorInfoLeaderStatus::Enum status)
-        BSLS_KEYWORD_OVERRIDE;
+                         ElectorInfoLeaderStatus::Enum status) override;
 
     // ACCESSORS
     /// Return the cluster state managed by this instacne.
-    const mqbc::ClusterState* clusterState() const BSLS_KEYWORD_OVERRIDE;
+    const mqbc::ClusterState* clusterState() const override;
 
     /// Invoked to perform validation of CSL's contents (on disk) against
     /// the "real" cluster state.  Logs a descriptive error message if
@@ -629,15 +609,15 @@ class ClusterStateManager BSLS_KEYWORD_FINAL
     /// dispatcher thread.
     ///
     /// @todo This is mostly temporary, used in phase I of integrating CSL.
-    void validateClusterStateLedger() const BSLS_KEYWORD_OVERRIDE;
+    void validateClusterStateLedger() const override;
 
     /// Load into the specified `out` the latest ledger LSN associated with
     /// this cluster node.  Return 0 on success, and a non-zero error code
     /// on failure.  Note that this involves iteration over the entire
     /// ledger which can be an expensive operation. This is necessary to
     /// give the latest LSN from the ledger.
-    int latestLedgerLSN(bmqp_ctrlmsg::LeaderMessageSequence* out) const
-        BSLS_KEYWORD_OVERRIDE;
+    int
+    latestLedgerLSN(bmqp_ctrlmsg::LeaderMessageSequence* out) const override;
 
     // ACCESSORS
 

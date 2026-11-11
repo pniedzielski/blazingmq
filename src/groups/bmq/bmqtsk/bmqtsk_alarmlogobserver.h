@@ -97,7 +97,7 @@ class AlarmLogObserver : public ball::ObserverAdapter {
     explicit AlarmLogObserver(bslma::Allocator* allocator);
 
     /// Destroy this object.
-    ~AlarmLogObserver() BSLS_KEYWORD_OVERRIDE;
+    ~AlarmLogObserver() override;
 
     // MANIPULATORS
     //  (virtual: ball::ObserverAdapter)
@@ -106,12 +106,12 @@ class AlarmLogObserver : public ball::ObserverAdapter {
     /// `context`.  If `record` correspond to an alarm record, its message
     /// will be dumped to stderr with respects to rate-controlled logic.
     void publish(const ball::Record&  record,
-                 const ball::Context& context) BSLS_KEYWORD_OVERRIDE;
+                 const ball::Context& context) override;
 
     /// Note: this member is overridden to get rid of the "hides the virtual
     ///       function" warning.
     inline void publish(const bsl::shared_ptr<const ball::Record>& record,
-                        const ball::Context& context) BSLS_KEYWORD_OVERRIDE
+                        const ball::Context& context) override
     {
         publish(*record, context);
     }

@@ -122,19 +122,19 @@ class StatChannel : public DecoratingChannelPartialImp {
     explicit StatChannel(const Config&     config,
                          bslma::Allocator* basicAllocator = 0);
 
-    ~StatChannel() BSLS_KEYWORD_OVERRIDE;
+    ~StatChannel() override;
 
     // MANIPULATORS
     // channel
-    void read(Status*                      status,
-              int                          numBytes,
-              const Channel::ReadCallback& readCallback,
-              const bsls::TimeInterval&    timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    read(Status*                      status,
+         int                          numBytes,
+         const Channel::ReadCallback& readCallback,
+         const bsls::TimeInterval&    timeout = bsls::TimeInterval()) override;
 
     void write(Status*            status,
                const bdlbb::Blob& blob,
-               bsls::Types::Int64 highWatermark) BSLS_KEYWORD_OVERRIDE;
+               bsls::Types::Int64 highWatermark) override;
 };
 
 }  // close package namespace

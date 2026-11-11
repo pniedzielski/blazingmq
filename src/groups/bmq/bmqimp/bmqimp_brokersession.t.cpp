@@ -2313,14 +2313,14 @@ class DTTestContext : public bmqpi::DTContext {
         // NOTHING
     }
 
-    bsl::shared_ptr<bmqpi::DTSpan> span() const BSLS_KEYWORD_OVERRIDE
+    bsl::shared_ptr<bmqpi::DTSpan> span() const override
     {
         bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);
         return d_currentSpan_sp;
     }
 
     bslma::ManagedPtr<void>
-    scope(const bsl::shared_ptr<bmqpi::DTSpan>& newSpan) BSLS_KEYWORD_OVERRIDE
+    scope(const bsl::shared_ptr<bmqpi::DTSpan>& newSpan) override
     {
         bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);
         bslma::ManagedPtr<void>        result(
@@ -2359,7 +2359,7 @@ class DTTestSpan : public bmqpi::DTSpan {
         d_eventsQueue_p->pushBack(event.str());
     }
 
-    ~DTTestSpan() BSLS_KEYWORD_OVERRIDE
+    ~DTTestSpan() override
     {
         bmqu::MemOutStream event(d_allocator_p);
         event << "END " << d_operation;
@@ -2367,10 +2367,7 @@ class DTTestSpan : public bmqpi::DTSpan {
         d_eventsQueue_p->pushBack(event.str());
     }
 
-    bsl::string_view operation() const BSLS_KEYWORD_OVERRIDE
-    {
-        return d_operation;
-    }
+    bsl::string_view operation() const override { return d_operation; }
 };
 
 class DTTestTracer : public bmqpi::DTTracer {
@@ -2388,10 +2385,10 @@ class DTTestTracer : public bmqpi::DTTracer {
         BSLS_ASSERT_SAFE(d_eventsQueue_p);
     }
 
-    bsl::shared_ptr<bmqpi::DTSpan> createChildSpan(
-        const bsl::shared_ptr<bmqpi::DTSpan>& parent,
-        const bsl::string_view&               operation,
-        const bmqpi::DTSpan::Baggage& baggage) const BSLS_KEYWORD_OVERRIDE
+    bsl::shared_ptr<bmqpi::DTSpan>
+    createChildSpan(const bsl::shared_ptr<bmqpi::DTSpan>& parent,
+                    const bsl::string_view&               operation,
+                    const bmqpi::DTSpan::Baggage& baggage) const override
     {
         bmqu::MemOutStream operationName(d_allocator_p);
         operationName << operation;

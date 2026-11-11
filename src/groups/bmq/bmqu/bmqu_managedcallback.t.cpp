@@ -68,12 +68,12 @@ struct IncrementCallback : public bmqu::ManagedCallback::CallbackFunctor {
         BSLS_ASSERT_SAFE(calls);
     }
 
-    ~IncrementCallback() BSLS_KEYWORD_OVERRIDE
+    ~IncrementCallback() override
     {
         // NOTHING
     }
 
-    void operator()() const BSLS_KEYWORD_OVERRIDE { ++(*d_calls_p); }
+    void operator()() const override { ++(*d_calls_p); }
 };
 
 void complexFunction(size_t*           calls,
@@ -110,12 +110,12 @@ struct ComplexCallback : bmqu::ManagedCallback::CallbackFunctor {
         BSLS_ASSERT_SAFE(calls);
     }
 
-    ~ComplexCallback() BSLS_KEYWORD_OVERRIDE
+    ~ComplexCallback() override
     {
         // NOTHING
     }
 
-    void operator()() const BSLS_KEYWORD_OVERRIDE { ++(*d_calls_p); }
+    void operator()() const override { ++(*d_calls_p); }
 };
 
 struct BigCallback : public bmqu::ManagedCallback::CallbackFunctor {
@@ -129,12 +129,12 @@ struct BigCallback : public bmqu::ManagedCallback::CallbackFunctor {
         BSLS_ASSERT_SAFE(calls);
     }
 
-    ~BigCallback() BSLS_KEYWORD_OVERRIDE
+    ~BigCallback() override
     {
         // NOTHING
     }
 
-    void operator()() const BSLS_KEYWORD_OVERRIDE { ++(*d_calls_p); }
+    void operator()() const override { ++(*d_calls_p); }
 };
 
 struct DestructorChecker : public bmqu::ManagedCallback::CallbackFunctor {
@@ -148,12 +148,9 @@ struct DestructorChecker : public bmqu::ManagedCallback::CallbackFunctor {
         *d_wasDestructorCalled_p = false;
     }
 
-    ~DestructorChecker() BSLS_KEYWORD_OVERRIDE
-    {
-        *d_wasDestructorCalled_p = true;
-    }
+    ~DestructorChecker() override { *d_wasDestructorCalled_p = true; }
 
-    void operator()() const BSLS_KEYWORD_OVERRIDE
+    void operator()() const override
     {
         // NOTHING
     }

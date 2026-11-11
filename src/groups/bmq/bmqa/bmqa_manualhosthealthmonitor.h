@@ -59,16 +59,16 @@ class ManualHostHealthMonitor : public bmqpi::HostHealthMonitor {
                             bslma::Allocator*           allocator = 0);
 
     /// Destructor.
-    ~ManualHostHealthMonitor() BSLS_KEYWORD_OVERRIDE;
+    ~ManualHostHealthMonitor() override;
 
     // MANIPULATORS
     bdlmt::SignalerConnection
-    observeHostHealth(const HostHealthChangeFn& cb) BSLS_KEYWORD_OVERRIDE;
+    observeHostHealth(const HostHealthChangeFn& cb) override;
 
     void setState(bmqt::HostHealthState::Enum newState);
 
     // ACCESSORS
-    bmqt::HostHealthState::Enum hostState() const BSLS_KEYWORD_OVERRIDE;
+    bmqt::HostHealthState::Enum hostState() const override;
 };
 
 }  // close package namespace

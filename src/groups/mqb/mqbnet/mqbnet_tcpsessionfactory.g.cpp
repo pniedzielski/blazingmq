@@ -199,7 +199,7 @@ class TCPSessionFactoryTest : public ::testing::Test {
         mqbcfg::BrokerConfig::set(d_appConfig);
     }
 
-    ~TCPSessionFactoryTest() BSLS_KEYWORD_OVERRIDE;
+    ~TCPSessionFactoryTest() override;
 
     mqbnet::TCPSessionFactory& obj() { return d_tcpSessionFactory; }
 };

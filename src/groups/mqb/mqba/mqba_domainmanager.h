@@ -313,7 +313,7 @@ class DomainManager BSLS_CPP11_FINAL : public mqbi::DomainFactory {
                   bslma::Allocator*         allocator);
 
     /// Destructor
-    ~DomainManager() BSLS_KEYWORD_OVERRIDE;
+    ~DomainManager() override;
 
     // MANIPULATORS
 
@@ -353,23 +353,22 @@ class DomainManager BSLS_CPP11_FINAL : public mqbi::DomainFactory {
     /// invoking the specified `callback` with the result.  Note that the
     /// `callback` may be executed directly from the caller's thread, or may
     /// be invoked asynchronously at a later time from a different thread.
-    void qualifyDomain(const bslstl::StringRef&                      name,
-                       const mqbi::DomainFactory::QualifiedDomainCb& callback)
-        BSLS_KEYWORD_OVERRIDE;
+    void qualifyDomain(
+        const bslstl::StringRef&                      name,
+        const mqbi::DomainFactory::QualifiedDomainCb& callback) override;
 
     /// Asynchronously get the domain with the specified fully resolved
     /// `name`, invoking the specified `callback` with the result.  Note
     /// that the `callback` may be executed directly from the caller's
     /// thread, or may be invoked asynchronously at a later time from a
     /// different thread.
-    void createDomain(const bsl::string&                         name,
-                      const mqbi::DomainFactory::CreateDomainCb& callback)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    createDomain(const bsl::string&                         name,
+                 const mqbi::DomainFactory::CreateDomainCb& callback) override;
 
     /// Synchronously get the domain with the specified `name`.  Return null
     /// if the domain has not been previously created via `createDomain`.
-    mqbi::Domain*
-    getDomain(const bsl::string& name) const BSLS_KEYWORD_OVERRIDE;
+    mqbi::Domain* getDomain(const bsl::string& name) const override;
 };
 
 }  // close package namespace

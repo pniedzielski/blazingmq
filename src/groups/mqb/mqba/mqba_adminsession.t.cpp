@@ -113,10 +113,9 @@ class TestAuthorizer : public mqbi::Authorizer {
   public:
     TestAuthorizer() {}
 
-    bool
-    authorize(BSLA_UNUSED const mqbact::Action& action,
-              BSLA_UNUSED const mqbplug::AuthenticationResult& authnResult)
-        BSLS_KEYWORD_OVERRIDE
+    bool authorize(
+        BSLA_UNUSED const mqbact::Action& action,
+        BSLA_UNUSED const mqbplug::AuthenticationResult& authnResult) override
     {
         return true;
     }

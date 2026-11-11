@@ -115,7 +115,7 @@ class DummySession : public Session {
                  bslma::Allocator*                       allocator);
 
     /// Destructor
-    ~DummySession() BSLS_KEYWORD_OVERRIDE;
+    ~DummySession() override;
 
     // MANIPULATORS
     //   (virtual: mqbnet::Session)
@@ -130,42 +130,42 @@ class DummySession : public Session {
     /// prevent destruction of the session object until the shutdown
     /// sequence completes.
     void tearDown(const bsl::shared_ptr<void>& handle,
-                  bool isBrokerShutdown) BSLS_KEYWORD_OVERRIDE;
+                  bool                         isBrokerShutdown) override;
 
     /// Initiate the shutdown of the session and invoke the specified
     /// `callback` upon completion of (asynchronous) shutdown sequence.
-    void initiateShutdown(const ShutdownCb& callback) BSLS_KEYWORD_OVERRIDE;
+    void initiateShutdown(const ShutdownCb& callback) override;
 
     /// Make the session abandon any work it has.
-    void invalidate() BSLS_KEYWORD_OVERRIDE;
+    void invalidate() override;
 
     /// Process the specified `event` received from the remote peer
     /// represented by the optionally specified `source`.  Note that this
     /// method is the entry point for all incoming events coming from the
     /// remote peer.
     void processEvent(const bmqp::Event&   event,
-                      mqbnet::ClusterNode* source = 0) BSLS_KEYWORD_OVERRIDE;
+                      mqbnet::ClusterNode* source = 0) override;
 
     // MANIPULATORS
     //   (virtual: mqbnet::Session)
 
     /// Return the channel associated to this session.
-    bsl::shared_ptr<bmqio::Channel> channel() const BSLS_KEYWORD_OVERRIDE;
+    bsl::shared_ptr<bmqio::Channel> channel() const override;
 
     /// Return the clusterNode associated to this session, or 0 if there are
     /// none.
-    ClusterNode* clusterNode() const BSLS_KEYWORD_OVERRIDE;
+    ClusterNode* clusterNode() const override;
 
     // ACCESSORS
     //   (virtual: mqbnet::Session)
     const bmqp_ctrlmsg::NegotiationMessage&
-    negotiationMessage() const BSLS_KEYWORD_OVERRIDE;
+    negotiationMessage() const override;
     // Return a reference not offering modifiable access to the negotiation
     // message received from the remote peer of this session during the
     // negotiation phase.
 
     /// Return a printable description of this session (e.g. for logging).
-    bsl::string_view description() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view description() const override;
 };
 
 // ============================================================================

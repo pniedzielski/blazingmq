@@ -32,10 +32,10 @@ using namespace BloombergLP;
 
 /// A test implementation of the `bmqpi::DTTracer` protocol.
 struct DTTracerTestImp : public bsls::ProtocolTestImp<bmqpi::DTTracer> {
-    virtual bsl::shared_ptr<bmqpi::DTSpan> createChildSpan(
-        const bsl::shared_ptr<bmqpi::DTSpan>& parent,
-        const bsl::string_view&               operation,
-        const bmqpi::DTSpan::Baggage& baggage) const BSLS_KEYWORD_OVERRIDE;
+    virtual bsl::shared_ptr<bmqpi::DTSpan>
+    createChildSpan(const bsl::shared_ptr<bmqpi::DTSpan>& parent,
+                    const bsl::string_view&               operation,
+                    const bmqpi::DTSpan::Baggage& baggage) const override;
 };
 
 // Define one of DTTracerTestImp methods out-of-line, to instruct the

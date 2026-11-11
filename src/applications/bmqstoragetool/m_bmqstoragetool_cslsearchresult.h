@@ -122,18 +122,17 @@ class CslSearchShortResult : public CslSearchResult {
 
     /// Process record with the specified `header`, `record` and
     /// `recordId`.
-    bool
-    processRecord(const mqbc::ClusterStateRecordHeader& header,
-                  const bmqp_ctrlmsg::ClusterMessage&   record,
-                  const mqbsi::LedgerRecordId& recordId) BSLS_KEYWORD_OVERRIDE;
+    bool processRecord(const mqbc::ClusterStateRecordHeader& header,
+                       const bmqp_ctrlmsg::ClusterMessage&   record,
+                       const mqbsi::LedgerRecordId& recordId) override;
 
     // ACCESSORS
 
     /// Output result of a search.
-    void outputResult() const BSLS_KEYWORD_OVERRIDE;
+    void outputResult() const override;
 
     /// Return a reference to the non-modifiable CSL printer
-    const bsl::shared_ptr<CslPrinter>& printer() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<CslPrinter>& printer() const override;
 };
 
 // ===========================
@@ -172,18 +171,17 @@ class CslSearchDetailResult : public CslSearchResult {
 
     /// Process record with the specified `header`, `record` and
     /// `recordId`.
-    bool
-    processRecord(const mqbc::ClusterStateRecordHeader& header,
-                  const bmqp_ctrlmsg::ClusterMessage&   record,
-                  const mqbsi::LedgerRecordId& recordId) BSLS_KEYWORD_OVERRIDE;
+    bool processRecord(const mqbc::ClusterStateRecordHeader& header,
+                       const bmqp_ctrlmsg::ClusterMessage&   record,
+                       const mqbsi::LedgerRecordId& recordId) override;
 
     // ACCESSORS
 
     /// Output result of a search.
-    void outputResult() const BSLS_KEYWORD_OVERRIDE;
+    void outputResult() const override;
 
     /// Return a reference to the non-modifiable CSL printer
-    const bsl::shared_ptr<CslPrinter>& printer() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<CslPrinter>& printer() const override;
 };
 
 // ==============================
@@ -211,18 +209,17 @@ class CslSearchResultDecorator : public CslSearchResult {
 
     /// Process record with the specified `header`, `record` and
     /// `recordId`.
-    bool
-    processRecord(const mqbc::ClusterStateRecordHeader& header,
-                  const bmqp_ctrlmsg::ClusterMessage&   record,
-                  const mqbsi::LedgerRecordId& recordId) BSLS_KEYWORD_OVERRIDE;
+    bool processRecord(const mqbc::ClusterStateRecordHeader& header,
+                       const bmqp_ctrlmsg::ClusterMessage&   record,
+                       const mqbsi::LedgerRecordId& recordId) override;
 
     // ACCESSORS
 
     /// Output result of a search.
-    void outputResult() const BSLS_KEYWORD_OVERRIDE;
+    void outputResult() const override;
 
     /// Return a reference to the non-modifiable CSL printer
-    const bsl::shared_ptr<CslPrinter>& printer() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<CslPrinter>& printer() const override;
 };
 
 // ======================================
@@ -256,15 +253,14 @@ class CslSearchSequenceNumberDecorator : public CslSearchResultDecorator {
 
     /// Process record with the specified `header`, `record` and
     /// `recordId`.
-    bool
-    processRecord(const mqbc::ClusterStateRecordHeader& header,
-                  const bmqp_ctrlmsg::ClusterMessage&   record,
-                  const mqbsi::LedgerRecordId& recordId) BSLS_KEYWORD_OVERRIDE;
+    bool processRecord(const mqbc::ClusterStateRecordHeader& header,
+                       const bmqp_ctrlmsg::ClusterMessage&   record,
+                       const mqbsi::LedgerRecordId& recordId) override;
 
     // ACCESSORS
 
     /// Output result of a search.
-    void outputResult() const BSLS_KEYWORD_OVERRIDE;
+    void outputResult() const override;
 };
 
 // ==============================
@@ -296,15 +292,14 @@ class CslSearchOffsetDecorator : public CslSearchResultDecorator {
 
     /// Process record with the specified `header`, `record` and
     /// `recordId`.
-    bool
-    processRecord(const mqbc::ClusterStateRecordHeader& header,
-                  const bmqp_ctrlmsg::ClusterMessage&   record,
-                  const mqbsi::LedgerRecordId& recordId) BSLS_KEYWORD_OVERRIDE;
+    bool processRecord(const mqbc::ClusterStateRecordHeader& header,
+                       const bmqp_ctrlmsg::ClusterMessage&   record,
+                       const mqbsi::LedgerRecordId& recordId) override;
 
     // ACCESSORS
 
     /// Output result of a search.
-    void outputResult() const BSLS_KEYWORD_OVERRIDE;
+    void outputResult() const override;
 };
 
 // ======================
@@ -350,18 +345,17 @@ class CslSummaryResult : public CslSearchResult {
 
     /// Process record with the specified `header`, `record` and
     /// `recordId`.
-    bool
-    processRecord(const mqbc::ClusterStateRecordHeader& header,
-                  const bmqp_ctrlmsg::ClusterMessage&   record,
-                  const mqbsi::LedgerRecordId& recordId) BSLS_KEYWORD_OVERRIDE;
+    bool processRecord(const mqbc::ClusterStateRecordHeader& header,
+                       const bmqp_ctrlmsg::ClusterMessage&   record,
+                       const mqbsi::LedgerRecordId& recordId) override;
 
     // ACCESSORS
 
     /// Output result of a search.
-    void outputResult() const BSLS_KEYWORD_OVERRIDE;
+    void outputResult() const override;
 
     /// Return a reference to the non-modifiable CSL printer
-    const bsl::shared_ptr<CslPrinter>& printer() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<CslPrinter>& printer() const override;
 };
 
 }  // close package namespace

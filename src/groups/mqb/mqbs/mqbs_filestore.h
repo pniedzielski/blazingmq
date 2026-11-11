@@ -858,18 +858,17 @@ class FileStore BSLS_KEYWORD_FINAL : public DataStore {
 
     /// Destroy this instance.  The behavior is undefined unless this
     /// instance has been closed.
-    ~FileStore() BSLS_KEYWORD_OVERRIDE;
+    ~FileStore() override;
 
     // MANIPULATORS
     //   (virtual: mqbi::DispatcherClient)
 
     /// Called by the `Dispatcher` when it has the specified `event` to
     /// deliver to the client.
-    void onDispatcherEvent(const mqbi::DispatcherEvent& event)
-        BSLS_KEYWORD_OVERRIDE;
+    void onDispatcherEvent(const mqbi::DispatcherEvent& event) override;
 
     /// Called by the dispatcher to flush any pending operation.
-    void flush() BSLS_KEYWORD_OVERRIDE;
+    void flush() override;
 
     /// Iterate over all storages and run garbage collection.
     /// Regularily invoked from the scheduler and executed from the dispatcher
@@ -877,10 +876,10 @@ class FileStore BSLS_KEYWORD_FINAL : public DataStore {
     void scheduledCleanupStorages();
 
     /// Return a pointer to the dispatcher this client is associated with.
-    mqbi::Dispatcher* dispatcher() BSLS_KEYWORD_OVERRIDE;
+    mqbi::Dispatcher* dispatcher() override;
 
     /// Return a reference to the dispatcherClientData.
-    mqbi::DispatcherClientData& dispatcherClientData() BSLS_KEYWORD_OVERRIDE;
+    mqbi::DispatcherClientData& dispatcherClientData() override;
 
     void dispatchEvent(mqbi::Dispatcher::DispatcherEventRvRef event);
 
@@ -908,13 +907,13 @@ class FileStore BSLS_KEYWORD_FINAL : public DataStore {
     /// when `queueKeyInfoMap` is null.  Return zero on success, non-zero value
     /// otherwise.
     int open(QueueKeyInfoMap* queueKeyInfoMap,
-             unsigned int     primaryLeaseId) BSLS_KEYWORD_OVERRIDE;
+             unsigned int     primaryLeaseId) override;
 
     /// Close this instance.  If the optional `flush` flag is true, flush
     /// the data store to disk.  If the optional `archive` flag is true,
     /// archive the data store.  Return zero on success, non-zero value
     /// otherwise.
-    int close(bool flush = false, bool archive = false) BSLS_KEYWORD_OVERRIDE;
+    int close(bool flush = false, bool archive = false) override;
 
     /// Create and load into the specified `storageSp` an instance of
     /// ReplicatedStorage for the queue having the specified `queueUri` and
@@ -923,7 +922,7 @@ class FileStore BSLS_KEYWORD_FINAL : public DataStore {
     void createStorage(bsl::shared_ptr<ReplicatedStorage>* storageSp,
                        const bmqt::Uri&                    queueUri,
                        const mqbu::StorageKey&             queueKey,
-                       mqbi::Domain* domain) BSLS_KEYWORD_OVERRIDE;
+                       mqbi::Domain*                       domain) override;
 
     /// Payload related
     /// ---------------
@@ -932,13 +931,12 @@ class FileStore BSLS_KEYWORD_FINAL : public DataStore {
     /// `queueKey` and having specified `guid` and `attributes` to the data
     /// store, and update the specified `handle` with an identifier which
     /// can be used to retrieve the message.
-    int
-    writeMessageRecord(mqbi::StorageMessageAttributes*     attributes,
-                       DataStoreRecordHandle*              handle,
-                       const bmqt::MessageGUID&            guid,
-                       const bsl::shared_ptr<bdlbb::Blob>& appData,
-                       const bsl::shared_ptr<bdlbb::Blob>& options,
-                       const mqbu::StorageKey& queueKey) BSLS_KEYWORD_OVERRIDE;
+    int writeMessageRecord(mqbi::StorageMessageAttributes*     attributes,
+                           DataStoreRecordHandle*              handle,
+                           const bmqt::MessageGUID&            guid,
+                           const bsl::shared_ptr<bdlbb::Blob>& appData,
+                           const bsl::shared_ptr<bdlbb::Blob>& options,
+                           const mqbu::StorageKey& queueKey) override;
 
     /// Qlist related
     /// -------------
@@ -952,20 +950,18 @@ class FileStore BSLS_KEYWORD_FINAL : public DataStore {
                                  const mqbu::StorageKey& queueKey,
                                  const AppInfos&         appIdKeyPairs,
                                  bsls::Types::Uint64     timestamp,
-                                 bool isNewQueue) BSLS_KEYWORD_OVERRIDE;
+                                 bool                    isNewQueue) override;
 
     int writeQueuePurgeRecord(DataStoreRecordHandle*       handle,
                               const mqbu::StorageKey&      queueKey,
                               const mqbu::StorageKey&      appKey,
                               bsls::Types::Uint64          timestamp,
-                              const DataStoreRecordHandle& start)
-        BSLS_KEYWORD_OVERRIDE;
+                              const DataStoreRecordHandle& start) override;
 
     int writeQueueDeletionRecord(DataStoreRecordHandle*  handle,
                                  const mqbu::StorageKey& queueKey,
                                  const mqbu::StorageKey& appKey,
-                                 bsls::Types::Uint64     timestamp)
-        BSLS_KEYWORD_OVERRIDE;
+                                 bsls::Types::Uint64     timestamp) override;
 
     /// Journal related
     /// ---------------
@@ -978,29 +974,27 @@ class FileStore BSLS_KEYWORD_FINAL : public DataStore {
                            const mqbu::StorageKey&  queueKey,
                            const mqbu::StorageKey&  appKey,
                            bsls::Types::Uint64      timestamp,
-                           ConfirmReason::Enum reason) BSLS_KEYWORD_OVERRIDE;
+                           ConfirmReason::Enum      reason) override;
 
     /// Write a DELETION record to the journal with the specified
     /// `queueKey`, `flag`, `guid` and `timestamp` to the journal.  Return
     /// zero on success, non-zero value otherwise.
-    int
-    writeDeletionRecord(const bmqt::MessageGUID& guid,
-                        const mqbu::StorageKey&  queueKey,
-                        DeletionRecordFlag::Enum deletionFlag,
-                        bsls::Types::Uint64 timestamp) BSLS_KEYWORD_OVERRIDE;
+    int writeDeletionRecord(const bmqt::MessageGUID& guid,
+                            const mqbu::StorageKey&  queueKey,
+                            DeletionRecordFlag::Enum deletionFlag,
+                            bsls::Types::Uint64      timestamp) override;
 
     int writeSyncPointRecord(const bmqp_ctrlmsg::SyncPoint& syncPoint,
-                             SyncPointType::Enum type) BSLS_KEYWORD_OVERRIDE;
+                             SyncPointType::Enum            type) override;
 
     /// Remove the record identified by the specified `handle`.  The
     /// behavior is undefined unless `handle` is valid and represents a
     /// record in the data store.
-    void
-    removeRecordRaw(const DataStoreRecordHandle& handle) BSLS_KEYWORD_OVERRIDE;
+    void removeRecordRaw(const DataStoreRecordHandle& handle) override;
 
     /// Attempt to rollover the journal if needed after a purge has cleared
     /// outstanding records.
-    void onPurgeComplete() BSLS_KEYWORD_OVERRIDE;
+    void onPurgeComplete() override;
 
     /// Process the specified storage event `blob` containing one or more
     /// storage messages.  Return zero on success, or a non-zero value if the
@@ -1010,23 +1004,22 @@ class FileStore BSLS_KEYWORD_FINAL : public DataStore {
     /// by this data store instance.
     int processStorageEvent(const bsl::shared_ptr<bdlbb::Blob>& blob,
                             bool                 isPartitionSyncEvent,
-                            mqbnet::ClusterNode* source) BSLS_KEYWORD_OVERRIDE;
+                            mqbnet::ClusterNode* source) override;
 
     /// Process the specified recovery event `blob` containing one or more
     /// storage messages.  Return zero on success, non-zero value otherwise.
     /// The behavior is undefined unless each message in the event belongs
     /// to this partition.
-    int processRecoveryEvent(const bsl::shared_ptr<bdlbb::Blob>& blob)
-        BSLS_KEYWORD_OVERRIDE;
+    int
+    processRecoveryEvent(const bsl::shared_ptr<bdlbb::Blob>& blob) override;
 
     /// Process Receipt for the specified `primaryLeaseId` and
     /// `sequenceNum`.  The behavior is undefined unless the event belongs
     /// to this partition and unless the `primaryLeaseId` and `sequenceNum`
     /// match a record of the `StorageMessageType::e_DATA` type.
-    void
-    processReceiptEvent(unsigned int         primaryLeaseId,
-                        bsls::Types::Uint64  sequenceNum,
-                        mqbnet::ClusterNode* source) BSLS_KEYWORD_OVERRIDE;
+    void processReceiptEvent(unsigned int         primaryLeaseId,
+                             bsls::Types::Uint64  sequenceNum,
+                             mqbnet::ClusterNode* source) override;
 
     /// Replication related
     /// -------------------
@@ -1038,14 +1031,14 @@ class FileStore BSLS_KEYWORD_FINAL : public DataStore {
     /// as the active primary for this data store partition.  Note that
     /// `primaryNode` could refer to the node which owns this data store.
     void setActivePrimary(mqbnet::ClusterNode* primaryNode,
-                          unsigned int primaryLeaseId) BSLS_KEYWORD_OVERRIDE;
+                          unsigned int         primaryLeaseId) override;
 
     /// Clear the current primary associated with this partition.
-    void clearPrimary() BSLS_KEYWORD_OVERRIDE;
+    void clearPrimary() override;
 
     /// Flush any buffered replication messages to the peers.  Behaviour is
     /// undefined unless this cluster node is the primary for this partition.
-    void flushStorage() BSLS_KEYWORD_OVERRIDE;
+    void flushStorage() override;
 
     /// Flush weak consistency queues that have replicated messages since the
     /// last call.  This method has no effect if `d_storageEventBuilder` is not
@@ -1107,45 +1100,44 @@ class FileStore BSLS_KEYWORD_FINAL : public DataStore {
     // ACCESSORS
 
     /// Return true if this instance is open, false otherwise.
-    bool isOpen() const BSLS_KEYWORD_OVERRIDE;
+    bool isOpen() const override;
 
     /// Return configuration associated with this instance.
-    const DataStoreConfig& config() const BSLS_KEYWORD_OVERRIDE;
+    const DataStoreConfig& config() const override;
 
     /// Return the replication factor associated with this data store.
-    unsigned int clusterSize() const BSLS_KEYWORD_OVERRIDE;
+    unsigned int clusterSize() const override;
 
     /// Return total number of records currently present in the data store.
-    bsls::Types::Uint64 numRecords() const BSLS_KEYWORD_OVERRIDE;
+    bsls::Types::Uint64 numRecords() const override;
 
-    void loadMessageRecordRaw(MessageRecord*               buffer,
-                              const DataStoreRecordHandle& handle) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    loadMessageRecordRaw(MessageRecord*               buffer,
+                         const DataStoreRecordHandle& handle) const override;
 
-    void loadConfirmRecordRaw(ConfirmRecord*               buffer,
-                              const DataStoreRecordHandle& handle) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    loadConfirmRecordRaw(ConfirmRecord*               buffer,
+                         const DataStoreRecordHandle& handle) const override;
 
-    void loadDeletionRecordRaw(DeletionRecord*              buffer,
-                               const DataStoreRecordHandle& handle) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    loadDeletionRecordRaw(DeletionRecord*              buffer,
+                          const DataStoreRecordHandle& handle) const override;
 
-    void loadQueueOpRecordRaw(QueueOpRecord*               buffer,
-                              const DataStoreRecordHandle& handle) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    loadQueueOpRecordRaw(QueueOpRecord*               buffer,
+                         const DataStoreRecordHandle& handle) const override;
 
-    void loadMessageAttributesRaw(mqbi::StorageMessageAttributes* buffer,
-                                  const DataStoreRecordHandle&    handle) const
-        BSLS_KEYWORD_OVERRIDE;
+    void loadMessageAttributesRaw(
+        mqbi::StorageMessageAttributes* buffer,
+        const DataStoreRecordHandle&    handle) const override;
 
     void loadMessageRaw(bsl::shared_ptr<bdlbb::Blob>*   appData,
                         bsl::shared_ptr<bdlbb::Blob>*   options,
                         mqbi::StorageMessageAttributes* attributes,
-                        const DataStoreRecordHandle&    handle) const
-        BSLS_KEYWORD_OVERRIDE;
+                        const DataStoreRecordHandle&    handle) const override;
 
-    unsigned int getMessageLenRaw(const DataStoreRecordHandle& handle) const
-        BSLS_KEYWORD_OVERRIDE;
+    unsigned int
+    getMessageLenRaw(const DataStoreRecordHandle& handle) const override;
 
     // ACCESSORS
     int processorId() const;
@@ -1153,13 +1145,12 @@ class FileStore BSLS_KEYWORD_FINAL : public DataStore {
     //   (virtual: mqbi::DispatcherClient)
 
     /// Return a pointer to the dispatcher this client is associated with.
-    const mqbi::Dispatcher* dispatcher() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::Dispatcher* dispatcher() const override;
 
-    const mqbi::DispatcherClientData&
-    dispatcherClientData() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::DispatcherClientData& dispatcherClientData() const override;
 
     /// Return a printable description of the client (e.g. for logging).
-    bsl::string_view description() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view description() const override;
 
     /// Load into the specified `fileStoreSet` the active (current) file
     /// set.  The behavior is undefined unless there is a fileSet in current
@@ -1176,12 +1167,11 @@ class FileStore BSLS_KEYWORD_FINAL : public DataStore {
 
     /// Return the write-head leaseId for this partition: the lease id of the
     /// next record this store writes or applies (see `d_writeHeadLeaseId`).
-    unsigned int writeHeadLeaseId() const BSLS_KEYWORD_OVERRIDE;
+    unsigned int writeHeadLeaseId() const override;
 
     /// Return `true` if there was Replication Receipt for the specified
     /// `handle`.
-    bool hasReceipt(const DataStoreRecordHandle& handle) const
-        BSLS_KEYWORD_OVERRIDE;
+    bool hasReceipt(const DataStoreRecordHandle& handle) const override;
 
     /// Return the write head's sequence number for this partition.
     bsls::Types::Uint64 writeHeadSeqNum() const;

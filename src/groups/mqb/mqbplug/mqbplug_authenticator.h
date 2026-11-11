@@ -166,7 +166,7 @@ class AuthenticatorPluginFactory : public PluginFactory {
     // CREATORS
     AuthenticatorPluginFactory();
 
-    ~AuthenticatorPluginFactory() BSLS_KEYWORD_OVERRIDE;
+    ~AuthenticatorPluginFactory() override;
 
     // MANIPULATORS
     virtual bslma::ManagedPtr<Authenticator>

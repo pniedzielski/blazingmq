@@ -136,7 +136,7 @@ class CommandRouter {
         /// given `cluster`.
         int getRouteTargets(bsl::ostream&  errorDescription,
                             RouteTargets*  routeMembers,
-                            mqbi::Cluster* cluster) BSLS_KEYWORD_OVERRIDE;
+                            mqbi::Cluster* cluster) override;
     };
     class SinglePartitionPrimaryRoutingMode : public RoutingMode {
       private:
@@ -152,7 +152,7 @@ class CommandRouter {
         /// routing mode was constructed with on the given `cluster`.
         int getRouteTargets(bsl::ostream&  errorDescription,
                             RouteTargets*  routeMembers,
-                            mqbi::Cluster* cluster) BSLS_KEYWORD_OVERRIDE;
+                            mqbi::Cluster* cluster) override;
     };
     class ClusterWideRoutingMode : public RoutingMode {
       public:
@@ -162,7 +162,7 @@ class CommandRouter {
         /// Collects all nodes in the given `cluster`.
         int getRouteTargets(bsl::ostream&  errorDescription,
                             RouteTargets*  routeMembers,
-                            mqbi::Cluster* cluster) BSLS_KEYWORD_OVERRIDE;
+                            mqbi::Cluster* cluster) override;
     };
 
   private:

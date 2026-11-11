@@ -92,13 +92,12 @@ class AnonAuthenticationResult : public mqbplug::AuthenticationResult {
                              bsl::optional<bsls::Types::Uint64> lifetimeMs,
                              bslma::Allocator*                  allocator);
 
-    ~AnonAuthenticationResult() BSLS_KEYWORD_OVERRIDE;
+    ~AnonAuthenticationResult() override;
 
     // ACCESSORS
 
-    bsl::string_view principal() const BSLS_KEYWORD_OVERRIDE;
-    const bsl::optional<bsls::Types::Uint64>&
-    lifetimeMs() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view                          principal() const override;
+    const bsl::optional<bsls::Types::Uint64>& lifetimeMs() const override;
 };
 
 // =======================
@@ -144,32 +143,32 @@ class AnonAuthenticator : public mqbplug::Authenticator {
                       bslma::Allocator*                        allocator = 0);
 
     /// Destructor.
-    ~AnonAuthenticator() BSLS_KEYWORD_OVERRIDE;
+    ~AnonAuthenticator() override;
 
     // ACCESSORS
 
     /// Return the name of the plugin.
-    bsl::string_view name() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view name() const override;
 
     /// Return the authentication mechanism the Authenticator supports.
-    bsl::string_view mechanism() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view mechanism() const override;
 
     /// Authenticate using the data provided in the specified `input`.
     /// Behavior depends on the `shouldPass` configuration.
     int authenticate(bsl::ostream& errorDescription,
                      bsl::shared_ptr<mqbplug::AuthenticationResult>* result,
                      const mqbplug::AuthenticationData&              input,
-                     bslma::Allocator* allocator) const BSLS_KEYWORD_OVERRIDE;
+                     bslma::Allocator* allocator) const override;
 
     // MANIPULATORS
 
     /// Start the Authenticator and return 0 on success, or return a non-zero
     /// value and populate the specified `errorDescription` with the
     /// description of any failure encountered.
-    int start(bsl::ostream& errorDescription) BSLS_KEYWORD_OVERRIDE;
+    int start(bsl::ostream& errorDescription) override;
 
     /// Stop the Authenticator.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 };
 
 // ====================================
@@ -182,11 +181,11 @@ class AnonAuthenticatorPluginFactory
     // CREATORS
     explicit AnonAuthenticatorPluginFactory();
 
-    ~AnonAuthenticatorPluginFactory() BSLS_KEYWORD_OVERRIDE;
+    ~AnonAuthenticatorPluginFactory() override;
 
     // MANIPULATORS
     bslma::ManagedPtr<mqbplug::Authenticator>
-    create(bslma::Allocator* allocator) BSLS_KEYWORD_OVERRIDE;
+    create(bslma::Allocator* allocator) override;
 };
 
 }  // close package namespace

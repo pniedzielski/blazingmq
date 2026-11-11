@@ -73,94 +73,80 @@ struct LogTestImp : bsls::ProtocolTestImp<mqbsi::Log> {
     }
 
     // MANIPULATORS
-    int open(int flags) BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    int open(int flags) override { return markDone(); }
 
-    int close() BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    int close() override { return markDone(); }
 
-    int seek(mqbsi::Log::Offset offset) BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
+    int seek(mqbsi::Log::Offset offset) override { return markDone(); }
 
-    void
-    updateOutstandingNumBytes(bsls::Types::Int64 value) BSLS_KEYWORD_OVERRIDE
+    void updateOutstandingNumBytes(bsls::Types::Int64 value) override
     {
         markDone();
     }
 
-    void setOutstandingNumBytes(bsls::Types::Int64 value) BSLS_KEYWORD_OVERRIDE
+    void setOutstandingNumBytes(bsls::Types::Int64 value) override
     {
         markDone();
     }
 
-    Offset
-    write(const void* entry, int offset, int length) BSLS_KEYWORD_OVERRIDE
+    Offset write(const void* entry, int offset, int length) override
     {
         return markDone();
     }
 
     Offset write(const bdlbb::Blob&        entry,
                  const bmqu::BlobPosition& offset,
-                 int                       length) BSLS_KEYWORD_OVERRIDE
+                 int                       length) override
     {
         return markDone();
     }
 
     Offset write(const bdlbb::Blob&       entry,
-                 const bmqu::BlobSection& section) BSLS_KEYWORD_OVERRIDE
+                 const bmqu::BlobSection& section) override
     {
         return markDone();
     }
 
-    int flush(Offset offset = 0) BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    int flush(Offset offset = 0) override { return markDone(); }
 
-    int
-    read(void* entry, int length, Offset offset) const BSLS_KEYWORD_OVERRIDE
+    int read(void* entry, int length, Offset offset) const override
     {
         return markDone();
     }
 
-    int read(bdlbb::Blob* entry,
-             int          length,
-             Offset       offset) const BSLS_KEYWORD_OVERRIDE
+    int read(bdlbb::Blob* entry, int length, Offset offset) const override
     {
         return markDone();
     }
 
-    int
-    alias(void** entry, int length, Offset offset) const BSLS_KEYWORD_OVERRIDE
+    int alias(void** entry, int length, Offset offset) const override
     {
         return markDone();
     }
 
-    int alias(bdlbb::Blob* entry,
-              int          length,
-              Offset       offset) const BSLS_KEYWORD_OVERRIDE
+    int alias(bdlbb::Blob* entry, int length, Offset offset) const override
     {
         return markDone();
     }
 
-    bool isOpened() const BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    bool isOpened() const override { return markDone(); }
 
-    bsls::Types::Int64 totalNumBytes() const BSLS_KEYWORD_OVERRIDE
+    bsls::Types::Int64 totalNumBytes() const override { return markDone(); }
+
+    bsls::Types::Int64 outstandingNumBytes() const override
     {
         return markDone();
     }
 
-    bsls::Types::Int64 outstandingNumBytes() const BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
+    Offset currentOffset() const override { return markDone(); }
 
-    Offset currentOffset() const BSLS_KEYWORD_OVERRIDE { return markDone(); }
-
-    const mqbsi::LogConfig& logConfig() const BSLS_KEYWORD_OVERRIDE
+    const mqbsi::LogConfig& logConfig() const override
     {
         markDone();
         return d_config;
     }
 
-    bool supportsAliasing() const BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    bool supportsAliasing() const override { return markDone(); }
 };
 
 }  // close anonymous namespace

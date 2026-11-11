@@ -126,7 +126,7 @@ class ScopedLogObserver : public ball::ObserverAdapter {
                       bslma::Allocator*     allocator);
 
     /// Destroy this object.
-    ~ScopedLogObserver() BSLS_KEYWORD_OVERRIDE;
+    ~ScopedLogObserver() override;
 
   public:
     // MANIPULATORS
@@ -144,12 +144,12 @@ class ScopedLogObserver : public ball::ObserverAdapter {
     /// Process the specified log `record` having the specified publishing
     /// `context`.
     void publish(const ball::Record&  record,
-                 const ball::Context& context) BSLS_KEYWORD_OVERRIDE;
+                 const ball::Context& context) override;
 
     /// Note: this member is overridden to get rid of the "hides the virtual
     ///       function" warning.
     inline void publish(const bsl::shared_ptr<const ball::Record>& record,
-                        const ball::Context& context) BSLS_KEYWORD_OVERRIDE
+                        const ball::Context& context) override
     {
         publish(*record, context);
     }

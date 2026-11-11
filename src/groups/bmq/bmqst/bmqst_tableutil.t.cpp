@@ -67,44 +67,39 @@ class TestTableInfoProvider : public bmqst::TableInfoProvider {
     {
     }
 
-    ~TestTableInfoProvider() BSLS_KEYWORD_OVERRIDE {}
+    ~TestTableInfoProvider() override {}
 
     void addRow(const Row& row) { d_table.push_back(row); }
 
     void addHeaderLevel(const Row& row) { d_headers.push_back(row); }
 
-    int numRows() const BSLS_KEYWORD_OVERRIDE
-    {
-        return static_cast<int>(d_table.size());
-    }
+    int numRows() const override { return static_cast<int>(d_table.size()); }
 
-    int numColumns(int) const BSLS_KEYWORD_OVERRIDE
+    int numColumns(int) const override
     {
         BSLS_ASSERT(d_headers.size() > 0);
         return static_cast<int>(d_headers[0].size());
     }
 
-    bool hasTitle() const BSLS_KEYWORD_OVERRIDE { return false; }
+    bool hasTitle() const override { return false; }
 
-    int numHeaderLevels() const BSLS_KEYWORD_OVERRIDE
+    int numHeaderLevels() const override
     {
         return static_cast<int>(d_headers.size());
     }
 
-    int getValueSize(int row, int column) const BSLS_KEYWORD_OVERRIDE
+    int getValueSize(int row, int column) const override
     {
         return static_cast<int>(d_table[row][column].length());
     }
 
-    bsl::ostream& printValue(bsl::ostream& stream,
-                             int           row,
-                             int           column,
-                             int) const BSLS_KEYWORD_OVERRIDE
+    bsl::ostream&
+    printValue(bsl::ostream& stream, int row, int column, int) const override
     {
         return stream << d_table[row][column];
     }
 
-    int getHeaderSize(int level, int column) const BSLS_KEYWORD_OVERRIDE
+    int getHeaderSize(int level, int column) const override
     {
         const Row& row = d_headers[level];
         for (size_t i = 0; i < row.size(); ++i) {
@@ -120,7 +115,7 @@ class TestTableInfoProvider : public bmqst::TableInfoProvider {
         return -1;
     }
 
-    int getParentHeader(int level, int column) const BSLS_KEYWORD_OVERRIDE
+    int getParentHeader(int level, int column) const override
     {
         const Row& row = d_headers[level + 1];
         while (row[column] != "-") {
@@ -136,7 +131,7 @@ class TestTableInfoProvider : public bmqst::TableInfoProvider {
         return index;
     }
 
-    bsl::ostream& printTitle(bsl::ostream& stream) const BSLS_KEYWORD_OVERRIDE
+    bsl::ostream& printTitle(bsl::ostream& stream) const override
     {
         return stream;
     }
@@ -144,7 +139,7 @@ class TestTableInfoProvider : public bmqst::TableInfoProvider {
     bsl::ostream& printHeader(bsl::ostream& stream,
                               int           level,
                               int           column,
-                              int) const BSLS_KEYWORD_OVERRIDE
+                              int) const override
     {
         const Row& row = d_headers[level];
         for (size_t i = 0; i < row.size(); ++i) {

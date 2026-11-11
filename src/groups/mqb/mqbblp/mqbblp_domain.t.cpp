@@ -108,7 +108,7 @@ class TestQueue : public mqbmock::Queue {
     /// @return 0 always.
     int configure(BSLA_MAYBE_UNUSED bsl::ostream* errorDescription_p,
                   BSLA_MAYBE_UNUSED bool          isReconfigure,
-                  BSLA_MAYBE_UNUSED bool          wait) BSLS_KEYWORD_OVERRIDE
+                  BSLA_MAYBE_UNUSED bool          wait) override
     {
         ++d_configureCalls;
         return 0;
@@ -124,7 +124,7 @@ class TestQueue : public mqbmock::Queue {
     /// @brief Return the URI of this queue.
     ///
     /// @return The URI supplied at construction.
-    const bmqt::Uri& uri() const BSLS_KEYWORD_OVERRIDE { return d_uri; }
+    const bmqt::Uri& uri() const override { return d_uri; }
 };
 
 /// @brief Build a valid priority / in-memory domain configuration.

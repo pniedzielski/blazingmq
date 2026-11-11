@@ -135,7 +135,7 @@ class ClusterCatalog {
                                      bslma::Allocator* allocator = 0);
 
         /// Destroy this object.
-        ~NegotiationUserData() BSLS_KEYWORD_OVERRIDE;
+        ~NegotiationUserData() override;
 
         // ACCESSORS
 

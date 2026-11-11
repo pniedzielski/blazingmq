@@ -577,10 +577,10 @@ class Routers {
         MessagePropertiesReader(bmqp::SchemaLearner& schemaLearner,
                                 bslma::Allocator*    allocator);
 
-        ~MessagePropertiesReader() BSLS_KEYWORD_OVERRIDE;
+        ~MessagePropertiesReader() override;
 
         bdld::Datum get(const bsl::string& name,
-                        bslma::Allocator*  allocator) BSLS_KEYWORD_OVERRIDE;
+                        bslma::Allocator*  allocator) override;
 
         /// Prepare the reader for the next message given the specified
         /// `currentMessage`.

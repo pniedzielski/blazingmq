@@ -102,7 +102,7 @@ class PutEvent : public mqbi::DispatcherEvent {
     explicit PutEvent(bslma::Allocator* allocator);
 
     /// Destructor.
-    ~PutEvent() BSLS_KEYWORD_OVERRIDE;
+    ~PutEvent() override;
 
     // MANIPULATORS
 
@@ -139,7 +139,7 @@ class PutEvent : public mqbi::DispatcherEvent {
     PutEvent& setSource(mqbi::DispatcherClient* value);
 
     /// Reset all members of this event to default values.
-    void reset() BSLS_KEYWORD_OVERRIDE;
+    void reset() override;
 
     // ACCESSORS
 
@@ -172,12 +172,12 @@ class PutEvent : public mqbi::DispatcherEvent {
     const bsl::shared_ptr<bmqu::AtomicState>& state() const;
 
     /// Return the type of this event.
-    mqbi::DispatcherEventType::Enum type() const BSLS_KEYWORD_OVERRIDE;
+    mqbi::DispatcherEventType::Enum type() const override;
 
     /// Format this object to the specified output `stream`.
     bsl::ostream& print(bsl::ostream& stream,
-                        int           level = 0,
-                        int spacesPerLevel  = 4) const BSLS_KEYWORD_OVERRIDE;
+                        int           level          = 0,
+                        int           spacesPerLevel = 4) const override;
 };
 
 // ============================================================================

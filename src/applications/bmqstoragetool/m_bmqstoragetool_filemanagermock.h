@@ -67,11 +67,10 @@ class FileManagerMock : public FileManager {
     // MANIPULATORS
 
     /// Return pointer to modifiable journal file iterator.
-    mqbs::JournalFileIterator* journalFileIterator() BSLS_KEYWORD_OVERRIDE;
+    mqbs::JournalFileIterator* journalFileIterator() override;
 
     /// Return pointer to modifiable CSL file iterator.
-    mqbc::IncoreClusterStateLedgerIterator*
-    cslFileIterator() BSLS_KEYWORD_OVERRIDE;
+    mqbc::IncoreClusterStateLedgerIterator* cslFileIterator() override;
 
     MOCK_METHOD0(dataFileIterator, mqbs::DataFileIterator*());
     MOCK_CONST_METHOD1(fillQueueMapFromCslFile, void(QueueMap*));

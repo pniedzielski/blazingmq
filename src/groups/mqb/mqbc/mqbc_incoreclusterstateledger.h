@@ -329,7 +329,7 @@ class IncoreClusterStateLedger BSLS_KEYWORD_FINAL : public ClusterStateLedger {
         bslma::Allocator*                allocator);
 
     /// Destructor.
-    ~IncoreClusterStateLedger() BSLS_KEYWORD_OVERRIDE;
+    ~IncoreClusterStateLedger() override;
 
     // MANIPULATORS
     //   (virtual mqbc::ClusterStateLedger)
@@ -340,14 +340,14 @@ class IncoreClusterStateLedger BSLS_KEYWORD_FINAL : public ClusterStateLedger {
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    int open() BSLS_KEYWORD_OVERRIDE;
+    int open() override;
 
     /// Close the ledger, and return 0 on success or a non-zero value
     /// otherwise.
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    int close() BSLS_KEYWORD_OVERRIDE;
+    int close() override;
 
     /// @{
     /// Apply the specified `advisory` to self and replicate to followers.
@@ -356,16 +356,12 @@ class IncoreClusterStateLedger BSLS_KEYWORD_FINAL : public ClusterStateLedger {
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    int apply(const bmqp_ctrlmsg::PartitionPrimaryAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE;
-    int apply(const bmqp_ctrlmsg::QueueAssignmentAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE;
-    int apply(const bmqp_ctrlmsg::QueueUnAssignmentAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE;
-    int apply(const bmqp_ctrlmsg::QueueUpdateAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE;
+    int apply(const bmqp_ctrlmsg::PartitionPrimaryAdvisory& advisory) override;
+    int apply(const bmqp_ctrlmsg::QueueAssignmentAdvisory& advisory) override;
     int
-    apply(const bmqp_ctrlmsg::LeaderAdvisory& advisory) BSLS_KEYWORD_OVERRIDE;
+    apply(const bmqp_ctrlmsg::QueueUnAssignmentAdvisory& advisory) override;
+    int apply(const bmqp_ctrlmsg::QueueUpdateAdvisory& advisory) override;
+    int apply(const bmqp_ctrlmsg::LeaderAdvisory& advisory) override;
     /// @}
 
     /// Apply the advisory contained in the specified `clusterMessage` to
@@ -378,8 +374,7 @@ class IncoreClusterStateLedger BSLS_KEYWORD_FINAL : public ClusterStateLedger {
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    int apply(const bmqp_ctrlmsg::ClusterMessage& clusterMessage)
-        BSLS_KEYWORD_OVERRIDE;
+    int apply(const bmqp_ctrlmsg::ClusterMessage& clusterMessage) override;
 
     /// Apply the specified raw cluster state record `event` received from
     /// the specified `source` node.  Note that while a replica node may
@@ -388,11 +383,10 @@ class IncoreClusterStateLedger BSLS_KEYWORD_FINAL : public ClusterStateLedger {
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    int apply(const bdlbb::Blob&   event,
-              mqbnet::ClusterNode* source) BSLS_KEYWORD_OVERRIDE;
+    int apply(const bdlbb::Blob& event, mqbnet::ClusterNode* source) override;
 
     /// Set the commit callback to the specified `value`.
-    void setCommitCb(const CommitCb& value) BSLS_KEYWORD_OVERRIDE;
+    void setCommitCb(const CommitCb& value) override;
 
     // ACCESSORS
     //   (virtual mqbc::ClusterStateLedger)
@@ -401,22 +395,20 @@ class IncoreClusterStateLedger BSLS_KEYWORD_FINAL : public ClusterStateLedger {
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    bool isOpen() const BSLS_KEYWORD_OVERRIDE;
+    bool isOpen() const override;
 
     /// Load into the specified `out` the list of uncommitted advisories as
     /// const references.
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    void uncommittedAdvisories(ClusterMessageCRefList* out) const
-        BSLS_KEYWORD_OVERRIDE;
+    void uncommittedAdvisories(ClusterMessageCRefList* out) const override;
 
     /// Return an iterator to this ledger.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    bslma::ManagedPtr<ClusterStateLedgerIterator>
-    getIterator() const BSLS_KEYWORD_OVERRIDE;
+    bslma::ManagedPtr<ClusterStateLedgerIterator> getIterator() const override;
 
     // ACCESSORS
 

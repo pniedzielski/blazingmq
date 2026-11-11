@@ -133,11 +133,11 @@ class Visitor : public mqbblp::Routers::Visitor {
     {
         // NOTHING
     }
-    ~Visitor() BSLS_KEYWORD_OVERRIDE;
+    ~Visitor() override;
 
     bool visit(mqbi::QueueHandle*         handle,
                mqbblp::Routers::Consumer* consumer,
-               unsigned int downstreamSubscriptionId) BSLS_KEYWORD_OVERRIDE
+               unsigned int               downstreamSubscriptionId) override
     {
         d_subQueueId = downstreamSubscriptionId;
         d_consumer   = consumer;

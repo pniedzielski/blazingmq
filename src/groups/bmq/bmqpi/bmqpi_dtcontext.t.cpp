@@ -33,13 +33,10 @@ using namespace BloombergLP;
 
 /// A test implementation of the `bmqpi::DTContext` protocol.
 struct DTContextTestImp : public bsls::ProtocolTestImp<bmqpi::DTContext> {
-    bsl::shared_ptr<bmqpi::DTSpan> span() const BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
+    bsl::shared_ptr<bmqpi::DTSpan> span() const override { return markDone(); }
 
     bslma::ManagedPtr<void>
-    scope(const bsl::shared_ptr<bmqpi::DTSpan>&) BSLS_KEYWORD_OVERRIDE;
+    scope(const bsl::shared_ptr<bmqpi::DTSpan>&) override;
 };
 
 // Define one of DTContextTestImp methods out-of-line, to instruct the compiler

@@ -65,32 +65,32 @@ class DecoratingChannelPartialImp : public Channel {
     // CREATORS
     explicit DecoratingChannelPartialImp(const bsl::shared_ptr<Channel>& base,
                                          bslma::Allocator* basicAllocator = 0);
-    ~DecoratingChannelPartialImp() BSLS_KEYWORD_OVERRIDE;
+    ~DecoratingChannelPartialImp() override;
 
     // MANIPULATORS
 
     // Channel
-    void read(Status*                   status,
-              int                       numBytes,
-              const ReadCallback&       readCallback,
-              const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    read(Status*                   status,
+         int                       numBytes,
+         const ReadCallback&       readCallback,
+         const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     void write(Status*            status,
                const bdlbb::Blob& blob,
-               bsls::Types::Int64 watermark = bsl::numeric_limits<int>::max())
-        BSLS_KEYWORD_OVERRIDE;
+               bsls::Types::Int64 watermark =
+                   bsl::numeric_limits<int>::max()) override;
 
-    void cancelRead() BSLS_KEYWORD_OVERRIDE;
-    void close(const Status& status = Status()) BSLS_KEYWORD_OVERRIDE;
-    int  execute(const ExecuteCb& cb) BSLS_KEYWORD_OVERRIDE;
-    void onClose(const CloseFn& cb) BSLS_KEYWORD_OVERRIDE;
-    void onWatermark(const WatermarkFn& cb) BSLS_KEYWORD_OVERRIDE;
-    void setWriteQueueLowWatermark(int lowWatermark) BSLS_KEYWORD_OVERRIDE;
-    void setWriteQueueHighWatermark(int highWatermark) BSLS_KEYWORD_OVERRIDE;
+    void cancelRead() override;
+    void close(const Status& status = Status()) override;
+    int  execute(const ExecuteCb& cb) override;
+    void onClose(const CloseFn& cb) override;
+    void onWatermark(const WatermarkFn& cb) override;
+    void setWriteQueueLowWatermark(int lowWatermark) override;
+    void setWriteQueueHighWatermark(int highWatermark) override;
 
     /// Forward to the underlying base `Channel`.
-    bmqvt::PropertyBag& properties() BSLS_KEYWORD_OVERRIDE;
+    bmqvt::PropertyBag& properties() override;
 
     // ACCESSORS
 
@@ -99,10 +99,10 @@ class DecoratingChannelPartialImp : public Channel {
     Channel* base() const;
 
     // Channel
-    bsl::string peerUri() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string peerUri() const override;
 
     /// Forward to the underlying base `Channel`.
-    const bmqvt::PropertyBag& properties() const BSLS_KEYWORD_OVERRIDE;
+    const bmqvt::PropertyBag& properties() const override;
 };
 
 // ============================================================================

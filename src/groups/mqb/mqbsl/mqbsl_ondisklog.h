@@ -55,7 +55,7 @@ class OnDiskLog : public mqbsi::Log {
     // CREATORS
 
     /// Destructor
-    ~OnDiskLog() BSLS_KEYWORD_OVERRIDE;
+    ~OnDiskLog() override;
 
     // ACCESSORS
 

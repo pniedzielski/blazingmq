@@ -43,12 +43,12 @@
 //          BSLS_ASSERT_SAFE(calls);
 //      }
 //
-//      ~ExampleCallback() BSLS_KEYWORD_OVERRIDE
+//      ~ExampleCallback() override
 //      {
 //          // NOTHING
 //      }
 //
-//      void operator()() const BSLS_KEYWORD_OVERRIDE { ++(*d_calls_p); }
+//      void operator()() const override { ++(*d_calls_p); }
 // };
 //..
 //

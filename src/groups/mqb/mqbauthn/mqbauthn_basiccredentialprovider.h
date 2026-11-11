@@ -96,26 +96,26 @@ class BasicCredentialProvider : public mqbplug::CredentialProvider {
                                      bslma::Allocator* basicAllocator = 0);
 
     /// Destructor.
-    ~BasicCredentialProvider() BSLS_KEYWORD_OVERRIDE;
+    ~BasicCredentialProvider() override;
 
     // ACCESSORS
 
     /// Return the name of the plugin.
-    bsl::string_view name() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view name() const override;
 
     // MANIPULATORS
 
     /// Return a credential-providing function.  The behavior is undefined
     /// unless `start()` has been called successfully.
-    CredentialCb load() BSLS_KEYWORD_OVERRIDE;
+    CredentialCb load() override;
 
     /// Start the provider and return 0 on success, or return a non-zero
     /// value and populate the specified `errorDescription` with the
     /// description of any failure encountered.
-    int start(bsl::ostream& errorDescription) BSLS_KEYWORD_OVERRIDE;
+    int start(bsl::ostream& errorDescription) override;
 
     /// Stop the provider.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 };
 
 // ========================================
@@ -127,11 +127,11 @@ class BasicCredentialProviderPluginFactory
   public:
     // CREATORS
     BasicCredentialProviderPluginFactory();
-    ~BasicCredentialProviderPluginFactory() BSLS_KEYWORD_OVERRIDE;
+    ~BasicCredentialProviderPluginFactory() override;
 
     // MANIPULATORS
     bslma::ManagedPtr<mqbplug::CredentialProvider>
-    create(bslma::Allocator* allocator) BSLS_KEYWORD_OVERRIDE;
+    create(bslma::Allocator* allocator) override;
 };
 
 }  // close package namespace

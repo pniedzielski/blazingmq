@@ -168,92 +168,89 @@ class Queue : public mqbi::Queue {
     explicit Queue(mqbi::Domain* domain, bslma::Allocator* allocator = 0);
 
     /// Destructor.
-    ~Queue() BSLS_KEYWORD_OVERRIDE;
+    ~Queue() override;
 
     // MANIPULATORS
     //   (virtual: mqbi::DispatcherClient)
 
     /// Return a pointer to the dispatcher this client is associated with.
-    mqbi::Dispatcher* dispatcher() BSLS_KEYWORD_OVERRIDE;
+    mqbi::Dispatcher* dispatcher() override;
 
     /// Return a reference to the dispatcherClientData.
-    mqbi::DispatcherClientData& dispatcherClientData() BSLS_KEYWORD_OVERRIDE;
+    mqbi::DispatcherClientData& dispatcherClientData() override;
 
     /// Called by the `Dispatcher` when it has the specified `event` to
     /// deliver to the client.
-    void onDispatcherEvent(const mqbi::DispatcherEvent& event)
-        BSLS_KEYWORD_OVERRIDE;
+    void onDispatcherEvent(const mqbi::DispatcherEvent& event) override;
 
     /// Called by the dispatcher to flush any pending operation.. mainly
     /// used to provide batch and nagling mechanism.
-    void flush() BSLS_KEYWORD_OVERRIDE;
+    void flush() override;
 
     // MANIPULATORS
     //   (virtual: mqbi::Queue)
     int configure(bsl::ostream* errorDescription_p,
                   bool          isReconfigure,
-                  bool          wait) BSLS_KEYWORD_OVERRIDE;
+                  bool          wait) override;
 
     /// Obtain a handle to this queue, for the client represented by the
     /// specified `clientContext` and using the specified `handleParameters`
     /// and `upstreamSubQueueId`.  Invoke the specified `callback` with the
     /// result.
-    void getHandle(const mqbi::OpenQueueConfirmationCookieSp& context,
-                   const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>&
-                                                              clientContext,
-                   const bmqp_ctrlmsg::QueueHandleParameters& handleParameters,
-                   unsigned int upstreamSubQueueId,
-                   const mqbi::QueueHandle::GetHandleCallback& callback)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    getHandle(const mqbi::OpenQueueConfirmationCookieSp& context,
+              const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>&
+                                                          clientContext,
+              const bmqp_ctrlmsg::QueueHandleParameters&  handleParameters,
+              unsigned int                                upstreamSubQueueId,
+              const mqbi::QueueHandle::GetHandleCallback& callback) override;
 
     /// Configure the specified `handle` with the specified
     /// `streamParameters`, and invoke the specified `configuredCb` callback
     /// when finished.
     ///
     /// THREAD: this method can be called from any thread.
-    void configureHandle(
-        mqbi::QueueHandle*                                 handle,
-        const bmqp_ctrlmsg::StreamParameters&              streamParameters,
-        const mqbi::QueueHandle::HandleConfiguredCallback& configuredCb)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    configureHandle(mqbi::QueueHandle*                    handle,
+                    const bmqp_ctrlmsg::StreamParameters& streamParameters,
+                    const mqbi::QueueHandle::HandleConfiguredCallback&
+                        configuredCb) override;
 
     /// Release the specified `handle`.
     ///
     /// THREAD: this method can be called from any thread.
-    void
-    releaseHandle(mqbi::QueueHandle*                         handle,
-                  const bmqp_ctrlmsg::QueueHandleParameters& handleParameters,
-                  bool                                       isFinal,
-                  const mqbi::QueueHandle::HandleReleasedCallback& releasedCb)
-        BSLS_KEYWORD_OVERRIDE;
+    void releaseHandle(
+        mqbi::QueueHandle*                               handle,
+        const bmqp_ctrlmsg::QueueHandleParameters&       handleParameters,
+        bool                                             isFinal,
+        const mqbi::QueueHandle::HandleReleasedCallback& releasedCb) override;
 
     void dropHandle(mqbi::QueueHandle* handle,
-                    bool doDeconfigure = true) BSLS_KEYWORD_OVERRIDE;
+                    bool               doDeconfigure = true) override;
 
     /// Close this queue.  Call the specified `callback` when the queue does
     /// not have any outstanding events and can destruct.
     ///
     /// THREAD: this method can be called from any thread.
-    void
-    close(const bsl::function<void(void)>& callback) BSLS_KEYWORD_OVERRIDE;
+    void close(const bsl::function<void(void)>& callback) override;
 
     /// Return the resource capacity meter associated to this queue, if any,
     /// or a null pointer otherwise.
-    mqbu::CapacityMeter* capacityMeter() BSLS_KEYWORD_OVERRIDE;
+    mqbu::CapacityMeter* capacityMeter() override;
 
     /// Return the queue engine used by this queue.
-    mqbi::QueueEngine* queueEngine() BSLS_KEYWORD_OVERRIDE;
+    mqbi::QueueEngine* queueEngine() override;
 
     /// Set the stats associated with this queue.
-    void setStats(const bsl::shared_ptr<mqbstat::QueueStatsDomain>& stats)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    setStats(const bsl::shared_ptr<mqbstat::QueueStatsDomain>& stats) override;
 
     /// Set the state of this queue to "stopping".
     /// This is a one-way step before shutting down the broker.
     /// In this state, the queue will:
     /// - Continue receiving CONFIRMs, receiving and sending PUTs and ACKs.
     /// - Stop sending PUSHes and stop idle GC.
-    void setStopping() BSLS_KEYWORD_OVERRIDE;
+    void setStopping() override;
 
     /// Called when a message with the specified `msgGUID`, `appData`,
     /// `options` and compressionAlgorithmType payload is pushed to this
@@ -265,7 +262,7 @@ class Queue : public mqbi::Queue {
         const bsl::shared_ptr<bdlbb::Blob>&  options,
         const bmqp::MessagePropertiesInfo&   messagePropertiesInfo,
         bmqt::CompressionAlgorithmType::Enum compressionAlgorithmType,
-        bool isOutOfOrder) BSLS_KEYWORD_OVERRIDE;
+        bool                                 isOutOfOrder) override;
 
     /// Confirm the message with the specified `msgGUID` for the specified
     /// `upstreamSubQueueId` stream of the queue on behalf of the client
@@ -276,7 +273,7 @@ class Queue : public mqbi::Queue {
     /// THREAD: This method is called from the Queue's dispatcher thread.
     void confirmMessage(const bmqt::MessageGUID& msgGUID,
                         unsigned int             upstreamSubQueueId,
-                        mqbi::QueueHandle*       source) BSLS_KEYWORD_OVERRIDE;
+                        mqbi::QueueHandle*       source) override;
 
     /// Reject the message with the specified `msgGUID` for the specified
     /// `upstreamSubQueueId` stream of the queue on the specified `source`.
@@ -287,17 +284,16 @@ class Queue : public mqbi::Queue {
     ///         Queue's dispatcher thread.
     int rejectMessage(const bmqt::MessageGUID& msgGUID,
                       unsigned int             upstreamSubQueueId,
-                      mqbi::QueueHandle*       source) BSLS_KEYWORD_OVERRIDE;
+                      mqbi::QueueHandle*       source) override;
 
     /// Invoked by the cluster whenever it receives an ACK from upstream.
-    void
-    onAckMessage(const bmqp::AckMessage& ackMessage) BSLS_KEYWORD_OVERRIDE;
+    void onAckMessage(const bmqp::AckMessage& ackMessage) override;
 
     /// Notify the queue that the upstream is not ready to receive
     /// PUTs/CONFIRMs.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void onLostUpstream() BSLS_KEYWORD_OVERRIDE;
+    void onLostUpstream() override;
 
     /// Notify the queue that the upstream is ready to receive PUTs/CONFIRMs
     /// for the specified `upstreamSubQueueId`.  PUT messages carry the
@@ -311,7 +307,7 @@ class Queue : public mqbi::Queue {
     /// THREAD: This method is called from the Queue's dispatcher thread.
     void onOpenUpstream(bsls::Types::Uint64 genCount,
                         unsigned int        upstreamSubQueueId,
-                        bool isWriterOnly = false) BSLS_KEYWORD_OVERRIDE;
+                        bool                isWriterOnly = false) override;
 
     /// Notify the (remote) queue about reopen failure.  The queue NACKs all
     /// pending and incoming PUTs and drops CONFIRMs related to to the
@@ -319,13 +315,13 @@ class Queue : public mqbi::Queue {
     /// this state onReopenUpstream' with non-zero `genCount`.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void onOpenFailure(unsigned int upstreamSubQueueId) BSLS_KEYWORD_OVERRIDE;
+    void onOpenFailure(unsigned int upstreamSubQueueId) override;
 
     /// Invoked by the Data Store when it receives quorum Receipts.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
     void onReceipt(const bmqt::MessageGUID& msgGUID,
-                   mqbi::QueueHandle*       qH) BSLS_KEYWORD_OVERRIDE;
+                   mqbi::QueueHandle*       qH) override;
 
     /// Invoked by the Data Store when it removes (times out waiting for
     /// quorum Receipts for) a message with the specified `msgGUID`.  Send
@@ -335,22 +331,21 @@ class Queue : public mqbi::Queue {
     /// THREAD: This method is called from the Storage dispatcher thread.
     void onRemoval(const bmqt::MessageGUID& msgGUID,
                    mqbi::QueueHandle*       qH,
-                   bmqt::AckResult::Enum    result) BSLS_KEYWORD_OVERRIDE;
+                   bmqt::AckResult::Enum    result) override;
 
     /// Invoked when data store has transmitted all cached replication
     /// records.  Switch from PUT processing to PUSH delivery.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void onReplicatedBatch() BSLS_KEYWORD_OVERRIDE;
+    void onReplicatedBatch() override;
 
     /// Synchronously process the specified `command` and write the result
     /// to the specified `result` object.  Return zero on success or a
     /// nonzero value otherwise.
-    virtual int
-    processCommand(mqbcmd::QueueResult*        result,
-                   const mqbcmd::QueueCommand& command) BSLS_KEYWORD_OVERRIDE;
+    virtual int processCommand(mqbcmd::QueueResult*        result,
+                               const mqbcmd::QueueCommand& command) override;
 
-    void convertToLocal() BSLS_KEYWORD_OVERRIDE;
+    void convertToLocal() override;
 
     // MANIPULATORS
     //   (specific to mqbmock::Queue)
@@ -369,70 +364,67 @@ class Queue : public mqbi::Queue {
     //   (virtual: mqbi::DispatcherClient)
 
     /// Return a pointer to the dispatcher this client is associated with.
-    const mqbi::Dispatcher* dispatcher() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::Dispatcher* dispatcher() const override;
 
-    const mqbi::DispatcherClientData&
-    dispatcherClientData() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::DispatcherClientData& dispatcherClientData() const override;
 
     /// Return a printable description of the client (e.g. for logging).
-    bsl::string_view description() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view description() const override;
 
     // ACCESSORS
     //   (virtual: mqbi::Queue)
 
     /// Return the domain this queue belong to.
-    mqbi::Domain* domain() const BSLS_KEYWORD_OVERRIDE;
+    mqbi::Domain* domain() const override;
 
     /// Return the storage used by this queue.
-    mqbi::Storage* storage() const BSLS_KEYWORD_OVERRIDE;
+    mqbi::Storage* storage() const override;
 
     /// Return the stats associated with this queue.
-    const bsl::shared_ptr<mqbstat::QueueStatsDomain>&
-    stats() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<mqbstat::QueueStatsDomain>& stats() const override;
 
     /// Return the partitionId assigned to this queue.
-    int partitionId() const BSLS_KEYWORD_OVERRIDE;
+    int partitionId() const override;
 
     /// Return the URI of this queue.
-    const bmqt::Uri& uri() const BSLS_KEYWORD_OVERRIDE;
+    const bmqt::Uri& uri() const override;
 
     /// Return the unique ID of this queue, as advertised to upstream
     /// connection upon queue opening.
-    unsigned int id() const BSLS_KEYWORD_OVERRIDE;
+    unsigned int id() const override;
 
     /// Returns `true` if the configuration for this queue requires
     /// at-most-once semantics or `false` otherwise.
-    bool isAtMostOnce() const BSLS_KEYWORD_OVERRIDE;
+    bool isAtMostOnce() const override;
 
     /// Return `true` if the configuration for this queue requires
     /// delivering to all consumers, and `false` otherwise.
-    bool isDeliverAll() const BSLS_KEYWORD_OVERRIDE;
+    bool isDeliverAll() const override;
 
     /// Returns `true` if the configuration for this queue requires
     /// has-multiple-sub-streams semantics or `false` otherwise.
-    bool hasMultipleSubStreams() const BSLS_KEYWORD_OVERRIDE;
+    bool hasMultipleSubStreams() const override;
 
     /// Return a reference not offering modifiable access to the aggregated
     /// parameters of all currently opened queueHandles on this queue.
     const bmqp_ctrlmsg::QueueHandleParameters&
-    handleParameters() const BSLS_KEYWORD_OVERRIDE;
+    handleParameters() const override;
 
     /// Return true if the queue has upstream parameters for the specified
     /// `upstreamSubQueueId` in which case load the parameters into the
     /// specified `value`.  Return false otherwise.
     bool getUpstreamParameters(bmqp_ctrlmsg::StreamParameters* value,
-                               unsigned int upstreamSubQueueId) const
-        BSLS_KEYWORD_OVERRIDE;
+                               unsigned int upstreamSubQueueId) const override;
 
     /// Return the message throttle config associated with this queue.
     const mqbcfg::MessageThrottleConfig&
-    messageThrottleConfig() const BSLS_KEYWORD_OVERRIDE;
+    messageThrottleConfig() const override;
 
     /// Return the Schema Leaner associated with this queue.
-    bmqp::SchemaLearner& schemaLearner() const BSLS_KEYWORD_OVERRIDE;
+    bmqp::SchemaLearner& schemaLearner() const override;
 
     /// Return number of unconfirmed messages across all handles.
-    bsls::Types::Int64 countUnconfirmed() const BSLS_KEYWORD_OVERRIDE;
+    bsls::Types::Int64 countUnconfirmed() const override;
 
     // ACCESSORS
     //   (specific to mqbi::MockQueue)
@@ -449,7 +441,7 @@ class HandleFactory : public mqbi::QueueHandleFactory {
     // CREATORS
 
     /// Destructor.
-    ~HandleFactory() BSLS_KEYWORD_OVERRIDE;
+    ~HandleFactory() override;
 
     // MANIPULATORS
 
@@ -463,7 +455,7 @@ class HandleFactory : public mqbi::QueueHandleFactory {
                                                           clientContext,
                mqbstat::QueueStatsDomain*                 stats,
                const bmqp_ctrlmsg::QueueHandleParameters& handleParameters,
-               bslma::Allocator* allocator) BSLS_KEYWORD_OVERRIDE;
+               bslma::Allocator*                          allocator) override;
 };
 
 }  // close package namespace

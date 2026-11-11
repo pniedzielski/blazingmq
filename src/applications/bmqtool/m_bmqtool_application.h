@@ -167,11 +167,11 @@ class Application : public bmqa::SessionEventHandler {
 
     /// Process the specified session `event` (connected, disconnected,
     /// queue opened, queue closed, etc.).
-    void onSessionEvent(const bmqa::SessionEvent& event) BSLS_KEYWORD_OVERRIDE;
+    void onSessionEvent(const bmqa::SessionEvent& event) override;
 
     /// Process the specified message `event` containing one or more
     /// messages.
-    void onMessageEvent(const bmqa::MessageEvent& event) BSLS_KEYWORD_OVERRIDE;
+    void onMessageEvent(const bmqa::MessageEvent& event) override;
 
     // PRIVATE MANIPULATORS
     void setUpLog();
@@ -225,7 +225,7 @@ class Application : public bmqa::SessionEventHandler {
                 bslmt::Semaphore*            shutdownSemaphore,
                 bslma::Allocator*            allocator);
 
-    ~Application() BSLS_KEYWORD_OVERRIDE;
+    ~Application() override;
 
     // MANIPULATORS
     int start();

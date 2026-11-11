@@ -80,12 +80,12 @@ class TestChannelEx : public TestChannel {
                   bdlbb::BlobBufferFactory*       factory,
                   bmqp::BlobPoolUtil::BlobSpPool* blobSpPool_p,
                   bslma::Allocator*               basicAllocator);
-    ~TestChannelEx() BSLS_KEYWORD_OVERRIDE;
+    ~TestChannelEx() override;
 
     void write(bmqio::Status*     status,
                const bdlbb::Blob& blob,
-               bsls::Types::Int64 watermark = bsl::numeric_limits<int>::max())
-        BSLS_KEYWORD_OVERRIDE;
+               bsls::Types::Int64 watermark =
+                   bsl::numeric_limits<int>::max()) override;
 
     void setWriteStatus(const bmqio::Status& status);
     void setLimit(size_t limit);

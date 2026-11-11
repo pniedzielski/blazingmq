@@ -252,8 +252,7 @@ class SharedResource_Deleter : public bdlma::Deleter<void> {
 
     /// Delete the specified `resource` by applying the stored `deleter`, as
     /// `deleter(static_cast<RESOURCE*>(resource))`.
-    void
-    deleteObject(void* resource) BSLS_KEYWORD_NOEXCEPT BSLS_KEYWORD_OVERRIDE;
+    void deleteObject(void* resource) BSLS_KEYWORD_NOEXCEPT override;
 };
 
 // ==========================

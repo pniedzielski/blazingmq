@@ -71,7 +71,7 @@ class WrappedChannelFactory : public bmqio::ChannelFactory {
     void listen(bmqio::Status*               status,
                 bslma::ManagedPtr<OpHandle>* handle,
                 const bmqio::ListenOptions&  options,
-                const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE
+                const ResultCallback&        cb) override
     {
         d_wrapped->listen(status, handle, options, cb);
     }
@@ -79,14 +79,14 @@ class WrappedChannelFactory : public bmqio::ChannelFactory {
     void connect(bmqio::Status*               status,
                  bslma::ManagedPtr<OpHandle>* handle,
                  const bmqio::ConnectOptions& options,
-                 const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE
+                 const ResultCallback&        cb) override
     {
         d_wrapped->connect(status, handle, options, cb);
     }
 
-    int start() BSLS_KEYWORD_OVERRIDE { return 0; }
+    int start() override { return 0; }
 
-    void stop() BSLS_KEYWORD_OVERRIDE {}
+    void stop() override {}
 };
 
 }
@@ -98,7 +98,7 @@ class WrappedChannelFactory : public bmqio::ChannelFactory {
 class ChannelFactoryPipelineConfigTest : public ::testing::Test {
   protected:
     ChannelFactoryPipelineConfigTest() {}
-    ~ChannelFactoryPipelineConfigTest() BSLS_KEYWORD_OVERRIDE;
+    ~ChannelFactoryPipelineConfigTest() override;
 
     typedef bsl::allocator<unsigned char>         allocator_type;
     typedef bmqio::ChannelFactoryPipeline::Config Config;
@@ -189,7 +189,7 @@ TEST_F(ChannelFactoryPipelineConfigTest, canMove)
 class ChannelFactoryPipelineTest : public ::testing::Test {
   protected:
     ChannelFactoryPipelineTest() {}
-    ~ChannelFactoryPipelineTest() BSLS_KEYWORD_OVERRIDE;
+    ~ChannelFactoryPipelineTest() override;
 
     typedef bsl::allocator<unsigned char>         allocator_type;
     typedef bslmf::MovableRefUtil                 MoveUtil;

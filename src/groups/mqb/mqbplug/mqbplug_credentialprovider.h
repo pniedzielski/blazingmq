@@ -106,7 +106,7 @@ class CredentialProviderPluginFactory : public PluginFactory {
     // CREATORS
     CredentialProviderPluginFactory();
 
-    ~CredentialProviderPluginFactory() BSLS_KEYWORD_OVERRIDE;
+    ~CredentialProviderPluginFactory() override;
 
     // MANIPULATORS
     virtual bslma::ManagedPtr<CredentialProvider>

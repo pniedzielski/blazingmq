@@ -42,13 +42,13 @@ class VoidCallback : public bmqu::ManagedCallback::CallbackFunctor {
         // NOTHING
     }
 
-    ~VoidCallback() BSLS_KEYWORD_OVERRIDE
+    ~VoidCallback() override
     {
         // NOTHING
     }
 
     // ACCESSORS
-    void operator()() const BSLS_KEYWORD_OVERRIDE
+    void operator()() const override
     {
         if (d_callback) {
             d_callback();

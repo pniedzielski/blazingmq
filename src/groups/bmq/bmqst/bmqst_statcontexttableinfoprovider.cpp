@@ -67,13 +67,12 @@ class DefaultIdColumn : public StatContextTableInfoProviderCustomColumn {
     {
     }
 
-    ~DefaultIdColumn() BSLS_KEYWORD_OVERRIDE {}
+    ~DefaultIdColumn() override {}
 
     // ACCESSORS
-    int
-    getValueSize(int                    level,
-                 const StatContext&     context,
-                 StatContext::ValueType valueType) const BSLS_KEYWORD_OVERRIDE
+    int getValueSize(int                    level,
+                     const StatContext&     context,
+                     StatContext::ValueType valueType) const override
     {
         int length = 0;
         if (valueType == StatContext::e_TOTAL_VALUE) {
@@ -107,11 +106,10 @@ class DefaultIdColumn : public StatContextTableInfoProviderCustomColumn {
         }
     }
 
-    bsl::ostream&
-    printValue(bsl::ostream&          stream,
-               int                    level,
-               const StatContext&     context,
-               StatContext::ValueType valueType) const BSLS_KEYWORD_OVERRIDE
+    bsl::ostream& printValue(bsl::ostream&          stream,
+                             int                    level,
+                             const StatContext&     context,
+                             StatContext::ValueType valueType) const override
     {
         bslstl::StringRef name;
         if (valueType == StatContext::e_TOTAL_VALUE) {

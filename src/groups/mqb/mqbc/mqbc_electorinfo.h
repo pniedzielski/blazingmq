@@ -204,13 +204,13 @@ class ElectorInfo : public ClusterFSMObserver {
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void onHealedLeader() BSLS_KEYWORD_OVERRIDE;
+    void onHealedLeader() override;
 
     /// Invoked when the Cluster FSM transitions to `FOL_HEALED` state.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void onHealedFollower() BSLS_KEYWORD_OVERRIDE;
+    void onHealedFollower() override;
 
     // MANIPULATORS
 

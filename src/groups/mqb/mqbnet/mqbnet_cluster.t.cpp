@@ -54,7 +54,7 @@ using namespace bsl;
 struct ClusterObserverTestImp
 : bsls::ProtocolTestImp<mqbnet::ClusterObserver> {
     void onNodeStateChange(mqbnet::ClusterNode* node,
-                           bool isAvailable) BSLS_KEYWORD_OVERRIDE
+                           bool                 isAvailable) override
     {
         markDone();
     }
@@ -62,124 +62,100 @@ struct ClusterObserverTestImp
 
 /// A test implementation of the `mqbnet::ClusterNode` protocol
 struct ClusterNodeTestImp : bsls::ProtocolTestImp<mqbnet::ClusterNode> {
-    mqbnet::ClusterNode* setChannel(
-        const bsl::weak_ptr<bmqio::Channel>& value,
-        const bmqp_ctrlmsg::ClientIdentity&  identity,
-        const bmqio::Channel::ReadCallback&  readCb) BSLS_KEYWORD_OVERRIDE
+    mqbnet::ClusterNode*
+    setChannel(const bsl::weak_ptr<bmqio::Channel>& value,
+               const bmqp_ctrlmsg::ClientIdentity&  identity,
+               const bmqio::Channel::ReadCallback&  readCb) override
     {
         return markDone();
     }
 
-    bool enableRead() BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    bool enableRead() override { return markDone(); }
 
     mqbnet::ClusterNode*
-    resetChannel(const bsl::shared_ptr<bmqio::Channel>&) BSLS_KEYWORD_OVERRIDE
+    resetChannel(const bsl::shared_ptr<bmqio::Channel>&) override
     {
         return markDone();
     }
 
     bmqt::GenericResult::Enum
     write(const bsl::shared_ptr<bdlbb::Blob>& blob,
-          bmqp::EventType::Enum type = bmqp::EventType::e_CONTROL)
-        BSLS_KEYWORD_OVERRIDE
+          bmqp::EventType::Enum type = bmqp::EventType::e_CONTROL) override
     {
         return markDone();
     }
 
-    mqbnet::Channel& channel() BSLS_KEYWORD_OVERRIDE { return markDoneRef(); }
+    mqbnet::Channel& channel() override { return markDoneRef(); }
 
-    bmqp_ctrlmsg::ClientIdentity identity() const BSLS_KEYWORD_OVERRIDE
+    bmqp_ctrlmsg::ClientIdentity identity() const override
     {
         return markDone();
     }
 
-    int nodeId() const BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    int nodeId() const override { return markDone(); }
 
-    const bsl::string& hostName() const BSLS_KEYWORD_OVERRIDE
+    const bsl::string& hostName() const override { return markDoneRef(); }
+
+    const bsl::string& nodeDescription() const override
     {
         return markDoneRef();
     }
 
-    const bsl::string& nodeDescription() const BSLS_KEYWORD_OVERRIDE
-    {
-        return markDoneRef();
-    }
+    const bsl::string& dataCenter() const override { return markDoneRef(); }
 
-    const bsl::string& dataCenter() const BSLS_KEYWORD_OVERRIDE
-    {
-        return markDoneRef();
-    }
+    const mqbnet::Cluster* cluster() const override { return markDone(); }
 
-    const mqbnet::Cluster* cluster() const BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
-
-    bool isAvailable() const BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    bool isAvailable() const override { return markDone(); }
 };
 
 /// A test implementation of the `mqbnet::Cluster` protocol
 struct ClusterTestImp : bsls::ProtocolTestImp<mqbnet::Cluster> {
     mqbnet::Cluster*
-    registerObserver(mqbnet::ClusterObserver* observer) BSLS_KEYWORD_OVERRIDE
+    registerObserver(mqbnet::ClusterObserver* observer) override
     {
         return markDone();
     }
 
     mqbnet::Cluster*
-    unregisterObserver(mqbnet::ClusterObserver* observer) BSLS_KEYWORD_OVERRIDE
+    unregisterObserver(mqbnet::ClusterObserver* observer) override
     {
         return markDone();
-    }
-
-    void writeAll(const bsl::shared_ptr<bdlbb::Blob>& blob,
-                  bmqp::EventType::Enum type = bmqp::EventType::e_CONTROL)
-        BSLS_KEYWORD_OVERRIDE
-    {
-        markDone();
     }
 
     void
-    broadcast(const bsl::shared_ptr<bdlbb::Blob>& blob) BSLS_KEYWORD_OVERRIDE
+    writeAll(const bsl::shared_ptr<bdlbb::Blob>& blob,
+             bmqp::EventType::Enum type = bmqp::EventType::e_CONTROL) override
     {
         markDone();
     }
 
-    void closeChannels() BSLS_KEYWORD_OVERRIDE { markDone(); }
-
-    mqbnet::ClusterNode* lookupNode(int nodeId) BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
-
-    mqbnet::Cluster::NodesList& nodes() BSLS_KEYWORD_OVERRIDE
-    {
-        return markDoneRef();
-    }
-
-    void enableRead() BSLS_KEYWORD_OVERRIDE { markDone(); }
-
-    void
-    onProxyConnectionUp(const bsl::shared_ptr<bmqio::Channel>& channel,
-                        const bmqp_ctrlmsg::ClientIdentity&    identity,
-                        bsl::string_view description) BSLS_KEYWORD_OVERRIDE
+    void broadcast(const bsl::shared_ptr<bdlbb::Blob>& blob) override
     {
         markDone();
     }
 
-    const bsl::string& name() const BSLS_KEYWORD_OVERRIDE
+    void closeChannels() override { markDone(); }
+
+    mqbnet::ClusterNode* lookupNode(int nodeId) override { return markDone(); }
+
+    mqbnet::Cluster::NodesList& nodes() override { return markDoneRef(); }
+
+    void enableRead() override { markDone(); }
+
+    void onProxyConnectionUp(const bsl::shared_ptr<bmqio::Channel>& channel,
+                             const bmqp_ctrlmsg::ClientIdentity&    identity,
+                             bsl::string_view description) override
     {
-        return markDoneRef();
+        markDone();
     }
 
-    int selfNodeId() const BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    const bsl::string& name() const override { return markDoneRef(); }
 
-    const mqbnet::ClusterNode* selfNode() const BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
+    int selfNodeId() const override { return markDone(); }
 
-    const mqbnet::Cluster::NodesList& nodes() const BSLS_KEYWORD_OVERRIDE
+    const mqbnet::ClusterNode* selfNode() const override { return markDone(); }
+
+    const mqbnet::Cluster::NodesList& nodes() const override
     {
         return markDoneRef();
     }

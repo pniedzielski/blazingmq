@@ -252,16 +252,15 @@ class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
     /// Configure this instance.  The specified `isReconfigure` flag indicates
     /// if queue is being reconfigured. Return zero on success, non-zero value
     /// otherwise and populate the specified `errorDescription`.
-    int configure(bsl::ostream& errorDescription,
-                  bool          isReconfigure) BSLS_KEYWORD_OVERRIDE;
+    int configure(bsl::ostream& errorDescription, bool isReconfigure) override;
 
     /// Prepare this engine for destruction by canceling all scheduled events.
-    void close() BSLS_KEYWORD_OVERRIDE;
+    void close() override;
 
     /// Reset the internal state of this engine.  If the optionally specified
     /// 'keepConfirming' is 'true', keep the data structures for CONFIRMs
     /// processing.
-    void resetState(bool isShuttingDown = false) BSLS_KEYWORD_OVERRIDE;
+    void resetState(bool isShuttingDown = false) override;
 
     /// Rebuild the internal state of this engine.  This method is invoked
     /// when the queue this engine is associated with is created from an
@@ -272,8 +271,7 @@ class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
     /// `rebuildInternalState` must be called on an empty-state object
     /// (i.e., which has just been constructed, or following a call to
     /// `resetState`) after it has been configured.
-    int
-    rebuildInternalState(bsl::ostream& errorDescription) BSLS_KEYWORD_OVERRIDE;
+    int rebuildInternalState(bsl::ostream& errorDescription) override;
 
     /// Obtain and return a handle to this queue for the client identified
     /// with the specified `clientContext`, using the specified
@@ -287,31 +285,29 @@ class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
                                                           clientContext,
               const bmqp_ctrlmsg::QueueHandleParameters&  handleParameters,
               unsigned int                                upstreamSubQueueId,
-              const mqbi::QueueHandle::GetHandleCallback& callback)
-        BSLS_KEYWORD_OVERRIDE;
+              const mqbi::QueueHandle::GetHandleCallback& callback) override;
 
     /// Configure the specified `handle` with the specified
     /// `streamParameters` and invoke the specified `configuredCb` when
     /// finished.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void configureHandle(
-        mqbi::QueueHandle*                                 handle,
-        const bmqp_ctrlmsg::StreamParameters&              streamParameters,
-        const mqbi::QueueHandle::HandleConfiguredCallback& configuredCb)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    configureHandle(mqbi::QueueHandle*                    handle,
+                    const bmqp_ctrlmsg::StreamParameters& streamParameters,
+                    const mqbi::QueueHandle::HandleConfiguredCallback&
+                        configuredCb) override;
 
     /// Reconfigure the specified `handle` by releasing the specified
     /// `parameters` from its current settings and invoke the specified
     /// `releasedCb` when done.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void
-    releaseHandle(mqbi::QueueHandle*                         handle,
-                  const bmqp_ctrlmsg::QueueHandleParameters& handleParameters,
-                  bool                                       isFinal,
-                  const mqbi::QueueHandle::HandleReleasedCallback& releasedCb)
-        BSLS_KEYWORD_OVERRIDE;
+    void releaseHandle(
+        mqbi::QueueHandle*                               handle,
+        const bmqp_ctrlmsg::QueueHandleParameters&       handleParameters,
+        bool                                             isFinal,
+        const mqbi::QueueHandle::HandleReleasedCallback& releasedCb) override;
 
     /// Called when the specified `handle` is usable and ready to receive
     /// messages (usually meaning its client has become available) for the
@@ -320,15 +316,14 @@ class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
     /// messages to the `handle`.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void
-    onHandleUsable(mqbi::QueueHandle* handle,
-                   unsigned int upstreamSubscriptionId) BSLS_KEYWORD_OVERRIDE;
+    void onHandleUsable(mqbi::QueueHandle* handle,
+                        unsigned int       upstreamSubscriptionId) override;
 
     /// Called by the mqbi::Queue when a new message is available on the queue
     /// and ready to be sent to eventual interested clients.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void afterNewMessage() BSLS_KEYWORD_OVERRIDE;
+    void afterNewMessage() override;
 
     /// Called by the `mqbi::Queue` when the message identified by the
     /// specified `msgGUID` is confirmed for the specified `subQueueId`
@@ -341,7 +336,7 @@ class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
     /// THREAD: This method is called from the Queue's dispatcher thread.
     int onConfirmMessage(mqbi::QueueHandle*       handle,
                          const bmqt::MessageGUID& msgGUID,
-                         unsigned int subQueueId) BSLS_KEYWORD_OVERRIDE;
+                         unsigned int             subQueueId) override;
 
     /// Called by the `mqbi::Queue` when the message identified by the
     /// specified `msgGUID` is rejected for the specified
@@ -349,10 +344,9 @@ class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
     /// identified by the specified `handle`.  Return resulting RDA counter.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    int
-    onRejectMessage(mqbi::QueueHandle*       handle,
-                    const bmqt::MessageGUID& msgGUID,
-                    unsigned int downstreamSubQueueId) BSLS_KEYWORD_OVERRIDE;
+    int onRejectMessage(mqbi::QueueHandle*       handle,
+                        const bmqt::MessageGUID& msgGUID,
+                        unsigned int downstreamSubQueueId) override;
 
     /// Called by the mqbi::Queue before a message with the specified
     /// `msgGUID` is removed from the queue (either it's TTL expired, it was
@@ -360,8 +354,7 @@ class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
     /// update the positions of the QueueHandles it manages.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void beforeMessageRemoved(const bmqt::MessageGUID& msgGUID)
-        BSLS_KEYWORD_OVERRIDE;
+    void beforeMessageRemoved(const bmqt::MessageGUID& msgGUID) override;
 
     /// Called by the mqbi::Queue *after* *all* messages are removed from
     /// the storage for the client identified by the specified `appId` and
@@ -372,9 +365,8 @@ class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
     /// `appId` must be empty if and only if `appKey` is null.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void
-    afterQueuePurged(const bsl::string&      appId,
-                     const mqbu::StorageKey& appKey) BSLS_KEYWORD_OVERRIDE;
+    void afterQueuePurged(const bsl::string&      appId,
+                          const mqbu::StorageKey& appKey) override;
 
     /// Notify this queue engine that a message has been posted and
     /// saved in the storage.
@@ -382,21 +374,21 @@ class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
     ///           `mqbblp::RemoteQueue::postMessage`
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void afterPostMessage() BSLS_KEYWORD_OVERRIDE;
+    void afterPostMessage() override;
 
     /// Called after the specified `addedAppIds` have been dynamically
     /// registered.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void afterAppIdRegistered(const mqbi::Storage::AppInfos& addedAppIds)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    afterAppIdRegistered(const mqbi::Storage::AppInfos& addedAppIds) override;
 
     /// Called after the specified `removedAppIds` have been dynamically
     /// unregistered.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void afterAppIdUnregistered(const mqbi::Storage::AppInfos& removedAppIds)
-        BSLS_KEYWORD_OVERRIDE;
+    void afterAppIdUnregistered(
+        const mqbi::Storage::AppInfos& removedAppIds) override;
 
     /// Called after creation of a new storage for the  specified
     /// `appIdKeyPair`.
@@ -404,7 +396,7 @@ class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
     /// THREAD: This method is called from the Queue's dispatcher thread.
     void registerStorage(const bsl::string&      appId,
                          const mqbu::StorageKey& appKey,
-                         unsigned int appOrdinal) BSLS_KEYWORD_OVERRIDE;
+                         unsigned int            appOrdinal) override;
 
     /// Called after removal of the storage for the specified
     /// `appIdKeyPair`.
@@ -412,17 +404,17 @@ class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
     /// THREAD: This method is called from the Queue's dispatcher thread.
     void unregisterStorage(const bsl::string&      appId,
                            const mqbu::StorageKey& appKey,
-                           unsigned int appOrdinal) BSLS_KEYWORD_OVERRIDE;
+                           unsigned int            appOrdinal) override;
 
     /// Given the specified 'putHeader', 'appData', 'mpi', and 'timestamp',
     /// evaluate all application subscriptions and exclude applications with
     /// negative results from message delivery.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void evaluateAppSubscriptions(const bmqp::PutHeader& putHeader,
-                                  const bsl::shared_ptr<bdlbb::Blob>& appData,
-                                  const bmqp::MessagePropertiesInfo&  mpi)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    evaluateAppSubscriptions(const bmqp::PutHeader&              putHeader,
+                             const bsl::shared_ptr<bdlbb::Blob>& appData,
+                             const bmqp::MessagePropertiesInfo&  mpi) override;
 
     /// Return storage iterator to the 1st un-delivered message including
     /// 'put-aside' messages (those without matching Subscriptions).
@@ -435,22 +427,22 @@ class RootQueueEngine BSLS_KEYWORD_FINAL : public mqbi::QueueEngine {
     /// posted to the queue managed by this engine.  Note that returned
     /// value may or may not be equal to `numOpenReaderHandles()` depending
     /// upon the specific type of this engine.
-    unsigned int messageReferenceCount() const BSLS_KEYWORD_OVERRIDE;
+    unsigned int messageReferenceCount() const override;
 
     /// Load into the specified `out` object the internal information about
     /// this queue engine and associated queue handles.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void loadInternals(mqbcmd::QueueEngine* out) const BSLS_KEYWORD_OVERRIDE;
+    void loadInternals(mqbcmd::QueueEngine* out) const override;
 
     /// Log application subscription info for the specified `appId` into the
     /// specified `stream`.
     ///
     /// THREAD: This method is called from the Queue's
     /// dispatcher thread.
-    bsl::ostream& logAppSubscriptionInfo(bsl::ostream&      stream,
-                                         const bsl::string& appId) const
-        BSLS_KEYWORD_OVERRIDE;
+    bsl::ostream&
+    logAppSubscriptionInfo(bsl::ostream&      stream,
+                           const bsl::string& appId) const override;
 
   private:
     /// Log application subscription info for the specified `appState` into

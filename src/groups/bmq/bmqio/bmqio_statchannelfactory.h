@@ -146,18 +146,18 @@ struct StatChannelFactoryHandle : public ChannelFactory::OpHandle {
 
     // CREATORS
     explicit StatChannelFactoryHandle(bslma::Allocator* basicAllocator = 0);
-    ~StatChannelFactoryHandle() BSLS_KEYWORD_OVERRIDE;
+    ~StatChannelFactoryHandle() override;
 
     // MANIPULATORS
 
     /// Cancel any current and future connect attempts (but do not close any
     /// existing Channel).
-    void cancel() BSLS_KEYWORD_OVERRIDE;
+    void cancel() override;
 
-    bmqvt::PropertyBag& properties() BSLS_KEYWORD_OVERRIDE;
+    bmqvt::PropertyBag& properties() override;
 
     // ACCESSORS
-    const bmqvt::PropertyBag& properties() const BSLS_KEYWORD_OVERRIDE;
+    const bmqvt::PropertyBag& properties() const override;
 
     const OptionsVariant& options() const;
 };
@@ -204,7 +204,7 @@ class StatChannelFactory : public ChannelFactory {
     // CREATORS
     explicit StatChannelFactory(const Config&     config,
                                 bslma::Allocator* basicAllocator = 0);
-    ~StatChannelFactory() BSLS_KEYWORD_OVERRIDE;
+    ~StatChannelFactory() override;
 
     // MANIPULATORS
     // ChannelFactory
@@ -213,7 +213,7 @@ class StatChannelFactory : public ChannelFactory {
     void listen(Status*                      status,
                 bslma::ManagedPtr<OpHandle>* handle,
                 const ListenOptions&         options,
-                const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                const ResultCallback&        cb) override;
 
     /// Connect (using the base `ChannelFactory`) to one of the endpoints
     /// produced by our Config's `endpointEvalFn`, and if that connection
@@ -224,16 +224,16 @@ class StatChannelFactory : public ChannelFactory {
     void connect(Status*                      status,
                  bslma::ManagedPtr<OpHandle>* handle,
                  const ConnectOptions&        options,
-                 const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                 const ResultCallback&        cb) override;
 
     /// Start the channel factory. Return 0 on success and a non-zero value
     /// otherwise.
-    int start() BSLS_KEYWORD_OVERRIDE;
+    int start() override;
 
     /// Stop the channel factory. Note that the behavior is undefined unless
     /// the thread calling this function is the same thread that called
     /// `start()` and is not one of the I/O threads used by this object.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 };
 
 // =============================

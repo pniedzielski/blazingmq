@@ -61,21 +61,20 @@ class PluginLibrary : public mqbplug::PluginLibrary {
     // CREATORS
     explicit PluginLibrary(bslma::Allocator* allocator = 0);
 
-    ~PluginLibrary() BSLS_KEYWORD_OVERRIDE;
+    ~PluginLibrary() override;
 
     // MODIFIERS
 
     /// Called by 'PluginManager' during broker startup if at least one
     /// enabled plugin is provided by this library.
-    int activate() BSLS_KEYWORD_OVERRIDE;
+    int activate() override;
 
     /// Called by 'PluginManager' during broker shutdown if at least one
     /// enabled plugin is provided by this library.
-    void deactivate() BSLS_KEYWORD_OVERRIDE;
+    void deactivate() override;
 
     // ACCESSORS
-    const bsl::vector<mqbplug::PluginInfo>&
-    plugins() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::vector<mqbplug::PluginInfo>& plugins() const override;
 };
 
 }  // close package namespace

@@ -814,7 +814,7 @@ class Queue : public DispatcherClient {
     // CREATORS
 
     /// Destructor
-    ~Queue() BSLS_KEYWORD_OVERRIDE;
+    ~Queue() override;
 
     // MANIPULATORS
 

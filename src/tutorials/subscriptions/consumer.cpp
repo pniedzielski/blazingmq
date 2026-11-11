@@ -152,12 +152,10 @@ class EventHandler : public bmqa::SessionEventHandler {
     // MANIPULATORS
 
     /// Process the specified 'sessionEvent' received from the broker.
-    void onSessionEvent(const bmqa::SessionEvent& sessionEvent)
-        BSLS_KEYWORD_OVERRIDE;
+    void onSessionEvent(const bmqa::SessionEvent& sessionEvent) override;
 
     /// Process the specified 'messageEvent' received from the broker.
-    void onMessageEvent(const bmqa::MessageEvent& messageEvent)
-        BSLS_KEYWORD_OVERRIDE;
+    void onMessageEvent(const bmqa::MessageEvent& messageEvent) override;
 
     /// Set the associated member of this event handler to the specified
     /// `value` and return a reference offering modifiable access to this

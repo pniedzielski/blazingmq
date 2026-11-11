@@ -215,7 +215,7 @@ class Ledger BSLS_KEYWORD_FINAL : public mqbsi::Ledger {
     Ledger(const mqbsi::LedgerConfig& config, bslma::Allocator* allocator);
 
     /// Destructor
-    ~Ledger() BSLS_KEYWORD_OVERRIDE;
+    ~Ledger() override;
 
     // MANIPULATORS
     //   (virtual 'mqbsi::Ledger')
@@ -229,24 +229,23 @@ class Ledger BSLS_KEYWORD_FINAL : public mqbsi::Ledger {
     /// true, create the ledger if it does not exist.  Else, return error if
     /// it does not exist.  Note that if e_READ_ONLY is true,
     /// `writeRecord()` will return failure.
-    int open(int flags) BSLS_KEYWORD_OVERRIDE;
+    int open(int flags) override;
 
     /// Close the ledger, and return 0 on success or a non-zero value
     /// otherwise.
-    int close() BSLS_KEYWORD_OVERRIDE;
+    int close() override;
 
     /// Increment the number of outstanding bytes in the log having the
     /// specified `logId` by the specified `value` (can be negative).
     /// Return 0 on success or a non-zero value otherwise.
-    int
-    updateOutstandingNumBytes(const mqbu::StorageKey& logId,
-                              bsls::Types::Int64 value) BSLS_KEYWORD_OVERRIDE;
+    int updateOutstandingNumBytes(const mqbu::StorageKey& logId,
+                                  bsls::Types::Int64      value) override;
 
     /// Set the number of outstanding bytes in the log having the specified
     /// `logId` to the specified `value`.  Return 0 on success or a non-zero
     /// value otherwise.
     int setOutstandingNumBytes(const mqbu::StorageKey& logId,
-                               bsls::Types::Int64 value) BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Int64      value) override;
 
     /// Write the specified `record` starting at the specified `offset`
     /// and of the specified `length` into this ledger and load into `recordId`
@@ -257,11 +256,11 @@ class Ledger BSLS_KEYWORD_FINAL : public mqbsi::Ledger {
     int writeRecord(LedgerRecordId* recordId,
                     const void*     record,
                     int             offset,
-                    int             length) BSLS_KEYWORD_OVERRIDE;
+                    int             length) override;
     int writeRecord(LedgerRecordId*           recordId,
                     const bdlbb::Blob&        record,
                     const bmqu::BlobPosition& offset,
-                    int                       length) BSLS_KEYWORD_OVERRIDE;
+                    int                       length) override;
 
     /// Write the specified `section` of the specified `record` into this
     /// ledger and load into the specified `recordId` an identifier which
@@ -270,17 +269,17 @@ class Ledger BSLS_KEYWORD_FINAL : public mqbsi::Ledger {
     /// must also adjust outstanding num bytes of the corresponding log.
     int writeRecord(LedgerRecordId*          recordId,
                     const bdlbb::Blob&       record,
-                    const bmqu::BlobSection& section) BSLS_KEYWORD_OVERRIDE;
+                    const bmqu::BlobSection& section) override;
 
     /// Flush any cached data in this ledger to the underlying storing
     /// mechanism, and return 0 on success, or a non-zero value on error.
-    int flush() BSLS_KEYWORD_OVERRIDE;
+    int flush() override;
 
     // ACCESSORS
     //   (virtual 'mqbsi::Ledger')
     int readRecord(void*                 entry,
                    int                   length,
-                   const LedgerRecordId& recordId) const BSLS_KEYWORD_OVERRIDE;
+                   const LedgerRecordId& recordId) const override;
 
     /// Copy the specified `length` bytes from the specified `recordId` in
     /// this ledger into the specified `entry`, and return 0 on success, or
@@ -288,37 +287,37 @@ class Ledger BSLS_KEYWORD_FINAL : public mqbsi::Ledger {
     /// space for at least `length` bytes.
     int readRecord(bdlbb::Blob*          entry,
                    int                   length,
-                   const LedgerRecordId& recordId) const BSLS_KEYWORD_OVERRIDE;
+                   const LedgerRecordId& recordId) const override;
 
-    int aliasRecord(void** entry, int length, const LedgerRecordId& recordId)
-        const BSLS_KEYWORD_OVERRIDE;
+    int aliasRecord(void**                entry,
+                    int                   length,
+                    const LedgerRecordId& recordId) const override;
 
     /// Load into the specified `entry` a reference to the specified
     /// `length` bytes from the specified `recordId` in this ledger, and
     /// return 0 on success, or a non-zero value on error.  Behavior is
     /// undefined unless aliasing is supported.
-    int
-    aliasRecord(bdlbb::Blob*          entry,
-                int                   length,
-                const LedgerRecordId& recordId) const BSLS_KEYWORD_OVERRIDE;
+    int aliasRecord(bdlbb::Blob*          entry,
+                    int                   length,
+                    const LedgerRecordId& recordId) const override;
 
     /// Return true if this ledger is opened, false otherwise.
-    bool isOpened() const BSLS_KEYWORD_OVERRIDE;
+    bool isOpened() const override;
 
     /// Return true if this ledger supports aliasing, false otherwise.
-    bool supportsAliasing() const BSLS_KEYWORD_OVERRIDE;
+    bool supportsAliasing() const override;
 
     /// Return the number of logs in this ledger.
-    size_t numLogs() const BSLS_KEYWORD_OVERRIDE;
+    size_t numLogs() const override;
 
     /// Return the list of logs inside the ledger.  Note that the last log
     /// instance in the returned list is the "current" one (i.e., the one
     /// to which next record will be written).
-    const Logs& logs() const BSLS_KEYWORD_OVERRIDE;
+    const Logs& logs() const override;
 
     /// Return a reference not offering modifiable access to the current log
     /// being written to in this ledger.
-    const LogSp& currentLog() const BSLS_KEYWORD_OVERRIDE;
+    const LogSp& currentLog() const override;
 
     /// If the optionally specified `logId` is null (`isNull()` returns
     /// true), return the number of outstanding bytes across all log
@@ -326,13 +325,11 @@ class Ledger BSLS_KEYWORD_FINAL : public mqbsi::Ledger {
     /// bytes in the log instance identified by `logId`.  The behavior is
     /// undefined unless there is a log instance identified by `logId` in
     /// this ledger.
-    bsls::Types::Int64
-    outstandingNumBytes(const mqbu::StorageKey& logId =
-                            mqbu::StorageKey()) const BSLS_KEYWORD_OVERRIDE;
+    bsls::Types::Int64 outstandingNumBytes(
+        const mqbu::StorageKey& logId = mqbu::StorageKey()) const override;
 
-    bsls::Types::Int64
-    totalNumBytes(const mqbu::StorageKey& logId = mqbu::StorageKey()) const
-        BSLS_KEYWORD_OVERRIDE;
+    bsls::Types::Int64 totalNumBytes(
+        const mqbu::StorageKey& logId = mqbu::StorageKey()) const override;
     // If the optionally specified 'logId' is null ('isNull()' returns
     // true), return the number of bytes across all log instances that this
     // ledger.  Else, return the number of bytes in the log instance

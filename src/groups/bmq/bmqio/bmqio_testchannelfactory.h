@@ -75,12 +75,12 @@ class TestChannelFactoryOpHandle : public ChannelFactoryOperationHandle {
     bsl::shared_ptr<bsl::string>& token();
 
     // ChannelFactoryOperationHandle
-    void                cancel() BSLS_KEYWORD_OVERRIDE;
-    bmqvt::PropertyBag& properties() BSLS_KEYWORD_OVERRIDE;
+    void                cancel() override;
+    bmqvt::PropertyBag& properties() override;
 
     // ACCESSORS
     // ChannelFactoryOperationHandle
-    const bmqvt::PropertyBag& properties() const BSLS_KEYWORD_OVERRIDE;
+    const bmqvt::PropertyBag& properties() const override;
 };
 
 // ========================
@@ -198,13 +198,13 @@ class TestChannelFactory : public ChannelFactory {
     void listen(Status*                      status,
                 bslma::ManagedPtr<OpHandle>* handle,
                 const ListenOptions&         options,
-                const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                const ResultCallback&        cb) override;
     void connect(Status*                      status,
                  bslma::ManagedPtr<OpHandle>* handle,
                  const ConnectOptions&        options,
-                 const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
-    int  start() BSLS_KEYWORD_OVERRIDE;
-    void stop() BSLS_KEYWORD_OVERRIDE;
+                 const ResultCallback&        cb) override;
+    int  start() override;
+    void stop() override;
 };
 
 }  // close package namespace

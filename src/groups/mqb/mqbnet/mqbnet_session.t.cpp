@@ -53,7 +53,7 @@ using namespace bsl;
 struct SessionEventProcessorTestImp
 : bsls::ProtocolTestImp<mqbnet::SessionEventProcessor> {
     void processEvent(const bmqp::Event&   event,
-                      mqbnet::ClusterNode* source = 0) BSLS_KEYWORD_OVERRIDE
+                      mqbnet::ClusterNode* source = 0) override
     {
         markDone();
     }
@@ -62,42 +62,32 @@ struct SessionEventProcessorTestImp
 /// A test implementation of the `mqbnet::Session` protocol
 struct SessionTestImp : bsls::ProtocolTestImp<mqbnet::Session> {
     void tearDown(const bsl::shared_ptr<void>& handle,
-                  bool isShutdown) BSLS_KEYWORD_OVERRIDE
+                  bool                         isShutdown) override
     {
         markDone();
     }
 
-    void initiateShutdown(const ShutdownCb& callback) BSLS_KEYWORD_OVERRIDE
-    {
-        markDone();
-    }
+    void initiateShutdown(const ShutdownCb& callback) override { markDone(); }
 
-    void invalidate() BSLS_KEYWORD_OVERRIDE { markDone(); }
+    void invalidate() override { markDone(); }
 
-    bsl::shared_ptr<bmqio::Channel> channel() const BSLS_KEYWORD_OVERRIDE
+    bsl::shared_ptr<bmqio::Channel> channel() const override
     {
         return markDone();
     }
 
-    mqbnet::ClusterNode* clusterNode() const BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
+    mqbnet::ClusterNode* clusterNode() const override { return markDone(); }
 
-    const bmqp_ctrlmsg::NegotiationMessage&
-    negotiationMessage() const BSLS_KEYWORD_OVERRIDE
+    const bmqp_ctrlmsg::NegotiationMessage& negotiationMessage() const override
     {
         return markDoneRef();
     }
 
-    bsl::string_view description() const BSLS_KEYWORD_OVERRIDE
-    {
-        return markDoneRef();
-    }
+    bsl::string_view description() const override { return markDoneRef(); }
 
     // SessionEventProcessor
     void processEvent(const bmqp::Event&   event,
-                      mqbnet::ClusterNode* source = 0) BSLS_KEYWORD_OVERRIDE
+                      mqbnet::ClusterNode* source = 0) override
     {
         markDone();
     }

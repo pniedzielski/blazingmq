@@ -241,7 +241,7 @@ class CountingAllocator BSLS_KEYWORD_FINAL : public bslma::Allocator {
                       bslma::Allocator*        allocator = 0);
 
     /// Destroy this object.
-    virtual ~CountingAllocator() BSLS_KEYWORD_OVERRIDE;
+    virtual ~CountingAllocator() override;
 
     // MANIPULATORS
 
@@ -264,7 +264,7 @@ class CountingAllocator BSLS_KEYWORD_FINAL : public bslma::Allocator {
     /// is undefined unless `0 <= size`.  Note that the alignment of the
     /// address returned conforms to the platform requirement for any object
     /// of the specified `size`.
-    virtual void* allocate(size_type size) BSLS_KEYWORD_OVERRIDE;
+    virtual void* allocate(size_type size) override;
 
     /// Return the memory block at the specified `address` back to this
     /// allocator and report the deallocation size to the parent
@@ -272,7 +272,7 @@ class CountingAllocator BSLS_KEYWORD_FINAL : public bslma::Allocator {
     /// this function has no effect.  The behavior is undefined unless
     /// `address` was allocated using this allocator object and has not
     /// already been deallocated.
-    virtual void deallocate(void* address) BSLS_KEYWORD_OVERRIDE;
+    virtual void deallocate(void* address) override;
 
     // ACCESSORS
     //   (specific to bmqma::CountingAllocator)

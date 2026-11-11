@@ -49,8 +49,7 @@ class MockPropertiesReader : public PropertiesReader {
 
     /// Return a `bdld::Datum` object with value for the specified `name`.
     /// The `bslma::Allocator*` argument is unused.
-    bdld::Datum get(const bsl::string& name,
-                    bslma::Allocator*) BSLS_KEYWORD_OVERRIDE;
+    bdld::Datum get(const bsl::string& name, bslma::Allocator*) override;
 };
 
 MockPropertiesReader::MockPropertiesReader(bslma::Allocator* allocator)

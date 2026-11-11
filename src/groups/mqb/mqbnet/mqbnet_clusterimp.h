@@ -122,64 +122,62 @@ class ClusterNodeImp : public ClusterNode {
                    bslma::Allocator*          allocator);
 
     /// Destructor.
-    ~ClusterNodeImp() BSLS_KEYWORD_OVERRIDE;
+    ~ClusterNodeImp() override;
 
     // MANIPULATORS
 
     /// Return associated channel.
-    Channel& channel() BSLS_KEYWORD_OVERRIDE;
+    Channel& channel() override;
 
     /// Set the channel associated to this node to the specified `value` and
     /// return a pointer to this object.  Store the specified `identity`.
     /// The specified `readCb` serves as read data callback when
     /// `enableRead` is called.
-    ClusterNode* setChannel(const bsl::weak_ptr<bmqio::Channel>& value,
-                            const bmqp_ctrlmsg::ClientIdentity&  identity,
-                            const bmqio::Channel::ReadCallback&  readCb)
-        BSLS_KEYWORD_OVERRIDE;
+    ClusterNode*
+    setChannel(const bsl::weak_ptr<bmqio::Channel>& value,
+               const bmqp_ctrlmsg::ClientIdentity&  identity,
+               const bmqio::Channel::ReadCallback&  readCb) override;
 
     /// Start reading from the channel.  Return true if `read` is successful
     /// or if it is already reading.
-    bool enableRead() BSLS_KEYWORD_OVERRIDE;
+    bool enableRead() override;
 
     /// Reset the channel associated to this node.
-    ClusterNode*
-    resetChannel(const bsl::shared_ptr<bmqio::Channel>& closedChannel)
-        BSLS_KEYWORD_OVERRIDE;
+    ClusterNode* resetChannel(
+        const bsl::shared_ptr<bmqio::Channel>& closedChannel) override;
 
     /// Enqueue the specified message `blob` of the specified `type`to be
     /// written to the channel associated to this node.  Return 0 on
     /// success, and a non-zero value otherwise.  Note that success does not
     /// imply that the data has been written or will be successfully written
     /// to the underlying stream used by this channel.
-    bmqt::GenericResult::Enum
-    write(const bsl::shared_ptr<bdlbb::Blob>& blob,
-          bmqp::EventType::Enum               type) BSLS_KEYWORD_OVERRIDE;
+    bmqt::GenericResult::Enum write(const bsl::shared_ptr<bdlbb::Blob>& blob,
+                                    bmqp::EventType::Enum type) override;
 
     // ACCESSORS
-    bmqp_ctrlmsg::ClientIdentity identity() const BSLS_KEYWORD_OVERRIDE;
+    bmqp_ctrlmsg::ClientIdentity identity() const override;
     // Return identity from the last received negotiation message.
 
     /// Return the id of this node.
-    int nodeId() const BSLS_KEYWORD_OVERRIDE;
+    int nodeId() const override;
 
     /// Return the name of this node.
-    const bsl::string& hostName() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::string& hostName() const override;
 
     /// Return a string which contains a brief description of the node.
     /// Note that this method is provided only for logging purposes and
     /// format of returned string can change anytime.
-    const bsl::string& nodeDescription() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::string& nodeDescription() const override;
 
     /// Return the dataCenter this node resides in.
-    const bsl::string& dataCenter() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::string& dataCenter() const override;
 
     /// Return a pointer to the cluster this node belongs to.
-    const Cluster* cluster() const BSLS_KEYWORD_OVERRIDE;
+    const Cluster* cluster() const override;
 
     /// Return true if this node is available, i.e., it has an attached
     /// channel.
-    bool isAvailable() const BSLS_KEYWORD_OVERRIDE;
+    bool isAvailable() const override;
 };
 
 // =============
@@ -281,66 +279,63 @@ class ClusterImp : public Cluster {
                bslma::Allocator*                       allocator);
 
     /// Destructor
-    ~ClusterImp() BSLS_KEYWORD_OVERRIDE;
+    ~ClusterImp() override;
 
     // MANIPULATORS
 
     /// Register the specified `observer` to be notified of node state
     /// changes.  Return a pointer to this object.
-    Cluster* registerObserver(ClusterObserver* observer) BSLS_KEYWORD_OVERRIDE;
+    Cluster* registerObserver(ClusterObserver* observer) override;
 
     /// Un-register the specified `observer` from being notified of node
     /// state changes.  Return a pointer to this object.
-    Cluster*
-    unregisterObserver(ClusterObserver* observer) BSLS_KEYWORD_OVERRIDE;
+    Cluster* unregisterObserver(ClusterObserver* observer) override;
 
     /// Write the specified `blob` of the specified `type` to all connected
     /// nodes of this cluster (with the exception of the current node).
     void writeAll(const bsl::shared_ptr<bdlbb::Blob>& blob,
-                  bmqp::EventType::Enum type) BSLS_KEYWORD_OVERRIDE;
+                  bmqp::EventType::Enum               type) override;
 
     /// Send the specified `blob` to all currently up nodes of this cluster
     /// (with the exception of the current node).
-    void
-    broadcast(const bsl::shared_ptr<bdlbb::Blob>& blob) BSLS_KEYWORD_OVERRIDE;
+    void broadcast(const bsl::shared_ptr<bdlbb::Blob>& blob) override;
 
     /// Close the channels associated to all nodes in this cluster.
-    void closeChannels() BSLS_KEYWORD_OVERRIDE;
+    void closeChannels() override;
 
     /// Lookup the node having the specified `nodeId` and return a pointer
     /// to it, or the null pointer if no such node was found.
-    ClusterNode* lookupNode(int nodeId) BSLS_KEYWORD_OVERRIDE;
+    ClusterNode* lookupNode(int nodeId) override;
 
     /// Return a reference to the list of nodes part of this cluster.
     ///
     /// NOTE: the returned list itself should *NOT* be changed.
-    Cluster::NodesList& nodes() BSLS_KEYWORD_OVERRIDE;
+    Cluster::NodesList& nodes() override;
 
     /// Start reading from all channels.
-    void enableRead() BSLS_KEYWORD_OVERRIDE;
+    void enableRead() override;
 
     /// Process incoming proxy connection.
-    void
-    onProxyConnectionUp(const bsl::shared_ptr<bmqio::Channel>& channel,
-                        const bmqp_ctrlmsg::ClientIdentity&    identity,
-                        bsl::string_view description) BSLS_KEYWORD_OVERRIDE;
+    void onProxyConnectionUp(const bsl::shared_ptr<bmqio::Channel>& channel,
+                             const bmqp_ctrlmsg::ClientIdentity&    identity,
+                             bsl::string_view description) override;
 
     // ACCESSORS
 
     /// Return the name of that cluster.
-    const bsl::string& name() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::string& name() const override;
 
     /// Return the node Id of the current broker in that cluster, or -1 if
     /// the broker isn't a member of that cluster.
-    int selfNodeId() const BSLS_KEYWORD_OVERRIDE;
+    int selfNodeId() const override;
 
     /// Return a pointer to the node of the current broker in that cluster,
     /// or a null pointer if the broker isn't a member of that cluster.
-    const ClusterNode* selfNode() const BSLS_KEYWORD_OVERRIDE;
+    const ClusterNode* selfNode() const override;
 
     /// Return a reference not offering modifiable access to the list of
     /// nodes part of this cluster.
-    const Cluster::NodesList& nodes() const BSLS_KEYWORD_OVERRIDE;
+    const Cluster::NodesList& nodes() const override;
 };
 
 // ============================================================================

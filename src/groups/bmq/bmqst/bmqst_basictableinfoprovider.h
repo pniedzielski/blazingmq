@@ -299,22 +299,22 @@ class BasicTableInfoProvider : public bmqst::TableInfoProvider {
     // ACCESSORS
 
     // bmqst::TableInfoProvider
-    int  numRows() const BSLS_KEYWORD_OVERRIDE;
-    int  numColumns(int level) const BSLS_KEYWORD_OVERRIDE;
-    bool hasTitle() const BSLS_KEYWORD_OVERRIDE;
-    int  numHeaderLevels() const BSLS_KEYWORD_OVERRIDE;
-    int  getValueSize(int row, int column) const BSLS_KEYWORD_OVERRIDE;
+    int           numRows() const override;
+    int           numColumns(int level) const override;
+    bool          hasTitle() const override;
+    int           numHeaderLevels() const override;
+    int           getValueSize(int row, int column) const override;
     bsl::ostream& printValue(bsl::ostream& stream,
                              int           row,
                              int           column,
-                             int           width) const BSLS_KEYWORD_OVERRIDE;
-    int getHeaderSize(int level, int column) const BSLS_KEYWORD_OVERRIDE;
-    int getParentHeader(int level, int column) const BSLS_KEYWORD_OVERRIDE;
-    bsl::ostream& printTitle(bsl::ostream& stream) const BSLS_KEYWORD_OVERRIDE;
+                             int           width) const override;
+    int           getHeaderSize(int level, int column) const override;
+    int           getParentHeader(int level, int column) const override;
+    bsl::ostream& printTitle(bsl::ostream& stream) const override;
     bsl::ostream& printHeader(bsl::ostream& stream,
                               int           level,
                               int           column,
-                              int           width) const BSLS_KEYWORD_OVERRIDE;
+                              int           width) const override;
 };
 
 // ============================================================================

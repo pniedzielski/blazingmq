@@ -102,7 +102,7 @@ class ClusterStateLedgerIterator BSLS_KEYWORD_FINAL
     operator=(const ClusterStateLedgerIterator& rhs);
 
     /// Destructor
-    ~ClusterStateLedgerIterator() BSLS_KEYWORD_OVERRIDE;
+    ~ClusterStateLedgerIterator() override;
 
     // MANIPULATORS
 
@@ -112,36 +112,35 @@ class ClusterStateLedgerIterator BSLS_KEYWORD_FINAL
     /// returns a non-zero value, this iterator becomes invalid and
     /// `isValid()` must return false.  Note that this method must be called
     /// once prior to accessing the first record.
-    int next() BSLS_KEYWORD_OVERRIDE;
+    int next() override;
 
     /// Assign self to be a copy of the specified `other`.  This uses the
     /// assignment operator under the hood, but circumvents object slicing.
     /// Behavior is undefined unless `other` and this object have the same
     /// type.
-    void
-    copy(const mqbc::ClusterStateLedgerIterator& other) BSLS_KEYWORD_OVERRIDE;
+    void copy(const mqbc::ClusterStateLedgerIterator& other) override;
 
     // ACCESSORS
 
     /// Return a new `ClusterStateLedgerIterator`, which is a clone of self,
     /// using the specified `allocator`.
     bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator>
-    clone(bslma::Allocator* allocator) const BSLS_KEYWORD_OVERRIDE;
+    clone(bslma::Allocator* allocator) const override;
 
     /// Return true if this iterator is initialized and valid, and the
     /// previous call to `next()` returned 0; return false otherwise.
-    bool isValid() const BSLS_KEYWORD_OVERRIDE;
+    bool isValid() const override;
 
     /// Return a const reference to the `ClusterStateRecordHeader` at the
     /// iterator position.  Behavior is undefined unless `isValid()` returns
     /// true.
-    const mqbc::ClusterStateRecordHeader& header() const BSLS_KEYWORD_OVERRIDE;
+    const mqbc::ClusterStateRecordHeader& header() const override;
 
     /// Load the cluster message recorded at the iterator position to the
     /// specified `message`.  Return 0 on success or a non-zero error value
     /// otherwise.  Behavior is undefined unless `isValid()` returns true.
-    int loadClusterMessage(bmqp_ctrlmsg::ClusterMessage* message) const
-        BSLS_KEYWORD_OVERRIDE;
+    int
+    loadClusterMessage(bmqp_ctrlmsg::ClusterMessage* message) const override;
 
     /// Format this object to the specified output `stream` at the (absolute
     /// value of) the optionally specified indentation `level` and return a
@@ -154,8 +153,8 @@ class ClusterStateLedgerIterator BSLS_KEYWORD_FINAL
     /// not valid on entry, this operation has no effect.  Behavior is
     /// undefined unless `isValid()` returns true.
     bsl::ostream& print(bsl::ostream& stream,
-                        int           level = 0,
-                        int spacesPerLevel  = 4) const BSLS_KEYWORD_OVERRIDE;
+                        int           level          = 0,
+                        int           spacesPerLevel = 4) const override;
 };
 
 // FREE OPERATORS

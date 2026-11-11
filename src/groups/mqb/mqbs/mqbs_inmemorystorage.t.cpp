@@ -357,7 +357,7 @@ struct Test : bmqtst::Test {
 
     // CREATORS
     Test();
-    ~Test() BSLS_KEYWORD_OVERRIDE;
+    ~Test() override;
 };
 
 // -----------

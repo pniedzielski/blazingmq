@@ -200,7 +200,7 @@ class ClusterNodeSession : public mqbi::DispatcherClient,
         bslma::Allocator*                          allocator);
 
     /// Destructor.
-    ~ClusterNodeSession() BSLS_KEYWORD_OVERRIDE;
+    ~ClusterNodeSession() override;
 
     // MANIPULATORS
 
@@ -209,21 +209,20 @@ class ClusterNodeSession : public mqbi::DispatcherClient,
     /// have been released.
     void teardown();
 
-    void onDispatcherEvent(const mqbi::DispatcherEvent& event)
-        BSLS_KEYWORD_OVERRIDE;
+    void onDispatcherEvent(const mqbi::DispatcherEvent& event) override;
     // Called by the 'Dispatcher' when it has the specified 'event' to
     // deliver to the client.
 
     /// Called by the dispatcher to flush any pending operation. Mainly used
     /// to provide batch and nagling mechanism.  Note that this method will
     /// never be invoked for this type.
-    void flush() BSLS_KEYWORD_OVERRIDE;
+    void flush() override;
 
     /// Return a pointer to the dispatcher this client is associated with.
-    mqbi::Dispatcher* dispatcher() BSLS_KEYWORD_OVERRIDE;
+    mqbi::Dispatcher* dispatcher() override;
 
     /// Return a reference to the dispatcherClientData.
-    mqbi::DispatcherClientData& dispatcherClientData() BSLS_KEYWORD_OVERRIDE;
+    mqbi::DispatcherClientData& dispatcherClientData() override;
 
     /// @brief Update the status of this node session.
     /// @param other Node status of the node this session is connected to.
@@ -261,7 +260,7 @@ class ClusterNodeSession : public mqbi::DispatcherClient,
              const mqbi::StorageMessageAttributes&     attributes,
              const bmqp::MessagePropertiesInfo&        mps,
              const bmqp::Protocol::SubQueueInfosArray& subQueueInfos,
-             bool isOutOfOrder) BSLS_KEYWORD_OVERRIDE;
+             bool                                      isOutOfOrder) override;
     // Called by the 'queueId' to deliver the specified 'message' with the
     // specified 'message', 'msgGUID', 'attributes' and 'mps' for the
     // specified 'subQueueInfos' streams of the queue.
@@ -269,8 +268,7 @@ class ClusterNodeSession : public mqbi::DispatcherClient,
     // THREAD: This method is called from the Queue's dispatcher thread.
 
     mqbi::InlineResult::Enum
-    sendAck(int                     queueId,
-            const bmqp::AckMessage& ackMessage) BSLS_KEYWORD_OVERRIDE;
+    sendAck(int queueId, const bmqp::AckMessage& ackMessage) override;
     // Called by the 'queueId' to send the specified 'ackMessage'.
     //
     // THREAD: This method is called from the Queue's dispatcher thread.
@@ -285,14 +283,13 @@ class ClusterNodeSession : public mqbi::DispatcherClient,
     // ACCESSORS
 
     /// Return a pointer to the dispatcher this client is associated with.
-    const mqbi::Dispatcher* dispatcher() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::Dispatcher* dispatcher() const override;
 
     /// Return a reference to the dispatcherClientData.
-    const mqbi::DispatcherClientData&
-    dispatcherClientData() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::DispatcherClientData& dispatcherClientData() const override;
 
     /// Return a printable description of the client (e.g. for logging).
-    bsl::string_view description() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view description() const override;
 
     /// Return the associated cluster as the dispatcher client.
     mqbi::DispatcherClient* cluster() const;
@@ -323,7 +320,7 @@ class ClusterNodeSession : public mqbi::DispatcherClient,
     /// Return a non-modifiable reference to the context of this requester
     /// of a QueueHandle.
     const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>&
-    handleRequesterContext() const BSLS_KEYWORD_OVERRIDE;
+    handleRequesterContext() const override;
 };
 
 // ============================================================================

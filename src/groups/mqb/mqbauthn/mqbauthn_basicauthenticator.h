@@ -79,13 +79,12 @@ class BasicAuthenticationResult : public mqbplug::AuthenticationResult {
                               bsls::Types::Uint64 lifetimeMs,
                               bslma::Allocator*   allocator);
 
-    ~BasicAuthenticationResult() BSLS_KEYWORD_OVERRIDE;
+    ~BasicAuthenticationResult() override;
 
     // ACCESSORS
 
-    bsl::string_view principal() const BSLS_KEYWORD_OVERRIDE;
-    const bsl::optional<bsls::Types::Uint64>&
-    lifetimeMs() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view                          principal() const override;
+    const bsl::optional<bsls::Types::Uint64>& lifetimeMs() const override;
 };
 
 // ========================
@@ -126,15 +125,15 @@ class BasicAuthenticator : public mqbplug::Authenticator {
                        bslma::Allocator*                        allocator = 0);
 
     /// Destructor.
-    ~BasicAuthenticator() BSLS_KEYWORD_OVERRIDE;
+    ~BasicAuthenticator() override;
 
     // ACCESSORS
 
     /// Return the name of the plugin.
-    bsl::string_view name() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view name() const override;
 
     /// Return the authentication mechanism the Authenticator supports.
-    bsl::string_view mechanism() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view mechanism() const override;
 
     /// Authenticate using the data provided in the specified `input`.
     /// - Return `0` on success, and populate the specified `result` with
@@ -146,17 +145,17 @@ class BasicAuthenticator : public mqbplug::Authenticator {
     int authenticate(bsl::ostream& errorDescription,
                      bsl::shared_ptr<mqbplug::AuthenticationResult>* result,
                      const mqbplug::AuthenticationData&              input,
-                     bslma::Allocator* allocator) const BSLS_KEYWORD_OVERRIDE;
+                     bslma::Allocator* allocator) const override;
 
     // MANIPULATORS
 
     /// Start the authenticator and return 0 on success, or return a non-zero
     /// value and populate the specified `errorDescription` with the
     /// description of any failure encountered.
-    int start(bsl::ostream& errorDescription) BSLS_KEYWORD_OVERRIDE;
+    int start(bsl::ostream& errorDescription) override;
 
     /// Stop the authenticator.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 };
 
 // =====================================
@@ -168,11 +167,11 @@ class BasicAuthenticatorPluginFactory
   public:
     // CREATORS
     BasicAuthenticatorPluginFactory();
-    ~BasicAuthenticatorPluginFactory() BSLS_KEYWORD_OVERRIDE;
+    ~BasicAuthenticatorPluginFactory() override;
 
     // MANIPULATORS
     bslma::ManagedPtr<mqbplug::Authenticator>
-    create(bslma::Allocator* allocator) BSLS_KEYWORD_OVERRIDE;
+    create(bslma::Allocator* allocator) override;
 };
 
 }  // close package namespace

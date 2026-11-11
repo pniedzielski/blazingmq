@@ -310,18 +310,18 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
     /// method is the entry point for all incoming events coming from the
     /// remote peer.
     void processEvent(const bmqp::Event&   event,
-                      mqbnet::ClusterNode* source = 0) BSLS_KEYWORD_OVERRIDE;
+                      mqbnet::ClusterNode* source = 0) override;
 
     // PRIVATE MANIPULATORS
     //   (virtual: mqbi::Cluster)
 
     /// Return a reference offering modifiable access to the request manager
     /// used by this cluster.
-    RequestManagerType& requestManager() BSLS_KEYWORD_OVERRIDE;
+    RequestManagerType& requestManager() override;
 
     /// Return a reference offering modifiable access to the multi request
     /// manager used by this cluster.
-    MultiRequestManagerType& multiRequestManager() BSLS_KEYWORD_OVERRIDE;
+    MultiRequestManagerType& multiRequestManager() override;
 
     /// Send the specified `request` with the specified `timeout` to the
     /// specified `target` node.  If `target` is 0, it is the Cluster's
@@ -334,13 +334,13 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
     bmqt::GenericResult::Enum
     sendRequest(const RequestManagerType::RequestSp& request,
                 mqbnet::ClusterNode*                 target,
-                bsls::TimeInterval timeout) BSLS_KEYWORD_OVERRIDE;
+                bsls::TimeInterval                   timeout) override;
 
     /// Process the specified `response` message as a response to previously
     /// transmitted request.  This method is invoked in the cluster-dispatcher
     /// thread.
-    void processResponse(const bmqp_ctrlmsg::ControlMessage& response)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    processResponse(const bmqp_ctrlmsg::ControlMessage& response) override;
     void processPeerStopResponse(const bmqp_ctrlmsg::ControlMessage& response);
 
     void processPeerStopRequest(mqbnet::ClusterNode* clusterNode,
@@ -399,7 +399,7 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
                  bslma::Allocator*                     allocator);
 
     /// Destructor
-    ~ClusterProxy() BSLS_KEYWORD_OVERRIDE;
+    ~ClusterProxy() override;
 
     // MANIPULATORS
     //   (virtual: mqbi::Cluster)
@@ -407,21 +407,21 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
     /// Start the `Cluster`.  Return 0 on success and non-zero otherwise
     /// populating the specified `errorDescription` with the reason of the
     /// error.
-    int start(bsl::ostream& errorDescription) BSLS_KEYWORD_OVERRIDE;
+    int start(bsl::ostream& errorDescription) override;
 
     /// Initiate the shutdown of the cluster and invoke the specified
     /// `callback` upon completion of (asynchronous) shutdown sequence. It
     /// is expected that `stop()` will be called soon after this routine is
     /// invoked.  Execute shutdown logic where upstream (not downstream) nodes
     /// deconfigure queues and the shutting down node waits for CONFIRMS.
-    void initiateShutdown(const VoidFunctor& callback) BSLS_KEYWORD_OVERRIDE;
+    void initiateShutdown(const VoidFunctor& callback) override;
 
     /// Stop the `Cluster`.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 
     /// Return a reference offering modifiable access to the net cluster
     /// used by this cluster.
-    mqbnet::Cluster& netCluster() BSLS_KEYWORD_OVERRIDE;
+    mqbnet::Cluster& netCluster() override;
 
     /// Open the queue with the specified `uri`, belonging to the specified
     /// `domain` with the specified `parameters` from a client identified
@@ -432,18 +432,16 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
                    const bmqp_ctrlmsg::QueueHandleParameters& handleParameters,
                    const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>&
                                                            clientContext,
-                   const mqbi::Cluster::OpenQueueCallback& callback)
-        BSLS_KEYWORD_OVERRIDE;
+                   const mqbi::Cluster::OpenQueueCallback& callback) override;
 
     /// Configure the specified `upstreamSubQueueId` subStream of the
     /// specified `queue` with the specified `streamParameters`, and invoke
     /// the specified `callback` when finished.
-    void
-    configureQueue(mqbi::Queue*                          queue,
-                   const bmqp_ctrlmsg::StreamParameters& streamParameters,
-                   unsigned int                          upstreamSubQueueId,
-                   const mqbi::QueueHandle::HandleConfiguredCallback& callback)
-        BSLS_KEYWORD_OVERRIDE;
+    void configureQueue(
+        mqbi::Queue*                                       queue,
+        const bmqp_ctrlmsg::StreamParameters&              streamParameters,
+        unsigned int                                       upstreamSubQueueId,
+        const mqbi::QueueHandle::HandleConfiguredCallback& callback) override;
 
     /// Configure the specified `upstreamSubQueueId` subStream of the
     /// specified `queue` with the specified `handleParameters` and invoke
@@ -452,44 +450,41 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
     closeQueue(mqbi::Queue*                                 queue,
                const bmqp_ctrlmsg::QueueHandleParameters&   handleParameters,
                unsigned int                                 upstreamSubQueueId,
-               const mqbi::Cluster::HandleReleasedCallback& callback)
-        BSLS_KEYWORD_OVERRIDE;
+               const mqbi::Cluster::HandleReleasedCallback& callback) override;
 
     /// Invoked whenever an attempt was made to create a queue handle for
     /// the specified `queue` having the specified `uri`, with
     /// `handleCreated` flag indicating if the handle was created or not.
     void onQueueHandleCreated(mqbi::Queue*     queue,
                               const bmqt::Uri& uri,
-                              bool handleCreated) BSLS_KEYWORD_OVERRIDE;
+                              bool             handleCreated) override;
 
     /// Invoked whenever a queue handle associated with the specified
     /// `queue` having the specified `uri` has been destroyed.
     void onQueueHandleDestroyed(mqbi::Queue*     queue,
-                                const bmqt::Uri& uri) BSLS_KEYWORD_OVERRIDE;
+                                const bmqt::Uri& uri) override;
 
     /// Invoked whenever `domain` previously configured having `oldDefn` is
     /// reconfigured with `newDefn`.
     void onDomainReconfigured(const mqbi::Domain&     domain,
                               const mqbconfm::Domain& oldDefn,
-                              const mqbconfm::Domain& newDefn)
-        BSLS_KEYWORD_OVERRIDE;
+                              const mqbconfm::Domain& newDefn) override;
 
     /// Process the specified `command`, and write the result in the
     /// specified `result`. Return 0 if the command was successfully
     /// processed, or a non-zero value otherwise.
     int processCommand(mqbcmd::ClusterResult*        result,
-                       const mqbcmd::ClusterCommand& command)
-        BSLS_KEYWORD_OVERRIDE;
+                       const mqbcmd::ClusterCommand& command) override;
 
     /// Load the cluster state in the specified `out` object.
-    void loadClusterStatus(mqbcmd::ClusterResult* out) BSLS_KEYWORD_OVERRIDE;
+    void loadClusterStatus(mqbcmd::ClusterResult* out) override;
 
     /// Send the specified CONFIRM 'message' for the specified 'partitionId'
     /// without switching thread context.
     /// 'onRelayConfirmEvent' replacement.
-    mqbi::InlineResult::Enum sendConfirmInline(
-        int                         partitionId,
-        const bmqp::ConfirmMessage& message) BSLS_KEYWORD_OVERRIDE;
+    mqbi::InlineResult::Enum
+    sendConfirmInline(int                         partitionId,
+                      const bmqp::ConfirmMessage& message) override;
 
     /// Send PUT message for the specified 'partitionId' using the specified
     /// 'putHeader', 'appData', 'options', 'state', 'genCount' without
@@ -501,50 +496,47 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
                   const bsl::shared_ptr<bdlbb::Blob>&       appData,
                   const bsl::shared_ptr<bdlbb::Blob>&       options,
                   const bsl::shared_ptr<bmqu::AtomicState>& state,
-                  bsls::Types::Uint64 genCount) BSLS_KEYWORD_OVERRIDE;
+                  bsls::Types::Uint64                       genCount) override;
 
     /// Purge and force GC queues in this cluster on a given domain.
     void purgeAndGCQueueOnDomain(mqbcmd::ClusterResult* result,
-                                 const bsl::string&     domainName)
-        BSLS_KEYWORD_OVERRIDE;
+                                 const bsl::string&     domainName) override;
 
     /// PFSM signals when it is `e_DONE_RECEIVING_DATA_CHUNKS`.  Previously
     /// buffered PrimaryStatusAdvisories should be reread.
-    void processBufferedPrimaryStatusAdvisories(int partitionId)
-        BSLS_KEYWORD_OVERRIDE;
+    void processBufferedPrimaryStatusAdvisories(int partitionId) override;
 
     void getPrimaryNodes(int*                               rc,
                          bsl::ostream&                      errorDescription,
                          bsl::vector<mqbnet::ClusterNode*>* nodes,
-                         bool* isSelfPrimary) const BSLS_KEYWORD_OVERRIDE;
+                         bool* isSelfPrimary) const override;
 
     void getPartitionPrimaryNode(int*                  rc,
                                  bsl::ostream&         errorDescription,
                                  mqbnet::ClusterNode** node,
                                  bool*                 isSelfPrimary,
-                                 int partitionId) const BSLS_KEYWORD_OVERRIDE;
+                                 int partitionId) const override;
 
     /// Return `true` if this node is shutting down using new shutdown logic.
     /// This can only be true when all cluster nodes support StopRequest V2.
-    bool isShutdownLogicOn() const BSLS_KEYWORD_OVERRIDE;
+    bool isShutdownLogicOn() const override;
 
     // MANIPULATORS
     //   (virtual: mqbi::DispatcherClient)
 
     /// Return a pointer to the dispatcher this client is associated with.
-    mqbi::Dispatcher* dispatcher() BSLS_KEYWORD_OVERRIDE;
+    mqbi::Dispatcher* dispatcher() override;
 
     /// Return a reference to the dispatcherClientData.
-    mqbi::DispatcherClientData& dispatcherClientData() BSLS_KEYWORD_OVERRIDE;
+    mqbi::DispatcherClientData& dispatcherClientData() override;
 
     /// Called by the `Dispatcher` when it has the specified `event` to
     /// deliver to the client.
-    void onDispatcherEvent(const mqbi::DispatcherEvent& event)
-        BSLS_KEYWORD_OVERRIDE;
+    void onDispatcherEvent(const mqbi::DispatcherEvent& event) override;
 
     /// Called by the dispatcher to flush any pending operation.. mainly
     /// used to provide batch and nagling mechanism.
-    void flush() BSLS_KEYWORD_OVERRIDE;
+    void flush() override;
 
     // MANIPULATORS
     //   (virtual: mqbc::ClusterStateObserver)
@@ -554,7 +546,7 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void onFailoverThreshold() BSLS_KEYWORD_OVERRIDE;
+    void onFailoverThreshold() override;
 
     // MANIPULATORS
     //   (virtual: mqbnet::ClusterObserver)
@@ -563,72 +555,68 @@ class ClusterProxy : public mqbc::ClusterStateObserver,
     /// available (it the specified `isAvailable` is true) or not available
     /// (if `isAvailable` is false).
     void onNodeStateChange(mqbnet::ClusterNode* node,
-                           bool isAvailable) BSLS_KEYWORD_OVERRIDE;
+                           bool                 isAvailable) override;
 
     // ACCESSORS
     //   (virtual: mqbi::Cluster)
 
     /// Return the name of this cluster.
-    const bsl::string& name() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::string& name() const override;
 
     /// Return true if this cluster is a local cluster.
-    bool isLocal() const BSLS_KEYWORD_OVERRIDE;
+    bool isLocal() const override;
 
     /// Return true if this cluster is a remote cluster.
-    bool isRemote() const BSLS_KEYWORD_OVERRIDE;
+    bool isRemote() const override;
 
     /// Return true if this cluster is a `cluster`.
-    bool isClusterMember() const BSLS_KEYWORD_OVERRIDE;
+    bool isClusterMember() const override;
 
     /// Return true if this cluster is in the process of restoring its
     /// state; that is reopening the queues which were previously opened
     /// before a failover (active node switch, primary switch, ...).
-    bool isFailoverInProgress() const BSLS_KEYWORD_OVERRIDE;
+    bool isFailoverInProgress() const override;
 
     /// Return true if this cluster is stopping *or* has stopped, false
     /// otherwise.  Note that a cluster which has not been started will also
     /// return true.  TBD: this accessor should be replaced by something
     /// like `status()` which should return an enum specify various states
     /// like started/stopped/stopping etc.
-    bool isStopping() const BSLS_KEYWORD_OVERRIDE;
+    bool isStopping() const override;
 
     /// Print the state of the cluster to the specified `out`.
     ///
     /// THREAD: These methods must be invoked from the DISPATCHER thread.
     void printClusterStateSummary(bsl::ostream& out,
-                                  int           level          = 0,
-                                  int           spacesPerLevel = 0) const
-        BSLS_KEYWORD_OVERRIDE;
+                                  int           level = 0,
+                                  int spacesPerLevel  = 0) const override;
 
     /// Return a pointer to cluster proxy config if this @bbref{mqbi::Cluster}
     /// represents a proxy, otherwise null.
-    const mqbcfg::ClusterDefinition*
-    clusterConfig() const BSLS_KEYWORD_OVERRIDE;
+    const mqbcfg::ClusterDefinition* clusterConfig() const override;
 
     /// Return a pointer to cluster proxy config if this @bbref{mqbi::Cluster}
     /// represents a proxy, otherwise null.
-    const mqbcfg::ClusterProxyDefinition*
-    clusterProxyConfig() const BSLS_KEYWORD_OVERRIDE;
+    const mqbcfg::ClusterProxyDefinition* clusterProxyConfig() const override;
 
     // ACCESSORS
     //   (virtual: mqbi::DispatcherClient)
 
     /// Return a pointer to the dispatcher this client is associated with.
-    const mqbi::Dispatcher* dispatcher() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::Dispatcher* dispatcher() const override;
 
     /// Return a reference to the dispatcherClientData.
-    const mqbi::DispatcherClientData&
-    dispatcherClientData() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::DispatcherClientData& dispatcherClientData() const override;
 
     /// Return a printable description of the client (e.g. for logging).
-    bsl::string_view description() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view description() const override;
 
     // ACCESSORS
     //   (virtual: mqbi::Cluster)
 
     /// Return a reference not offering modifiable access to the net cluster
     /// used by this cluster.
-    const mqbnet::Cluster& netCluster() const BSLS_KEYWORD_OVERRIDE;
+    const mqbnet::Cluster& netCluster() const override;
 };
 
 // ============================================================================

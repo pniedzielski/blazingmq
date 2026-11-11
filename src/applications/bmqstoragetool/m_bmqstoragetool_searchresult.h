@@ -233,46 +233,41 @@ class SearchShortResult : public SearchResult {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `confirm` record with the specified `record`, `recordIndex` and
     /// `recordOffset`.
     bool processConfirmRecord(const mqbs::ConfirmRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
     /// Process `queueOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processQueueOpRecord(const mqbs::QueueOpRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `journalOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processJournalOpRecord(const mqbs::JournalOpRecord& record,
                                 bsls::Types::Uint64          recordIndex,
-                                bsls::Types::Uint64          recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                                bsls::Types::Uint64 recordOffset) override;
     /// Output result of a search.
-    void outputResult() BSLS_KEYWORD_OVERRIDE;
+    void outputResult() override;
     /// Output result of a search filtered by the specified GUIDs filter.
-    void outputResult(const GuidsList& guidFilter) BSLS_KEYWORD_OVERRIDE;
+    void outputResult(const GuidsList& guidFilter) override;
 
     // ACCESSORS
 
     /// Return 'false' if all required data is processed, e.g. all given GUIDs
     /// are output and search could be stopped. Return 'true' to indicate that
     /// there is incomplete data.
-    bool hasCache() const BSLS_KEYWORD_OVERRIDE;
+    bool hasCache() const override;
 
     /// Return a reference to the non-modifiable printer
-    const bsl::shared_ptr<Printer>& printer() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<Printer>& printer() const override;
 };
 
 // ========================
@@ -364,46 +359,41 @@ class SearchDetailResult : public SearchResult {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `confirm` record with the specified `record`, `recordIndex` and
     /// `recordOffset`.
     bool processConfirmRecord(const mqbs::ConfirmRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
     /// Process `queueOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processQueueOpRecord(const mqbs::QueueOpRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `journalOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processJournalOpRecord(const mqbs::JournalOpRecord& record,
                                 bsls::Types::Uint64          recordIndex,
-                                bsls::Types::Uint64          recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                                bsls::Types::Uint64 recordOffset) override;
     /// Output result of a search.
-    void outputResult() BSLS_KEYWORD_OVERRIDE;
+    void outputResult() override;
     /// Output result of a search filtered by the specified GUIDs filter.
-    void outputResult(const GuidsList& guidFilter) BSLS_KEYWORD_OVERRIDE;
+    void outputResult(const GuidsList& guidFilter) override;
 
     // ACCESSORS
 
     /// Return 'false' if all required data is processed, e.g. all given GUIDs
     /// are output and search could be stopped. Return 'true' to indicate that
     /// there is incomplete data.
-    bool hasCache() const BSLS_KEYWORD_OVERRIDE;
+    bool hasCache() const override;
 
     /// Return a reference to the non-modifiable printer
-    const bsl::shared_ptr<Printer>& printer() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<Printer>& printer() const override;
 };
 
 // ============================
@@ -468,41 +458,36 @@ class SearchExactMatchResult : public SearchResult {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `confirm` record with the specified `record`, `recordIndex` and
     /// `recordOffset`.
     bool processConfirmRecord(const mqbs::ConfirmRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
     /// Process `queueOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processQueueOpRecord(const mqbs::QueueOpRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `journalOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processJournalOpRecord(const mqbs::JournalOpRecord& record,
                                 bsls::Types::Uint64          recordIndex,
-                                bsls::Types::Uint64          recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                                bsls::Types::Uint64 recordOffset) override;
     /// Output result of a search.
-    void outputResult() BSLS_KEYWORD_OVERRIDE;
+    void outputResult() override;
     /// Output result of a search filtered by the specified GUIDs filter.
-    void outputResult(const GuidsList& guidFilter) BSLS_KEYWORD_OVERRIDE;
+    void outputResult(const GuidsList& guidFilter) override;
 
     // ACCESSORS
 
     /// Return a reference to the non-modifiable printer
-    const bsl::shared_ptr<Printer>& printer() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<Printer>& printer() const override;
 };
 
 // ===========================
@@ -531,46 +516,41 @@ class SearchResultDecorator : public SearchResult {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `confirm` record with the specified `record`, `recordIndex` and
     /// `recordOffset`.
     bool processConfirmRecord(const mqbs::ConfirmRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
     /// Process `queueOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processQueueOpRecord(const mqbs::QueueOpRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `journalOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processJournalOpRecord(const mqbs::JournalOpRecord& record,
                                 bsls::Types::Uint64          recordIndex,
-                                bsls::Types::Uint64          recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                                bsls::Types::Uint64 recordOffset) override;
     /// Output result of a search.
-    void outputResult() BSLS_KEYWORD_OVERRIDE;
+    void outputResult() override;
     /// Output result of a search filtered by the specified GUIDs filter.
-    void outputResult(const GuidsList& guidFilter) BSLS_KEYWORD_OVERRIDE;
+    void outputResult(const GuidsList& guidFilter) override;
 
     // ACCESSORS
 
     /// Return 'false' if all required data is processed, e.g. all given GUIDs
     /// are output and search could be stopped. Return 'true' to indicate that
     /// there is incomplete data.
-    bool hasCache() const BSLS_KEYWORD_OVERRIDE;
+    bool hasCache() const override;
 
     /// Return a reference to the non-modifiable printer
-    const bsl::shared_ptr<Printer>& printer() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<Printer>& printer() const override;
 };
 
 // ====================================
@@ -609,20 +589,17 @@ class SearchResultTimestampDecorator : public SearchResultDecorator {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `confirm` record with the specified `record`, `recordIndex` and
     /// `recordOffset`.
     bool processConfirmRecord(const mqbs::ConfirmRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
 };
 
 // =================================
@@ -660,20 +637,17 @@ class SearchResultOffsetDecorator : public SearchResultDecorator {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `confirm` record with the specified `record`, `recordIndex` and
     /// `recordOffset`.
     bool processConfirmRecord(const mqbs::ConfirmRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
 };
 
 // =========================================
@@ -712,20 +686,17 @@ class SearchResultSequenceNumberDecorator : public SearchResultDecorator {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `confirm` record with the specified `record`, `recordIndex` and
     /// `recordOffset`.
     bool processConfirmRecord(const mqbs::ConfirmRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
 };
 
 // ========================
@@ -751,8 +722,7 @@ class SearchAllDecorator : public SearchResultDecorator {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
 };
 
 // ================================
@@ -789,16 +759,14 @@ class SearchOutstandingDecorator : public SearchResultDecorator {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
     /// Output result of a search.
-    void outputResult() BSLS_KEYWORD_OVERRIDE;
+    void outputResult() override;
 };
 
 // =======================================
@@ -842,22 +810,19 @@ class SearchPartiallyConfirmedDecorator : public SearchResultDecorator {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `confirm` record with the specified `record`, `recordIndex` and
     /// `recordOffset`.
     bool processConfirmRecord(const mqbs::ConfirmRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
     /// Output result of a search.
-    void outputResult() BSLS_KEYWORD_OVERRIDE;
+    void outputResult() override;
 };
 
 // =========================
@@ -895,16 +860,14 @@ class SearchGuidDecorator : public SearchResultDecorator {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
     /// Output result of a search.
-    void outputResult() BSLS_KEYWORD_OVERRIDE;
+    void outputResult() override;
 };
 
 // ===========================
@@ -940,34 +903,29 @@ class SearchOffsetDecorator : public SearchResultDecorator {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `confirm` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processConfirmRecord(const mqbs::ConfirmRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
     /// Process `queueOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processQueueOpRecord(const mqbs::QueueOpRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `journalOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processJournalOpRecord(const mqbs::JournalOpRecord& record,
                                 bsls::Types::Uint64          recordIndex,
-                                bsls::Types::Uint64          recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                                bsls::Types::Uint64 recordOffset) override;
     /// Output result of a search.
-    void outputResult() BSLS_KEYWORD_OVERRIDE;
+    void outputResult() override;
 };
 
 // ===================================
@@ -1006,35 +964,30 @@ class SearchSequenceNumberDecorator : public SearchResultDecorator {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
 
     /// Process `confirm` record with the specified `record`, `recordIndex` and
     /// `recordOffset`.
     bool processConfirmRecord(const mqbs::ConfirmRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
     /// Process `queueOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processQueueOpRecord(const mqbs::QueueOpRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `journalOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processJournalOpRecord(const mqbs::JournalOpRecord& record,
                                 bsls::Types::Uint64          recordIndex,
-                                bsls::Types::Uint64          recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                                bsls::Types::Uint64 recordOffset) override;
     /// Output result of a search.
-    void outputResult() BSLS_KEYWORD_OVERRIDE;
+    void outputResult() override;
 };
 
 // ======================
@@ -1117,41 +1070,36 @@ class SummaryProcessor : public SearchResult {
     /// `recordOffset`.
     bool processMessageRecord(const mqbs::MessageRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `confirm` record with the specified `record`, `recordIndex` and
     /// `recordOffset`.
     bool processConfirmRecord(const mqbs::ConfirmRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `deletion` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processDeletionRecord(const mqbs::DeletionRecord& record,
                                bsls::Types::Uint64         recordIndex,
-                               bsls::Types::Uint64         recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                               bsls::Types::Uint64 recordOffset) override;
     /// Process `queueOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processQueueOpRecord(const mqbs::QueueOpRecord& record,
                               bsls::Types::Uint64        recordIndex,
-                              bsls::Types::Uint64        recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                              bsls::Types::Uint64 recordOffset) override;
     /// Process `journalOp` record with the specified `record`, `recordIndex`
     /// and `recordOffset`.
     bool processJournalOpRecord(const mqbs::JournalOpRecord& record,
                                 bsls::Types::Uint64          recordIndex,
-                                bsls::Types::Uint64          recordOffset)
-        BSLS_KEYWORD_OVERRIDE;
+                                bsls::Types::Uint64 recordOffset) override;
     /// Output result of a search.
-    void outputResult() BSLS_KEYWORD_OVERRIDE;
+    void outputResult() override;
     /// Output result of a search filtered by the specified GUIDs filter.
-    void outputResult(const GuidsList& guidFilter) BSLS_KEYWORD_OVERRIDE;
+    void outputResult(const GuidsList& guidFilter) override;
 
     // ACCESSORS
 
     /// Return a reference to the non-modifiable printer
-    const bsl::shared_ptr<Printer>& printer() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<Printer>& printer() const override;
 };
 
 }  // close package namespace

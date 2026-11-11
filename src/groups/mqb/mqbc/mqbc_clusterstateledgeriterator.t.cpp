@@ -63,39 +63,38 @@ struct ClusterStateLedgerIteratorTestImp
 
   public:
     // MANIPULATORS
-    int next() BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    int next() override { return markDone(); }
 
-    void
-    copy(const mqbc::ClusterStateLedgerIterator& other) BSLS_KEYWORD_OVERRIDE
+    void copy(const mqbc::ClusterStateLedgerIterator& other) override
     {
         markDone();
     }
 
     // ACCESSORS
     bslma::ManagedPtr<ClusterStateLedgerIterator>
-    clone(bslma::Allocator* allocator) const BSLS_KEYWORD_OVERRIDE
+    clone(bslma::Allocator* allocator) const override
     {
         markDone();
         return bslma::ManagedPtr<ClusterStateLedgerIterator>();
     }
 
-    bool isValid() const BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    bool isValid() const override { return markDone(); }
 
-    const mqbc::ClusterStateRecordHeader& header() const BSLS_KEYWORD_OVERRIDE
+    const mqbc::ClusterStateRecordHeader& header() const override
     {
         markDone();
         return d_header;
     }
 
-    int loadClusterMessage(bmqp_ctrlmsg::ClusterMessage* message) const
-        BSLS_KEYWORD_OVERRIDE
+    int
+    loadClusterMessage(bmqp_ctrlmsg::ClusterMessage* message) const override
     {
         return markDone();
     }
 
     bsl::ostream& print(bsl::ostream& stream,
-                        int           level = 0,
-                        int spacesPerLevel  = 4) const BSLS_KEYWORD_OVERRIDE
+                        int           level          = 0,
+                        int           spacesPerLevel = 4) const override
     {
         markDone();
         return stream;

@@ -187,7 +187,7 @@ class Authenticator : public mqbnet::Authenticator {
                   bslma::Allocator*                   allocator);
 
     /// Destructor
-    ~Authenticator() BSLS_KEYWORD_OVERRIDE;
+    ~Authenticator() override;
 
     // MANIPULATORS
     //   (virtual: mqbnet::Authenticator)
@@ -196,11 +196,11 @@ class Authenticator : public mqbnet::Authenticator {
     /// code and populate the specified `errorDescription` with a description
     /// of the error otherwise.
     /// This method will block until the thread pool is started.
-    int start(bsl::ostream& errorDescription) BSLS_KEYWORD_OVERRIDE;
+    int start(bsl::ostream& errorDescription) override;
 
     /// Stop the authenticator.  This method will block until the thread pool
     /// is stopped.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 
     /// @brief Authenticate the connection based on the AuthenticationMessage
     ///        type.
@@ -210,19 +210,19 @@ class Authenticator : public mqbnet::Authenticator {
     ///                       The behaviour is undefined if it is NULL.
     /// @param authenticationMsg The authentication message.
     /// @return 0 on success, a non-zero error code otherwise.
-    int handleAuthentication(bsl::ostream& errorDescription,
-                             mqbnet::InitialConnectionContext* context_p,
-                             const bmqp_ctrlmsg::AuthenticationMessage&
-                                 authenticationMsg) BSLS_KEYWORD_OVERRIDE;
+    int handleAuthentication(
+        bsl::ostream&                              errorDescription,
+        mqbnet::InitialConnectionContext*          context_p,
+        const bmqp_ctrlmsg::AuthenticationMessage& authenticationMsg) override;
 
     /// Handle reauthentication for the specified `context` using the
     /// specified `channel`.  Return 0 on success, or a non-zero error code and
     /// populate the specified `errorDescription` with a description of the
     /// error otherwise.
-    int handleReauthentication(bsl::ostream&                  errorDescription,
-                               const AuthenticationContextSp& context_sp,
-                               const bsl::shared_ptr<bmqio::Channel>& channel)
-        BSLS_KEYWORD_OVERRIDE;
+    int handleReauthentication(
+        bsl::ostream&                          errorDescription,
+        const AuthenticationContextSp&         context_sp,
+        const bsl::shared_ptr<bmqio::Channel>& channel) override;
 
     /// @brief Create a client-side authenticator for the specified outbound
     ///        `channel`.
@@ -232,7 +232,7 @@ class Authenticator : public mqbnet::Authenticator {
     /// @return A new AuthenticationClient, or an empty shared pointer if this
     ///         broker is not configured with a credential provider.
     bsl::shared_ptr<mqbnet::AuthenticationClient> createAuthenticationClient(
-        const bsl::shared_ptr<bmqio::Channel>& channel) BSLS_KEYWORD_OVERRIDE;
+        const bsl::shared_ptr<bmqio::Channel>& channel) override;
 
     // ACCESSORS
     //   (virtual: mqbnet::Authenticator)
@@ -240,7 +240,7 @@ class Authenticator : public mqbnet::Authenticator {
     /// Return the anonymous credential used for authentication.
     /// If no anonymous credential is set, return an empty optional.
     const bsl::optional<mqbcfg::Credential>&
-    anonymousCredential() const BSLS_KEYWORD_OVERRIDE;
+    anonymousCredential() const override;
 };
 
 }  // close package namespace

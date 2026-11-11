@@ -264,7 +264,7 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
                     bmqma::CountingAllocatorStore* allocatorStore = 0);
 
     /// Destructor
-    ~InMemoryStorage() BSLS_KEYWORD_OVERRIDE;
+    ~InMemoryStorage() override;
 
     // MANIPULATORS
     //   (virtual mqbi::Storage)
@@ -275,17 +275,16 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     void configure(const mqbconfm::Storage& config,
                    const mqbconfm::Limits&  limits,
                    bsls::Types::Int64       messageTtl,
-                   int maxDeliveryAttempts) BSLS_KEYWORD_OVERRIDE;
+                   int                      maxDeliveryAttempts) override;
 
     /// Set the consistency level associated to this storage to the specified
     /// `value`.
-    void
-    setConsistency(const mqbconfm::Consistency& value) BSLS_KEYWORD_OVERRIDE;
+    void setConsistency(const mqbconfm::Consistency& value) override;
 
-    void setQueue(mqbi::Queue* queue) BSLS_KEYWORD_OVERRIDE;
+    void setQueue(mqbi::Queue* queue) override;
 
     /// Close this storage.
-    void close() BSLS_KEYWORD_OVERRIDE;
+    void close() override;
 
     /// Get an iterator for data stored in the virtual storage identified by
     /// the specified 'appKey'.
@@ -293,7 +292,7 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     /// all Apps; otherwise, the iterator can iterate states of the App
     /// corresponding to the 'appKey'.
     bslma::ManagedPtr<mqbi::StorageIterator>
-    getIterator(const mqbu::StorageKey& appKey) BSLS_KEYWORD_OVERRIDE;
+    getIterator(const mqbu::StorageKey& appKey) override;
 
     /// Load into the specified 'out' an iterator for data stored in the
     /// virtual storage initially pointing to the message associated with the
@@ -306,7 +305,7 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     mqbi::StorageResult::Enum
     getIterator(bslma::ManagedPtr<mqbi::StorageIterator>* out,
                 const mqbu::StorageKey&                   appKey,
-                const bmqt::MessageGUID& msgGUID) BSLS_KEYWORD_OVERRIDE;
+                const bmqt::MessageGUID&                  msgGUID) override;
 
     /// Save the message contained in the specified 'appData', 'options' and
     /// the associated 'attributes' and 'msgGUID' into this storage and the
@@ -315,12 +314,11 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     /// optionally specified `out` is not zero, load the created
     /// `DataStreamMessage` into the 'out'.
     /// Return 0 on success or an non-zero error code on failure.
-    mqbi::StorageResult::Enum
-    put(mqbi::StorageMessageAttributes*     attributes,
-        const bmqt::MessageGUID&            msgGUID,
-        const bsl::shared_ptr<bdlbb::Blob>& appData,
-        const bsl::shared_ptr<bdlbb::Blob>& options,
-        mqbi::DataStreamMessage**           out = 0) BSLS_KEYWORD_OVERRIDE;
+    mqbi::StorageResult::Enum put(mqbi::StorageMessageAttributes* attributes,
+                                  const bmqt::MessageGUID&        msgGUID,
+                                  const bsl::shared_ptr<bdlbb::Blob>& appData,
+                                  const bsl::shared_ptr<bdlbb::Blob>& options,
+                                  mqbi::DataStreamMessage** out = 0) override;
 
     /// Update the App state corresponding to the specified 'msgGUID' and the
     /// specified 'appKey' in the DataStream.  Decrement the reference count of
@@ -338,11 +336,10 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     /// On CONFIRM, the caller of 'confirm' is responsible to follow with
     /// 'remove' call.  'releaseRef' is an alternative way to remove message in
     /// one call.
-    mqbi::StorageResult::Enum
-    confirm(const bmqt::MessageGUID& msgGUID,
-            const mqbu::StorageKey&  appKey,
-            bsls::Types::Int64       timestamp,
-            bool                     onReject = false) BSLS_KEYWORD_OVERRIDE;
+    mqbi::StorageResult::Enum confirm(const bmqt::MessageGUID& msgGUID,
+                                      const mqbu::StorageKey&  appKey,
+                                      bsls::Types::Int64       timestamp,
+                                      bool onReject = false) override;
 
     /// Decrement the reference count of the message identified by the
     /// `msgGUID`.  If the resulting value is zero and the specified
@@ -357,9 +354,8 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     /// On CONFIRM, the caller of 'confirm' is responsible to follow with
     /// 'remove' call.  'releaseRef' is an alternative way to remove message in
     /// one call.
-    mqbi::StorageResult::Enum
-    releaseRef(const bmqt::MessageGUID& msgGUID,
-               bool asPrimary = true) BSLS_KEYWORD_OVERRIDE;
+    mqbi::StorageResult::Enum releaseRef(const bmqt::MessageGUID& msgGUID,
+                                         bool asPrimary = true) override;
 
     /// Remove from the storage the message having the specified 'msgGUID'
     /// and store it's size, in bytes, in the optionally specified 'msgSize'.
@@ -371,7 +367,7 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     /// 'remove' call.  'releaseRef' is an alternative way to remove message in
     /// one call.
     mqbi::StorageResult::Enum remove(const bmqt::MessageGUID& msgGUID,
-                                     int* msgSize = 0) BSLS_KEYWORD_OVERRIDE;
+                                     int* msgSize = 0) override;
 
     /// Remove all messages from this storage for the App identified by the
     /// specified 'appKey' if 'appKey' is not null.  Otherwise, remove messages
@@ -381,14 +377,14 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     /// * e_WRITE_FAILURE    : failed to record this event in storage
     /// * e_APPKEY_NOT_FOUND : Invalid 'appKey' specified
     mqbi::StorageResult::Enum
-    removeAll(const mqbu::StorageKey& appKey) BSLS_KEYWORD_OVERRIDE;
+    removeAll(const mqbu::StorageKey& appKey) override;
 
     /// Flush any buffered replication messages to the peers.  Behaviour is
     /// undefined unless this cluster node is the primary for this partition.
-    void flushStorage() BSLS_KEYWORD_OVERRIDE;
+    void flushStorage() override;
 
     /// Return the resource capacity meter associated to this storage.
-    mqbu::CapacityMeter* capacityMeter() BSLS_KEYWORD_OVERRIDE;
+    mqbu::CapacityMeter* capacityMeter() override;
 
     /// Attempt to garbage-collect messages for which TTL has expired.  This is
     /// a no-op for broadcast queues, which never expire messages via TTL.
@@ -399,16 +395,15 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     /// @return The number of expired messages.
     int gcExpiredMessages(const bdlt::Datetime& currentTimeUtc,
                           bsls::Types::Uint64   secondsFromEpoch,
-                          int limit = -1) BSLS_KEYWORD_OVERRIDE;
+                          int                   limit = -1) override;
 
     /// Garbage collect a batch of expired messages from the deduplication
     /// history, using the specified `now` as the current timestamp.
-    void gcHistory(bsls::Types::Int64 now) BSLS_KEYWORD_OVERRIDE;
+    void gcHistory(bsls::Types::Int64 now) override;
 
-    int
-    addVirtualStorage(bsl::ostream&           errorDescription,
-                      const bsl::string&      appId,
-                      const mqbu::StorageKey& appKey) BSLS_KEYWORD_OVERRIDE;
+    int addVirtualStorage(bsl::ostream&           errorDescription,
+                          const bsl::string&      appId,
+                          const mqbu::StorageKey& appKey) override;
     // Create, if it doesn't exist already, a virtual storage instance with
     // the specified 'appId' and 'appKey'.  Return zero upon success and a
     // non-zero value otherwise, and populate the specified
@@ -423,11 +418,10 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     /// method will delete the virtual storage, and any reference to it will
     /// become invalid after this method returns.
     bool removeVirtualStorage(const mqbu::StorageKey& appKey,
-                              bool asPrimary) BSLS_KEYWORD_OVERRIDE;
+                              bool                    asPrimary) override;
 
-    void selectForAutoConfirming(const bmqt::MessageGUID& msgGUID)
-        BSLS_KEYWORD_OVERRIDE;
-    void autoConfirm(const mqbu::StorageKey& appKey) BSLS_KEYWORD_OVERRIDE;
+    void selectForAutoConfirming(const bmqt::MessageGUID& msgGUID) override;
+    void autoConfirm(const mqbu::StorageKey& appKey) override;
     /// The sequence of calls is 'startAutoConfirming', then zero or more
     /// 'autoConfirm', then 'put' - all for the same specified 'msgGUID'.
     /// Any other sequence removes auto CONFIRMs.
@@ -438,21 +432,21 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
 
     /// Return the queue this storage is associated with.
     /// Storage exists without a queue before `setQueue`.
-    mqbi::Queue* queue() const BSLS_KEYWORD_OVERRIDE;
+    mqbi::Queue* queue() const override;
 
     /// Return the URI of the queue this storage is associated with.
-    const bmqt::Uri& queueUri() const BSLS_KEYWORD_OVERRIDE;
+    const bmqt::Uri& queueUri() const override;
 
     /// Return the storage key associated with this instance.
-    const mqbu::StorageKey& queueKey() const BSLS_KEYWORD_OVERRIDE;
+    const mqbu::StorageKey& queueKey() const override;
 
     /// Return the current configuration used by this storage. The behavior
     /// is undefined unless `configure` was successfully called.
-    const mqbconfm::Storage& config() const BSLS_KEYWORD_OVERRIDE;
+    const mqbconfm::Storage& config() const override;
 
     /// Return true if storage is backed by a persistent data store,
     /// otherwise return false.
-    bool isPersistent() const BSLS_KEYWORD_OVERRIDE;
+    bool isPersistent() const override;
 
     /// Return the number of messages in the virtual storage associated with
     /// the specified `appKey`.  If `appKey` is null, number of messages in
@@ -460,24 +454,22 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     /// `appKey` is non-null but no virtual storage identified with it
     /// exists.
     bsls::Types::Int64
-    numMessages(const mqbu::StorageKey& appKey) const BSLS_KEYWORD_OVERRIDE;
+    numMessages(const mqbu::StorageKey& appKey) const override;
 
     /// Return the number of bytes in the virtual storage associated with
     /// the specified `appKey`. If `appKey` is null, number of bytes in the
     /// `physical` storage is returned. Behavior is undefined if
     /// `appKey` is non-null but no virtual storage identified with it
     /// exists.
-    bsls::Types::Int64
-    numBytes(const mqbu::StorageKey& appKey) const BSLS_KEYWORD_OVERRIDE;
+    bsls::Types::Int64 numBytes(const mqbu::StorageKey& appKey) const override;
 
     /// Return true if storage is empty.  This method can be invoked from
     /// any thread.
-    bool isEmpty() const BSLS_KEYWORD_OVERRIDE;
+    bool isEmpty() const override;
 
     /// Return true if this storage has message with the specified
     /// `msgGUID`, false otherwise.
-    bool
-    hasMessage(const bmqt::MessageGUID& msgGUID) const BSLS_KEYWORD_OVERRIDE;
+    bool hasMessage(const bmqt::MessageGUID& msgGUID) const override;
 
     /// Retrieve the message and its metadata having the specified `msgGUID`
     /// in the specified `appData`, `options` and `attributes` from this
@@ -487,89 +479,82 @@ class InMemoryStorage BSLS_KEYWORD_FINAL : public ReplicatedStorage {
     get(bsl::shared_ptr<bdlbb::Blob>*   appData,
         bsl::shared_ptr<bdlbb::Blob>*   options,
         mqbi::StorageMessageAttributes* attributes,
-        const bmqt::MessageGUID&        msgGUID) const BSLS_KEYWORD_OVERRIDE;
+        const bmqt::MessageGUID&        msgGUID) const override;
 
     /// Populate the specified `attributes` buffer with attributes of the
     /// message having the specified `msgGUID`.  Return zero on success or a
     /// non-zero error code on failure.
     mqbi::StorageResult::Enum
     get(mqbi::StorageMessageAttributes* attributes,
-        const bmqt::MessageGUID&        msgGUID) const BSLS_KEYWORD_OVERRIDE;
+        const bmqt::MessageGUID&        msgGUID) const override;
 
     /// Store in the specified 'msgSize' the size, in bytes, of the message
     /// having the specified 'msgGUID' if found and return success, or return a
     /// non-zero return code and leave 'msgSize' untouched if no message for
     /// the 'msgGUID' was found.
-    mqbi::StorageResult::Enum getMessageSize(
-        int*                     msgSize,
-        const bmqt::MessageGUID& msgGUID) const BSLS_KEYWORD_OVERRIDE;
+    mqbi::StorageResult::Enum
+    getMessageSize(int*                     msgSize,
+                   const bmqt::MessageGUID& msgGUID) const override;
 
     /// Return the number of virtual storages registered with this instance.
-    int numVirtualStorages() const BSLS_KEYWORD_OVERRIDE;
+    int numVirtualStorages() const override;
 
     /// Return true if virtual storage identified by the specified 'appKey'
     /// exists, otherwise return false.  Load into the optionally specified
     /// 'appId' the appId associated with 'appKey' if the virtual storage
     /// exists, otherwise set it to 0.
     bool hasVirtualStorage(const mqbu::StorageKey& appKey,
-                           bsl::string* appId = 0) const BSLS_KEYWORD_OVERRIDE;
+                           bsl::string*            appId = 0) const override;
 
     /// Return true if virtual storage identified by the specified 'appId'
     /// exists, otherwise return false.  Load into the optionally specified
     /// 'appKey' and 'ordinal' the appKey and ordinal associated with 'appId'
     /// if the virtual storage exists, otherwise set it to 0.
-    bool
-    hasVirtualStorage(const bsl::string& appId,
-                      mqbu::StorageKey*  appKey = 0,
-                      unsigned int* ordinal = 0) const BSLS_KEYWORD_OVERRIDE;
+    bool hasVirtualStorage(const bsl::string& appId,
+                           mqbu::StorageKey*  appKey  = 0,
+                           unsigned int*      ordinal = 0) const override;
 
     /// Return 'true' if there was Replication Receipt for the specified
     /// 'msgGUID'.
-    bool
-    hasReceipt(const bmqt::MessageGUID& msgGUID) const BSLS_KEYWORD_OVERRIDE;
+    bool hasReceipt(const bmqt::MessageGUID& msgGUID) const override;
 
     /// Load into the specified 'buffer' the list of pairs of appId and
     /// appKey for all the virtual storages registered with this instance.
-    void
-    loadVirtualStorageDetails(AppInfos* buffer) const BSLS_KEYWORD_OVERRIDE;
+    void loadVirtualStorageDetails(AppInfos* buffer) const override;
 
-    unsigned int numAutoConfirms() const BSLS_KEYWORD_OVERRIDE;
+    unsigned int numAutoConfirms() const override;
 
     // MANIPULATORS
     //   (virtual mqbs::ReplicatedStorage)
     void processMessageRecord(const bmqt::MessageGUID&     guid,
                               unsigned int                 msgLen,
                               unsigned int                 refCount,
-                              const DataStoreRecordHandle& handle)
-        BSLS_KEYWORD_OVERRIDE;
+                              const DataStoreRecordHandle& handle) override;
 
     void processConfirmRecord(const bmqt::MessageGUID&     guid,
                               const mqbu::StorageKey&      appKey,
                               ConfirmReason::Enum          reason,
-                              const DataStoreRecordHandle& handle)
-        BSLS_KEYWORD_OVERRIDE;
+                              const DataStoreRecordHandle& handle) override;
 
-    void
-    processDeletionRecord(const bmqt::MessageGUID& guid) BSLS_KEYWORD_OVERRIDE;
+    void processDeletionRecord(const bmqt::MessageGUID& guid) override;
 
-    void addQueueOpRecordHandle(const DataStoreRecordHandle& handle)
-        BSLS_KEYWORD_OVERRIDE;
+    void addQueueOpRecordHandle(const DataStoreRecordHandle& handle) override;
 
-    void purge(const mqbu::StorageKey& appKey) BSLS_KEYWORD_OVERRIDE;
+    void purge(const mqbu::StorageKey& appKey) override;
 
-    virtual void setPrimary() BSLS_KEYWORD_OVERRIDE;
+    virtual void setPrimary() override;
 
     /// Calculate offsets of all Apps (after recovery) in the data stream.
     /// An App offset is the number of messages older than the App.
-    virtual void calibrate() BSLS_KEYWORD_OVERRIDE;
+    virtual void calibrate() override;
 
     // ACCESSORS
     //   (virtual mqbs::ReplicatedStorage)
-    int partitionId() const BSLS_KEYWORD_OVERRIDE;
+    int partitionId() const override;
 
-    const RecordHandles& queueOpRecordHandles() const BSLS_KEYWORD_OVERRIDE;
+    const RecordHandles& queueOpRecordHandles() const override;
 
-    bool isStrongConsistency() const BSLS_KEYWORD_OVERRIDE;
+    bool isStrongConsistency() const override;
 
     // ACCESSORS
     bool isProxy() const;

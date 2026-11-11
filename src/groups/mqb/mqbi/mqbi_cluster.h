@@ -264,7 +264,7 @@ class Cluster : public DispatcherClient {
     // CREATORS
 
     /// Destructor.
-    ~Cluster() BSLS_KEYWORD_OVERRIDE;
+    ~Cluster() override;
 
     // MANIPULATORS
 

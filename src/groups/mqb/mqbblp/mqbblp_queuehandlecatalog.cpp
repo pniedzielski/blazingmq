@@ -56,7 +56,7 @@ class DefaultHandleFactory : public mqbi::QueueHandleFactory {
     // CREATOR
 
     /// Destructor.
-    ~DefaultHandleFactory() BSLS_KEYWORD_OVERRIDE;
+    ~DefaultHandleFactory() override;
 
     // MANIPULATOR
     mqbi::QueueHandle*
@@ -65,7 +65,7 @@ class DefaultHandleFactory : public mqbi::QueueHandleFactory {
                                                           clientContext,
                mqbstat::QueueStatsDomain*                 stats,
                const bmqp_ctrlmsg::QueueHandleParameters& handleParameters,
-               bslma::Allocator* allocator) BSLS_KEYWORD_OVERRIDE;
+               bslma::Allocator*                          allocator) override;
     // Create a new handle, using the specified 'allocator', for the
     // specified 'queue' as requested by the specified 'clientContext' with
     // the specified 'parameters', and associated wit the specified

@@ -64,7 +64,7 @@ class Authorizer : public mqbi::Authorizer {
     explicit Authorizer(mqbauthz::AuthorizationController* authnController);
 
     /// Destructor
-    ~Authorizer() BSLS_KEYWORD_OVERRIDE;
+    ~Authorizer() override;
 
     // MANIPULATORS
 
@@ -74,8 +74,7 @@ class Authorizer : public mqbi::Authorizer {
     /// @param action The action being authorized
     /// @param authnResult The result of an authenticated connection
     bool authorize(const mqbact::Action&                action,
-                   const mqbplug::AuthenticationResult& authnResult)
-        BSLS_KEYWORD_OVERRIDE;
+                   const mqbplug::AuthenticationResult& authnResult) override;
 };
 
 }  // close package namespace

@@ -939,7 +939,7 @@ class RecoveryManager : public mqbnet::ClusterObserver {
                     bslma::Allocator*                allocator);
 
     /// Destroy this object.
-    ~RecoveryManager() BSLS_KEYWORD_OVERRIDE;
+    ~RecoveryManager() override;
 
     // MANIPULATORS
     int start(bsl::ostream& errorDescription);
@@ -1003,7 +1003,7 @@ class RecoveryManager : public mqbnet::ClusterObserver {
     /// (if `isAvailable` is false).  This method is invoked in any thread
     /// (mostly in `mqbblp::Cluster` IO thread).
     void onNodeStateChange(mqbnet::ClusterNode* node,
-                           bool isAvailable) BSLS_KEYWORD_OVERRIDE;
+                           bool                 isAvailable) override;
 
     // ACCESSORS
     bool isStarted() const;

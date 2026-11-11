@@ -643,208 +643,192 @@ class StorageManager BSLS_KEYWORD_FINAL : public mqbi::StorageManager,
 
     //   (virtual: mqbc::PartitionStateTableActions)
     void do_startWatchdog(PartitionStateTableEvent::Enum eventType,
-                          const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                          const PartitionFSMEventData&   eventData) override;
 
     void do_stopWatchdog(PartitionStateTableEvent::Enum eventType,
-                         const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                         const PartitionFSMEventData&   eventData) override;
 
-    void do_openRecoveryFileSet(PartitionStateTableEvent::Enum eventType,
-                                const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_openRecoveryFileSet(PartitionStateTableEvent::Enum eventType,
+                           const PartitionFSMEventData&   eventData) override;
 
-    void do_closeRecoveryFileSet(PartitionStateTableEvent::Enum eventType,
-                                 const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_closeRecoveryFileSet(PartitionStateTableEvent::Enum eventType,
+                            const PartitionFSMEventData&   eventData) override;
 
     void do_storeSelfSeq(PartitionStateTableEvent::Enum eventType,
-                         const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                         const PartitionFSMEventData&   eventData) override;
 
     void do_storePrimarySeq(PartitionStateTableEvent::Enum eventType,
-                            const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                            const PartitionFSMEventData&   eventData) override;
 
     void do_storeReplicaSeq(PartitionStateTableEvent::Enum eventType,
-                            const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                            const PartitionFSMEventData&   eventData) override;
 
-    void do_replicaStateRequest(PartitionStateTableEvent::Enum eventType,
-                                const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_replicaStateRequest(PartitionStateTableEvent::Enum eventType,
+                           const PartitionFSMEventData&   eventData) override;
 
-    void do_replicaStateResponse(PartitionStateTableEvent::Enum eventType,
-                                 const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_replicaStateResponse(PartitionStateTableEvent::Enum eventType,
+                            const PartitionFSMEventData&   eventData) override;
 
     void do_failureReplicaStateResponse(
         PartitionStateTableEvent::Enum eventType,
-        const PartitionFSMEventData&   eventData) BSLS_KEYWORD_OVERRIDE;
+        const PartitionFSMEventData&   eventData) override;
 
     void do_logFailureReplicaStateResponse(
         PartitionStateTableEvent::Enum eventType,
-        const PartitionFSMEventData&   eventData) BSLS_KEYWORD_OVERRIDE;
+        const PartitionFSMEventData&   eventData) override;
 
     void do_logFailurePrimaryStateResponse(
         PartitionStateTableEvent::Enum eventType,
-        const PartitionFSMEventData&   eventData) BSLS_KEYWORD_OVERRIDE;
+        const PartitionFSMEventData&   eventData) override;
 
     void do_logUnexpectedPrimaryStateResponse(
         PartitionStateTableEvent::Enum eventType,
-        const PartitionFSMEventData&   eventData) BSLS_KEYWORD_OVERRIDE;
+        const PartitionFSMEventData&   eventData) override;
 
     void do_logUnexpectedFailurePrimaryStateResponse(
         PartitionStateTableEvent::Enum eventType,
-        const PartitionFSMEventData&   eventData) BSLS_KEYWORD_OVERRIDE;
+        const PartitionFSMEventData&   eventData) override;
 
-    void do_primaryStateRequest(PartitionStateTableEvent::Enum eventType,
-                                const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_primaryStateRequest(PartitionStateTableEvent::Enum eventType,
+                           const PartitionFSMEventData&   eventData) override;
 
-    void do_primaryStateResponse(PartitionStateTableEvent::Enum eventType,
-                                 const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_primaryStateResponse(PartitionStateTableEvent::Enum eventType,
+                            const PartitionFSMEventData&   eventData) override;
 
     void do_primaryRemoveStorageIfNeeded(
         PartitionStateTableEvent::Enum eventType,
-        const PartitionFSMEventData&   eventData) BSLS_KEYWORD_OVERRIDE;
+        const PartitionFSMEventData&   eventData) override;
 
-    void do_primaryRemoveStorage(PartitionStateTableEvent::Enum eventType,
-                                 const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_primaryRemoveStorage(PartitionStateTableEvent::Enum eventType,
+                            const PartitionFSMEventData&   eventData) override;
 
     void do_failurePrimaryStateResponse(
         PartitionStateTableEvent::Enum eventType,
-        const PartitionFSMEventData&   eventData) BSLS_KEYWORD_OVERRIDE;
+        const PartitionFSMEventData&   eventData) override;
 
-    void do_replicaDataResponsePush(PartitionStateTableEvent::Enum eventType,
-                                    const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void do_replicaDataResponsePush(
+        PartitionStateTableEvent::Enum eventType,
+        const PartitionFSMEventData&   eventData) override;
 
-    void do_replicaDataRequestPull(PartitionStateTableEvent::Enum eventType,
-                                   const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_replicaDataRequestPull(PartitionStateTableEvent::Enum eventType,
+                              const PartitionFSMEventData& eventData) override;
 
-    void do_replicaDataResponsePull(PartitionStateTableEvent::Enum eventType,
-                                    const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void do_replicaDataResponsePull(
+        PartitionStateTableEvent::Enum eventType,
+        const PartitionFSMEventData&   eventData) override;
 
     void do_failureReplicaDataResponsePull(
         PartitionStateTableEvent::Enum eventType,
-        const PartitionFSMEventData&   eventData) BSLS_KEYWORD_OVERRIDE;
+        const PartitionFSMEventData&   eventData) override;
 
     void do_failureReplicaDataResponsePush(
         PartitionStateTableEvent::Enum eventType,
-        const PartitionFSMEventData&   eventData) BSLS_KEYWORD_OVERRIDE;
+        const PartitionFSMEventData&   eventData) override;
 
-    void do_sendDataToReplicas(PartitionStateTableEvent::Enum eventType,
-                               const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_sendDataToReplicas(PartitionStateTableEvent::Enum eventType,
+                          const PartitionFSMEventData&   eventData) override;
 
     void do_sendDataToPrimary(PartitionStateTableEvent::Enum eventType,
-                              const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                              const PartitionFSMEventData& eventData) override;
 
     void do_bufferLiveData(PartitionStateTableEvent::Enum eventType,
-                           const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                           const PartitionFSMEventData&   eventData) override;
 
-    void do_processBufferedLiveData(PartitionStateTableEvent::Enum eventType,
-                                    const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void do_processBufferedLiveData(
+        PartitionStateTableEvent::Enum eventType,
+        const PartitionFSMEventData&   eventData) override;
 
-    void do_clearBufferedLiveData(PartitionStateTableEvent::Enum eventType,
-                                  const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_clearBufferedLiveData(PartitionStateTableEvent::Enum eventType,
+                             const PartitionFSMEventData& eventData) override;
 
     void do_processBufferedPrimaryStatusAdvisories(
         PartitionStateTableEvent::Enum eventType,
-        const PartitionFSMEventData&   eventData) BSLS_KEYWORD_OVERRIDE;
+        const PartitionFSMEventData&   eventData) override;
 
     void do_processLiveData(PartitionStateTableEvent::Enum eventType,
-                            const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                            const PartitionFSMEventData&   eventData) override;
 
     void do_setPrimary(PartitionStateTableEvent::Enum eventType,
-                       const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                       const PartitionFSMEventData&   eventData) override;
 
     void do_cleanupMetadata(PartitionStateTableEvent::Enum eventType,
-                            const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                            const PartitionFSMEventData&   eventData) override;
 
     void do_cancelRequests(PartitionStateTableEvent::Enum eventType,
-                           const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                           const PartitionFSMEventData&   eventData) override;
 
     void do_clearPrimary(PartitionStateTableEvent::Enum eventType,
-                         const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                         const PartitionFSMEventData&   eventData) override;
 
-    void do_setExpectedDataChunkRange(PartitionStateTableEvent::Enum eventType,
-                                      const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void do_setExpectedDataChunkRange(
+        PartitionStateTableEvent::Enum eventType,
+        const PartitionFSMEventData&   eventData) override;
 
-    void do_resetReceiveDataCtx(PartitionStateTableEvent::Enum eventType,
-                                const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_resetReceiveDataCtx(PartitionStateTableEvent::Enum eventType,
+                           const PartitionFSMEventData&   eventData) override;
 
-    void do_attemptOpenStorage(PartitionStateTableEvent::Enum eventType,
-                               const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_attemptOpenStorage(PartitionStateTableEvent::Enum eventType,
+                          const PartitionFSMEventData&   eventData) override;
 
     void do_updateStorage(PartitionStateTableEvent::Enum eventType,
-                          const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                          const PartitionFSMEventData&   eventData) override;
 
     void do_removeStorageAndSendReplicaDataDropResponse(
         PartitionStateTableEvent::Enum eventType,
-        const PartitionFSMEventData&   eventData) BSLS_KEYWORD_OVERRIDE;
+        const PartitionFSMEventData&   eventData) override;
 
-    void do_incrementNumRplcaDataRspn(PartitionStateTableEvent::Enum eventType,
-                                      const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void do_incrementNumRplcaDataRspn(
+        PartitionStateTableEvent::Enum eventType,
+        const PartitionFSMEventData&   eventData) override;
 
-    void do_checkQuorumRplcaDataRspn(PartitionStateTableEvent::Enum eventType,
-                                     const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void do_checkQuorumRplcaDataRspn(
+        PartitionStateTableEvent::Enum eventType,
+        const PartitionFSMEventData&   eventData) override;
 
     void do_reapplyEvent(PartitionStateTableEvent::Enum eventType,
-                         const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                         const PartitionFSMEventData&   eventData) override;
 
     void do_checkQuorumSeq(PartitionStateTableEvent::Enum eventType,
-                           const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                           const PartitionFSMEventData&   eventData) override;
 
     void do_findHighestSeq(PartitionStateTableEvent::Enum eventType,
-                           const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+                           const PartitionFSMEventData&   eventData) override;
 
-    void do_flagFailedReplicaSeq(PartitionStateTableEvent::Enum eventType,
-                                 const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    do_flagFailedReplicaSeq(PartitionStateTableEvent::Enum eventType,
+                            const PartitionFSMEventData&   eventData) override;
 
-    void do_transitionToActivePrimary(PartitionStateTableEvent::Enum eventType,
-                                      const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void do_transitionToActivePrimary(
+        PartitionStateTableEvent::Enum eventType,
+        const PartitionFSMEventData&   eventData) override;
 
-    void do_sendPrimaryStatusAdvisory(PartitionStateTableEvent::Enum eventType,
-                                      const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void do_sendPrimaryStatusAdvisory(
+        PartitionStateTableEvent::Enum eventType,
+        const PartitionFSMEventData&   eventData) override;
 
-    void do_reapplyDetectSelfPrimary(PartitionStateTableEvent::Enum eventType,
-                                     const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void do_reapplyDetectSelfPrimary(
+        PartitionStateTableEvent::Enum eventType,
+        const PartitionFSMEventData&   eventData) override;
 
-    void do_reapplyDetectSelfReplica(PartitionStateTableEvent::Enum eventType,
-                                     const PartitionFSMEventData&   eventData)
-        BSLS_KEYWORD_OVERRIDE;
+    void do_reapplyDetectSelfReplica(
+        PartitionStateTableEvent::Enum eventType,
+        const PartitionFSMEventData&   eventData) override;
 
     void do_unsupportedPrimaryDowngrade(
         PartitionStateTableEvent::Enum eventType,
-        const PartitionFSMEventData&   eventData) BSLS_KEYWORD_OVERRIDE;
+        const PartitionFSMEventData&   eventData) override;
 
     // PRIVATE ACCESSORS
 
@@ -890,13 +874,13 @@ class StorageManager BSLS_KEYWORD_FINAL : public mqbi::StorageManager,
 
     /// Destroy this instance. Behavior is undefined unless this instance is
     /// stopped.
-    ~StorageManager() BSLS_KEYWORD_OVERRIDE;
+    ~StorageManager() override;
 
     // MANIPULATORS
     //   (virtual: mqbc::PartitionFSMObserver)
-    void onTransitionToPrimaryHealed(int partitionId,
-                                     PartitionStateTableState::Enum oldState)
-        BSLS_KEYWORD_OVERRIDE;
+    void onTransitionToPrimaryHealed(
+        int                            partitionId,
+        PartitionStateTableState::Enum oldState) override;
 
     /// Called by PartitionFSM when corresponding state transition from the
     /// specified `oldState` happens for the specified `paritionId`.
@@ -905,11 +889,11 @@ class StorageManager BSLS_KEYWORD_FINAL : public mqbi::StorageManager,
     ///         `partitionId`.
     void onTransitionToReplicaHealed(
         int                                  partitionId,
-        mqbc::PartitionStateTableState::Enum oldState) BSLS_KEYWORD_OVERRIDE;
+        mqbc::PartitionStateTableState::Enum oldState) override;
 
-    void onTransitionOutOfHealed(int                            partitionId,
-                                 PartitionStateTableState::Enum oldState)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    onTransitionOutOfHealed(int                            partitionId,
+                            PartitionStateTableState::Enum oldState) override;
 
     // MANIPULATORS
 
@@ -918,18 +902,18 @@ class StorageManager BSLS_KEYWORD_FINAL : public mqbi::StorageManager,
     /// description of the error.
     ///
     /// THREAD: Executed by the cluster's dispatcher thread.
-    int start(bsl::ostream& errorDescription) BSLS_KEYWORD_OVERRIDE;
+    int start(bsl::ostream& errorDescription) override;
 
     /// Stop this storage manager.
     ///
     /// THREAD: Executed by the cluster's dispatcher thread.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 
     /// Initialize the queue key info map based on information in the specified
     /// `clusterState`.  Note that this method should only be called once;
     /// subsequent calls will be ignored.
-    void initializeQueueKeyInfoMap(const mqbc::ClusterState& clusterState)
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    initializeQueueKeyInfoMap(const mqbc::ClusterState& clusterState) override;
 
     /// Register a queue with the specified `uri`, `queueKey` and
     /// `partitionId`, having the spcified `appIdKeyPairs`, and belonging to
@@ -941,14 +925,13 @@ class StorageManager BSLS_KEYWORD_FINAL : public mqbi::StorageManager,
                        const mqbu::StorageKey& queueKey,
                        int                     partitionId,
                        const AppInfos&         appIdKeyPairs,
-                       mqbi::Domain*           domain) BSLS_KEYWORD_OVERRIDE;
+                       mqbi::Domain*           domain) override;
 
     /// Synchronously unregister the queue with the specified `uri` from the
     /// specified `partitionId`.
     ///
     /// THREAD: Executed by the Client's dispatcher thread.
-    void unregisterQueue(const bmqt::Uri& uri,
-                         int              partitionId) BSLS_KEYWORD_OVERRIDE;
+    void unregisterQueue(const bmqt::Uri& uri, int partitionId) override;
 
     /// Configure the fanout queue having specified `uri` and `queueKey`,
     /// assigned to the specified `partitionId` to have the specified
@@ -962,161 +945,148 @@ class StorageManager BSLS_KEYWORD_FINAL : public mqbi::StorageManager,
     int updateQueuePrimary(const bmqt::Uri& uri,
                            int              partitionId,
                            const AppInfos&  addedIdKeyPairs,
-                           const AppInfos&  removedIdKeyPairs)
-        BSLS_KEYWORD_OVERRIDE;
+                           const AppInfos&  removedIdKeyPairs) override;
 
     /// Behavior is undefined unless the specified 'partitionId' is in range
     /// and the specified 'primaryNode' is not null.
     ///
     /// THREAD: Executed in cluster dispatcher thread.
-    void
-    setPrimaryForPartition(int                  partitionId,
-                           mqbnet::ClusterNode* primaryNode,
-                           unsigned int primaryLeaseId) BSLS_KEYWORD_OVERRIDE;
+    void setPrimaryForPartition(int                  partitionId,
+                                mqbnet::ClusterNode* primaryNode,
+                                unsigned int         primaryLeaseId) override;
 
     /// Behavior is undefined unless the specified 'partitionId' is in range
     /// and the specified 'primaryNode' is not null.
     ///
     /// THREAD: Executed in cluster dispatcher thread.
     void clearPrimaryForPartition(int                  partitionId,
-                                  mqbnet::ClusterNode* primary)
-        BSLS_KEYWORD_OVERRIDE;
+                                  mqbnet::ClusterNode* primary) override;
 
     /// Set the primary status of the specified 'partitionId' to the specified
     /// 'value'.
     ///
     /// THREAD: Executed in cluster dispatcher thread.
-    void setPrimaryStatusForPartition(int partitionId,
-                                      bmqp_ctrlmsg::PrimaryStatus::Value value)
-        BSLS_KEYWORD_OVERRIDE;
+    void setPrimaryStatusForPartition(
+        int                                partitionId,
+        bmqp_ctrlmsg::PrimaryStatus::Value value) override;
 
     /// Stop all Partition FSMs.
     ///
     /// THREAD: Executed in cluster dispatcher thread.
-    void stopPFSMs() BSLS_KEYWORD_OVERRIDE;
+    void stopPFSMs() override;
 
     /// Apply `RST_UNKNOWN` event to the Partition FSM for the specified
     /// `partitionId`.
     ///
     /// THREAD: Executed in cluster dispatcher thread.
-    void detectPrimaryLossInPFSM(int partitionId) BSLS_KEYWORD_OVERRIDE;
+    void detectPrimaryLossInPFSM(int partitionId) override;
 
     /// Apply DETECT_SelfPrimary event to Partition FSM using the specified
     /// `partitionId`, `primaryNode`, `primaryLeaseId`.
     ///
     /// THREAD: Executed in cluster dispatcher thread.
-    void
-    detectSelfPrimaryInPFSM(int                  partitionId,
-                            mqbnet::ClusterNode* primaryNode,
-                            unsigned int primaryLeaseId) BSLS_KEYWORD_OVERRIDE;
+    void detectSelfPrimaryInPFSM(int                  partitionId,
+                                 mqbnet::ClusterNode* primaryNode,
+                                 unsigned int         primaryLeaseId) override;
 
     /// Apply DETECT_SelfReplica event to Partition FSM using the specified
     /// `partitionId`, `primaryNode` and `primaryLeaseId`.
     ///
     /// THREAD: Executed in cluster dispatcher thread.
-    void
-    detectSelfReplicaInPFSM(int                  partitionId,
-                            mqbnet::ClusterNode* primaryNode,
-                            unsigned int primaryLeaseId) BSLS_KEYWORD_OVERRIDE;
+    void detectSelfReplicaInPFSM(int                  partitionId,
+                                 mqbnet::ClusterNode* primaryNode,
+                                 unsigned int         primaryLeaseId) override;
 
     /// Process primary state request received from the specified `source`
     /// with the specified `message`.
-    void processPrimaryStateRequest(
-        const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source) BSLS_KEYWORD_OVERRIDE;
+    void
+    processPrimaryStateRequest(const bmqp_ctrlmsg::ControlMessage& message,
+                               mqbnet::ClusterNode* source) override;
 
     /// Process replica state request received from the specified `source`
     /// with the specified `message`.
-    void processReplicaStateRequest(
-        const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source) BSLS_KEYWORD_OVERRIDE;
+    void
+    processReplicaStateRequest(const bmqp_ctrlmsg::ControlMessage& message,
+                               mqbnet::ClusterNode* source) override;
 
     /// Process replica data request received from the specified `source`
     /// with the specified `message`.
     void processReplicaDataRequest(const bmqp_ctrlmsg::ControlMessage& message,
-                                   mqbnet::ClusterNode*                source)
-        BSLS_KEYWORD_OVERRIDE;
+                                   mqbnet::ClusterNode* source) override;
 
-    int configureStorage(bsl::ostream&                   errorDescription,
-                         bsl::shared_ptr<mqbi::Storage>* out,
-                         const bmqt::Uri&                uri,
-                         const mqbu::StorageKey&         queueKey,
-                         int                             partitionId,
-                         const bsls::Types::Int64        messageTtl,
-                         const int                       maxDeliveryAttempts,
-                         const mqbconfm::StorageDefinition& storageDef)
-        BSLS_KEYWORD_OVERRIDE;
+    int
+    configureStorage(bsl::ostream&                      errorDescription,
+                     bsl::shared_ptr<mqbi::Storage>*    out,
+                     const bmqt::Uri&                   uri,
+                     const mqbu::StorageKey&            queueKey,
+                     int                                partitionId,
+                     const bsls::Types::Int64           messageTtl,
+                     const int                          maxDeliveryAttempts,
+                     const mqbconfm::StorageDefinition& storageDef) override;
 
     /// Executed in cluster dispatcher thread.
-    void processStorageEvent(const mqbevt::StorageEvent& event)
-        BSLS_KEYWORD_OVERRIDE;
+    void processStorageEvent(const mqbevt::StorageEvent& event) override;
 
     /// Executed by any thread.
     void processStorageSyncRequest(const bmqp_ctrlmsg::ControlMessage& message,
-                                   mqbnet::ClusterNode*                source)
-        BSLS_KEYWORD_OVERRIDE;
+                                   mqbnet::ClusterNode* source) override;
 
     /// Executed by any thread.
     void processPartitionSyncStateRequest(
         const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source) BSLS_KEYWORD_OVERRIDE;
+        mqbnet::ClusterNode*                source) override;
 
     /// Executed by any thread.
     void processPartitionSyncDataRequest(
         const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source) BSLS_KEYWORD_OVERRIDE;
+        mqbnet::ClusterNode*                source) override;
 
     /// Executed by any thread.
     void processPartitionSyncDataRequestStatus(
         const bmqp_ctrlmsg::ControlMessage& message,
-        mqbnet::ClusterNode*                source) BSLS_KEYWORD_OVERRIDE;
+        mqbnet::ClusterNode*                source) override;
 
     /// Executed in cluster dispatcher thread.
-    void processRecoveryEvent(const mqbevt::RecoveryEvent& event)
-        BSLS_KEYWORD_OVERRIDE;
+    void processRecoveryEvent(const mqbevt::RecoveryEvent& event) override;
 
     /// Executed in IO thread.
-    void
-    processReceiptEvent(const bmqp::Event&   event,
-                        mqbnet::ClusterNode* source) BSLS_KEYWORD_OVERRIDE;
+    void processReceiptEvent(const bmqp::Event&   event,
+                             mqbnet::ClusterNode* source) override;
 
     /// Executed in cluster dispatcher thread.
     void processPrimaryStatusAdvisory(
         const bmqp_ctrlmsg::PrimaryStatusAdvisory& advisory,
-        mqbnet::ClusterNode* source) BSLS_KEYWORD_OVERRIDE;
+        mqbnet::ClusterNode*                       source) override;
 
     /// Executed in cluster dispatcher thread.
-    void processReplicaStatusAdvisory(int                  partitionId,
-                                      mqbnet::ClusterNode* source,
-                                      bmqp_ctrlmsg::NodeStatus::Value status)
-        BSLS_KEYWORD_OVERRIDE;
+    void processReplicaStatusAdvisory(
+        int                             partitionId,
+        mqbnet::ClusterNode*            source,
+        bmqp_ctrlmsg::NodeStatus::Value status) override;
 
     /// Executed by any thread.
-    void processShutdownEvent() BSLS_KEYWORD_OVERRIDE;
+    void processShutdownEvent() override;
 
     /// Invoke the specified `functor` with each queue associated to the
     /// partition identified by the specified `partitionId` if that
     /// partition has been successfully opened.  The behavior is undefined
     /// unless invoked from the queue thread corresponding to `partitionId`.
-    void
-    applyForEachQueue(int                 partitionId,
-                      const QueueFunctor& functor) const BSLS_KEYWORD_OVERRIDE;
+    void applyForEachQueue(int                 partitionId,
+                           const QueueFunctor& functor) const override;
 
     /// Process the specified `command`, and load the result to the
     /// specified `result`.  This function can be invoked from any thread,
     /// and will block until the potentially asynchronous operation is
     /// complete.
     void processCommand(mqbcmd::StorageResult*        result,
-                        const mqbcmd::StorageCommand& command)
-        BSLS_KEYWORD_OVERRIDE;
+                        const mqbcmd::StorageCommand& command) override;
 
     /// GC the queues from unrecognized domains, if any.
-    void gcUnrecognizedDomainQueues() BSLS_KEYWORD_OVERRIDE;
+    void gcUnrecognizedDomainQueues() override;
 
     /// Purge the queues on a given domain.
-    int
-    purgeQueueOnDomain(mqbcmd::StorageResult* result,
-                       const bsl::string& domainName) BSLS_KEYWORD_OVERRIDE;
+    int purgeQueueOnDomain(mqbcmd::StorageResult* result,
+                           const bsl::string&     domainName) override;
 
     /// Return partition corresponding to the specified `partitionId`.  The
     /// behavior is undefined if `partitionId` does not represent a valid
@@ -1133,23 +1103,22 @@ class StorageManager BSLS_KEYWORD_FINAL : public mqbi::StorageManager,
     /// THREAD: Executed by any thread. It is safe because process handle is
     ///         set at ctor and never modified afterwards.
     mqbi::Dispatcher::ProcessorHandle
-    processorForPartition(int partitionId) const BSLS_KEYWORD_OVERRIDE;
+    processorForPartition(int partitionId) const override;
 
     /// Return true if the queue having specified `uri` and assigned to the
     /// specified `partitionId` has no messages, false in any other case.
     /// Behavior is undefined unless this routine is invoked from cluster
     /// dispatcher thread.
-    bool isStorageEmpty(const bmqt::Uri& uri,
-                        int partitionId) const BSLS_KEYWORD_OVERRIDE;
+    bool isStorageEmpty(const bmqt::Uri& uri, int partitionId) const override;
 
     /// Return partition corresponding to the specified `partitionId`.  The
     /// behavior is undefined if `partitionId` does not represent a valid
     /// partition id.
-    mqbs::FileStore& fileStore(int partitionId) const BSLS_KEYWORD_OVERRIDE;
+    mqbs::FileStore& fileStore(int partitionId) const override;
 
     /// Return a StorageManagerIterator for the specified `partitionId`.
     bslma::ManagedPtr<mqbi::StorageManagerIterator>
-    getIterator(int partitionId) const BSLS_KEYWORD_OVERRIDE;
+    getIterator(int partitionId) const override;
 
     /// Return the health state of the specified `partitionId`.
     PartitionFSM::State::Enum partitionHealthState(int partitionId) const;
@@ -1228,7 +1197,7 @@ class StorageManagerIterator : public mqbi::StorageManagerIterator {
 
     /// Destroy this iterator and unlock the partition lock associated with
     /// it.
-    ~StorageManagerIterator() BSLS_KEYWORD_OVERRIDE;
+    ~StorageManagerIterator() override;
 
     // MANIPULATORS
 
@@ -1237,23 +1206,23 @@ class StorageManagerIterator : public mqbi::StorageManagerIterator {
     /// then this iterator becomes *invalid*.  The behavior is undefined
     /// unless this iterator is valid.  Note that the order of the iteration
     /// is not specified.
-    void operator++() BSLS_KEYWORD_OVERRIDE;
+    void operator++() override;
 
     // ACCESSORS
 
     /// Return non-zero if the iterator is *valid*, and 0 otherwise.
-    operator const void*() const BSLS_KEYWORD_OVERRIDE;
+    operator const void*() const override;
 
     /// Return a reference offering non-modifiable access to the queue URI
     /// being pointed by this iterator.  The behavior is undefined unless
     /// the iterator is *valid*.
-    const bmqt::Uri& uri() const BSLS_KEYWORD_OVERRIDE;
+    const bmqt::Uri& uri() const override;
 
     /// Return a reference offering non-modifiable access to the storage
     /// being pointed by this iterator.  The behavior is undefined unless
     /// the iterator is *valid*. Note that since iterator is not a first
     /// class object, its okay to pass a raw pointer.
-    const mqbs::ReplicatedStorage* storage() const BSLS_KEYWORD_OVERRIDE;
+    const mqbs::ReplicatedStorage* storage() const override;
 };
 
 // ============================================================================

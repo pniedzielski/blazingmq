@@ -73,13 +73,13 @@ class QueueConsumptionMonitorTest : public QueueConsumptionMonitor {
                                 const LoggingCb&         loggingCb,
                                 bslma::Allocator*        allocator);
 
-    ~QueueConsumptionMonitorTest() BSLS_KEYWORD_OVERRIDE;
+    ~QueueConsumptionMonitorTest() override;
 
     // MODIFIERS
 
-    void alarmEventDispatched() BSLS_KEYWORD_OVERRIDE;
+    void alarmEventDispatched() override;
 
-    void idleEventDispatched(const bsl::string& appId) BSLS_KEYWORD_OVERRIDE;
+    void idleEventDispatched(const bsl::string& appId) override;
 };
 
 QueueConsumptionMonitorTest::QueueConsumptionMonitorTest(
@@ -125,32 +125,30 @@ struct MockStorageIterator : public mqbi::StorageIterator {
     MockStorageIterator();
 
     // MANIPULATORS
-    void clearCache() BSLS_KEYWORD_OVERRIDE;
+    void clearCache() override;
 
-    bool advance() BSLS_KEYWORD_OVERRIDE;
+    bool advance() override;
 
     // ACCESSORS
-    void reset(BSLA_MAYBE_UNUSED const bmqt::MessageGUID& where)
-        BSLS_KEYWORD_OVERRIDE;
+    void reset(BSLA_MAYBE_UNUSED const bmqt::MessageGUID& where) override;
 
-    const bmqt::MessageGUID& guid() const BSLS_KEYWORD_OVERRIDE;
+    const bmqt::MessageGUID& guid() const override;
 
-    const mqbi::AppMessage& appMessageView(
-        BSLA_MAYBE_UNUSED unsigned int appOrdinal) const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::AppMessage&
+    appMessageView(BSLA_MAYBE_UNUSED unsigned int appOrdinal) const override;
 
-    mqbi::AppMessage& appMessageState(
-        BSLA_MAYBE_UNUSED unsigned int appOrdinal) BSLS_KEYWORD_OVERRIDE;
+    mqbi::AppMessage&
+    appMessageState(BSLA_MAYBE_UNUSED unsigned int appOrdinal) override;
 
-    const bsl::shared_ptr<bdlbb::Blob>& appData() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<bdlbb::Blob>& appData() const override;
 
-    const bsl::shared_ptr<bdlbb::Blob>& options() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<bdlbb::Blob>& options() const override;
 
-    const mqbi::StorageMessageAttributes&
-    attributes() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::StorageMessageAttributes& attributes() const override;
 
-    bool atEnd() const BSLS_KEYWORD_OVERRIDE;
+    bool atEnd() const override;
 
-    bool hasReceipt() const BSLS_KEYWORD_OVERRIDE;
+    bool hasReceipt() const override;
 };
 
 MockStorageIterator::MockStorageIterator()
@@ -238,7 +236,7 @@ struct Test : bmqtst::Test {
 
     // CREATORS
     Test();
-    ~Test() BSLS_KEYWORD_OVERRIDE;
+    ~Test() override;
 
     // MANIPULATORS
     void putMessage(const bsl::string& appId = bsl::string());

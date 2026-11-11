@@ -97,7 +97,7 @@ class IncoreClusterStateLedgerIterator BSLS_KEYWORD_FINAL
     operator=(const IncoreClusterStateLedgerIterator& rhs);
 
     /// Destructor
-    ~IncoreClusterStateLedgerIterator() BSLS_KEYWORD_OVERRIDE;
+    ~IncoreClusterStateLedgerIterator() override;
 
   private:
     // PRIVATE MANIPULATORS
@@ -118,13 +118,13 @@ class IncoreClusterStateLedgerIterator BSLS_KEYWORD_FINAL
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    int next() BSLS_KEYWORD_OVERRIDE;
+    int next() override;
 
     /// Assign self to be a copy of the specified `other`.  This uses the
     /// assignment operator under the hood, but circumvents object slicing.
     /// Behavior is undefined unless `other` and this object have the same
     /// type.
-    void copy(const ClusterStateLedgerIterator& other) BSLS_KEYWORD_OVERRIDE;
+    void copy(const ClusterStateLedgerIterator& other) override;
 
     // ACCESSORS
     //   (virtual mqbc::ClusterStateLedgerIterator)
@@ -132,14 +132,14 @@ class IncoreClusterStateLedgerIterator BSLS_KEYWORD_FINAL
     /// Return a new `ClusterStateLedgerIterator`, which is a clone of self,
     /// using the specified `allocator`.
     bslma::ManagedPtr<ClusterStateLedgerIterator>
-    clone(bslma::Allocator* allocator) const BSLS_KEYWORD_OVERRIDE;
+    clone(bslma::Allocator* allocator) const override;
 
     /// Return true if this iterator is initialized and valid, and the
     /// previous call to `next()` returned 0; return false otherwise.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    bool isValid() const BSLS_KEYWORD_OVERRIDE;
+    bool isValid() const override;
 
     /// Return a const reference to the `ClusterStateRecordHeader` at the
     /// iterator position.  Behavior is undefined unless `isValid()` returns
@@ -147,7 +147,7 @@ class IncoreClusterStateLedgerIterator BSLS_KEYWORD_FINAL
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    const ClusterStateRecordHeader& header() const BSLS_KEYWORD_OVERRIDE;
+    const ClusterStateRecordHeader& header() const override;
 
     /// Load the cluster message recorded at the iterator position to the
     /// specified `message`.  Return 0 on success or a non-zero error value
@@ -155,8 +155,8 @@ class IncoreClusterStateLedgerIterator BSLS_KEYWORD_FINAL
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    int loadClusterMessage(bmqp_ctrlmsg::ClusterMessage* message) const
-        BSLS_KEYWORD_OVERRIDE;
+    int
+    loadClusterMessage(bmqp_ctrlmsg::ClusterMessage* message) const override;
 
     /// Format this object to the specified output `stream` at the (absolute
     /// value of) the optionally specified indentation `level` and return a
@@ -172,8 +172,8 @@ class IncoreClusterStateLedgerIterator BSLS_KEYWORD_FINAL
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
     bsl::ostream& print(bsl::ostream& stream,
-                        int           level = 0,
-                        int spacesPerLevel  = 4) const BSLS_KEYWORD_OVERRIDE;
+                        int           level          = 0,
+                        int           spacesPerLevel = 4) const override;
 
     // ACCESSORS
 

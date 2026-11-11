@@ -151,7 +151,7 @@ class Domain : public mqbi::Domain {
     Domain(mqbi::Cluster* cluster, bslma::Allocator* allocator);
 
     /// Destructor.  Do nothing.
-    ~Domain() BSLS_KEYWORD_OVERRIDE;
+    ~Domain() override;
 
     // MANIPULATORS
     //   (virtual: mqbi::Domain)
@@ -163,12 +163,12 @@ class Domain : public mqbi::Domain {
     /// atomically reconfigure that domain (and all of it's queues) with the
     /// new configuration (or fail and leave the storage untouched).
     int configure(bsl::ostream&           errorDescription,
-                  const mqbconfm::Domain& config) BSLS_KEYWORD_OVERRIDE;
+                  const mqbconfm::Domain& config) override;
 
     /// Do some logging.
-    void teardown(const Domain::TeardownCb& teardownCb) BSLS_KEYWORD_OVERRIDE;
+    void teardown(const Domain::TeardownCb& teardownCb) override;
 
-    void teardownRemove(const TeardownCb& teardownCb) BSLS_KEYWORD_OVERRIDE;
+    void teardownRemove(const TeardownCb& teardownCb) override;
 
     /// Create/Open with the specified `handleParameters` the queue having
     /// the specified `uri` for the requester client represented with the
@@ -181,25 +181,23 @@ class Domain : public mqbi::Domain {
                    const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>&
                                                               clientContext,
                    const bmqp_ctrlmsg::QueueHandleParameters& handleParameters,
-                   const mqbi::Domain::OpenQueueCallback&     callback)
-        BSLS_KEYWORD_OVERRIDE;
+                   const mqbi::Domain::OpenQueueCallback& callback) override;
 
     /// Take ownership of the specified `queue`.  Return 0 on success, or a
     /// non-zero return code otherwise.
-    int registerQueue(const bsl::shared_ptr<mqbi::Queue>& queueSp)
-        BSLS_KEYWORD_OVERRIDE;
+    int registerQueue(const bsl::shared_ptr<mqbi::Queue>& queueSp) override;
 
     /// Reverse method of `registerQueue`, invoked when the last
     /// `QueueHandle` associated to the specified `queue` has been deleted
     /// and `queue` can now safely be deleted from the domain.
-    void unregisterQueue(mqbi::Queue* queue) BSLS_KEYWORD_OVERRIDE;
+    void unregisterQueue(mqbi::Queue* queue) override;
 
     /// Directly unregister the specified `appId` from this domain.
     virtual void unregisterAppId(const bsl::string& appId);
 
     /// Return the capacity meter associated to this domain, if any, or a
     /// null pointer otherwise.
-    mqbu::CapacityMeter* capacityMeter() BSLS_KEYWORD_OVERRIDE;
+    mqbu::CapacityMeter* capacityMeter() override;
 
     // ACCESSORS
     //   (virtual: mqbi::Domain)
@@ -207,52 +205,49 @@ class Domain : public mqbi::Domain {
     /// Process the specified `command`, and write the result to the
     /// specified `result`.  Return zero on success, or a nonzero value
     /// otherwise.
-    int
-    processCommand(mqbcmd::DomainResult*        result,
-                   const mqbcmd::DomainCommand& command) BSLS_KEYWORD_OVERRIDE;
+    int processCommand(mqbcmd::DomainResult*        result,
+                       const mqbcmd::DomainCommand& command) override;
 
     /// Load into the specified `out`, if `out` is not 0, the queue
     /// corresponding to the specified `uri`, if found. Return 0 on success,
     /// or a non-zero return code otherwise.
     int lookupQueue(bsl::shared_ptr<mqbi::Queue>* out,
-                    const bmqt::Uri& uri) const BSLS_KEYWORD_OVERRIDE;
+                    const bmqt::Uri&              uri) const override;
 
     /// Load into the specified `out` all queues belonging to this domain.
-    void loadAllQueues(bsl::vector<bsl::shared_ptr<mqbi::Queue> >* out) const
-        BSLS_KEYWORD_OVERRIDE;
+    void loadAllQueues(
+        bsl::vector<bsl::shared_ptr<mqbi::Queue> >* out) const override;
 
     /// Load into the specified `out` all queues belonging to this domain.
-    void
-    loadAllQueues(bsl::vector<bmqt::Uri>* out) const BSLS_KEYWORD_OVERRIDE;
+    void loadAllQueues(bsl::vector<bmqt::Uri>* out) const override;
 
     /// Return the name of this domain.
-    const bsl::string& name() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::string& name() const override;
 
     /// Return a thread-safe snapshot of the configuration of this domain.
-    bsl::shared_ptr<const mqbconfm::Domain>
-    config() const BSLS_KEYWORD_OVERRIDE;
+    bsl::shared_ptr<const mqbconfm::Domain> config() const override;
 
     /// Return the `DomainStats` object associated to this Domain.
-    mqbstat::DomainStats* domainStats() BSLS_KEYWORD_OVERRIDE;
+    mqbstat::DomainStats* domainStats() override;
 
     /// Return the stat context associated to this Domain.
-    bmqst::StatContext* queueStatContext() BSLS_KEYWORD_OVERRIDE;
+    bmqst::StatContext* queueStatContext() override;
 
     /// Return the cluster associated to this Domain.
-    mqbi::Cluster* cluster() const BSLS_KEYWORD_OVERRIDE;
+    mqbi::Cluster* cluster() const override;
 
     /// Load into the specified `config` the routing configuration which
     /// should be used by all queues under this domain.
-    void loadRoutingConfiguration(bmqp_ctrlmsg::RoutingConfiguration* config)
-        const BSLS_KEYWORD_OVERRIDE;
+    void loadRoutingConfiguration(
+        bmqp_ctrlmsg::RoutingConfiguration* config) const override;
 
     /// Check the state of the queues in this domain, return false if there's
     /// queues opened or opening.
-    bool tryRemove() BSLS_KEYWORD_OVERRIDE;
+    bool tryRemove() override;
 
     /// Check the state of the domain, return true if the first round
     /// of DOMAINS REMOVE is completed
-    bool isRemoveComplete() const BSLS_KEYWORD_OVERRIDE;
+    bool isRemoveComplete() const override;
 };
 
 // ===================
@@ -289,27 +284,25 @@ class DomainFactory : public mqbi::DomainFactory {
     DomainFactory(mqbi::Domain& domain, bslma::Allocator* allocator);
 
     /// Destructor
-    ~DomainFactory() BSLS_KEYWORD_OVERRIDE;
+    ~DomainFactory() override;
 
     // MANIPULATORS
 
     /// Asynchronously qualify the domain with the specified `name`,
     /// invoking the specified `callback` with the result.  `callback` will
     /// be executed directly from the caller's thread.
-    void
-    qualifyDomain(const bslstl::StringRef& name,
-                  const QualifiedDomainCb& callback) BSLS_KEYWORD_OVERRIDE;
+    void qualifyDomain(const bslstl::StringRef& name,
+                       const QualifiedDomainCb& callback) override;
 
     /// Asynchronously get the domain with the specified `name`, invoking
     /// the specified `callback` with the result.  `callback` will be
     /// executed directly from the caller's thread.
     void createDomain(const bsl::string&    name,
-                      const CreateDomainCb& callback) BSLS_KEYWORD_OVERRIDE;
+                      const CreateDomainCb& callback) override;
 
     /// Synchronously get the domain with the specified `name`.  Return null
     /// if the domain has not been previously created via `createDomain`.
-    mqbi::Domain*
-    getDomain(const bsl::string& name) const BSLS_KEYWORD_OVERRIDE;
+    mqbi::Domain* getDomain(const bsl::string& name) const override;
 };
 
 }  // close package namespace

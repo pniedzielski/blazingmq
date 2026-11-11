@@ -163,28 +163,28 @@ class NegotiatedChannelFactory : public bmqio::ChannelFactory {
     explicit NegotiatedChannelFactory(const Config&     config,
                                       bslma::Allocator* basicAllocator = 0);
 
-    ~NegotiatedChannelFactory() BSLS_KEYWORD_OVERRIDE;
+    ~NegotiatedChannelFactory() override;
 
   public:
     // MANIPULATORS
     void listen(bmqio::Status*               status,
                 bslma::ManagedPtr<OpHandle>* handle,
                 const bmqio::ListenOptions&  options,
-                const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                const ResultCallback&        cb) override;
 
     void connect(bmqio::Status*               status,
                  bslma::ManagedPtr<OpHandle>* handle,
                  const bmqio::ConnectOptions& options,
-                 const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                 const ResultCallback&        cb) override;
 
     /// Start the channel factory. Return 0 on success and a non-zero value
     /// otherwise.
-    int start() BSLS_KEYWORD_OVERRIDE;
+    int start() override;
 
     /// Stop the channel factory. Note that the behavior is undefined unless
     /// the thread calling this function is the same thread that called
     /// `start()` and is not one of the I/O threads used by this object.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 };
 
 }  // close package namespace

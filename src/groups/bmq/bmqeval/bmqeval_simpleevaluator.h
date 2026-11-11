@@ -200,8 +200,7 @@ class SimpleEvaluator {
         /// Return the boolean value of the property. If the property is not
         /// a boolean, stop evaluation, set last error to e_TYPE, and return
         /// `false`;
-        bdld::Datum
-        evaluate(EvaluationContext& context) const BSLS_KEYWORD_OVERRIDE;
+        bdld::Datum evaluate(EvaluationContext& context) const override;
     };
 
     // --------------
@@ -225,8 +224,7 @@ class SimpleEvaluator {
         // ACCESSORS
 
         /// Return the integer passed to the constructor, as an Int64 Datum.
-        bdld::Datum
-        evaluate(EvaluationContext& context) const BSLS_KEYWORD_OVERRIDE;
+        bdld::Datum evaluate(EvaluationContext& context) const override;
     };
 
     // -------------
@@ -256,8 +254,7 @@ class SimpleEvaluator {
         // ACCESSORS
 
         /// Return the string passed to the constructor, as StringRef Datum.
-        bdld::Datum
-        evaluate(EvaluationContext& context) const BSLS_KEYWORD_OVERRIDE;
+        bdld::Datum evaluate(EvaluationContext& context) const override;
     };
 
     // --------------
@@ -282,8 +279,7 @@ class SimpleEvaluator {
 
         /// Return the boolean value passed to the constructor, as a boolean
         /// Datum.
-        bdld::Datum
-        evaluate(EvaluationContext& context) const BSLS_KEYWORD_OVERRIDE;
+        bdld::Datum evaluate(EvaluationContext& context) const override;
 
         /// Return `d_value`.
         bool value() const;
@@ -318,8 +314,7 @@ class SimpleEvaluator {
         /// `Op`, and return the result as a boolean Datum. Otherwise, set
         /// the error in the context to  e_TYPE, stop the evaluation, and
         /// return a null datum.
-        bdld::Datum
-        evaluate(EvaluationContext& context) const BSLS_KEYWORD_OVERRIDE;
+        bdld::Datum evaluate(EvaluationContext& context) const override;
     };
 
     // --
@@ -353,8 +348,7 @@ class SimpleEvaluator {
         /// evaluation, and return a null datum. Note that the `right`
         /// expression is not evaluated if `left` evaluates to `true`, and
         /// its type is not checked.
-        bdld::Datum
-        evaluate(EvaluationContext& context) const BSLS_KEYWORD_OVERRIDE;
+        bdld::Datum evaluate(EvaluationContext& context) const override;
     };
 
     // ---
@@ -388,8 +382,7 @@ class SimpleEvaluator {
         /// evaluation, and return a null datum. Note that the `right`
         /// expression is not evaluated if `left` evaluates to `false`, and
         /// its type is not checked.
-        bdld::Datum
-        evaluate(EvaluationContext& context) const BSLS_KEYWORD_OVERRIDE;
+        bdld::Datum evaluate(EvaluationContext& context) const override;
     };
 
     // ------------------
@@ -422,8 +415,7 @@ class SimpleEvaluator {
         /// return the result as a Int64 Datum. Otherwise, set the error in
         /// the context to  e_TYPE, stop the evaluation, and return a null
         /// datum.
-        bdld::Datum
-        evaluate(EvaluationContext& context) const BSLS_KEYWORD_OVERRIDE;
+        bdld::Datum evaluate(EvaluationContext& context) const override;
     };
 
     // ----------
@@ -449,8 +441,7 @@ class SimpleEvaluator {
         /// integer, return the negated value as an Int64 Datum. Otherwise,
         /// set the error in the context to  e_TYPE, stop the evaluation,
         /// and return a null datum.
-        bdld::Datum
-        evaluate(EvaluationContext& context) const BSLS_KEYWORD_OVERRIDE;
+        bdld::Datum evaluate(EvaluationContext& context) const override;
     };
 
     // ---
@@ -476,8 +467,7 @@ class SimpleEvaluator {
         /// boolean, return the negated value as a boolean Datum.
         /// Otherwise, set the error in the context to  e_TYPE, stop the
         /// evaluation, and return a null datum.
-        bdld::Datum
-        evaluate(EvaluationContext& context) const BSLS_KEYWORD_OVERRIDE;
+        bdld::Datum evaluate(EvaluationContext& context) const override;
     };
 
     // ------
@@ -511,8 +501,7 @@ class SimpleEvaluator {
         /// boolean, return the negated value as a boolean Datum.
         /// Otherwise, set the error in the context to e_TYPE, stop the
         /// evaluation, and return a null datum.
-        bdld::Datum
-        evaluate(EvaluationContext& context) const BSLS_KEYWORD_OVERRIDE;
+        bdld::Datum evaluate(EvaluationContext& context) const override;
     };
 
   private:

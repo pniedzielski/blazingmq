@@ -1023,7 +1023,7 @@ class Elector : public SessionEventProcessor {
 
     /// Destroy this instance.  Behavior is undefined unless this instance
     /// is not stopped.
-    ~Elector() BSLS_KEYWORD_OVERRIDE;
+    ~Elector() override;
 
     // MANIPULATORS
 
@@ -1050,7 +1050,7 @@ class Elector : public SessionEventProcessor {
     /// this method is invoked in the associated cluster's dispatcher
     /// thread.
     void processEvent(const bmqp::Event& event,
-                      ClusterNode*       source = 0) BSLS_KEYWORD_OVERRIDE;
+                      ClusterNode*       source = 0) override;
 
     /// Process the change in status of the specified `node` as indicated by
     /// the specified `isAvailable` flag.  Behavior is undefined unless this

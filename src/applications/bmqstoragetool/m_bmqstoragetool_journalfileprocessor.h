@@ -94,7 +94,7 @@ class JournalFileProcessor : public CommandProcessor {
 
     // MANIPULATORS
     /// Process the journal file and print result.
-    void process() BSLS_KEYWORD_OVERRIDE;
+    void process() override;
 };
 
 }  // close package namespace

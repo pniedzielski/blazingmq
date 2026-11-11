@@ -116,7 +116,7 @@ class Tester : public bmqtst::Test {
 
   public:
     Tester();
-    ~Tester() BSLS_KEYWORD_OVERRIDE;
+    ~Tester() override;
 
     ReconnectingChannelFactory& obj();
     TestChannelFactory&         baseFactory();

@@ -208,27 +208,26 @@ class Executor_Target : public Executor_TargetBase {
     // MANIPULATORS
 
     /// Implements `Executor_TargetBase::post()`.
-    void post(const bsl::function<void()>&) const BSLS_KEYWORD_OVERRIDE;
+    void post(const bsl::function<void()>&) const override;
 
     /// Implements `Executor_TargetBase::dispatch()`.
-    void dispatch(const bsl::function<void()>&) const BSLS_KEYWORD_OVERRIDE;
+    void dispatch(const bsl::function<void()>&) const override;
 
     /// Implements `Executor_TargetBase::move()`.
-    void move(void* dst) BSLS_KEYWORD_NOEXCEPT BSLS_KEYWORD_OVERRIDE;
+    void move(void* dst) BSLS_KEYWORD_NOEXCEPT override;
 
   public:
     // ACCESSORS
-    void* target() BSLS_KEYWORD_NOEXCEPT BSLS_KEYWORD_OVERRIDE;
+    void* target() BSLS_KEYWORD_NOEXCEPT override;
 
     /// Implements `Executor_TargetBase::target()`.
-    const void* target() const BSLS_KEYWORD_NOEXCEPT BSLS_KEYWORD_OVERRIDE;
+    const void* target() const BSLS_KEYWORD_NOEXCEPT override;
 
-    const bsl::type_info&
-    targetType() const BSLS_KEYWORD_NOEXCEPT BSLS_KEYWORD_OVERRIDE;
+    const bsl::type_info& targetType() const BSLS_KEYWORD_NOEXCEPT override;
     // Implements 'Executor_TargetBase::targetType'.
 
     /// Implements `Executor_TargetBase::copy`.
-    void copy(void* dst) const BSLS_KEYWORD_NOEXCEPT BSLS_KEYWORD_OVERRIDE;
+    void copy(void* dst) const BSLS_KEYWORD_NOEXCEPT override;
 };
 
 // =========================

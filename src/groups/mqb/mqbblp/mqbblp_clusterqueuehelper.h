@@ -921,8 +921,7 @@ class ClusterQueueHelper BSLS_KEYWORD_FINAL
 
     /// Callback invoked when self node's status changes to the specified
     /// `value`.
-    void onSelfNodeStatus(bmqp_ctrlmsg::NodeStatus::Value value)
-        BSLS_KEYWORD_OVERRIDE;
+    void onSelfNodeStatus(bmqp_ctrlmsg::NodeStatus::Value value) override;
 
     // PRIVATE MANIPULATORS
     //   (virtual: mqbc::ElectorInfoObserver)
@@ -933,8 +932,7 @@ class ClusterQueueHelper BSLS_KEYWORD_FINAL
     /// a state of no leader, and in this case, `status` will be
     /// `UNDEFINED`.
     void onClusterLeader(mqbnet::ClusterNode*                node,
-                         mqbc::ElectorInfoLeaderStatus::Enum status)
-        BSLS_KEYWORD_OVERRIDE;
+                         mqbc::ElectorInfoLeaderStatus::Enum status) override;
 
     // PRIVATE MANIPULATORS
     //   (virtual: mqbc::ClusterStateObserver)
@@ -944,18 +942,16 @@ class ClusterQueueHelper BSLS_KEYWORD_FINAL
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void
-    onQueueAssigned(const bsl::shared_ptr<mqbc::ClusterStateQueueInfo>& info)
-        BSLS_KEYWORD_OVERRIDE;
+    void onQueueAssigned(
+        const bsl::shared_ptr<mqbc::ClusterStateQueueInfo>& info) override;
 
     /// Callback invoked when a queue with the specified `info` gets
     /// unassigned from the cluster.
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    void
-    onQueueUnassigned(const bsl::shared_ptr<mqbc::ClusterStateQueueInfo>& info)
-        BSLS_KEYWORD_OVERRIDE;
+    void onQueueUnassigned(
+        const bsl::shared_ptr<mqbc::ClusterStateQueueInfo>& info) override;
 
     /// Callback invoked when a queue with the specified `uri` belonging to
     /// the specified `domain` is updated with the optionally specified
@@ -967,8 +963,7 @@ class ClusterQueueHelper BSLS_KEYWORD_FINAL
     void onQueueUpdated(const bmqt::Uri&   uri,
                         const bsl::string& domain,
                         const AppInfos&    addedAppIds,
-                        const AppInfos&    removedAppIds = AppInfos())
-        BSLS_KEYWORD_OVERRIDE;
+                        const AppInfos& removedAppIds = AppInfos()) override;
 
   private:
     // NOT IMPLEMENTED
@@ -993,7 +988,7 @@ class ClusterQueueHelper BSLS_KEYWORD_FINAL
                        bslma::Allocator*          allocator);
 
     /// Destructor
-    ~ClusterQueueHelper() BSLS_KEYWORD_OVERRIDE;
+    ~ClusterQueueHelper() override;
 
     // MANIPULATORS
 

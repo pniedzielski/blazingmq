@@ -131,7 +131,7 @@ class AuthenticationClient : public mqbnet::AuthenticationClient {
         bslma::Allocator*                                allocator);
 
     /// Destructor
-    ~AuthenticationClient() BSLS_KEYWORD_OVERRIDE;
+    ~AuthenticationClient() override;
 
     // MANIPULATORS
     //   (virtual: mqbnet::AuthenticationClient)
@@ -140,19 +140,19 @@ class AuthenticationClient : public mqbnet::AuthenticationClient {
     /// provider.  Return 0 on success, or a non-zero value and populate the
     /// specified `errorDescription` with the description of any failure
     /// encountered.
-    int authenticate(bsl::ostream& errorDescription) BSLS_KEYWORD_OVERRIDE;
+    int authenticate(bsl::ostream& errorDescription) override;
 
     /// Process the specified `response` received from the remote broker.
     /// Return 0 if authentication succeeded, or a non-zero value and
     /// populate the specified `errorDescription` with the description of
     /// any failure encountered.
-    int handleResponse(bsl::ostream& errorDescription,
-                       const bmqp_ctrlmsg::AuthenticationMessage& response)
-        BSLS_KEYWORD_OVERRIDE;
+    int handleResponse(
+        bsl::ostream&                              errorDescription,
+        const bmqp_ctrlmsg::AuthenticationMessage& response) override;
 
     /// @brief Stop reauthenticating and release the channel.  This client
     ///        cannot be used afterwards.  May be called more than once.
-    void onClose() BSLS_KEYWORD_OVERRIDE;
+    void onClose() override;
 };
 
 }  // close package namespace

@@ -205,7 +205,7 @@ class TestChannel : public Channel {
 
     // CREATORS
     explicit TestChannel(bslma::Allocator* basicAllocator = 0);
-    ~TestChannel() BSLS_KEYWORD_OVERRIDE;
+    ~TestChannel() override;
 
     // MANIPULATORS
 
@@ -281,34 +281,34 @@ class TestChannel : public Channel {
     size_t numOnCloseCalls() const;
 
     // Channel
-    void read(Status*                   status,
-              int                       numBytes,
-              const ReadCallback&       readCallback,
-              const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    read(Status*                   status,
+         int                       numBytes,
+         const ReadCallback&       readCallback,
+         const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     void write(Status*            status,
                const bdlbb::Blob& blob,
-               bsls::Types::Int64 watermark = bsl::numeric_limits<int>::max())
-        BSLS_KEYWORD_OVERRIDE;
+               bsls::Types::Int64 watermark =
+                   bsl::numeric_limits<int>::max()) override;
 
-    void cancelRead() BSLS_KEYWORD_OVERRIDE;
-    void close(const Status& status = Status()) BSLS_KEYWORD_OVERRIDE;
-    int  execute(const ExecuteCb& cb) BSLS_KEYWORD_OVERRIDE;
-    void onClose(const CloseFn& cb) BSLS_KEYWORD_OVERRIDE;
-    void onWatermark(const WatermarkFn& cb) BSLS_KEYWORD_OVERRIDE;
-    bmqvt::PropertyBag& properties() BSLS_KEYWORD_OVERRIDE;
+    void                cancelRead() override;
+    void                close(const Status& status = Status()) override;
+    int                 execute(const ExecuteCb& cb) override;
+    void                onClose(const CloseFn& cb) override;
+    void                onWatermark(const WatermarkFn& cb) override;
+    bmqvt::PropertyBag& properties() override;
 
     /// Set the write queue low watermark to the specified `lowWatermark`.
-    void setWriteQueueLowWatermark(int lowWatermark) BSLS_KEYWORD_OVERRIDE;
+    void setWriteQueueLowWatermark(int lowWatermark) override;
 
     /// Set the write queue high watermark to the specified `highWatermark`.
-    void setWriteQueueHighWatermark(int highWatermark) BSLS_KEYWORD_OVERRIDE;
+    void setWriteQueueHighWatermark(int highWatermark) override;
 
     // ACCESSORS
     // Channel
-    bsl::string               peerUri() const BSLS_KEYWORD_OVERRIDE;
-    const bmqvt::PropertyBag& properties() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string               peerUri() const override;
+    const bmqvt::PropertyBag& properties() const override;
 };
 
 }  // close package namespace

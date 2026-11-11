@@ -210,36 +210,34 @@ class HumanReadableCslPrinter : public CslPrinter {
     explicit HumanReadableCslPrinter(bsl::ostream&     os,
                                      bslma::Allocator* allocator = 0);
 
-    ~HumanReadableCslPrinter() BSLS_KEYWORD_OVERRIDE;
+    ~HumanReadableCslPrinter() override;
 
     // ACCESSORS
 
-    void printShortResult(const bmqp_ctrlmsg::ClusterMessage&   record,
-                          const mqbc::ClusterStateRecordHeader& header,
-                          const mqbsi::LedgerRecordId&          recordId) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    printShortResult(const bmqp_ctrlmsg::ClusterMessage&   record,
+                     const mqbc::ClusterStateRecordHeader& header,
+                     const mqbsi::LedgerRecordId& recordId) const override;
 
-    void printDetailResult(const bmqp_ctrlmsg::ClusterMessage&   record,
-                           const mqbc::ClusterStateRecordHeader& header,
-                           const mqbsi::LedgerRecordId& recordId) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    printDetailResult(const bmqp_ctrlmsg::ClusterMessage&   record,
+                      const mqbc::ClusterStateRecordHeader& header,
+                      const mqbsi::LedgerRecordId& recordId) const override;
 
-    void printOffsetsNotFound(const OffsetsVec& offsets) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printOffsetsNotFound(const OffsetsVec& offsets) const override;
 
-    void printCompositesNotFound(const CompositesVec& seqNums) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printCompositesNotFound(const CompositesVec& seqNums) const override;
 
     void printSummaryResult(
         const CslRecordCount&                    recordCount,
         const CslUpdateChoiceMap&                updateChoiceMap,
         const QueueMap&                          queueMap,
         const Parameters::ProcessCslRecordTypes& processCslRecordTypes,
-        unsigned int queuesLimit) const BSLS_KEYWORD_OVERRIDE;
+        unsigned int                             queuesLimit) const override;
 
     void printFooter(const CslRecordCount& recordCount,
                      const Parameters::ProcessCslRecordTypes&
-                         processCslRecordTypes) const BSLS_KEYWORD_OVERRIDE;
+                         processCslRecordTypes) const override;
 };
 
 // CREATORS
@@ -451,19 +449,17 @@ class JsonCslPrinter : public CslPrinter {
 
     explicit JsonCslPrinter(bsl::ostream& os, bslma::Allocator* allocator = 0);
 
-    ~JsonCslPrinter() BSLS_KEYWORD_OVERRIDE;
+    ~JsonCslPrinter() override;
 
     // PUBLIC METHODS
 
-    void printOffsetsNotFound(const OffsetsVec& offsets) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printOffsetsNotFound(const OffsetsVec& offsets) const override;
 
-    void printCompositesNotFound(const CompositesVec& seqNums) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printCompositesNotFound(const CompositesVec& seqNums) const override;
 
     void printFooter(const CslRecordCount&   recordCount,
                      BSLA_MAYBE_UNUSED const Parameters::ProcessCslRecordTypes&
-                         processCslRecordTypes) const BSLS_KEYWORD_OVERRIDE;
+                         processCslRecordTypes) const override;
 };
 
 // PROTECTED METHODS
@@ -571,19 +567,19 @@ class JsonPrettyCslPrinter : public JsonCslPrinter {
     // CREATORS
     JsonPrettyCslPrinter(bsl::ostream& os, bslma::Allocator* allocator);
 
-    ~JsonPrettyCslPrinter() BSLS_KEYWORD_OVERRIDE;
+    ~JsonPrettyCslPrinter() override;
 
     // PUBLIC METHODS
 
-    void printShortResult(const bmqp_ctrlmsg::ClusterMessage&   record,
-                          const mqbc::ClusterStateRecordHeader& header,
-                          const mqbsi::LedgerRecordId&          recordId) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    printShortResult(const bmqp_ctrlmsg::ClusterMessage&   record,
+                     const mqbc::ClusterStateRecordHeader& header,
+                     const mqbsi::LedgerRecordId& recordId) const override;
 
-    void printDetailResult(const bmqp_ctrlmsg::ClusterMessage&   record,
-                           const mqbc::ClusterStateRecordHeader& header,
-                           const mqbsi::LedgerRecordId& recordId) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    printDetailResult(const bmqp_ctrlmsg::ClusterMessage&   record,
+                      const mqbc::ClusterStateRecordHeader& header,
+                      const mqbsi::LedgerRecordId& recordId) const override;
 
     void printSummaryResult(
         const CslRecordCount&     recordCount,
@@ -591,7 +587,7 @@ class JsonPrettyCslPrinter : public JsonCslPrinter {
         const QueueMap&           queueMap,
         BSLA_MAYBE_UNUSED const   Parameters::ProcessCslRecordTypes&
                                   processCslRecordTypes,
-        unsigned int              queuesLimit) const BSLS_KEYWORD_OVERRIDE;
+        unsigned int              queuesLimit) const override;
 };
 
 // CREATORS
@@ -667,18 +663,18 @@ class JsonLineCslPrinter : public JsonCslPrinter {
     // CREATORS
     JsonLineCslPrinter(bsl::ostream& os, bslma::Allocator* allocator);
 
-    ~JsonLineCslPrinter() BSLS_KEYWORD_OVERRIDE;
+    ~JsonLineCslPrinter() override;
 
     // PUBLIC METHODS
-    void printShortResult(const bmqp_ctrlmsg::ClusterMessage&   record,
-                          const mqbc::ClusterStateRecordHeader& header,
-                          const mqbsi::LedgerRecordId&          recordId) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    printShortResult(const bmqp_ctrlmsg::ClusterMessage&   record,
+                     const mqbc::ClusterStateRecordHeader& header,
+                     const mqbsi::LedgerRecordId& recordId) const override;
 
-    void printDetailResult(const bmqp_ctrlmsg::ClusterMessage&   record,
-                           const mqbc::ClusterStateRecordHeader& header,
-                           const mqbsi::LedgerRecordId& recordId) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    printDetailResult(const bmqp_ctrlmsg::ClusterMessage&   record,
+                      const mqbc::ClusterStateRecordHeader& header,
+                      const mqbsi::LedgerRecordId& recordId) const override;
 
     void printSummaryResult(
         const CslRecordCount&     recordCount,
@@ -686,7 +682,7 @@ class JsonLineCslPrinter : public JsonCslPrinter {
         const QueueMap&           queueMap,
         BSLA_MAYBE_UNUSED const   Parameters::ProcessCslRecordTypes&
                                   processCslRecordTypes,
-        unsigned int              queuesLimit) const BSLS_KEYWORD_OVERRIDE;
+        unsigned int              queuesLimit) const override;
 };
 
 // CREATORS

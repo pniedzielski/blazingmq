@@ -62,19 +62,18 @@ struct LedgerTestImp : bsls::ProtocolTestImp<mqbsi::Ledger> {
 
   public:
     // MANIPULATORS
-    int open(int flags) BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    int open(int flags) override { return markDone(); }
 
-    int close() BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    int close() override { return markDone(); }
 
-    int
-    updateOutstandingNumBytes(const mqbu::StorageKey& logId,
-                              bsls::Types::Int64 value) BSLS_KEYWORD_OVERRIDE
+    int updateOutstandingNumBytes(const mqbu::StorageKey& logId,
+                                  bsls::Types::Int64      value) override
     {
         return markDone();
     }
 
     int setOutstandingNumBytes(const mqbu::StorageKey& logId,
-                               bsls::Types::Int64 value) BSLS_KEYWORD_OVERRIDE
+                               bsls::Types::Int64      value) override
     {
         return markDone();
     }
@@ -82,7 +81,7 @@ struct LedgerTestImp : bsls::ProtocolTestImp<mqbsi::Ledger> {
     int writeRecord(LedgerRecordId* recordId,
                     const void*     record,
                     int             offset,
-                    int             length) BSLS_KEYWORD_OVERRIDE
+                    int             length) override
     {
         return markDone();
     }
@@ -90,74 +89,74 @@ struct LedgerTestImp : bsls::ProtocolTestImp<mqbsi::Ledger> {
     int writeRecord(LedgerRecordId*           recordId,
                     const bdlbb::Blob&        record,
                     const bmqu::BlobPosition& offset,
-                    int                       length) BSLS_KEYWORD_OVERRIDE
+                    int                       length) override
     {
         return markDone();
     }
 
     int writeRecord(LedgerRecordId*          recordId,
                     const bdlbb::Blob&       record,
-                    const bmqu::BlobSection& section) BSLS_KEYWORD_OVERRIDE
+                    const bmqu::BlobSection& section) override
     {
         return markDone();
     }
 
-    int flush() BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    int flush() override { return markDone(); }
 
     int readRecord(void*                 entry,
                    int                   length,
-                   const LedgerRecordId& recordId) const BSLS_KEYWORD_OVERRIDE
+                   const LedgerRecordId& recordId) const override
     {
         return markDone();
     }
 
     int readRecord(bdlbb::Blob*          entry,
                    int                   length,
-                   const LedgerRecordId& recordId) const BSLS_KEYWORD_OVERRIDE
+                   const LedgerRecordId& recordId) const override
     {
         return markDone();
     }
 
     int aliasRecord(void**                entry,
                     int                   length,
-                    const LedgerRecordId& recordId) const BSLS_KEYWORD_OVERRIDE
+                    const LedgerRecordId& recordId) const override
     {
         return markDone();
     }
 
     int aliasRecord(bdlbb::Blob*          entry,
                     int                   length,
-                    const LedgerRecordId& recordId) const BSLS_KEYWORD_OVERRIDE
+                    const LedgerRecordId& recordId) const override
     {
         return markDone();
     }
 
-    bool isOpened() const BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    bool isOpened() const override { return markDone(); }
 
-    bool supportsAliasing() const BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    bool supportsAliasing() const override { return markDone(); }
 
-    size_t numLogs() const BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    size_t numLogs() const override { return markDone(); }
 
-    const Logs& logs() const BSLS_KEYWORD_OVERRIDE
+    const Logs& logs() const override
     {
         markDone();
         return d_logs;
     }
 
-    const Ledger::LogSp& currentLog() const BSLS_KEYWORD_OVERRIDE
+    const Ledger::LogSp& currentLog() const override
     {
         markDone();
         return d_logSp;
     }
 
-    bsls::Types::Int64 outstandingNumBytes(const mqbu::StorageKey& logId) const
-        BSLS_KEYWORD_OVERRIDE
+    bsls::Types::Int64
+    outstandingNumBytes(const mqbu::StorageKey& logId) const override
     {
         return markDone();
     }
 
     bsls::Types::Int64
-    totalNumBytes(const mqbu::StorageKey& logId) const BSLS_KEYWORD_OVERRIDE
+    totalNumBytes(const mqbu::StorageKey& logId) const override
     {
         return markDone();
     }

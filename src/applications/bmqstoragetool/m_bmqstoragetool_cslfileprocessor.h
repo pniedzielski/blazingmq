@@ -65,7 +65,7 @@ class CslFileProcessor : public CommandProcessor {
     // MANIPULATORS
 
     /// Process the CSL file and print result.
-    void process() BSLS_KEYWORD_OVERRIDE;
+    void process() override;
 };
 
 }  // close package namespace

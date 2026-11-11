@@ -192,18 +192,18 @@ class NtcChannelFactory : public bmqio::ChannelFactory {
                                bslma::Allocator* basicAllocator = 0);
 
     /// Destroy this object.
-    ~NtcChannelFactory() BSLS_KEYWORD_OVERRIDE;
+    ~NtcChannelFactory() override;
 
     // MANIPULATORS
 
     /// Start the channel factory. Return 0 on success and a non-zero value
     /// otherwise.
-    int start() BSLS_KEYWORD_OVERRIDE;
+    int start() override;
 
     /// Stop the channel factory. Note that the behavior is undefined unless
     /// the thread calling this function is the same thread that called
     /// `start()` and is not one of the I/O threads used by this object.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 
     /// Listen for connections according to the specified `options` (whose
     /// meaning is implementation-defined), and invoke the specified `cb`
@@ -215,7 +215,7 @@ class NtcChannelFactory : public bmqio::ChannelFactory {
     void listen(Status*                      status,
                 bslma::ManagedPtr<OpHandle>* handle,
                 const ListenOptions&         options,
-                const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                const ResultCallback&        cb) override;
 
     /// Attempt to establish a connection according to the specified
     /// `options` (whose meaning is implementation-defined), and invoke the
@@ -234,7 +234,7 @@ class NtcChannelFactory : public bmqio::ChannelFactory {
     void connect(Status*                      status,
                  bslma::ManagedPtr<OpHandle>* handle,
                  const ConnectOptions&        options,
-                 const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                 const ResultCallback&        cb) override;
 
     /// Register the specified `cb` to be invoked when a channel is
     /// created. Return a `bdlmt::SignalerConnection` object than can be

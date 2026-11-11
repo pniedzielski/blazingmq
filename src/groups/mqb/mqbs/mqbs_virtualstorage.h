@@ -244,7 +244,7 @@ class StorageIterator : public mqbi::StorageIterator {
         const VirtualStorage::DataStream::iterator& initialPosition);
 
     /// Destructor
-    ~StorageIterator() BSLS_KEYWORD_OVERRIDE;
+    ~StorageIterator() override;
 
     // MANIPULATORS
 
@@ -252,62 +252,59 @@ class StorageIterator : public mqbi::StorageIterator {
     /// The cache might be initialized within `appData`, `options` or
     /// `attributes` routines.
     /// TODO: refactor iterators to remove cached data.
-    void clearCache() BSLS_KEYWORD_OVERRIDE;
+    void clearCache() override;
 
-    bool advance() BSLS_KEYWORD_OVERRIDE;
+    bool advance() override;
 
     /// If the specified 'where' is unset, reset the iterator to point to the
     /// to the beginning of the Virtual Storage.  Otherwise, reset the
     /// iterator to point to the item corresponding to the 'where'.  If the
     /// item is not found, reset the iterator to the end of the storage.
-    void reset(const bmqt::MessageGUID& where = bmqt::MessageGUID())
-        BSLS_KEYWORD_OVERRIDE;
+    void reset(const bmqt::MessageGUID& where = bmqt::MessageGUID()) override;
 
     // ACCESSORS
 
     /// Return a reference offering non-modifiable access to the guid
     /// associated to the item currently pointed at by this iterator.  The
     /// behavior is undefined unless `atEnd` returns `false`.
-    const bmqt::MessageGUID& guid() const BSLS_KEYWORD_OVERRIDE;
+    const bmqt::MessageGUID& guid() const override;
 
     /// Return a reference offering non-modifiable access to the App state
     /// corresponding to the specified 'ordinal' and the item currently pointed
     /// at by this iterator.
     /// The behavior is undefined unless `atEnd` returns `false`.
     const mqbi::AppMessage&
-    appMessageView(unsigned int appOrdinal) const BSLS_KEYWORD_OVERRIDE;
+    appMessageView(unsigned int appOrdinal) const override;
 
     /// Return a reference offering modifiable access to the App state
     /// corresponding to the specified 'ordinal' and the item currently pointed
     /// at by this iterator.
     /// The behavior is undefined unless `atEnd` returns `false`.
-    mqbi::AppMessage&
-    appMessageState(unsigned int appOrdinal) BSLS_KEYWORD_OVERRIDE;
+    mqbi::AppMessage& appMessageState(unsigned int appOrdinal) override;
 
     /// Return a reference offering non-modifiable access to the application
     /// data associated with the item currently pointed at by this iterator.
     /// The behavior is undefined unless `atEnd` returns `false`.
-    const bsl::shared_ptr<bdlbb::Blob>& appData() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<bdlbb::Blob>& appData() const override;
 
     /// Return a reference offering non-modifiable access to the options
     /// associated with the item currently pointed at by this iterator.  The
     /// behavior is undefined unless `atEnd` returns `false`.
-    const bsl::shared_ptr<bdlbb::Blob>& options() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<bdlbb::Blob>& options() const override;
 
     /// Return a reference offering non-modifiable access to the attributes
     /// associated with the message currently pointed at by this iterator.
     /// The behavior is undefined unless `atEnd` returns `false`.
-    const mqbi::StorageMessageAttributes&
-    attributes() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::StorageMessageAttributes& attributes() const override;
 
     /// Return `true` if this iterator is currently at the end of the items'
     /// collection, and hence doesn't reference a valid item.
-    bool atEnd() const BSLS_KEYWORD_OVERRIDE;
+    bool atEnd() const override;
 
     /// Return `true` if this iterator is currently not at the end of the
     /// `items` collection and the message currently pointed at by this
     /// iterator has received replication factor Receipts.
-    bool hasReceipt() const BSLS_KEYWORD_OVERRIDE;
+    bool hasReceipt() const override;
 };
 
 // ============================
@@ -340,13 +337,13 @@ class VirtualStorageIterator : public StorageIterator {
         const VirtualStorage::DataStream::iterator& initialPosition);
 
     /// Destructor
-    ~VirtualStorageIterator() BSLS_KEYWORD_OVERRIDE;
+    ~VirtualStorageIterator() override;
 
     // MANIPULATORS
 
     /// Advance the iterator to the next messages which has the App state as
     /// pending.
-    bool advance() BSLS_KEYWORD_OVERRIDE;
+    bool advance() override;
 };
 
 // ============================================================================

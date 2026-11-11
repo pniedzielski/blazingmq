@@ -76,14 +76,14 @@ class ManualHostHealthMonitor : public bmqpi::HostHealthMonitor {
     ManualHostHealthMonitor(bmqt::HostHealthState::Enum initialState,
                             bslma::Allocator*           allocator = 0);
 
-    ~ManualHostHealthMonitor() BSLS_KEYWORD_OVERRIDE;
+    ~ManualHostHealthMonitor() override;
 
     // MANIPULATORS
 
     /// Registers the specified `cb` to be invoked each time the health of
     /// the host changes.
     bdlmt::SignalerConnection
-    observeHostHealth(const HostHealthChangeFn& cb) BSLS_KEYWORD_OVERRIDE;
+    observeHostHealth(const HostHealthChangeFn& cb) override;
 
     /// Assigns a new state for the host health, and triggers the underlying
     /// `d_signaler` if the state has changed.
@@ -92,7 +92,7 @@ class ManualHostHealthMonitor : public bmqpi::HostHealthMonitor {
     // ACCESSORS
 
     /// Queries the current health of the host.
-    bmqt::HostHealthState::Enum hostState() const BSLS_KEYWORD_OVERRIDE;
+    bmqt::HostHealthState::Enum hostState() const override;
 
     /// Return the number of registered observers to the state change.
     /// Useful for unit-testing HostHealthMonitor-BrokerSession integration.

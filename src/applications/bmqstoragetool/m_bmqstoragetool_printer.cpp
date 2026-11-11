@@ -344,83 +344,75 @@ class HumanReadablePrinter : public Printer {
     // CREATORS
     HumanReadablePrinter(bsl::ostream& os, bslma::Allocator* allocator);
 
-    ~HumanReadablePrinter() BSLS_KEYWORD_OVERRIDE;
+    ~HumanReadablePrinter() override;
 
     // PUBLIC METHODS
 
-    void
-    printMessage(const MessageDetails& details) const BSLS_KEYWORD_OVERRIDE;
+    void printMessage(const MessageDetails& details) const override;
 
-    void printConfirmRecord(const RecordDetails<mqbs::ConfirmRecord>& rec)
-        const BSLS_KEYWORD_OVERRIDE;
+    void printConfirmRecord(
+        const RecordDetails<mqbs::ConfirmRecord>& rec) const override;
 
-    void printDeletionRecord(const RecordDetails<mqbs::DeletionRecord>& rec)
-        const BSLS_KEYWORD_OVERRIDE;
+    void printDeletionRecord(
+        const RecordDetails<mqbs::DeletionRecord>& rec) const override;
 
-    void printQueueOpRecord(const RecordDetails<mqbs::QueueOpRecord>& rec)
-        const BSLS_KEYWORD_OVERRIDE;
+    void printQueueOpRecord(
+        const RecordDetails<mqbs::QueueOpRecord>& rec) const override;
 
-    void printJournalOpRecord(const RecordDetails<mqbs::JournalOpRecord>& rec)
-        const BSLS_KEYWORD_OVERRIDE;
+    void printJournalOpRecord(
+        const RecordDetails<mqbs::JournalOpRecord>& rec) const override;
 
-    void printGuidNotFound(const bmqt::MessageGUID& guid) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printGuidNotFound(const bmqt::MessageGUID& guid) const override;
 
-    void printGuid(const bmqt::MessageGUID& guid) const BSLS_KEYWORD_OVERRIDE;
+    void printGuid(const bmqt::MessageGUID& guid) const override;
 
     void printFooter(bsls::Types::Uint64                   foundMessagesCount,
                      bsls::Types::Uint64                   foundQueueOpCount,
                      bsls::Types::Uint64                   foundJournalOpCount,
                      const Parameters::ProcessRecordTypes& processRecordTypes)
-        const BSLS_KEYWORD_OVERRIDE;
+        const override;
 
-    void printExactMatchFooter(
-        bsls::Types::Uint64                   foundMessagesCount,
-        bsls::Types::Uint64                   foundConfirmCount,
-        bsls::Types::Uint64                   foundDeletionCount,
-        bsls::Types::Uint64                   foundQueueOpCount,
-        bsls::Types::Uint64                   foundJournalOpCount,
-        const Parameters::ProcessRecordTypes& processRecordTypes) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printExactMatchFooter(bsls::Types::Uint64 foundMessagesCount,
+                               bsls::Types::Uint64 foundConfirmCount,
+                               bsls::Types::Uint64 foundDeletionCount,
+                               bsls::Types::Uint64 foundQueueOpCount,
+                               bsls::Types::Uint64 foundJournalOpCount,
+                               const Parameters::ProcessRecordTypes&
+                                   processRecordTypes) const override;
 
     void printOutstandingRatio(int         ratio,
                                bsl::size_t outstandingMessagesCount,
-                               bsl::size_t totalMessagesCount) const
-        BSLS_KEYWORD_OVERRIDE;
+                               bsl::size_t totalMessagesCount) const override;
 
     void printMessageSummary(bsl::size_t totalMessagesCount,
                              bsl::size_t partiallyConfirmedCount,
                              bsl::size_t confirmedCount,
-                             bsl::size_t outstandingCount) const
-        BSLS_KEYWORD_OVERRIDE;
+                             bsl::size_t outstandingCount) const override;
 
-    void printQueueOpSummary(bsls::Types::Uint64     queueOpRecordsCount,
-                             const QueueOpCountsVec& queueOpCountsVec) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printQueueOpSummary(
+        bsls::Types::Uint64     queueOpRecordsCount,
+        const QueueOpCountsVec& queueOpCountsVec) const override;
 
-    void printJournalOpSummary(bsls::Types::Uint64 journalOpRecordsCount) const
-        BSLS_KEYWORD_OVERRIDE;
-
-    void printRecordSummary(bsls::Types::Uint64    totalRecordsCount,
-                            const QueueDetailsMap& queueDetailsMap) const
-        BSLS_KEYWORD_OVERRIDE;
-
-    void printJournalFileMeta(const mqbs::JournalFileIterator* journalFile_p)
-        const BSLS_KEYWORD_OVERRIDE;
-
-    void printDataFileMeta(const mqbs::DataFileIterator* dataFile_p) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printJournalOpSummary(
+        bsls::Types::Uint64 journalOpRecordsCount) const override;
 
     void
-    printGuidsNotFound(const GuidsList& guids) const BSLS_KEYWORD_OVERRIDE;
+    printRecordSummary(bsls::Types::Uint64    totalRecordsCount,
+                       const QueueDetailsMap& queueDetailsMap) const override;
 
-    void printOffsetsNotFound(const OffsetsVec& offsets) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printJournalFileMeta(
+        const mqbs::JournalFileIterator* journalFile_p) const override;
 
-    void printCompositesNotFound(const CompositesVec& seqNums) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    printDataFileMeta(const mqbs::DataFileIterator* dataFile_p) const override;
 
-    bool isPayloadHexMode() const BSLS_KEYWORD_OVERRIDE;
+    void printGuidsNotFound(const GuidsList& guids) const override;
+
+    void printOffsetsNotFound(const OffsetsVec& offsets) const override;
+
+    void printCompositesNotFound(const CompositesVec& seqNums) const override;
+
+    bool isPayloadHexMode() const override;
 };
 
 // CREATORS
@@ -708,59 +700,52 @@ class JsonPrinter : public Printer {
     // CREATORS
     JsonPrinter(bsl::ostream& os, bslma::Allocator* allocator);
 
-    ~JsonPrinter() BSLS_KEYWORD_OVERRIDE;
+    ~JsonPrinter() override;
 
     // PUBLIC METHODS
 
-    void printGuid(const bmqt::MessageGUID& guid) const BSLS_KEYWORD_OVERRIDE;
+    void printGuid(const bmqt::MessageGUID& guid) const override;
 
-    void printGuidNotFound(const bmqt::MessageGUID& guid) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printGuidNotFound(const bmqt::MessageGUID& guid) const override;
 
     void printFooter(bsls::Types::Uint64                   foundMessagesCount,
                      bsls::Types::Uint64                   foundQueueOpCount,
                      bsls::Types::Uint64                   foundJournalOpCount,
                      const Parameters::ProcessRecordTypes& processRecordTypes)
-        const BSLS_KEYWORD_OVERRIDE;
+        const override;
 
-    void printExactMatchFooter(
-        bsls::Types::Uint64                   foundMessagesCount,
-        bsls::Types::Uint64                   foundConfirmCount,
-        bsls::Types::Uint64                   foundDeletionCount,
-        bsls::Types::Uint64                   foundQueueOpCount,
-        bsls::Types::Uint64                   foundJournalOpCount,
-        const Parameters::ProcessRecordTypes& processRecordTypes) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printExactMatchFooter(bsls::Types::Uint64 foundMessagesCount,
+                               bsls::Types::Uint64 foundConfirmCount,
+                               bsls::Types::Uint64 foundDeletionCount,
+                               bsls::Types::Uint64 foundQueueOpCount,
+                               bsls::Types::Uint64 foundJournalOpCount,
+                               const Parameters::ProcessRecordTypes&
+                                   processRecordTypes) const override;
 
-    void
-    printOutstandingRatio(int               ratio,
-                          bsl::size_t       outstandingMessagesCount,
-                          BSLA_MAYBE_UNUSED bsl::size_t totalMessagesCount)
-        const BSLS_KEYWORD_OVERRIDE;
+    void printOutstandingRatio(
+        int               ratio,
+        bsl::size_t       outstandingMessagesCount,
+        BSLA_MAYBE_UNUSED bsl::size_t totalMessagesCount) const override;
 
     void printMessageSummary(bsl::size_t totalMessagesCount,
                              bsl::size_t partiallyConfirmedCount,
                              bsl::size_t confirmedCount,
-                             bsl::size_t outstandingCount) const
-        BSLS_KEYWORD_OVERRIDE;
+                             bsl::size_t outstandingCount) const override;
 
-    void printQueueOpSummary(bsls::Types::Uint64     queueOpRecordsCount,
-                             const QueueOpCountsVec& queueOpCountsVec) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printQueueOpSummary(
+        bsls::Types::Uint64     queueOpRecordsCount,
+        const QueueOpCountsVec& queueOpCountsVec) const override;
 
-    void printJournalOpSummary(bsls::Types::Uint64 journalOpRecordsCount) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printJournalOpSummary(
+        bsls::Types::Uint64 journalOpRecordsCount) const override;
 
-    void
-    printGuidsNotFound(const GuidsList& guids) const BSLS_KEYWORD_OVERRIDE;
+    void printGuidsNotFound(const GuidsList& guids) const override;
 
-    void printOffsetsNotFound(const OffsetsVec& offsets) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printOffsetsNotFound(const OffsetsVec& offsets) const override;
 
-    void printCompositesNotFound(const CompositesVec& seqNums) const
-        BSLS_KEYWORD_OVERRIDE;
+    void printCompositesNotFound(const CompositesVec& seqNums) const override;
 
-    bool isPayloadHexMode() const BSLS_KEYWORD_OVERRIDE;
+    bool isPayloadHexMode() const override;
 };
 
 // PROTECTED METHODS
@@ -985,34 +970,33 @@ class JsonPrettyPrinter : public JsonPrinter {
     // CREATORS
     JsonPrettyPrinter(bsl::ostream& os, bslma::Allocator* allocator);
 
-    ~JsonPrettyPrinter() BSLS_KEYWORD_OVERRIDE;
+    ~JsonPrettyPrinter() override;
 
     // PUBLIC METHODS
 
+    void printMessage(const MessageDetails& details) const override;
+
+    void printConfirmRecord(
+        const RecordDetails<mqbs::ConfirmRecord>& rec) const override;
+
+    void printDeletionRecord(
+        const RecordDetails<mqbs::DeletionRecord>& rec) const override;
+
+    void printQueueOpRecord(
+        const RecordDetails<mqbs::QueueOpRecord>& rec) const override;
+
+    void printJournalOpRecord(
+        const RecordDetails<mqbs::JournalOpRecord>& rec) const override;
+
+    void printJournalFileMeta(
+        const mqbs::JournalFileIterator* journalFile_p) const override;
+
     void
-    printMessage(const MessageDetails& details) const BSLS_KEYWORD_OVERRIDE;
+    printDataFileMeta(const mqbs::DataFileIterator* dataFile_p) const override;
 
-    void printConfirmRecord(const RecordDetails<mqbs::ConfirmRecord>& rec)
-        const BSLS_KEYWORD_OVERRIDE;
-
-    void printDeletionRecord(const RecordDetails<mqbs::DeletionRecord>& rec)
-        const BSLS_KEYWORD_OVERRIDE;
-
-    void printQueueOpRecord(const RecordDetails<mqbs::QueueOpRecord>& rec)
-        const BSLS_KEYWORD_OVERRIDE;
-
-    void printJournalOpRecord(const RecordDetails<mqbs::JournalOpRecord>& rec)
-        const BSLS_KEYWORD_OVERRIDE;
-
-    void printJournalFileMeta(const mqbs::JournalFileIterator* journalFile_p)
-        const BSLS_KEYWORD_OVERRIDE;
-
-    void printDataFileMeta(const mqbs::DataFileIterator* dataFile_p) const
-        BSLS_KEYWORD_OVERRIDE;
-
-    void printRecordSummary(bsls::Types::Uint64    totalRecordsCount,
-                            const QueueDetailsMap& queueDetailsMap) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    printRecordSummary(bsls::Types::Uint64    totalRecordsCount,
+                       const QueueDetailsMap& queueDetailsMap) const override;
 };
 
 // CREATORS
@@ -1125,34 +1109,33 @@ class JsonLinePrinter : public JsonPrinter {
     // CREATORS
     JsonLinePrinter(bsl::ostream& os, bslma::Allocator* allocator);
 
-    ~JsonLinePrinter() BSLS_KEYWORD_OVERRIDE;
+    ~JsonLinePrinter() override;
 
     // PUBLIC METHODS
 
+    void printMessage(const MessageDetails& details) const override;
+
+    void printConfirmRecord(
+        const RecordDetails<mqbs::ConfirmRecord>& rec) const override;
+
+    void printDeletionRecord(
+        const RecordDetails<mqbs::DeletionRecord>& rec) const override;
+
+    void printQueueOpRecord(
+        const RecordDetails<mqbs::QueueOpRecord>& rec) const override;
+
+    void printJournalOpRecord(
+        const RecordDetails<mqbs::JournalOpRecord>& rec) const override;
+
+    void printJournalFileMeta(
+        const mqbs::JournalFileIterator* journalFile_p) const override;
+
     void
-    printMessage(const MessageDetails& details) const BSLS_KEYWORD_OVERRIDE;
+    printDataFileMeta(const mqbs::DataFileIterator* dataFile_p) const override;
 
-    void printConfirmRecord(const RecordDetails<mqbs::ConfirmRecord>& rec)
-        const BSLS_KEYWORD_OVERRIDE;
-
-    void printDeletionRecord(const RecordDetails<mqbs::DeletionRecord>& rec)
-        const BSLS_KEYWORD_OVERRIDE;
-
-    void printQueueOpRecord(const RecordDetails<mqbs::QueueOpRecord>& rec)
-        const BSLS_KEYWORD_OVERRIDE;
-
-    void printJournalOpRecord(const RecordDetails<mqbs::JournalOpRecord>& rec)
-        const BSLS_KEYWORD_OVERRIDE;
-
-    void printJournalFileMeta(const mqbs::JournalFileIterator* journalFile_p)
-        const BSLS_KEYWORD_OVERRIDE;
-
-    void printDataFileMeta(const mqbs::DataFileIterator* dataFile_p) const
-        BSLS_KEYWORD_OVERRIDE;
-
-    void printRecordSummary(bsls::Types::Uint64    totalRecordsCount,
-                            const QueueDetailsMap& queueDetailsMap) const
-        BSLS_KEYWORD_OVERRIDE;
+    void
+    printRecordSummary(bsls::Types::Uint64    totalRecordsCount,
+                       const QueueDetailsMap& queueDetailsMap) const override;
 };
 
 // CREATORS

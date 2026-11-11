@@ -120,7 +120,7 @@ class StatConsumerPluginFactory : public PluginFactory {
     // CREATORS
     StatConsumerPluginFactory();
 
-    ~StatConsumerPluginFactory() BSLS_KEYWORD_OVERRIDE;
+    ~StatConsumerPluginFactory() override;
 
     // MANIPULATORS
     virtual bslma::ManagedPtr<StatConsumer>

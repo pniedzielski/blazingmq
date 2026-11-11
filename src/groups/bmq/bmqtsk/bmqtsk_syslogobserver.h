@@ -131,7 +131,7 @@ class SyslogObserver : public ball::ObserverAdapter {
     explicit SyslogObserver(bslma::Allocator* allocator);
 
     /// Destroy this object.
-    ~SyslogObserver() BSLS_KEYWORD_OVERRIDE;
+    ~SyslogObserver() override;
 
     // MANIPULATORS
 
@@ -164,12 +164,12 @@ class SyslogObserver : public ball::ObserverAdapter {
     /// printed to stdout according to the configured `format`, in the color
     /// associated to its corresponding category, if any
     void publish(const ball::Record&  record,
-                 const ball::Context& context) BSLS_KEYWORD_OVERRIDE;
+                 const ball::Context& context) override;
 
     /// Note: this member is overridden to get rid of the "hides the virtual
     ///       function" warning.
     inline void publish(const bsl::shared_ptr<const ball::Record>& record,
-                        const ball::Context& context) BSLS_KEYWORD_OVERRIDE
+                        const ball::Context& context) override
     {
         publish(*record, context);
     }

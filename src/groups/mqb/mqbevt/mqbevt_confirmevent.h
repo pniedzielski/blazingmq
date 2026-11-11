@@ -85,7 +85,7 @@ class ConfirmEvent : public mqbi::DispatcherEvent {
     explicit ConfirmEvent(bslma::Allocator* allocator);
 
     /// Destructor.
-    ~ConfirmEvent() BSLS_KEYWORD_OVERRIDE;
+    ~ConfirmEvent() override;
 
     // MANIPULATORS
 
@@ -106,7 +106,7 @@ class ConfirmEvent : public mqbi::DispatcherEvent {
     ConfirmEvent& setSource(mqbi::DispatcherClient* value);
 
     /// Reset all members of this event to default values.
-    void reset() BSLS_KEYWORD_OVERRIDE;
+    void reset() override;
 
     // ACCESSORS
 
@@ -125,12 +125,12 @@ class ConfirmEvent : public mqbi::DispatcherEvent {
     const bmqp::ConfirmMessage& confirmMessage() const;
 
     /// Return the type of this event.
-    mqbi::DispatcherEventType::Enum type() const BSLS_KEYWORD_OVERRIDE;
+    mqbi::DispatcherEventType::Enum type() const override;
 
     /// Format this object to the specified output `stream`.
     bsl::ostream& print(bsl::ostream& stream,
-                        int           level = 0,
-                        int spacesPerLevel  = 4) const BSLS_KEYWORD_OVERRIDE;
+                        int           level          = 0,
+                        int           spacesPerLevel = 4) const override;
 };
 
 // ============================================================================

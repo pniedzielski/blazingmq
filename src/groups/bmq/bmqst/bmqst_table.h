@@ -224,17 +224,17 @@ class Table : public bmqst::BaseTable {
     // ACCESSORS
 
     /// Return the number of columns.
-    int numColumns() const BSLS_KEYWORD_OVERRIDE;
+    int numColumns() const override;
 
     /// Return the number of rows.
-    int numRows() const BSLS_KEYWORD_OVERRIDE;
+    int numRows() const override;
 
     /// Return the name of the specified `column` index.
-    bslstl::StringRef columnName(int column) const BSLS_KEYWORD_OVERRIDE;
+    bslstl::StringRef columnName(int column) const override;
 
     /// Load the specified `value` with the value located at the specified
     /// `row` and `column` indices.
-    void value(Value* value, int row, int column) const BSLS_KEYWORD_OVERRIDE;
+    void value(Value* value, int row, int column) const override;
 };
 
 }  // close package namespace

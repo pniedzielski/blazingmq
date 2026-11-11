@@ -113,7 +113,7 @@ class MemOutStream : private virtual MemOutStream_BufferHolder,
 
     /// Destroy this object.  Note that this member is defined (even though
     /// it is empty) and defined out of line for several good reasons.
-    ~MemOutStream() BSLS_KEYWORD_OVERRIDE;
+    ~MemOutStream() override;
 
     // MANIPULATORS
 

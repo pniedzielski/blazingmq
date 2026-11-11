@@ -50,7 +50,7 @@ class BaseTest : public ::testing::Test {
     {
     }
 
-    ~BaseTest() BSLS_KEYWORD_OVERRIDE { EXPECT_TRUE(d_tam.isInUseSame()); }
+    ~BaseTest() override { EXPECT_TRUE(d_tam.isInUseSame()); }
 };
 
 template <typename T>
@@ -73,7 +73,7 @@ int simpleDecode(T*                      obj,
 
 class TestPolicy_UriResource : public BaseTest {
   protected:
-    ~TestPolicy_UriResource() BSLS_KEYWORD_OVERRIDE;
+    ~TestPolicy_UriResource() override;
 
     struct TestCase {
         bsl::string_view d_uri;
@@ -184,7 +184,7 @@ TEST_F(TestPolicy_UriResource, queuePatternMatchesQueue)
 
 class TestPolicy_Permission : public BaseTest {
   protected:
-    ~TestPolicy_Permission() BSLS_KEYWORD_OVERRIDE;
+    ~TestPolicy_Permission() override;
 
     bsl::allocator<> get_allocator() const
     {
@@ -728,7 +728,7 @@ TEST_F(TestPolicy_Permission, invalidActionNameFails)
 
 class TestPolicy : public BaseTest {
   protected:
-    ~TestPolicy() BSLS_KEYWORD_OVERRIDE;
+    ~TestPolicy() override;
 
     bsl::allocator<> get_allocator() const
     {

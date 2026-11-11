@@ -90,7 +90,7 @@ class AckEvent : public mqbi::DispatcherEvent {
     explicit AckEvent(bslma::Allocator* allocator);
 
     /// Destructor.
-    ~AckEvent() BSLS_KEYWORD_OVERRIDE;
+    ~AckEvent() override;
 
     // MANIPULATORS
 
@@ -119,7 +119,7 @@ class AckEvent : public mqbi::DispatcherEvent {
     AckEvent& setSource(mqbi::DispatcherClient* value);
 
     /// Reset all members of this event to default values.
-    void reset() BSLS_KEYWORD_OVERRIDE;
+    void reset() override;
 
     // ACCESSORS
 
@@ -145,12 +145,12 @@ class AckEvent : public mqbi::DispatcherEvent {
     bool isRelay() const;
 
     /// Return the type of this event.
-    mqbi::DispatcherEventType::Enum type() const BSLS_KEYWORD_OVERRIDE;
+    mqbi::DispatcherEventType::Enum type() const override;
 
     /// Format this object to the specified output `stream`.
     bsl::ostream& print(bsl::ostream& stream,
-                        int           level = 0,
-                        int spacesPerLevel  = 4) const BSLS_KEYWORD_OVERRIDE;
+                        int           level          = 0,
+                        int           spacesPerLevel = 4) const override;
 };
 
 // ============================================================================

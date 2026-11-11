@@ -322,12 +322,11 @@ class TestQueueHandle : public mqbmock::QueueHandle {
                                  clientContext,
                     unsigned int upstreamSubQueueId = 1);
 
-    ~TestQueueHandle() BSLS_KEYWORD_OVERRIDE;
+    ~TestQueueHandle() override;
 
     void postOneMessage(mqbblp::RemoteQueue* queue_p);
 
-    void
-    onAckMessage(const bmqp::AckMessage& ackMessage) BSLS_KEYWORD_OVERRIDE;
+    void onAckMessage(const bmqp::AckMessage& ackMessage) override;
 
     size_t nextPostSequenceNumber();
     size_t nextAckSequenceNumber();

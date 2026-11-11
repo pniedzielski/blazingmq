@@ -170,7 +170,7 @@ struct EventHandler : public bmqa::SessionEventHandler {
         // NOTHING
     }
 
-    ~EventHandler() BSLS_KEYWORD_OVERRIDE
+    ~EventHandler() override
     {
         size_t unpoppedEvents = d_receivedMessageEvents.size() +
                                 d_receivedSessionEvents.size() +
@@ -196,12 +196,12 @@ struct EventHandler : public bmqa::SessionEventHandler {
     }
 
     // MANIPULATORS
-    void onSessionEvent(const bmqa::SessionEvent& event) BSLS_KEYWORD_OVERRIDE
+    void onSessionEvent(const bmqa::SessionEvent& event) override
     {
         d_receivedSessionEvents.push_back(event);
     }
 
-    void onMessageEvent(const bmqa::MessageEvent& event) BSLS_KEYWORD_OVERRIDE
+    void onMessageEvent(const bmqa::MessageEvent& event) override
     {
         d_receivedMessageEvents.push_back(event);
     }

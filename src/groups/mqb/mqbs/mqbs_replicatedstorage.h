@@ -58,7 +58,7 @@ class ReplicatedStorage : public mqbi::Storage {
     // CREATORS
 
     /// Destructor
-    ~ReplicatedStorage() BSLS_KEYWORD_OVERRIDE;
+    ~ReplicatedStorage() override;
 
     // MANIPULATORS
 

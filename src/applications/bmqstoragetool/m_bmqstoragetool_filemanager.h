@@ -163,15 +163,13 @@ class FileManagerImpl : public FileManager {
                              bslma::Allocator*  allocator = 0);
 
     // MANIPULATORS
-    mqbs::JournalFileIterator* journalFileIterator() BSLS_KEYWORD_OVERRIDE;
-    mqbs::DataFileIterator*    dataFileIterator() BSLS_KEYWORD_OVERRIDE;
-    mqbc::IncoreClusterStateLedgerIterator*
-    cslFileIterator() BSLS_KEYWORD_OVERRIDE;
+    mqbs::JournalFileIterator*              journalFileIterator() override;
+    mqbs::DataFileIterator*                 dataFileIterator() override;
+    mqbc::IncoreClusterStateLedgerIterator* cslFileIterator() override;
 
     // ACCESSORS
     /// Fill the specified `queueMap_p` with key/uri mapping from CSL file.
-    void
-    fillQueueMapFromCslFile(QueueMap* queueMap_p) const BSLS_KEYWORD_OVERRIDE;
+    void fillQueueMapFromCslFile(QueueMap* queueMap_p) const override;
 };
 
 // ============================================================================

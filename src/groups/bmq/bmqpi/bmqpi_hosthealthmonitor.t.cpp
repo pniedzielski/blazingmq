@@ -34,12 +34,12 @@ using namespace BloombergLP;
 struct HostHealthMonitorTestImp
 : public bsls::ProtocolTestImp<bmqpi::HostHealthMonitor> {
     bdlmt::SignalerConnection
-    observeHostHealth(const HostHealthChangeFn&) BSLS_KEYWORD_OVERRIDE
+    observeHostHealth(const HostHealthChangeFn&) override
     {
         return markDone();
     }
 
-    bmqt::HostHealthState::Enum hostState() const BSLS_KEYWORD_OVERRIDE;
+    bmqt::HostHealthState::Enum hostState() const override;
 };
 
 // Define one of HostHealthMonitorTestImp methods out-of-line, to instruct the

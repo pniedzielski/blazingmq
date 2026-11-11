@@ -680,7 +680,7 @@
 
 #define BMQTST_TEST_F(FIXTURE, NAME)                                          \
     struct FIXTURE##NAME : FIXTURE {                                          \
-        void body() BSLS_KEYWORD_OVERRIDE;                                    \
+        void body() override;                                                 \
                                                                               \
         static void run()                                                     \
         {                                                                     \
@@ -700,7 +700,7 @@
 
 #define BMQTST_TEST(NAME)                                                     \
     struct Test##NAME : ::BloombergLP::bmqtst::Test {                         \
-        void body() BSLS_KEYWORD_OVERRIDE;                                    \
+        void body() override;                                                 \
                                                                               \
         static void run()                                                     \
         {                                                                     \

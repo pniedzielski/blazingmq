@@ -125,8 +125,8 @@ struct VirtualIterator : mqbblp::QueueEngineUtil_AppState::VirtualIterator {
         // PRECONDITIONS
         BSLS_ASSERT_SAFE(d_start_p);
     }
-    ~VirtualIterator() BSLS_KEYWORD_OVERRIDE;
-    const mqbi::StorageIterator* next() BSLS_KEYWORD_OVERRIDE;
+    ~VirtualIterator() override;
+    const mqbi::StorageIterator* next() override;
 };
 
 const mqbi::StorageIterator* VirtualIterator::next()

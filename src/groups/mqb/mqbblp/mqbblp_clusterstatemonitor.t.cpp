@@ -94,26 +94,22 @@ struct NotificationEvaluator : public mqbc::ClusterStateObserver {
         // NOTHING
     }
 
-    void onPartitionOrphanThreshold(size_t partitionId) BSLS_KEYWORD_OVERRIDE
+    void onPartitionOrphanThreshold(size_t partitionId) override
     {
         d_partitionOrphanThresholds.push_back(partitionId);
     }
 
-    void
-    onNodeUnavailableThreshold(mqbnet::ClusterNode* node) BSLS_KEYWORD_OVERRIDE
+    void onNodeUnavailableThreshold(mqbnet::ClusterNode* node) override
     {
         d_nodeUnavailableThresholds.push_back(node);
     }
 
-    void onLeaderPassiveThreshold() BSLS_KEYWORD_OVERRIDE
+    void onLeaderPassiveThreshold() override
     {
         ++d_numLeaderPassiveThresholds;
     }
 
-    void onFailoverThreshold() BSLS_KEYWORD_OVERRIDE
-    {
-        ++d_numFailoverThresholds;
-    }
+    void onFailoverThreshold() override { ++d_numFailoverThresholds; }
 };
 
 struct TestHelper {

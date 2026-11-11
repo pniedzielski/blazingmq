@@ -1221,7 +1221,7 @@ class MockSession : public AbstractSession {
         bslma::Allocator*           allocator = 0);
 
     /// Stop the `MockSession` and destroy this object.
-    ~MockSession() BSLS_KEYWORD_OVERRIDE;
+    ~MockSession() override;
 
     // MANIPULATORS
     //   (specific to 'bmqa::MockSession')
@@ -1320,65 +1320,61 @@ class MockSession : public AbstractSession {
 
     // MANIPULATORS
     //   (virtual bmqa::AbstractSession)
-    int start(const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    int
+    start(const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     /// Start the `MockSession` with an optionally specified `timeout`.  The
     /// return values are elucidated in `bmqt::GenericResult`.  In general a
     /// call to `start` or `startAsync` emits a `SessionEvent` of type
     /// `e_CONNECTED` or `e_CONNECTION_TIMEOUT`.
-    int startAsync(const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    int startAsync(
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 
     /// Stop the `MockSession`.  In general a call to `start` or
     /// `startAsync` emits a `SessionEvent` of type `e_DISCONNECTED` or
     /// `e_CONNECTION_TIMEOUT`.
-    void stopAsync() BSLS_KEYWORD_OVERRIDE;
+    void stopAsync() override;
 
     /// This method is only to be used if the session is in synchronous mode
     /// (i.e., not using the EventHandler): it must be called once all
     /// threads getting events with `nextEvent()` have been joined.
-    void finalizeStop() BSLS_KEYWORD_OVERRIDE;
+    void finalizeStop() override;
 
     /// Load the `MessageEventBuilder` into the specified `builder` output
     /// parameter.
-    void loadMessageEventBuilder(MessageEventBuilder* builder)
-        BSLS_KEYWORD_OVERRIDE;
+    void loadMessageEventBuilder(MessageEventBuilder* builder) override;
 
     /// Load the `ConfirmEventBuilder` into the specified `builder` output
     /// parameter.
-    void loadConfirmEventBuilder(ConfirmEventBuilder* builder)
-        BSLS_KEYWORD_OVERRIDE;
+    void loadConfirmEventBuilder(ConfirmEventBuilder* builder) override;
 
     /// Load the `MessageProperties` into the specified `buffer` output
     /// parameter.
-    void
-    loadMessageProperties(MessageProperties* buffer) BSLS_KEYWORD_OVERRIDE;
+    void loadMessageProperties(MessageProperties* buffer) override;
 
     /// Queue management
     ///----------------
 
     /// Load `QueueId` object associated with the specified `uri` into the
     /// specified `queueId` output parameter.
-    int getQueueId(QueueId*         queueId,
-                   const bmqt::Uri& uri) BSLS_KEYWORD_OVERRIDE;
+    int getQueueId(QueueId* queueId, const bmqt::Uri& uri) override;
 
     /// Load `QueueId` object associated with the specified `correlationId`
     /// into the specified `queueId` output parameter.
-    int getQueueId(QueueId* queueId, const bmqt::CorrelationId& correlationId)
-        BSLS_KEYWORD_OVERRIDE;
+    int getQueueId(QueueId*                   queueId,
+                   const bmqt::CorrelationId& correlationId) override;
 
     /// DEPRECATED: Use the `openQueueSync(QueueId *queueId...)` instead.
     ///             This method will be marked as `BSLA_DEPRECATED` in future
     ///             release of libbmq.
-    int openQueue(QueueId*                  queueId,
-                  const bmqt::Uri&          uri,
-                  bsls::Types::Uint64       flags,
-                  const bmqt::QueueOptions& options = bmqt::QueueOptions(),
-                  const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    int openQueue(
+        QueueId*                  queueId,
+        const bmqt::Uri&          uri,
+        bsls::Types::Uint64       flags,
+        const bmqt::QueueOptions& options = bmqt::QueueOptions(),
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     /// Open the queue having the specified `uri` with the specified `flags`
     /// (a combination of the values defined in `bmqt::QueueFlags::Enum`),
@@ -1388,24 +1384,22 @@ class MockSession : public AbstractSession {
     /// Return a result providing the status and context of the operation.
     /// Use the optionally specified `options` to configure some advanced
     /// settings.  In general, a call to `openQueueSync` emits nothing.
-    OpenQueueStatus
-    openQueueSync(QueueId*                  queueId,
-                  const bmqt::Uri&          uri,
-                  bsls::Types::Uint64       flags,
-                  const bmqt::QueueOptions& options = bmqt::QueueOptions(),
-                  const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    OpenQueueStatus openQueueSync(
+        QueueId*                  queueId,
+        const bmqt::Uri&          uri,
+        bsls::Types::Uint64       flags,
+        const bmqt::QueueOptions& options = bmqt::QueueOptions(),
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     /// DEPRECATED: Use the `openQueueAsync(...)` with callback flavor
     ///             instead.  This method will be marked as `BSLA_DEPRECATED`
     ///             in future release of libbmq.
-    int
-    openQueueAsync(QueueId*                  queueId,
-                   const bmqt::Uri&          uri,
-                   bsls::Types::Uint64       flags,
-                   const bmqt::QueueOptions& options = bmqt::QueueOptions(),
-                   const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    int openQueueAsync(
+        QueueId*                  queueId,
+        const bmqt::Uri&          uri,
+        bsls::Types::Uint64       flags,
+        const bmqt::QueueOptions& options = bmqt::QueueOptions(),
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     /// Asynchronously open the queue having the specified `uri` with the
     /// specified `flags` (a combination of the values defined in
@@ -1423,32 +1417,30 @@ class MockSession : public AbstractSession {
     /// NOTE: `openQueueAsync` updates the queue state to `e_OPENING` which
     ///       is further updated upon invocation of the `callback` (if
     ///       provided) with a successful `bmqa::OpenQueueStatus`.
-    void
-    openQueueAsync(QueueId*                  queueId,
-                   const bmqt::Uri&          uri,
-                   bsls::Types::Uint64       flags,
-                   const OpenQueueCallback&  callback,
-                   const bmqt::QueueOptions& options = bmqt::QueueOptions(),
-                   const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    void openQueueAsync(
+        QueueId*                  queueId,
+        const bmqt::Uri&          uri,
+        bsls::Types::Uint64       flags,
+        const OpenQueueCallback&  callback,
+        const bmqt::QueueOptions& options = bmqt::QueueOptions(),
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     /// DEPRECATED: Use the `configureQueueSync(QueueId *queueId...)` instead.
     ///             This method will be marked as `BSLA_DEPRECATED` in future
     ///             release of libbmq.
-    int
-    configureQueue(QueueId*                  queueId,
-                   const bmqt::QueueOptions& options = bmqt::QueueOptions(),
-                   const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    int configureQueue(
+        QueueId*                  queueId,
+        const bmqt::QueueOptions& options = bmqt::QueueOptions(),
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     /// Configure the queue identified by the specified `queueId` using the
     /// specified `options` to configure some advanced settings and return a
     /// result providing the status and context of the operation.  In
     /// general, a call to `configureQueueSync` emits nothing.
-    ConfigureQueueStatus configureQueueSync(QueueId*                  queueId,
-                                            const bmqt::QueueOptions& options,
-                                            const bsls::TimeInterval& timeout)
-        BSLS_KEYWORD_OVERRIDE;
+    ConfigureQueueStatus
+    configureQueueSync(QueueId*                  queueId,
+                       const bmqt::QueueOptions& options,
+                       const bsls::TimeInterval& timeout) override;
 
     /// DEPRECATED: Use the `configureQueueAsync(...)` with callback flavor
     ///             instead.  This method will be marked as `BSLA_DEPRECATED`
@@ -1456,8 +1448,7 @@ class MockSession : public AbstractSession {
     int configureQueueAsync(
         QueueId*                  queueId,
         const bmqt::QueueOptions& options = bmqt::QueueOptions(),
-        const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     /// Asynchronously configure the queue identified by the specified
     /// `queueId` using the specified `options` to configure some advanced
@@ -1467,35 +1458,34 @@ class MockSession : public AbstractSession {
     /// call to `configureQueueAsync` does not emit a `SessionEvent`, but
     /// rather invokes the `callback` (if provided) instead when the
     /// corresponding `emitEvent` is called.
-    void configureQueueAsync(QueueId*                      queueId,
-                             const bmqt::QueueOptions&     options,
-                             const ConfigureQueueCallback& callback,
-                             const bsls::TimeInterval&     timeout =
-                                 bsls::TimeInterval()) BSLS_KEYWORD_OVERRIDE;
+    void configureQueueAsync(
+        QueueId*                      queueId,
+        const bmqt::QueueOptions&     options,
+        const ConfigureQueueCallback& callback,
+        const bsls::TimeInterval&     timeout = bsls::TimeInterval()) override;
 
     /// DEPRECATED: Use the `closeQueueSync(QueueId *queueId...)` instead.
     ///             This method will be marked as `BSLA_DEPRECATED` in future
     ///             release of libbmq.
-    int closeQueue(QueueId*                  queueId,
-                   const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    int closeQueue(
+        QueueId*                  queueId,
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     /// Close the queue identified by the specified `queueId` using the
     /// specified `timeout`.  Populate the optionally specified `result`
     /// with the status and context of the operation and return a value
     /// providing the status of the operation.  In general, a call to
     /// `closeQueueSync` emits nothing.
-    CloseQueueStatus
-    closeQueueSync(QueueId*                  queueId,
-                   const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    CloseQueueStatus closeQueueSync(
+        QueueId*                  queueId,
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     /// DEPRECATED: Use the `closeQueueAsync(...)` with callback flavor
     ///             instead.  This method will be marked as `BSLA_DEPRECATED`
     ///             in future release of libbmq.
-    int closeQueueAsync(QueueId*                  queueId,
-                        const bsls::TimeInterval& timeout =
-                            bsls::TimeInterval()) BSLS_KEYWORD_OVERRIDE;
+    int closeQueueAsync(
+        QueueId*                  queueId,
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     /// Asynchronously close the queue identified by the specified `queueId`
     /// using the specified `timeout`.  The result of the operation is
@@ -1504,10 +1494,10 @@ class MockSession : public AbstractSession {
     /// requested operation.  In general, a call to `closeQueueAsync` does
     /// not emit a `SessionEvent`, but rather invokes the `callback` (if
     /// provided) instead when the corresponding `emitEvent` is called.
-    void closeQueueAsync(QueueId*                  queueId,
-                         const CloseQueueCallback& callback,
-                         const bsls::TimeInterval& timeout =
-                             bsls::TimeInterval()) BSLS_KEYWORD_OVERRIDE;
+    void closeQueueAsync(
+        QueueId*                  queueId,
+        const CloseQueueCallback& callback,
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     /// Returns the nextEvent emitted.
     ///
@@ -1515,26 +1505,24 @@ class MockSession : public AbstractSession {
     ///       been created in synchronous mode.  It is invalid if used in
     ///       asynchronous mode and your test case is likely to be faulty
     ///       if used with such a set up.
-    Event nextEvent(const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE;
+    Event nextEvent(
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override;
 
     /// Post the specified `messageEvent`.  Return values are defined as per
     /// `bmqt::PostResult`.  In general a call to `post` emits a
     /// `MessageEvent` of type `e_ACK` or no response if acks are not
     /// requested.
-    int post(const MessageEvent& messageEvent) BSLS_KEYWORD_OVERRIDE;
+    int post(const MessageEvent& messageEvent) override;
 
-    int confirmMessage(const Message& message) BSLS_KEYWORD_OVERRIDE;
-    int confirmMessage(const MessageConfirmationCookie& cookie)
-        BSLS_KEYWORD_OVERRIDE;
+    int confirmMessage(const Message& message) override;
+    int confirmMessage(const MessageConfirmationCookie& cookie) override;
 
     /// Confirm messages specified by the `message`, `cookie` or `builder`.
     /// Return values are defined as per `bmqt::GenericResult`.  No event is
     /// emitted for calls to `confirmMessage`.
-    int confirmMessages(ConfirmEventBuilder* builder) BSLS_KEYWORD_OVERRIDE;
+    int confirmMessages(ConfirmEventBuilder* builder) override;
 
-    int configureMessageDumping(const bslstl::StringRef& command)
-        BSLS_KEYWORD_OVERRIDE;
+    int configureMessageDumping(const bslstl::StringRef& command) override;
     // NOT IMPLEMENTED
 
     /// Set the failure callback of to be the specified `failureCb`.  This

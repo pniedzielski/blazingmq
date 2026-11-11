@@ -601,7 +601,7 @@ class ClientSession : public mqbnet::Session,
                   bslma::Allocator*                              allocator);
 
     /// Destructor
-    ~ClientSession() BSLS_KEYWORD_OVERRIDE;
+    ~ClientSession() override;
 
     // MANIPULATORS
     //   (virtual: mqbnet::Session)
@@ -611,7 +611,7 @@ class ClientSession : public mqbnet::Session,
     /// incoming events coming from the remote peer.  If the specified `event`
     /// is an `AuthenticationEvent`, it is dropped and an error is logged.
     void processEvent(const bmqp::Event&   event,
-                      mqbnet::ClusterNode* source = 0) BSLS_KEYWORD_OVERRIDE;
+                      mqbnet::ClusterNode* source = 0) override;
 
     /// Method invoked when the channel associated with the session is going
     /// down.  The session object will be destroyed once the specified
@@ -623,14 +623,14 @@ class ClientSession : public mqbnet::Session,
     /// destruction of the session object until the shutdown sequence
     /// completes.
     void tearDown(const bsl::shared_ptr<void>& session,
-                  bool isBrokerShutdown) BSLS_KEYWORD_OVERRIDE;
+                  bool                         isBrokerShutdown) override;
 
     /// Initiate the shutdown of the session and invoke the specified
     /// `callback` upon completion of (asynchronous) shutdown sequence.
-    void initiateShutdown(const ShutdownCb& callback) BSLS_KEYWORD_OVERRIDE;
+    void initiateShutdown(const ShutdownCb& callback) override;
 
     /// Make the session abandon any work it has.
-    void invalidate() BSLS_KEYWORD_OVERRIDE;
+    void invalidate() override;
 
     // MANIPULATORS
     void onWatermark(bmqio::ChannelWatermarkType::Enum type);
@@ -648,51 +648,49 @@ class ClientSession : public mqbnet::Session,
     /// Process the specified `event` routed by the dispatcher to this
     /// instance.  Dispatcher guarantees that all events to this instance
     /// are dispatched in a single thread.
-    void onDispatcherEvent(const mqbi::DispatcherEvent& event)
-        BSLS_KEYWORD_OVERRIDE;
+    void onDispatcherEvent(const mqbi::DispatcherEvent& event) override;
 
     /// Called by the dispatcher to flush any pending operation.. mainly
     /// used to provide batch and nagling mechanism.
-    void flush() BSLS_KEYWORD_OVERRIDE;
+    void flush() override;
 
     // MANIPULATORS
     //  (virtual: mqbnet::Session)
 
     /// Return the channel associated to this session.
-    bsl::shared_ptr<bmqio::Channel> channel() const BSLS_KEYWORD_OVERRIDE;
+    bsl::shared_ptr<bmqio::Channel> channel() const override;
 
     /// Return the clusterNode associated to this session, or 0 if there are
     /// none.
-    mqbnet::ClusterNode* clusterNode() const BSLS_KEYWORD_OVERRIDE;
+    mqbnet::ClusterNode* clusterNode() const override;
 
     // ACCESSORS
     //   (virtual: mqbnet::Session)
     const bmqp_ctrlmsg::NegotiationMessage&
-    negotiationMessage() const BSLS_KEYWORD_OVERRIDE;
+    negotiationMessage() const override;
     // Return a reference not offering modifiable access to the negotiation
     // message received from the remote peer of this session during the
     // negotiation phase.
 
     /// Return a printable description of the client (e.g. for logging).
-    bsl::string_view description() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view description() const override;
 
     // MANIPULATORS
     //   (virtual: mqbi::DispatcherClient)
 
     /// Return a pointer to the dispatcher this client is associated with.
-    mqbi::Dispatcher* dispatcher() BSLS_KEYWORD_OVERRIDE;
+    mqbi::Dispatcher* dispatcher() override;
 
     /// Return a reference to the dispatcherClientData.
-    mqbi::DispatcherClientData& dispatcherClientData() BSLS_KEYWORD_OVERRIDE;
+    mqbi::DispatcherClientData& dispatcherClientData() override;
 
     // ACCESSORS
     //   (virtual: mqbi::DispatcherClient)
 
     /// Return a pointer to the dispatcher this client is associated with.
-    const mqbi::Dispatcher* dispatcher() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::Dispatcher* dispatcher() const override;
 
-    const mqbi::DispatcherClientData&
-    dispatcherClientData() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::DispatcherClientData& dispatcherClientData() const override;
 
     // ACCESSORS
     //   (virtual: mqbi::QueueHandleRequester)
@@ -700,7 +698,7 @@ class ClientSession : public mqbnet::Session,
     /// Return a non-modifiable reference to the context of this requester
     /// of a QueueHandle.
     const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>&
-    handleRequesterContext() const BSLS_KEYWORD_OVERRIDE;
+    handleRequesterContext() const override;
 };
 
 // ============================================================================

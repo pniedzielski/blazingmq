@@ -60,69 +60,60 @@ struct ClusterStateLedgerTestImp
 : bsls::ProtocolTestImp<mqbc::ClusterStateLedger> {
   public:
     // MANIPULATORS
-    int open() BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    int open() override { return markDone(); }
 
-    int close() BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    int close() override { return markDone(); }
 
-    int apply(const bmqp_ctrlmsg::PartitionPrimaryAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE
+    int apply(const bmqp_ctrlmsg::PartitionPrimaryAdvisory& advisory) override
     {
         return markDone();
     }
 
-    int apply(const bmqp_ctrlmsg::QueueAssignmentAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE
+    int apply(const bmqp_ctrlmsg::QueueAssignmentAdvisory& advisory) override
     {
         return markDone();
     }
 
-    int apply(const bmqp_ctrlmsg::QueueUnAssignmentAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE
+    int apply(const bmqp_ctrlmsg::QueueUnAssignmentAdvisory& advisory) override
     {
         return markDone();
     }
 
-    int apply(const bmqp_ctrlmsg::QueueUpdateAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE
+    int apply(const bmqp_ctrlmsg::QueueUpdateAdvisory& advisory) override
     {
         return markDone();
     }
 
-    int
-    apply(const bmqp_ctrlmsg::LeaderAdvisory& advisory) BSLS_KEYWORD_OVERRIDE
+    int apply(const bmqp_ctrlmsg::LeaderAdvisory& advisory) override
     {
         return markDone();
     }
 
-    int apply(const bmqp_ctrlmsg::ClusterMessage& clusterMessage)
-        BSLS_KEYWORD_OVERRIDE
+    int apply(const bmqp_ctrlmsg::ClusterMessage& clusterMessage) override
     {
         return markDone();
     }
 
-    int apply(const bdlbb::Blob&   record,
-              mqbnet::ClusterNode* source) BSLS_KEYWORD_OVERRIDE
+    int apply(const bdlbb::Blob& record, mqbnet::ClusterNode* source) override
     {
         return markDone();
     }
 
-    void
-    setCommitCb(BSLA_MAYBE_UNUSED const CommitCb& value) BSLS_KEYWORD_OVERRIDE
+    void setCommitCb(BSLA_MAYBE_UNUSED const CommitCb& value) override
     {
         markDone();
     }
 
     // ACCESSORS
-    bool isOpen() const BSLS_KEYWORD_OVERRIDE { return markDone(); }
+    bool isOpen() const override { return markDone(); }
 
-    void
-    uncommittedAdvisories(ClusterMessageCRefList*) const BSLS_KEYWORD_OVERRIDE
+    void uncommittedAdvisories(ClusterMessageCRefList*) const override
     {
         markDone();
     }
 
     bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator>
-    getIterator() const BSLS_KEYWORD_OVERRIDE
+    getIterator() const override
     {
         markDone();
         return bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator>();

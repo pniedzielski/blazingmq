@@ -100,32 +100,24 @@ class DispatcherEventSource BSLS_KEYWORD_FINAL
     explicit DispatcherEventSource(bslma::Allocator* allocator = 0);
 
     /// Destructor.
-    ~DispatcherEventSource() BSLS_KEYWORD_OVERRIDE;
+    ~DispatcherEventSource() override;
 
     // MANIPULATORS
 
     /// Return a shared pointer to a typed event from this event source.
-    bsl::shared_ptr<mqbevt::AckEvent> getAckEvent() BSLS_KEYWORD_OVERRIDE;
-    bsl::shared_ptr<mqbevt::CallbackEvent>
-    getCallbackEvent() BSLS_KEYWORD_OVERRIDE;
-    bsl::shared_ptr<mqbevt::ClusterStateEvent>
-    getClusterStateEvent() BSLS_KEYWORD_OVERRIDE;
-    bsl::shared_ptr<mqbevt::ConfirmEvent>
-    getConfirmEvent() BSLS_KEYWORD_OVERRIDE;
+    bsl::shared_ptr<mqbevt::AckEvent>          getAckEvent() override;
+    bsl::shared_ptr<mqbevt::CallbackEvent>     getCallbackEvent() override;
+    bsl::shared_ptr<mqbevt::ClusterStateEvent> getClusterStateEvent() override;
+    bsl::shared_ptr<mqbevt::ConfirmEvent>      getConfirmEvent() override;
     bsl::shared_ptr<mqbevt::ControlMessageEvent>
-    getControlMessageEvent() BSLS_KEYWORD_OVERRIDE;
-    bsl::shared_ptr<mqbevt::DispatcherEvent>
-    getDispatcherEvent() BSLS_KEYWORD_OVERRIDE;
-    bsl::shared_ptr<mqbevt::PushEvent> getPushEvent() BSLS_KEYWORD_OVERRIDE;
-    bsl::shared_ptr<mqbevt::PutEvent>  getPutEvent() BSLS_KEYWORD_OVERRIDE;
-    bsl::shared_ptr<mqbevt::ReceiptEvent>
-    getReceiptEvent() BSLS_KEYWORD_OVERRIDE;
-    bsl::shared_ptr<mqbevt::RecoveryEvent>
-    getRecoveryEvent() BSLS_KEYWORD_OVERRIDE;
-    bsl::shared_ptr<mqbevt::RejectEvent>
-    getRejectEvent() BSLS_KEYWORD_OVERRIDE;
-    bsl::shared_ptr<mqbevt::StorageEvent>
-    getStorageEvent() BSLS_KEYWORD_OVERRIDE;
+                                             getControlMessageEvent() override;
+    bsl::shared_ptr<mqbevt::DispatcherEvent> getDispatcherEvent() override;
+    bsl::shared_ptr<mqbevt::PushEvent>       getPushEvent() override;
+    bsl::shared_ptr<mqbevt::PutEvent>        getPutEvent() override;
+    bsl::shared_ptr<mqbevt::ReceiptEvent>    getReceiptEvent() override;
+    bsl::shared_ptr<mqbevt::RecoveryEvent>   getRecoveryEvent() override;
+    bsl::shared_ptr<mqbevt::RejectEvent>     getRejectEvent() override;
+    bsl::shared_ptr<mqbevt::StorageEvent>    getStorageEvent() override;
 };
 
 }  // close package namespace

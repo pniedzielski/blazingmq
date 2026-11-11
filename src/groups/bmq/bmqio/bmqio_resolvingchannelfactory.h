@@ -179,7 +179,7 @@ class ResolvingChannelFactory_Channel : public DecoratingChannelPartialImp {
 
     /// Return our base Channel's peerUri until our resolution is done, and
     /// start returning the resolved peerUri after that.
-    bsl::string peerUri() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string peerUri() const override;
 };
 
 // =============================
@@ -242,7 +242,7 @@ class ResolvingChannelFactory : public ChannelFactory {
                                      bslma::Allocator* basicAllocator = 0);
 
     /// Destroy this object.
-    ~ResolvingChannelFactory() BSLS_KEYWORD_OVERRIDE;
+    ~ResolvingChannelFactory() override;
 
   public:
     // MANIPULATORS
@@ -250,21 +250,21 @@ class ResolvingChannelFactory : public ChannelFactory {
     void listen(Status*                      status,
                 bslma::ManagedPtr<OpHandle>* handle,
                 const ListenOptions&         options,
-                const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                const ResultCallback&        cb) override;
 
     void connect(Status*                      status,
                  bslma::ManagedPtr<OpHandle>* handle,
                  const ConnectOptions&        options,
-                 const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                 const ResultCallback&        cb) override;
 
     /// Start the channel factory. Return 0 on success and a non-zero value
     /// otherwise.
-    int start() BSLS_KEYWORD_OVERRIDE;
+    int start() override;
 
     /// Stop the channel factory. Note that the behavior is undefined unless
     /// the thread calling this function is the same thread that called
     /// `start()` and is not one of the I/O threads used by this object.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 };
 
 // ==================================

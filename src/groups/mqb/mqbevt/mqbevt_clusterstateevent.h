@@ -80,7 +80,7 @@ class ClusterStateEvent : public mqbi::DispatcherEvent {
     explicit ClusterStateEvent(bslma::Allocator* allocator);
 
     /// Destructor.
-    ~ClusterStateEvent() BSLS_KEYWORD_OVERRIDE;
+    ~ClusterStateEvent() override;
 
     // MANIPULATORS
 
@@ -97,7 +97,7 @@ class ClusterStateEvent : public mqbi::DispatcherEvent {
     ClusterStateEvent& setSource(mqbi::DispatcherClient* value);
 
     /// Reset all members of this event to default values.
-    void reset() BSLS_KEYWORD_OVERRIDE;
+    void reset() override;
 
     // ACCESSORS
 
@@ -112,12 +112,12 @@ class ClusterStateEvent : public mqbi::DispatcherEvent {
     mqbnet::ClusterNode* clusterNode() const;
 
     /// Return the type of this event.
-    mqbi::DispatcherEventType::Enum type() const BSLS_KEYWORD_OVERRIDE;
+    mqbi::DispatcherEventType::Enum type() const override;
 
     /// Format this object to the specified output `stream`.
     bsl::ostream& print(bsl::ostream& stream,
-                        int           level = 0,
-                        int spacesPerLevel  = 4) const BSLS_KEYWORD_OVERRIDE;
+                        int           level          = 0,
+                        int           spacesPerLevel = 4) const override;
 };
 
 // ============================================================================

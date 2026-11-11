@@ -130,9 +130,9 @@ class ClusterOrchestrator {
                                        const bmqp::Event&   event,
                                        mqbnet::ClusterNode* source_p);
 
-        ~OnElectorEventFunctor() BSLS_KEYWORD_OVERRIDE;
+        ~OnElectorEventFunctor() override;
 
-        void operator()() const BSLS_KEYWORD_OVERRIDE;
+        void operator()() const override;
     };
 
     /// Vector of pairs of buffered primary status advisories and their source

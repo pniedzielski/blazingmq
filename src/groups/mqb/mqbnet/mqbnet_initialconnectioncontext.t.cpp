@@ -114,7 +114,7 @@ struct MockAuthenticationClient : public mqbnet::AuthenticationClient {
     {
     }
 
-    int authenticate(bsl::ostream& errorDescription) BSLS_KEYWORD_OVERRIDE
+    int authenticate(bsl::ostream& errorDescription) override
     {
         ++d_numAuthenticateCalls;
         if (d_authenticateRc != 0) {
@@ -124,8 +124,7 @@ struct MockAuthenticationClient : public mqbnet::AuthenticationClient {
     }
 
     int handleResponse(bsl::ostream& errorDescription,
-                       const bmqp_ctrlmsg::AuthenticationMessage&)
-        BSLS_KEYWORD_OVERRIDE
+                       const bmqp_ctrlmsg::AuthenticationMessage&) override
     {
         ++d_numHandleResponseCalls;
         if (d_handleResponseRc != 0) {
@@ -134,7 +133,7 @@ struct MockAuthenticationClient : public mqbnet::AuthenticationClient {
         return d_handleResponseRc;
     }
 
-    void onClose() BSLS_KEYWORD_OVERRIDE { ++d_numOnCloseCalls; }
+    void onClose() override { ++d_numOnCloseCalls; }
 };
 
 // Mock authenticator
@@ -147,29 +146,29 @@ struct MockAuthenticator : public mqbnet::Authenticator {
     /// broker without a credential provider.
     bsl::shared_ptr<mqbnet::AuthenticationClient> d_authenticationClient_sp;
 
-    int  start(bsl::ostream&) BSLS_KEYWORD_OVERRIDE { return 0; }
-    void stop() BSLS_KEYWORD_OVERRIDE {}
-    int  handleAuthentication(bsl::ostream&,
-                              mqbnet::InitialConnectionContext*,
-                              const bmqp_ctrlmsg::AuthenticationMessage&)
-        BSLS_KEYWORD_OVERRIDE
+    int  start(bsl::ostream&) override { return 0; }
+    void stop() override {}
+    int
+    handleAuthentication(bsl::ostream&,
+                         mqbnet::InitialConnectionContext*,
+                         const bmqp_ctrlmsg::AuthenticationMessage&) override
     {
         return 0;
     }
     int handleReauthentication(
         bsl::ostream&,
         const bsl::shared_ptr<mqbnet::AuthenticationContext>&,
-        const bsl::shared_ptr<bmqio::Channel>&) BSLS_KEYWORD_OVERRIDE
+        const bsl::shared_ptr<bmqio::Channel>&) override
     {
         return 0;
     }
-    bsl::shared_ptr<mqbnet::AuthenticationClient> createAuthenticationClient(
-        const bsl::shared_ptr<bmqio::Channel>&) BSLS_KEYWORD_OVERRIDE
+    bsl::shared_ptr<mqbnet::AuthenticationClient>
+    createAuthenticationClient(const bsl::shared_ptr<bmqio::Channel>&) override
     {
         return d_authenticationClient_sp;
     }
     const bsl::optional<mqbcfg::Credential>&
-    anonymousCredential() const BSLS_KEYWORD_OVERRIDE
+    anonymousCredential() const override
     {
         return d_anonymousCredential;
     }
@@ -188,14 +187,13 @@ struct MockNegotiator : public mqbnet::Negotiator {
 
     int createSessionOnMsgType(bsl::ostream&,
                                bsl::shared_ptr<mqbnet::Session>*,
-                               mqbnet::InitialConnectionContext*)
-        BSLS_KEYWORD_OVERRIDE
+                               mqbnet::InitialConnectionContext*) override
     {
         ++d_numCreateSessionCalls;
         return 0;
     }
-    int negotiateOutbound(bsl::ostream&, mqbnet::InitialConnectionContext*)
-        BSLS_KEYWORD_OVERRIDE
+    int negotiateOutbound(bsl::ostream&,
+                          mqbnet::InitialConnectionContext*) override
     {
         ++d_numNegotiateOutboundCalls;
         return 0;

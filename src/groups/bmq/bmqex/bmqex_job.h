@@ -110,7 +110,7 @@ class Job_Target : public Job_TargetBase {
     // MANIPULATORS
 
     /// Invoke the contained function object `f` as if by `bsl::move(f)()`.
-    void invoke() BSLS_KEYWORD_OVERRIDE;
+    void invoke() override;
 };
 
 // =========

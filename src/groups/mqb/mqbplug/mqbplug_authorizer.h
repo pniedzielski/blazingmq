@@ -91,7 +91,7 @@ class AuthorizerPluginFactory : public PluginFactory {
     // CREATORS
     AuthorizerPluginFactory();
 
-    ~AuthorizerPluginFactory() BSLS_KEYWORD_OVERRIDE;
+    ~AuthorizerPluginFactory() override;
 
     // MANIPULATORS
     virtual bslma::ManagedPtr<Authorizer>

@@ -71,7 +71,7 @@ class CallbackEvent : public mqbi::DispatcherEvent {
     explicit CallbackEvent(bslma::Allocator* allocator);
 
     /// Destructor.
-    ~CallbackEvent() BSLS_KEYWORD_OVERRIDE;
+    ~CallbackEvent() override;
 
     // MANIPULATORS
 
@@ -89,7 +89,7 @@ class CallbackEvent : public mqbi::DispatcherEvent {
     CallbackEvent& setSource(mqbi::DispatcherClient* value);
 
     /// Reset all members of this event to default values.
-    void reset() BSLS_KEYWORD_OVERRIDE;
+    void reset() override;
 
     // ACCESSORS
 
@@ -100,12 +100,12 @@ class CallbackEvent : public mqbi::DispatcherEvent {
     const bmqu::ManagedCallback& callback() const;
 
     /// Return the type of this event.
-    mqbi::DispatcherEventType::Enum type() const BSLS_KEYWORD_OVERRIDE;
+    mqbi::DispatcherEventType::Enum type() const override;
 
     /// Format this object to the specified output `stream`.
     bsl::ostream& print(bsl::ostream& stream,
-                        int           level = 0,
-                        int spacesPerLevel  = 4) const BSLS_KEYWORD_OVERRIDE;
+                        int           level          = 0,
+                        int           spacesPerLevel = 4) const override;
 };
 
 // ============================================================================

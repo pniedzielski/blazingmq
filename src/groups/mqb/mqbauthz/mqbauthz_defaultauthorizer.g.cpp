@@ -46,14 +46,10 @@ class TestAuthenticationResult : public mqbplug::AuthenticationResult {
 
   public:
     /// Return the principal in human-readable format.
-    bsl::string_view principal() const BSLS_KEYWORD_OVERRIDE
-    {
-        return "anonymous";
-    }
+    bsl::string_view principal() const override { return "anonymous"; }
 
     /// Return the remaining lifetime of an authenticated session.
-    const bsl::optional<bsls::Types::Uint64>&
-    lifetimeMs() const BSLS_KEYWORD_OVERRIDE
+    const bsl::optional<bsls::Types::Uint64>& lifetimeMs() const override
     {
         return s_LIFETIME_MS;
     }
@@ -88,7 +84,7 @@ class DefaultAuthorizerTest : public ::testing::Test {
                                        bmqtst::TestHelperUtil::allocator());
     }
 
-    ~DefaultAuthorizerTest() BSLS_KEYWORD_OVERRIDE;
+    ~DefaultAuthorizerTest() override;
 };
 
 DefaultAuthorizerTest::~DefaultAuthorizerTest()
@@ -161,7 +157,7 @@ class DefaultAuthorizerAccessTest : public DefaultAuthorizerTest {
         executeAdminCommand.command() = testCommand;
     }
 
-    ~DefaultAuthorizerAccessTest() BSLS_KEYWORD_OVERRIDE;
+    ~DefaultAuthorizerAccessTest() override;
 };
 
 DefaultAuthorizerAccessTest::~DefaultAuthorizerAccessTest()

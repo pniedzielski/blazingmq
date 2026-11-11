@@ -114,7 +114,7 @@ class Dispatcher BSLS_KEYWORD_FINAL : public mqbi::Dispatcher {
     explicit Dispatcher(bslma::Allocator* allocator);
 
     /// Destructor of this object.
-    ~Dispatcher() BSLS_KEYWORD_OVERRIDE;
+    ~Dispatcher() override;
 
     // MANIPULATORS
     //   (virtual: mqbi::Dispatcher)
@@ -139,36 +139,32 @@ class Dispatcher BSLS_KEYWORD_FINAL : public mqbi::Dispatcher {
     registerClient(mqbi::DispatcherClient*           client,
                    mqbi::DispatcherClientType::Enum  type,
                    mqbi::Dispatcher::ProcessorHandle handle =
-                       mqbi::Dispatcher::k_INVALID_PROCESSOR_HANDLE)
-        BSLS_KEYWORD_OVERRIDE;
+                       mqbi::Dispatcher::k_INVALID_PROCESSOR_HANDLE) override;
 
     /// Remove the association of the specified `client` from its processor,
     /// and mark as invalid the `processorHandle` from the client's
     /// `dispatcherClientData` member.  This operation is a no-op if the
     /// `client` is not associated with any processor.
-    void
-    unregisterClient(mqbi::DispatcherClient* client) BSLS_KEYWORD_OVERRIDE;
+    void unregisterClient(mqbi::DispatcherClient* client) override;
 
     /// @brief Construct a new event source.
     /// @return event source.
     /// NOTE: the returned value should be cached and used by long-living
     ///       work threads that need to enqueue events to a dispatcher.
-    bsl::shared_ptr<mqbi::DispatcherEventSource>
-    createEventSource() BSLS_KEYWORD_OVERRIDE;
+    bsl::shared_ptr<mqbi::DispatcherEventSource> createEventSource() override;
 
     /// @brief Get a pointer to the default event source owned by dispatcher.
     /// @return event source const reference.
     /// NOTE: the returned value should be used by short-living routines
     ///       that need to enqueue events to a dispatcher.
     const bsl::shared_ptr<mqbi::DispatcherEventSource>&
-    getDefaultEventSource() BSLS_KEYWORD_OVERRIDE;
+    getDefaultEventSource() override;
 
     /// Dispatch the specified `event` to the specified `destination`.  The
     /// behavior is undefined unless `event` was obtained by a call to
     /// `getEvent` with a type matching the one of `destination`.
-    void
-    dispatchEvent(mqbi::Dispatcher::DispatcherEventRvRef event,
-                  mqbi::DispatcherClient* destination) BSLS_KEYWORD_OVERRIDE;
+    void dispatchEvent(mqbi::Dispatcher::DispatcherEventRvRef event,
+                       mqbi::DispatcherClient* destination) override;
 
     /// Dispatch the specified `event` to the processor in charge of clients
     /// of the specified `type` and associated with the specified `handle`.
@@ -176,8 +172,7 @@ class Dispatcher BSLS_KEYWORD_FINAL : public mqbi::Dispatcher {
     /// `getEvent` with a matching `type`..
     void dispatchEvent(mqbi::Dispatcher::DispatcherEventRvRef event,
                        mqbi::DispatcherClientType::Enum       type,
-                       mqbi::Dispatcher::ProcessorHandle      handle)
-        BSLS_KEYWORD_OVERRIDE;
+                       mqbi::Dispatcher::ProcessorHandle      handle) override;
 
     /// Execute the specified `functor`, using the optionally specified
     /// dispatcher `type`, in the processor associated to the specified
@@ -185,24 +180,23 @@ class Dispatcher BSLS_KEYWORD_FINAL : public mqbi::Dispatcher {
     /// or `e_CALLBACK`.
     void execute(const mqbi::Dispatcher::VoidFunction& functor,
                  mqbi::DispatcherClient*               client,
-                 mqbi::DispatcherEventType::Enum type) BSLS_KEYWORD_OVERRIDE;
+                 mqbi::DispatcherEventType::Enum       type) override;
 
     /// Execute the specified `functor`, using the `e_DISPATCHER` event
     /// type, in the processor associated to the specified `client`.
-    void
-    execute(const mqbi::Dispatcher::VoidFunction& functor,
-            const mqbi::DispatcherClientData& client) BSLS_KEYWORD_OVERRIDE;
+    void execute(const mqbi::Dispatcher::VoidFunction& functor,
+                 const mqbi::DispatcherClientData&     client) override;
 
     /// Execute the specified `functor` in the processors in charge of
     /// clients of the specified `type`, and invoke the specified
     /// `doneCallback` (if any) when all the relevant processors are done
     /// executing the `functor`.
-    void executeOnAllQueues(const mqbi::Dispatcher::VoidFunction& functor,
-                            mqbi::DispatcherClientType::Enum      type,
-                            const mqbi::Dispatcher::VoidFunction& doneCallback)
-        BSLS_KEYWORD_OVERRIDE;
+    void executeOnAllQueues(
+        const mqbi::Dispatcher::VoidFunction& functor,
+        mqbi::DispatcherClientType::Enum      type,
+        const mqbi::Dispatcher::VoidFunction& doneCallback) override;
 
-    void synchronize(mqbi::DispatcherClient* client) BSLS_KEYWORD_OVERRIDE;
+    void synchronize(mqbi::DispatcherClient* client) override;
 
     /// Enqueue an event to the processor associated to the specified
     /// `client` or pair of the specified `type` and `handle` and block
@@ -212,25 +206,23 @@ class Dispatcher BSLS_KEYWORD_FINAL : public mqbi::Dispatcher {
     /// `client`.  The behavior is undefined if `synchronize` is being
     /// invoked from the `client`s thread.
     void synchronize(mqbi::DispatcherClientType::Enum  type,
-                     mqbi::Dispatcher::ProcessorHandle handle)
-        BSLS_KEYWORD_OVERRIDE;
+                     mqbi::Dispatcher::ProcessorHandle handle) override;
 
     // ACCESSORS
     //   (virtual: mqbi::Dispatcher)
 
     /// Return the number of processors dedicated for dispatching clients of
     /// the specified `type`.
-    int numProcessors(mqbi::DispatcherClientType::Enum type) const
-        BSLS_KEYWORD_OVERRIDE;
+    int numProcessors(mqbi::DispatcherClientType::Enum type) const override;
 
     /// Not implemented.
     bmqex::Executor
-    executor(const mqbi::DispatcherClient* client) const BSLS_KEYWORD_OVERRIDE;
+    executor(const mqbi::DispatcherClient* client) const override;
 
     /// Return current number of events enqueued for the processor in charge of
     /// the specified `client`.
-    bsls::Types::Int64 numProcessorEvents(
-        const mqbi::DispatcherClient* client) const BSLS_KEYWORD_OVERRIDE;
+    bsls::Types::Int64
+    numProcessorEvents(const mqbi::DispatcherClient* client) const override;
 
     class InnerEventGuard;
     friend class InnerEventGuard;
@@ -285,20 +277,19 @@ class DispatcherClient : public mqbi::DispatcherClient {
     // MANIPULATORS
 
     /// Return a pointer to the dispatcher this client is associated with.
-    mqbi::Dispatcher* dispatcher() BSLS_KEYWORD_OVERRIDE;
+    mqbi::Dispatcher* dispatcher() override;
 
     /// Return a reference offering modifiable access to the
     /// DispatcherClientData of this client.
-    mqbi::DispatcherClientData& dispatcherClientData() BSLS_KEYWORD_OVERRIDE;
+    mqbi::DispatcherClientData& dispatcherClientData() override;
 
     /// Called by the `Dispatcher` when it has the specified `event` to
     /// deliver to the client.
-    void onDispatcherEvent(const mqbi::DispatcherEvent& event)
-        BSLS_KEYWORD_OVERRIDE;
+    void onDispatcherEvent(const mqbi::DispatcherEvent& event) override;
 
     /// Called by the dispatcher to flush any pending operation; mainly used
     /// to provide batch and nagling mechanism.
-    void flush() BSLS_KEYWORD_OVERRIDE;
+    void flush() override;
 
     /// Set the corresponding attribute to the specified `value` and return
     /// a reference offering modifiable access to this object.
@@ -307,15 +298,14 @@ class DispatcherClient : public mqbi::DispatcherClient {
     // ACCESSORS
 
     /// Return a pointer to the dispatcher this client is associated with.
-    const mqbi::Dispatcher* dispatcher() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::Dispatcher* dispatcher() const override;
 
     /// Return a reference not offering modifiable access to the
     /// DispatcherClientData of this client.
-    const mqbi::DispatcherClientData&
-    dispatcherClientData() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::DispatcherClientData& dispatcherClientData() const override;
 
     /// Return a printable description of the client (e.g., for logging).
-    bsl::string_view description() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view description() const override;
 };
 
 }  // close package namespace

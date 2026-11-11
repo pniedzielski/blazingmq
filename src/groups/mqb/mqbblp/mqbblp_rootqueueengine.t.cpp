@@ -220,9 +220,9 @@ MaybeError checkInvariants(const Invariants&                invariants,
 struct Start : public Operation {
     /// Applies the actual operation using the specified `model` and
     /// `tester`.
-    MaybeError operator()(BSLA_MAYBE_UNUSED ActiveConsumersModel* model,
-                          BSLA_MAYBE_UNUSED mqbblp::QueueEngineTester* tester)
-        const BSLS_KEYWORD_OVERRIDE
+    MaybeError operator()(
+        BSLA_MAYBE_UNUSED ActiveConsumersModel* model,
+        BSLA_MAYBE_UNUSED mqbblp::QueueEngineTester* tester) const override
     {
         return MaybeError();
     }
@@ -230,7 +230,7 @@ struct Start : public Operation {
     // ACCESSORS
 
     /// Prints this object to the specified `os` stream.
-    void print(bsl::ostream& os) const BSLS_KEYWORD_OVERRIDE { os << "Start"; }
+    void print(bsl::ostream& os) const override { os << "Start"; }
 };
 
 /// An operation that targets a specific client.
@@ -298,9 +298,8 @@ struct Subscribe : public ClientOperation {
     }
 
     // MANIPULATORS
-    MaybeError
-    operator()(ActiveConsumersModel*      model,
-               mqbblp::QueueEngineTester* tester) const BSLS_KEYWORD_OVERRIDE
+    MaybeError operator()(ActiveConsumersModel*      model,
+                          mqbblp::QueueEngineTester* tester) const override
     {
         // Applies the actual operation using the specified 'model' and
         // 'tester'.
@@ -323,7 +322,7 @@ struct Subscribe : public ClientOperation {
     // ACCESSORS
 
     /// Prints this object to the specified `os` stream.
-    void print(bsl::ostream& os) const BSLS_KEYWORD_OVERRIDE
+    void print(bsl::ostream& os) const override
     {
         os << "Subscribe(" << d_client << ", " << d_readCount << ")";
     }
@@ -340,9 +339,8 @@ struct UnSubscribe : public ClientOperation {
     }
 
     // MANIPULATORS
-    MaybeError
-    operator()(ActiveConsumersModel*      model,
-               mqbblp::QueueEngineTester* tester) const BSLS_KEYWORD_OVERRIDE
+    MaybeError operator()(ActiveConsumersModel*      model,
+                          mqbblp::QueueEngineTester* tester) const override
     {
         // Applies the actual operation using the specified 'model' and
         // 'tester'.
@@ -369,7 +367,7 @@ struct UnSubscribe : public ClientOperation {
     // ACCESSORS
 
     /// Prints this object to the specified `os` stream.
-    void print(bsl::ostream& os) const BSLS_KEYWORD_OVERRIDE
+    void print(bsl::ostream& os) const override
     {
         os << "UnSubscribe(" << d_client << ")";
     }
@@ -393,9 +391,9 @@ struct SetCanDeliver : public ClientOperation {
     }
 
     // MANIPULATORS
-    MaybeError operator()(ActiveConsumersModel* model,
-                          BSLA_MAYBE_UNUSED mqbblp::QueueEngineTester* tester)
-        const BSLS_KEYWORD_OVERRIDE
+    MaybeError operator()(
+        ActiveConsumersModel* model,
+        BSLA_MAYBE_UNUSED mqbblp::QueueEngineTester* tester) const override
     {
         // Applies the actual operation using the specified 'model' and
         // 'tester'.
@@ -416,7 +414,7 @@ struct SetCanDeliver : public ClientOperation {
     // ACCESSORS
 
     /// Prints this object to the specified `os` stream.
-    void print(bsl::ostream& os) const BSLS_KEYWORD_OVERRIDE
+    void print(bsl::ostream& os) const override
     {
         os << "SetCanDeliver(" << d_client << ", " << bsl::boolalpha
            << d_status << ")";
@@ -439,9 +437,8 @@ struct Post : public Operation {
     }
 
     // MANIPULATORS
-    MaybeError
-    operator()(ActiveConsumersModel*      model,
-               mqbblp::QueueEngineTester* tester) const BSLS_KEYWORD_OVERRIDE
+    MaybeError operator()(ActiveConsumersModel*      model,
+                          mqbblp::QueueEngineTester* tester) const override
     {
         // Applies the actual operation using the specified 'model' and
         // 'tester'.
@@ -480,7 +477,7 @@ struct Post : public Operation {
     // ACCESSORS
 
     /// Prints this object to the specified `os` stream.
-    void print(bsl::ostream& os) const BSLS_KEYWORD_OVERRIDE
+    void print(bsl::ostream& os) const override
     {
         os << "Post(" << d_value << ")";
     }

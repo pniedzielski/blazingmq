@@ -365,8 +365,7 @@ class OperationChain_Job {
         // MANIPULATORS
 
         /// Implements `TargetBase::execute`.
-        void execute(OperationChain* chain,
-                     JobHandle       jobHandle) BSLS_KEYWORD_OVERRIDE;
+        void execute(OperationChain* chain, JobHandle jobHandle) override;
     };
 
   private:

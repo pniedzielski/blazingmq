@@ -73,7 +73,7 @@ class PrinterMock : public Printer {
     // CREATORS
     PrinterMock();
 
-    ~PrinterMock() BSLS_KEYWORD_OVERRIDE;
+    ~PrinterMock() override;
 
     // PUBLIC METHODS
 
@@ -128,7 +128,7 @@ class CslPrinterMock : public CslPrinter {
     // CREATORS
     CslPrinterMock();
 
-    ~CslPrinterMock() BSLS_KEYWORD_OVERRIDE;
+    ~CslPrinterMock() override;
 
     // PUBLIC METHODS
 

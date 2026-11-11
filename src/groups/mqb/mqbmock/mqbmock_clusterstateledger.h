@@ -123,7 +123,7 @@ class ClusterStateLedger : public mqbc::ClusterStateLedger {
                        bslma::Allocator*  allocator);
 
     /// Destructor.
-    ~ClusterStateLedger() BSLS_KEYWORD_OVERRIDE;
+    ~ClusterStateLedger() override;
 
     // MANIPULATORS
     //   (virtual mqbc::ClusterStateLedger)
@@ -133,14 +133,14 @@ class ClusterStateLedger : public mqbc::ClusterStateLedger {
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    int open() BSLS_KEYWORD_OVERRIDE;
+    int open() override;
 
     /// Close the ledger, and return 0 on success or a non-zero value
     /// otherwise.
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    int close() BSLS_KEYWORD_OVERRIDE;
+    int close() override;
 
     /// Apply the specified `advisory` to self and replicate to followers.
     /// Notify via `commitCb` when consistency level has been achieved.
@@ -148,14 +148,11 @@ class ClusterStateLedger : public mqbc::ClusterStateLedger {
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    int apply(const bmqp_ctrlmsg::PartitionPrimaryAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE;
-    int apply(const bmqp_ctrlmsg::QueueAssignmentAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE;
-    int apply(const bmqp_ctrlmsg::QueueUnAssignmentAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE;
-    int apply(const bmqp_ctrlmsg::QueueUpdateAdvisory& advisory)
-        BSLS_KEYWORD_OVERRIDE;
+    int apply(const bmqp_ctrlmsg::PartitionPrimaryAdvisory& advisory) override;
+    int apply(const bmqp_ctrlmsg::QueueAssignmentAdvisory& advisory) override;
+    int
+    apply(const bmqp_ctrlmsg::QueueUnAssignmentAdvisory& advisory) override;
+    int apply(const bmqp_ctrlmsg::QueueUpdateAdvisory& advisory) override;
 
     /// Apply the specified `advisory` to self and replicate to followers.
     /// Notify via `commitCb` when consistency level has been achieved.  Note
@@ -163,8 +160,7 @@ class ClusterStateLedger : public mqbc::ClusterStateLedger {
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    int
-    apply(const bmqp_ctrlmsg::LeaderAdvisory& advisory) BSLS_KEYWORD_OVERRIDE;
+    int apply(const bmqp_ctrlmsg::LeaderAdvisory& advisory) override;
 
     /// Apply the advisory contained in the specified `clusterMessage` to
     /// self and replicate to followers.  Notify via `commitCb` when
@@ -176,8 +172,7 @@ class ClusterStateLedger : public mqbc::ClusterStateLedger {
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    int apply(const bmqp_ctrlmsg::ClusterMessage& clusterMessage)
-        BSLS_KEYWORD_OVERRIDE;
+    int apply(const bmqp_ctrlmsg::ClusterMessage& clusterMessage) override;
 
     /// Apply the specified raw `record` received from the specified
     /// `source` node.  Note that while a follower node may receive any type
@@ -185,11 +180,10 @@ class ClusterStateLedger : public mqbc::ClusterStateLedger {
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    int apply(const bdlbb::Blob&   record,
-              mqbnet::ClusterNode* source) BSLS_KEYWORD_OVERRIDE;
+    int apply(const bdlbb::Blob& record, mqbnet::ClusterNode* source) override;
 
     /// Set the commit callback to the specified `value`.
-    void setCommitCb(const CommitCb& value) BSLS_KEYWORD_OVERRIDE;
+    void setCommitCb(const CommitCb& value) override;
 
     // MANIPULATORS
 
@@ -212,22 +206,21 @@ class ClusterStateLedger : public mqbc::ClusterStateLedger {
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    bool isOpen() const BSLS_KEYWORD_OVERRIDE;
+    bool isOpen() const override;
 
     /// Load into the specified `out` the list of uncommitted advisories as
     /// const references.
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    void uncommittedAdvisories(ClusterMessageCRefList* out) const
-        BSLS_KEYWORD_OVERRIDE;
+    void uncommittedAdvisories(ClusterMessageCRefList* out) const override;
 
     /// Return an iterator to this ledger.
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
     bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator>
-    getIterator() const BSLS_KEYWORD_OVERRIDE;
+    getIterator() const override;
 };
 
 // ============================================================================

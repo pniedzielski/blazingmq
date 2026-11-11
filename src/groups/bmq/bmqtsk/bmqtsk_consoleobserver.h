@@ -200,7 +200,7 @@ class ConsoleObserver : public ball::ObserverAdapter {
     explicit ConsoleObserver(bslma::Allocator* allocator);
 
     /// Destroy this object.
-    ~ConsoleObserver() BSLS_KEYWORD_OVERRIDE;
+    ~ConsoleObserver() override;
 
     // MANIPULATORS
 
@@ -238,12 +238,12 @@ class ConsoleObserver : public ball::ObserverAdapter {
     /// regardless of the category, warning and error severity are printed
     /// in a special color.
     void publish(const ball::Record&  record,
-                 const ball::Context& context) BSLS_KEYWORD_OVERRIDE;
+                 const ball::Context& context) override;
 
     /// Note: this member is overridden to get rid of the "hides the virtual
     ///       function" warning.
     inline void publish(const bsl::shared_ptr<const ball::Record>& record,
-                        const ball::Context& context) BSLS_KEYWORD_OVERRIDE
+                        const ball::Context& context) override
     {
         publish(*record, context);
     }

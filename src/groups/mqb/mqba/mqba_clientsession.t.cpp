@@ -486,7 +486,7 @@ class MyMockQueueHandle : public mqbmock::QueueHandle {
     }
 
     /// Destructor
-    ~MyMockQueueHandle() BSLS_KEYWORD_OVERRIDE
+    ~MyMockQueueHandle() override
     {
         // Reset those.  Typically it should be done while closing queues.
         setStreamParameters(bmqp_ctrlmsg::StreamParameters());
@@ -509,10 +509,10 @@ class MyMockQueueHandle : public mqbmock::QueueHandle {
     /// Called by the framework when a new message with the specified
     /// `putHeader`, `appData` and `options` is sent upstream.  We capture
     /// the message.
-    virtual void postMessage(const bmqp::PutHeader&              putHeader,
-                             const bsl::shared_ptr<bdlbb::Blob>& appData,
-                             const bsl::shared_ptr<bdlbb::Blob>& options)
-        BSLS_KEYWORD_OVERRIDE
+    virtual void
+    postMessage(const bmqp::PutHeader&              putHeader,
+                const bsl::shared_ptr<bdlbb::Blob>& appData,
+                const bsl::shared_ptr<bdlbb::Blob>& options) override
     {
         Post& p = d_postedMessages.emplace_back();
 
@@ -534,14 +534,14 @@ class MyQueueEngine : public mqbmock::QueueEngine {
     {
     }
 
-    ~MyQueueEngine() BSLS_KEYWORD_OVERRIDE {}
+    ~MyQueueEngine() override {}
 
     // MANIPULATORS
-    void configureHandle(
-        BSLA_MAYBE_UNUSED mqbi::QueueHandle*               handle,
-        const bmqp_ctrlmsg::StreamParameters&              streamParameters,
-        const mqbi::QueueHandle::HandleConfiguredCallback& configuredCb)
-        BSLS_KEYWORD_OVERRIDE
+    void
+    configureHandle(BSLA_MAYBE_UNUSED mqbi::QueueHandle*  handle,
+                    const bmqp_ctrlmsg::StreamParameters& streamParameters,
+                    const mqbi::QueueHandle::HandleConfiguredCallback&
+                        configuredCb) override
     {
         bmqp_ctrlmsg::Status success(d_allocator_p);
         success.category() = bmqp_ctrlmsg::StatusCategory::E_SUCCESS;
@@ -583,7 +583,7 @@ class MyMockDomain : public mqbmock::Domain {
     }
 
     /// Destructor
-    ~MyMockDomain() BSLS_KEYWORD_OVERRIDE {}
+    ~MyMockDomain() override {}
 
     // MANIPULATORS
 
@@ -595,7 +595,7 @@ class MyMockDomain : public mqbmock::Domain {
                    const bsl::shared_ptr<mqbi::QueueHandleRequesterContext>&
                                                               clientContext,
                    const bmqp_ctrlmsg::QueueHandleParameters& handleParameters,
-                   const OpenQueueCallback& callback) BSLS_KEYWORD_OVERRIDE
+                   const OpenQueueCallback& callback) override
     {
         mqbstat::QueueStatsDomain*      domainStats = 0;
         bsl::shared_ptr<mqbmock::Queue> queue;
@@ -663,10 +663,9 @@ class TestAuthorizer : public mqbi::Authorizer {
   public:
     TestAuthorizer() {}
 
-    bool
-    authorize(BSLA_UNUSED const mqbact::Action& action,
-              BSLA_UNUSED const mqbplug::AuthenticationResult& authnResult)
-        BSLS_KEYWORD_OVERRIDE
+    bool authorize(
+        BSLA_UNUSED const mqbact::Action& action,
+        BSLA_UNUSED const mqbplug::AuthenticationResult& authnResult) override
     {
         return true;
     }
@@ -2199,65 +2198,58 @@ static void test11_initiateShutdown()
         /// The cache might be initialized within `appData`, `options` or
         /// `attributes` routines.
         /// TODO: refactor iterators to remove cached data.
-        void clearCache() BSLS_KEYWORD_OVERRIDE
+        void clearCache() override
         {
             d_appData.reset();
             d_options.reset();
             d_messageAttributes.reset();
         }
 
-        bool advance() BSLS_KEYWORD_OVERRIDE
+        bool advance() override
         {
             d_guid = bmqp::MessageGUIDGenerator::testGUID();
             return true;
         }
 
         // ACCESSORS
-        void reset(const bmqt::MessageGUID& where = bmqt::MessageGUID())
-            BSLS_KEYWORD_OVERRIDE
+        void
+        reset(const bmqt::MessageGUID& where = bmqt::MessageGUID()) override
         {
             d_guid = where;
         }
 
-        const bmqt::MessageGUID& guid() const BSLS_KEYWORD_OVERRIDE
-        {
-            return d_guid;
-        }
+        const bmqt::MessageGUID& guid() const override { return d_guid; }
 
-        const mqbi::AppMessage&
-        appMessageView(BSLA_MAYBE_UNUSED unsigned int appOrdinal) const
-            BSLS_KEYWORD_OVERRIDE
+        const mqbi::AppMessage& appMessageView(
+            BSLA_MAYBE_UNUSED unsigned int appOrdinal) const override
         {
             return d_appMessage;
         }
 
-        mqbi::AppMessage& appMessageState(
-            BSLA_MAYBE_UNUSED unsigned int appOrdinal) BSLS_KEYWORD_OVERRIDE
+        mqbi::AppMessage&
+        appMessageState(BSLA_MAYBE_UNUSED unsigned int appOrdinal) override
         {
             return d_appMessage;
         }
 
-        const bsl::shared_ptr<bdlbb::Blob>&
-        appData() const BSLS_KEYWORD_OVERRIDE
+        const bsl::shared_ptr<bdlbb::Blob>& appData() const override
         {
             return d_appData;
         }
 
-        const bsl::shared_ptr<bdlbb::Blob>&
-        options() const BSLS_KEYWORD_OVERRIDE
+        const bsl::shared_ptr<bdlbb::Blob>& options() const override
         {
             return d_options;
         }
 
-        const mqbi::StorageMessageAttributes&
-        attributes() const BSLS_KEYWORD_OVERRIDE
+        const mqbi::StorageMessageAttributes& attributes() const override
         {
             return d_messageAttributes;
         }
 
-        bool atEnd() const BSLS_KEYWORD_OVERRIDE { return false; }
+        bool atEnd() const override { return false; }
 
-        bool hasReceipt() const BSLS_KEYWORD_OVERRIDE { return true; }
+        bool hasReceipt() const override { return true; }
     };
 
     MockStorageIterator iter(bmqtst::TestHelperUtil::allocator());

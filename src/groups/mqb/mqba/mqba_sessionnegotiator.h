@@ -237,7 +237,7 @@ class SessionNegotiator : public mqbnet::Negotiator {
                       bslma::Allocator*         allocator);
 
     /// Destructor
-    ~SessionNegotiator() BSLS_KEYWORD_OVERRIDE;
+    ~SessionNegotiator() override;
 
     // MANIPULATORS
 
@@ -261,17 +261,17 @@ class SessionNegotiator : public mqbnet::Negotiator {
     /// the specified `context_p`.  Return 0 on success, or a non-zero error
     /// code and populate the specified `errorDescription` with a description
     /// of the error otherwise.
-    int createSessionOnMsgType(bsl::ostream& errorDescription,
-                               bsl::shared_ptr<mqbnet::Session>* session,
-                               mqbnet::InitialConnectionContext* context_p)
-        BSLS_KEYWORD_OVERRIDE;
+    int createSessionOnMsgType(
+        bsl::ostream&                     errorDescription,
+        bsl::shared_ptr<mqbnet::Session>* session,
+        mqbnet::InitialConnectionContext* context_p) override;
 
     /// Send out outbound negotiation message with the specified `context_p`.
     /// Return 0 on success, or a non-zero error code and populate the
     /// specified `errorDescription` with a description of the error otherwise.
-    int negotiateOutbound(bsl::ostream&                     errorDescription,
-                          mqbnet::InitialConnectionContext* context_p)
-        BSLS_KEYWORD_OVERRIDE;
+    int
+    negotiateOutbound(bsl::ostream&                     errorDescription,
+                      mqbnet::InitialConnectionContext* context_p) override;
 };
 
 // ============================================================================

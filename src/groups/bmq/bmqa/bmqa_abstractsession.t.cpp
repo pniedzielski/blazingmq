@@ -46,103 +46,95 @@ using namespace bsl;
 
 /// A test implementation of the `bmqa::AbstractSession` protocol
 struct AbstractSessionTestImp : bsls::ProtocolTestImp<bmqa::AbstractSession> {
-    int start(const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
-
-    int startAsync(const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
-
-    void stop() BSLS_KEYWORD_OVERRIDE { markDone(); }
-
-    void stopAsync() BSLS_KEYWORD_OVERRIDE { markDone(); }
-
-    void finalizeStop() BSLS_KEYWORD_OVERRIDE { markDone(); }
-
-    void loadMessageEventBuilder(bmqa::MessageEventBuilder* builder)
-        BSLS_KEYWORD_OVERRIDE
-    {
-        markDone();
-    }
-
-    void loadConfirmEventBuilder(bmqa::ConfirmEventBuilder* builder)
-        BSLS_KEYWORD_OVERRIDE
-    {
-        markDone();
-    }
-
-    void loadMessageProperties(bmqa::MessageProperties* buffer)
-        BSLS_KEYWORD_OVERRIDE
-    {
-        markDone();
-    }
-
-    int getQueueId(bmqa::QueueId*   queueId,
-                   const bmqt::Uri& uri) BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
-
     int
-    getQueueId(bmqa::QueueId*             queueId,
-               const bmqt::CorrelationId& correlationId) BSLS_KEYWORD_OVERRIDE
+    start(const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
     {
         return markDone();
     }
 
-    int openQueue(bmqa::QueueId*            queueId,
-                  const bmqt::Uri&          uri,
-                  bsls::Types::Uint64       flags,
-                  const bmqt::QueueOptions& options = bmqt::QueueOptions(),
-                  const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE
+    int startAsync(
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
     {
         return markDone();
     }
 
-    bmqa::OpenQueueStatus
-    openQueueSync(bmqa::QueueId*            queueId,
-                  const bmqt::Uri&          uri,
-                  bsls::Types::Uint64       flags,
-                  const bmqt::QueueOptions& options = bmqt::QueueOptions(),
-                  const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
+    void stop() override { markDone(); }
 
-    int
-    openQueueAsync(bmqa::QueueId*            queueId,
-                   const bmqt::Uri&          uri,
-                   bsls::Types::Uint64       flags,
-                   const bmqt::QueueOptions& options = bmqt::QueueOptions(),
-                   const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
+    void stopAsync() override { markDone(); }
 
-    void
-    openQueueAsync(bmqa::QueueId*            queueId,
-                   const bmqt::Uri&          uri,
-                   bsls::Types::Uint64       flags,
-                   const OpenQueueCallback&  callback,
-                   const bmqt::QueueOptions& options = bmqt::QueueOptions(),
-                   const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE
+    void finalizeStop() override { markDone(); }
+
+    void loadMessageEventBuilder(bmqa::MessageEventBuilder* builder) override
     {
         markDone();
     }
 
-    int configureQueue(bmqa::QueueId*            queueId,
-                       const bmqt::QueueOptions& options,
-                       const bsls::TimeInterval& timeout =
-                           bsls::TimeInterval()) BSLS_KEYWORD_OVERRIDE
+    void loadConfirmEventBuilder(bmqa::ConfirmEventBuilder* builder) override
+    {
+        markDone();
+    }
+
+    void loadMessageProperties(bmqa::MessageProperties* buffer) override
+    {
+        markDone();
+    }
+
+    int getQueueId(bmqa::QueueId* queueId, const bmqt::Uri& uri) override
+    {
+        return markDone();
+    }
+
+    int getQueueId(bmqa::QueueId*             queueId,
+                   const bmqt::CorrelationId& correlationId) override
+    {
+        return markDone();
+    }
+
+    int openQueue(
+        bmqa::QueueId*            queueId,
+        const bmqt::Uri&          uri,
+        bsls::Types::Uint64       flags,
+        const bmqt::QueueOptions& options = bmqt::QueueOptions(),
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
+    {
+        return markDone();
+    }
+
+    bmqa::OpenQueueStatus openQueueSync(
+        bmqa::QueueId*            queueId,
+        const bmqt::Uri&          uri,
+        bsls::Types::Uint64       flags,
+        const bmqt::QueueOptions& options = bmqt::QueueOptions(),
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
+    {
+        return markDone();
+    }
+
+    int openQueueAsync(
+        bmqa::QueueId*            queueId,
+        const bmqt::Uri&          uri,
+        bsls::Types::Uint64       flags,
+        const bmqt::QueueOptions& options = bmqt::QueueOptions(),
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
+    {
+        return markDone();
+    }
+
+    void openQueueAsync(
+        bmqa::QueueId*            queueId,
+        const bmqt::Uri&          uri,
+        bsls::Types::Uint64       flags,
+        const OpenQueueCallback&  callback,
+        const bmqt::QueueOptions& options = bmqt::QueueOptions(),
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
+    {
+        markDone();
+    }
+
+    int configureQueue(
+        bmqa::QueueId*            queueId,
+        const bmqt::QueueOptions& options,
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
     {
         return markDone();
     }
@@ -150,88 +142,81 @@ struct AbstractSessionTestImp : bsls::ProtocolTestImp<bmqa::AbstractSession> {
     bmqa::ConfigureQueueStatus
     configureQueueSync(bmqa::QueueId*            queueId,
                        const bmqt::QueueOptions& options,
-                       const bsls::TimeInterval& timeout) BSLS_KEYWORD_OVERRIDE
+                       const bsls::TimeInterval& timeout) override
     {
         return markDone();
     }
 
-    int configureQueueAsync(bmqa::QueueId*            queueId,
-                            const bmqt::QueueOptions& options,
-                            const bsls::TimeInterval& timeout =
-                                bsls::TimeInterval()) BSLS_KEYWORD_OVERRIDE
+    int configureQueueAsync(
+        bmqa::QueueId*            queueId,
+        const bmqt::QueueOptions& options,
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
     {
         return markDone();
     }
 
-    void configureQueueAsync(bmqa::QueueId*                queueId,
-                             const bmqt::QueueOptions&     options,
-                             const ConfigureQueueCallback& callback,
-                             const bsls::TimeInterval&     timeout =
-                                 bsls::TimeInterval()) BSLS_KEYWORD_OVERRIDE
+    void configureQueueAsync(
+        bmqa::QueueId*                queueId,
+        const bmqt::QueueOptions&     options,
+        const ConfigureQueueCallback& callback,
+        const bsls::TimeInterval&     timeout = bsls::TimeInterval()) override
     {
         markDone();
     }
 
-    int closeQueue(bmqa::QueueId*            queueId,
-                   const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE
+    int closeQueue(
+        bmqa::QueueId*            queueId,
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
     {
         return markDone();
     }
 
-    bmqa::CloseQueueStatus
-    closeQueueSync(bmqa::QueueId*            queueId,
-                   const bsls::TimeInterval& timeout = bsls::TimeInterval())
-        BSLS_KEYWORD_OVERRIDE
+    bmqa::CloseQueueStatus closeQueueSync(
+        bmqa::QueueId*            queueId,
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
     {
         return markDone();
     }
 
-    int closeQueueAsync(bmqa::QueueId*            queueId,
-                        const bsls::TimeInterval& timeout =
-                            bsls::TimeInterval()) BSLS_KEYWORD_OVERRIDE
+    int closeQueueAsync(
+        bmqa::QueueId*            queueId,
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
     {
         return markDone();
     }
 
-    void closeQueueAsync(bmqa::QueueId*            queueId,
-                         const CloseQueueCallback& callback,
-                         const bsls::TimeInterval& timeout =
-                             bsls::TimeInterval()) BSLS_KEYWORD_OVERRIDE
+    void closeQueueAsync(
+        bmqa::QueueId*            queueId,
+        const CloseQueueCallback& callback,
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
     {
         markDone();
     }
 
-    bmqa::Event nextEvent(const bsls::TimeInterval& timeout =
-                              bsls::TimeInterval()) BSLS_KEYWORD_OVERRIDE
+    bmqa::Event nextEvent(
+        const bsls::TimeInterval& timeout = bsls::TimeInterval()) override
     {
         return markDone();
     }
 
-    int post(const bmqa::MessageEvent& event) BSLS_KEYWORD_OVERRIDE
+    int post(const bmqa::MessageEvent& event) override { return markDone(); }
+
+    int confirmMessage(const bmqa::Message& message) override
     {
         return markDone();
     }
 
-    int confirmMessage(const bmqa::Message& message) BSLS_KEYWORD_OVERRIDE
+    int confirmMessage(const bmqa::MessageConfirmationCookie& cookie) override
     {
         return markDone();
     }
 
-    int confirmMessage(const bmqa::MessageConfirmationCookie& cookie)
-        BSLS_KEYWORD_OVERRIDE
+    int confirmMessages(bmqa::ConfirmEventBuilder* builder) override
     {
         return markDone();
     }
 
-    int
-    confirmMessages(bmqa::ConfirmEventBuilder* builder) BSLS_KEYWORD_OVERRIDE
-    {
-        return markDone();
-    }
-
-    int configureMessageDumping(const bslstl::StringRef& command)
-        BSLS_KEYWORD_OVERRIDE
+    int configureMessageDumping(const bslstl::StringRef& command) override
     {
         return markDone();
     }
@@ -240,8 +225,7 @@ struct AbstractSessionTestImp : bsls::ProtocolTestImp<bmqa::AbstractSession> {
 /// A dummy implementation of the `bmqa::AbstractSession` protocol
 /// overriding only one method.
 struct AbstractSessionDummyImp : bsls::ProtocolTestImp<bmqa::AbstractSession> {
-    int configureMessageDumping(const bslstl::StringRef& command)
-        BSLS_KEYWORD_OVERRIDE
+    int configureMessageDumping(const bslstl::StringRef& command) override
     {
         return -1497;
     }

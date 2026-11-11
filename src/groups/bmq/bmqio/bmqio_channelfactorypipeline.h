@@ -113,7 +113,7 @@ class ChannelFactoryPipeline : public bmqio::ChannelFactory {
     ChannelFactoryPipeline(bslmf::MovableRef<Config> builder,
                            const allocator_type& allocator = allocator_type());
 
-    ~ChannelFactoryPipeline() BSLS_KEYWORD_NOEXCEPT BSLS_KEYWORD_OVERRIDE;
+    ~ChannelFactoryPipeline() BSLS_KEYWORD_NOEXCEPT override;
 
   private:
     // PRIVATE CONSTRUCTORS
@@ -137,19 +137,19 @@ class ChannelFactoryPipeline : public bmqio::ChannelFactory {
     void listen(bmqio::Status*               status,
                 bslma::ManagedPtr<OpHandle>* handle,
                 const bmqio::ListenOptions&  options,
-                const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                const ResultCallback&        cb) override;
 
     void connect(bmqio::Status*               status,
                  bslma::ManagedPtr<OpHandle>* handle,
                  const bmqio::ConnectOptions& options,
-                 const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                 const ResultCallback&        cb) override;
 
     /// Enable this factory to start creating connections.
-    int start() BSLS_KEYWORD_OVERRIDE;
+    int start() override;
 
     /// Stop this factory from creating connections and clean up any pending
     /// connections.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 
     /// Search the channel factory stack for a ChannelFactory matching subtype
     /// T. If no such type is found, return NULL.

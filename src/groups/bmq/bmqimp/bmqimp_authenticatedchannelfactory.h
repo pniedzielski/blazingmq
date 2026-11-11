@@ -183,19 +183,19 @@ class AuthenticatedChannelFactory : public bmqio::ChannelFactory {
     explicit AuthenticatedChannelFactory(const Config&     config,
                                          bslma::Allocator* basicAllocator = 0);
 
-    ~AuthenticatedChannelFactory() BSLS_KEYWORD_OVERRIDE;
+    ~AuthenticatedChannelFactory() override;
 
   public:
     // MANIPULATORS
     void listen(bmqio::Status*               status,
                 bslma::ManagedPtr<OpHandle>* handle,
                 const bmqio::ListenOptions&  options,
-                const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                const ResultCallback&        cb) override;
 
     void connect(bmqio::Status*               status,
                  bslma::ManagedPtr<OpHandle>* handle,
                  const bmqio::ConnectOptions& options,
-                 const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                 const ResultCallback&        cb) override;
 
     /// Process the specified authentication `event` received from the broker
     /// on the specified `channel`, invoking the specified `cb` on failure.
@@ -208,12 +208,12 @@ class AuthenticatedChannelFactory : public bmqio::ChannelFactory {
 
     /// Start the channel factory. Return 0 on success and a non-zero value
     /// otherwise.
-    int start() BSLS_KEYWORD_OVERRIDE;
+    int start() override;
 
     /// Stop the channel factory. Note that the behavior is undefined unless
     /// the thread calling this function is the same thread that called
     /// `start()` and is not one of the I/O threads used by this object.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 };
 
 }  // close package namespace

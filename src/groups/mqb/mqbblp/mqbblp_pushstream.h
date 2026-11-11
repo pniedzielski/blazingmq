@@ -331,7 +331,7 @@ class PushStreamIterator : public mqbi::StorageIterator {
                        const PushStream::iterator& initialPosition);
 
     /// Destructor
-    virtual ~PushStreamIterator() BSLS_KEYWORD_OVERRIDE;
+    virtual ~PushStreamIterator() override;
 
     /// Remove the current element (`mqbi::AppMessage`, `upstreamSubQueueId`
     /// pair) from the current PUSH GUID.
@@ -360,59 +360,56 @@ class PushStreamIterator : public mqbi::StorageIterator {
     /// The cache might be initialized within `appData`, `options` or
     /// `attributes` routines.
     /// TODO: refactor iterators to remove cached data.
-    void clearCache() BSLS_KEYWORD_OVERRIDE;
+    void clearCache() override;
 
-    bool advance() BSLS_KEYWORD_OVERRIDE;
+    bool advance() override;
 
     /// If the specified `atEnd` is `true`, reset the iterator to point to the
     /// to the end of the underlying storage.  Otherwise, reset the iterator to
     /// point first item, if any, in the underlying storage.
-    void reset(const bmqt::MessageGUID& where = bmqt::MessageGUID())
-        BSLS_KEYWORD_OVERRIDE;
+    void reset(const bmqt::MessageGUID& where = bmqt::MessageGUID()) override;
 
     // ACCESSORS
 
     /// Return a reference offering non-modifiable access to the guid
     /// associated to the item currently pointed at by this iterator.  The
     /// behavior is undefined unless `atEnd` returns `false`.
-    const bmqt::MessageGUID& guid() const BSLS_KEYWORD_OVERRIDE;
+    const bmqt::MessageGUID& guid() const override;
 
     /// Return a reference offering non-modifiable access to the App state
     /// associated to the item currently pointed at by this iterator.  The
     /// behavior is undefined unless `atEnd` returns `false`.
     const mqbi::AppMessage&
-    appMessageView(unsigned int appOrdinal) const BSLS_KEYWORD_OVERRIDE;
+    appMessageView(unsigned int appOrdinal) const override;
 
     /// Return a reference offering modifiable access to the App state
     /// associated to the item currently pointed at by this iterator.  The
     /// behavior is undefined unless `atEnd` returns `false`.
-    mqbi::AppMessage&
-    appMessageState(unsigned int appOrdinal) BSLS_KEYWORD_OVERRIDE;
+    mqbi::AppMessage& appMessageState(unsigned int appOrdinal) override;
 
     /// Return a reference offering non-modifiable access to the application
     /// data associated with the item currently pointed at by this iterator.
     /// The behavior is undefined unless `atEnd` returns `false`.
-    const bsl::shared_ptr<bdlbb::Blob>& appData() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<bdlbb::Blob>& appData() const override;
 
     /// Return a reference offering non-modifiable access to the options
     /// associated with the item currently pointed at by this iterator.  The
     /// behavior is undefined unless `atEnd` returns `false`.
-    const bsl::shared_ptr<bdlbb::Blob>& options() const BSLS_KEYWORD_OVERRIDE;
+    const bsl::shared_ptr<bdlbb::Blob>& options() const override;
 
     /// Return a reference offering non-modifiable access to the attributes
     /// associated with the message currently pointed at by this iterator.
     /// The behavior is undefined unless `atEnd` returns `false`.
-    const mqbi::StorageMessageAttributes&
-    attributes() const BSLS_KEYWORD_OVERRIDE;
+    const mqbi::StorageMessageAttributes& attributes() const override;
 
     /// Return `true` if this iterator is currently at the end of the items'
     /// collection, and hence doesn't reference a valid item.
-    bool atEnd() const BSLS_KEYWORD_OVERRIDE;
+    bool atEnd() const override;
 
     /// Return `true` if this iterator is currently not at the end of the
     /// `items` collection and the message currently pointed at by this
     /// iterator has received replication factor Receipts.
-    bool hasReceipt() const BSLS_KEYWORD_OVERRIDE;
+    bool hasReceipt() const override;
 };
 
 // ============================
@@ -437,7 +434,7 @@ class VirtualPushStreamIterator : public PushStreamIterator {
                               PushStream*    owner);
 
     /// Destructor
-    virtual ~VirtualPushStreamIterator() BSLS_KEYWORD_OVERRIDE;
+    virtual ~VirtualPushStreamIterator() override;
 
     /// Remove the current element (`mqbi::AppMessage`, `upstreamSubQueueId`
     /// pair) from the current PUSH GUID.
@@ -452,15 +449,14 @@ class VirtualPushStreamIterator : public PushStreamIterator {
     /// Return the current element (`mqbi::AppMessage`, `upstreamSubQueueId`
     /// pair).
     /// The behavior is undefined unless `atEnd` returns `false`.
-    PushStream::Element*
-    element(unsigned int appOrdinal) const BSLS_KEYWORD_OVERRIDE;
+    PushStream::Element* element(unsigned int appOrdinal) const override;
 
     // MANIPULATORS
-    bool advance() BSLS_KEYWORD_OVERRIDE;
+    bool advance() override;
 
     /// Return `true` if this iterator is currently at the end of the items'
     /// collection, and hence doesn't reference a valid item.
-    bool atEnd() const BSLS_KEYWORD_OVERRIDE;
+    bool atEnd() const override;
 };
 
 // FREE OPERATORS

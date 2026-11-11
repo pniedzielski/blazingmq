@@ -154,7 +154,7 @@ struct TestDispatcherClient : public mqbi::DispatcherClient {
         // NOTHING
     }
 
-    ~TestDispatcherClient() BSLS_KEYWORD_OVERRIDE
+    ~TestDispatcherClient() override
     {
         // NOTHING
     }
@@ -162,22 +162,18 @@ struct TestDispatcherClient : public mqbi::DispatcherClient {
     // MANIPULATORS
 
     /// Return a pointer to the dispatcher this client is associated with.
-    mqbi::Dispatcher* dispatcher() BSLS_KEYWORD_OVERRIDE
-    {
-        return d_dispatcher_p;
-    }
+    mqbi::Dispatcher* dispatcher() override { return d_dispatcher_p; }
 
     /// Return a reference offering modifiable access to the
     /// DispatcherClientData of this client.
-    mqbi::DispatcherClientData& dispatcherClientData() BSLS_KEYWORD_OVERRIDE
+    mqbi::DispatcherClientData& dispatcherClientData() override
     {
         return d_data;
     }
 
     /// Called by the `Dispatcher` when it has the specified `event` to
     /// deliver to the client.
-    void
-    onDispatcherEvent(const mqbi::DispatcherEvent& event) BSLS_KEYWORD_OVERRIDE
+    void onDispatcherEvent(const mqbi::DispatcherEvent& event) override
     {
         if (event.type() == mqbi::DispatcherEventType::e_CALLBACK) {
             event.the<mqbevt::CallbackEvent>()->callback()();
@@ -186,7 +182,7 @@ struct TestDispatcherClient : public mqbi::DispatcherClient {
 
     /// Called by the dispatcher to flush any pending operation; mainly
     /// used to provide batch and nagling mechanism.
-    void flush() BSLS_KEYWORD_OVERRIDE
+    void flush() override
     {
         // NOTHING
     }
@@ -194,24 +190,20 @@ struct TestDispatcherClient : public mqbi::DispatcherClient {
     // ACCESSORS
 
     /// Return a pointer to the dispatcher this client is associated with.
-    const mqbi::Dispatcher* dispatcher() const BSLS_KEYWORD_OVERRIDE
+    const mqbi::Dispatcher* dispatcher() const override
     {
         return d_dispatcher_p;
     }
 
     /// Return a reference not offering modifiable access to the
     /// DispatcherClientData of this client.
-    const mqbi::DispatcherClientData&
-    dispatcherClientData() const BSLS_KEYWORD_OVERRIDE
+    const mqbi::DispatcherClientData& dispatcherClientData() const override
     {
         return d_data;
     }
 
     /// Return a printable description of the client (e.g., for logging).
-    bsl::string_view description() const BSLS_KEYWORD_OVERRIDE
-    {
-        return d_description;
-    }
+    bsl::string_view description() const override { return d_description; }
 };
 
 /// A helper class used to verify correctness of ExecuteOnAllQueues.

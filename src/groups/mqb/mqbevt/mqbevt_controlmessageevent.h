@@ -72,7 +72,7 @@ class ControlMessageEvent : public mqbi::DispatcherEvent {
     explicit ControlMessageEvent(bslma::Allocator* allocator);
 
     /// Destructor.
-    ~ControlMessageEvent() BSLS_KEYWORD_OVERRIDE;
+    ~ControlMessageEvent() override;
 
     // MANIPULATORS
 
@@ -86,7 +86,7 @@ class ControlMessageEvent : public mqbi::DispatcherEvent {
     ControlMessageEvent& setSource(mqbi::DispatcherClient* value);
 
     /// Reset all members of this event to default values.
-    void reset() BSLS_KEYWORD_OVERRIDE;
+    void reset() override;
 
     // ACCESSORS
 
@@ -98,12 +98,12 @@ class ControlMessageEvent : public mqbi::DispatcherEvent {
     const bmqp_ctrlmsg::ControlMessage& controlMessage() const;
 
     /// Return the type of this event.
-    mqbi::DispatcherEventType::Enum type() const BSLS_KEYWORD_OVERRIDE;
+    mqbi::DispatcherEventType::Enum type() const override;
 
     /// Format this object to the specified output `stream`.
     bsl::ostream& print(bsl::ostream& stream,
-                        int           level = 0,
-                        int spacesPerLevel  = 4) const BSLS_KEYWORD_OVERRIDE;
+                        int           level          = 0,
+                        int           spacesPerLevel = 4) const override;
 };
 
 // ============================================================================

@@ -139,7 +139,7 @@ class OneConsumerVisitor : public Routers::Visitor {
 
     bool visit(mqbi::QueueHandle* handle,
                Routers::Consumer* consumer,
-               unsigned int downstreamSubscriptionId) BSLS_KEYWORD_OVERRIDE
+               unsigned int       downstreamSubscriptionId) override
     {
         d_result_p->d_handle                   = handle;
         d_result_p->d_consumer                 = consumer;
@@ -173,7 +173,7 @@ class MinDelayConsumerVisitor : public Routers::Visitor {
 
     bool visit(mqbi::QueueHandle* handle,
                Routers::Consumer* consumer,
-               unsigned int downstreamSubscriptionId) BSLS_KEYWORD_OVERRIDE
+               unsigned int       downstreamSubscriptionId) override
     {
         BSLS_ASSERT(handle);
         BSLS_ASSERT(consumer);
@@ -209,7 +209,7 @@ class BroadcastNoTrackVisitor : public Routers::Visitor {
 
     bool visit(mqbi::QueueHandle* handle,
                BSLA_MAYBE_UNUSED Routers::Consumer* consumer,
-               unsigned int downstreamSubscriptionId) BSLS_KEYWORD_OVERRIDE
+               unsigned int downstreamSubscriptionId) override
     {
         BSLS_ASSERT(handle);
 
@@ -242,7 +242,7 @@ class FanoutVisitor : public Routers::Visitor {
 
     bool visit(mqbi::QueueHandle* handle,
                BSLA_MAYBE_UNUSED Routers::Consumer* consumer,
-               unsigned int downstreamSubscriptionId) BSLS_KEYWORD_OVERRIDE
+               unsigned int downstreamSubscriptionId) override
     {
         BSLS_ASSERT(handle);
 
@@ -269,7 +269,7 @@ class BroadcastVisitor : public Routers::Visitor {
 
     bool visit(mqbi::QueueHandle* handle,
                BSLA_MAYBE_UNUSED Routers::Consumer* consumer,
-               unsigned int downstreamSubscriptionId) BSLS_KEYWORD_OVERRIDE
+               unsigned int downstreamSubscriptionId) override
     {
         BSLS_ASSERT(handle);
 

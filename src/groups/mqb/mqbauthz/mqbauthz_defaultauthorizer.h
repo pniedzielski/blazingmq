@@ -90,12 +90,12 @@ class DefaultAuthorizer : public mqbplug::Authorizer {
     explicit DefaultAuthorizer(bslmf::MovableRef<PolicyMP> policy);
 
     /// Destructor.
-    ~DefaultAuthorizer() BSLS_KEYWORD_OVERRIDE;
+    ~DefaultAuthorizer() override;
 
     // ACCESSORS
 
     /// Return the name of the plugin.
-    bsl::string_view name() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string_view name() const override;
 
     /// Check if the supplied action is allowed based on the result of
     /// authentication. This authorizer always allows all actions regardless of
@@ -104,8 +104,7 @@ class DefaultAuthorizer : public mqbplug::Authorizer {
     /// @param action The action being authorized
     /// @param authnResult The result of an authenticated connection
     bool authorize(const mqbact::Action&                action,
-                   const mqbplug::AuthenticationResult& authnResult)
-        BSLS_KEYWORD_OVERRIDE;
+                   const mqbplug::AuthenticationResult& authnResult) override;
 };
 
 // ====================================
@@ -120,13 +119,13 @@ class DefaultAuthorizerPluginFactory
 
   public:
     // CREATORS
-    ~DefaultAuthorizerPluginFactory() BSLS_KEYWORD_OVERRIDE;
+    ~DefaultAuthorizerPluginFactory() override;
 
     // MANIPULATORS
 
     /// Create a `DefaultAuthorizer` using the supplied allocator.
     bslma::ManagedPtr<mqbplug::Authorizer>
-    create(bslma::Allocator* allocator) BSLS_KEYWORD_OVERRIDE;
+    create(bslma::Allocator* allocator) override;
 
   private:
     BSLA_NODISCARD int

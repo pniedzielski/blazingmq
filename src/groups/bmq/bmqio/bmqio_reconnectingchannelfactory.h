@@ -220,18 +220,18 @@ struct ReconnectingChannelFactory_ConnectHandle
     // CREATORS
     explicit ReconnectingChannelFactory_ConnectHandle(
         bslma::Allocator* basicAllocator = 0);
-    ~ReconnectingChannelFactory_ConnectHandle() BSLS_KEYWORD_OVERRIDE;
+    ~ReconnectingChannelFactory_ConnectHandle() override;
 
     // MANIPULATORS
 
     /// Cancel any current and future connect attempts (but do not close any
     /// existing Channel).
-    void cancel() BSLS_KEYWORD_OVERRIDE;
+    void cancel() override;
 
-    bmqvt::PropertyBag& properties() BSLS_KEYWORD_OVERRIDE;
+    bmqvt::PropertyBag& properties() override;
 
     // ACCESSORS
-    const bmqvt::PropertyBag& properties() const BSLS_KEYWORD_OVERRIDE;
+    const bmqvt::PropertyBag& properties() const override;
 };
 
 // ================================
@@ -309,18 +309,18 @@ class ReconnectingChannelFactory : public ChannelFactory {
     // CREATORS
     explicit ReconnectingChannelFactory(const Config&     config,
                                         bslma::Allocator* basicAllocator = 0);
-    ~ReconnectingChannelFactory() BSLS_KEYWORD_OVERRIDE;
+    ~ReconnectingChannelFactory() override;
 
     // MANIPULATORS
 
     /// Start the channel factory. Return 0 on success and a non-zero value
     /// otherwise.
-    int start() BSLS_KEYWORD_OVERRIDE;
+    int start() override;
 
     /// Stop the channel factory. Note that the behavior is undefined unless
     /// the thread calling this function is the same thread that called
     /// `start()` and is not one of the I/O threads used by this object.
-    void stop() BSLS_KEYWORD_OVERRIDE;
+    void stop() override;
 
     /// Disable automatic reconnection.  After this call, channels that go
     /// down will not trigger a reconnect attempt.
@@ -332,7 +332,7 @@ class ReconnectingChannelFactory : public ChannelFactory {
     void listen(Status*                      status,
                 bslma::ManagedPtr<OpHandle>* handle,
                 const ListenOptions&         options,
-                const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                const ResultCallback&        cb) override;
 
     /// Connect (using the base `ChannelFactory`) to one of the endpoints
     /// produced by our Config's `resolveEndpointFn`, and if that connection
@@ -346,7 +346,7 @@ class ReconnectingChannelFactory : public ChannelFactory {
     void connect(Status*                      status,
                  bslma::ManagedPtr<OpHandle>* handle,
                  const ConnectOptions&        options,
-                 const ResultCallback&        cb) BSLS_KEYWORD_OVERRIDE;
+                 const ResultCallback&        cb) override;
 };
 
 // =====================================

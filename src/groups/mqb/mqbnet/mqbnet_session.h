@@ -109,7 +109,7 @@ class Session : public SessionEventProcessor {
     // CREATORS
 
     /// Destructor
-    ~Session() BSLS_KEYWORD_OVERRIDE;
+    ~Session() override;
 
     // MANIPULATORS
     //  (virtual: mqbnet::SessionEventProcessor)

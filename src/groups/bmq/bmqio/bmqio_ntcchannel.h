@@ -240,7 +240,7 @@ class NtcChannel : public bmqio::Channel,
     /// than or equal to the read queue low watermark.
     void processReadQueueLowWatermark(
         const bsl::shared_ptr<ntci::StreamSocket>& streamSocket,
-        const ntca::ReadQueueEvent& event) BSLS_KEYWORD_OVERRIDE;
+        const ntca::ReadQueueEvent&                event) override;
 
     /// Process the condition that the size of the write queue has been
     /// drained down to less than or equal to the write queue low watermark.
@@ -249,7 +249,7 @@ class NtcChannel : public bmqio::Channel,
     /// high watermark conditions are guaranteed to occur serially.
     void processWriteQueueLowWatermark(
         const bsl::shared_ptr<ntci::StreamSocket>& streamSocket,
-        const ntca::WriteQueueEvent& event) BSLS_KEYWORD_OVERRIDE;
+        const ntca::WriteQueueEvent&               event) override;
 
     /// Process the condition that the size of the write queue is greater
     /// than the write queue high watermark. This condition will occur the
@@ -259,28 +259,28 @@ class NtcChannel : public bmqio::Channel,
     /// high watermark conditions are guaranteed to occur serially.
     void processWriteQueueHighWatermark(
         const bsl::shared_ptr<ntci::StreamSocket>& streamSocket,
-        const ntca::WriteQueueEvent& event) BSLS_KEYWORD_OVERRIDE;
+        const ntca::WriteQueueEvent&               event) override;
 
     /// Process the initiation of the shutdown sequence from the specified
     /// `origin`.
     void processShutdownInitiated(
         const bsl::shared_ptr<ntci::StreamSocket>& streamSocket,
-        const ntca::ShutdownEvent& event) BSLS_KEYWORD_OVERRIDE;
+        const ntca::ShutdownEvent&                 event) override;
 
     /// Process the socket being shut down for reading.
     void processShutdownReceive(
         const bsl::shared_ptr<ntci::StreamSocket>& streamSocket,
-        const ntca::ShutdownEvent& event) BSLS_KEYWORD_OVERRIDE;
+        const ntca::ShutdownEvent&                 event) override;
 
     /// Process the socket being shut down for writing.
     void processShutdownSend(
         const bsl::shared_ptr<ntci::StreamSocket>& streamSocket,
-        const ntca::ShutdownEvent& event) BSLS_KEYWORD_OVERRIDE;
+        const ntca::ShutdownEvent&                 event) override;
 
     /// Process the completion of the shutdown sequence.
     void processShutdownComplete(
         const bsl::shared_ptr<ntci::StreamSocket>& streamSocket,
-        const ntca::ShutdownEvent& event) BSLS_KEYWORD_OVERRIDE;
+        const ntca::ShutdownEvent&                 event) override;
 
     /// Process the closure of the socket.
     void processClose(const bmqio::Status& status);
@@ -309,7 +309,7 @@ class NtcChannel : public bmqio::Channel,
         bslma::Allocator*                            basicAllocator = 0);
 
     /// Destroy this object.
-    ~NtcChannel() BSLS_KEYWORD_OVERRIDE;
+    ~NtcChannel() override;
 
     // MANIPULATORS
 
@@ -346,7 +346,7 @@ class NtcChannel : public bmqio::Channel,
     void read(Status*                   status,
               int                       numBytes,
               const ReadCallback&       readCallback,
-              const bsls::TimeInterval& timeout) BSLS_KEYWORD_OVERRIDE;
+              const bsls::TimeInterval& timeout) override;
 
     /// Enqueue the specified message `blob` to be written to this channel.
     /// Optionally provide `highWaterMark` to specify the maximum data size
@@ -361,31 +361,31 @@ class NtcChannel : public bmqio::Channel,
     /// this channel for the write to succeed.
     void write(Status*            status,
                const bdlbb::Blob& blob,
-               bsls::Types::Int64 watermark = bsl::numeric_limits<int>::max())
-        BSLS_KEYWORD_OVERRIDE;
+               bsls::Types::Int64 watermark =
+                   bsl::numeric_limits<int>::max()) override;
 
     /// Cancel the operation.
     /// Note: the result callback might still be called after close due to
     ///       concurrency.
-    void cancel() BSLS_KEYWORD_OVERRIDE;
+    void cancel() override;
 
     /// Cancel all pending read requests, and invoke their read callbacks
     /// with a `bmqio::ChannelStatus::e_CANCELED` status.  Note that if the
     /// channel is active, the read callbacks are invoked in the thread in
     /// which the channel's data callbacks are invoked, else they are
     /// invoked in the thread calling `cancelRead`.
-    void cancelRead() BSLS_KEYWORD_OVERRIDE;
+    void cancelRead() override;
 
     /// Shutdown this channel, and cancel all pending read requests (but do
     /// not invoke them).  Pass the specified `status` to any registered
     /// `CloseFn`s.
-    void close(const Status& status = Status()) BSLS_KEYWORD_OVERRIDE;
+    void close(const Status& status = Status()) override;
 
     /// Execute the specified `cb` serialized with calls to any registered
     /// read callbacks, or any `close` or `watermark` event handlers for
     /// this channel.  Return `0` on success or a negative value if the `cb`
     /// could not be enqueued for execution.
-    int execute(const ExecuteCb& cb) BSLS_KEYWORD_OVERRIDE;
+    int execute(const ExecuteCb& cb) override;
 
     /// @brief Register a callback to be invoked when this channel closes.
     ///
@@ -394,7 +394,7 @@ class NtcChannel : public bmqio::Channel,
     /// immediately in the calling thread.
     ///
     /// @param cb The callback to invoke.
-    void onClose(const CloseFn& cb) BSLS_KEYWORD_OVERRIDE;
+    void onClose(const CloseFn& cb) override;
 
     /// @brief Register a callback to be invoked on each watermark event of
     /// this channel.
@@ -402,20 +402,20 @@ class NtcChannel : public bmqio::Channel,
     /// Callbacks are invoked in order of registration.
     ///
     /// @param cb The callback to invoke.
-    void onWatermark(const WatermarkFn& cb) BSLS_KEYWORD_OVERRIDE;
+    void onWatermark(const WatermarkFn& cb) override;
 
     /// Return a reference providing modifiable access to the properties of
     /// this Channel.
-    bmqvt::PropertyBag& properties() BSLS_KEYWORD_OVERRIDE;
+    bmqvt::PropertyBag& properties() override;
 
     /// Set the channel ID to the specified `channelId`.
     void setChannelId(int channelId);
 
     /// Set the write queue low watermark to the specified `lowWatermark`.
-    void setWriteQueueLowWatermark(int lowWatermark) BSLS_KEYWORD_OVERRIDE;
+    void setWriteQueueLowWatermark(int lowWatermark) override;
 
     /// Set the write queue high watermark to the specified `highWatermark`.
-    void setWriteQueueHighWatermark(int highWatermark) BSLS_KEYWORD_OVERRIDE;
+    void setWriteQueueHighWatermark(int highWatermark) override;
 
     // ACCESSORS
 
@@ -430,11 +430,11 @@ class NtcChannel : public bmqio::Channel,
 
     /// Return the URI of the "remote" end of this channel.  It is up to the
     /// underlying implementation to define the format of the returned URI.
-    bsl::string peerUri() const BSLS_KEYWORD_OVERRIDE;
+    bsl::string peerUri() const override;
 
     /// Return a reference providing modifiable access to the properties of
     /// this Channel.
-    const bmqvt::PropertyBag& properties() const BSLS_KEYWORD_OVERRIDE;
+    const bmqvt::PropertyBag& properties() const override;
 
     /// Return the allocator this object was created with.
     bslma::Allocator* allocator() const;
@@ -535,7 +535,7 @@ class NtcListener : public bmqio::ChannelFactoryOperationHandle,
         bslma::Allocator*                            basicAllocator = 0);
 
     /// Destroy this object.
-    ~NtcListener() BSLS_KEYWORD_OVERRIDE;
+    ~NtcListener() override;
 
     // MANIPULATORS
 
@@ -547,7 +547,7 @@ class NtcListener : public bmqio::ChannelFactoryOperationHandle,
     int listen(bmqio::Status* status, const bmqio::ListenOptions& options);
 
     /// Cancel the operation.
-    void cancel() BSLS_KEYWORD_OVERRIDE;
+    void cancel() override;
 
     /// @brief Register a callback to be invoked when this listener closes.
     ///
@@ -560,7 +560,7 @@ class NtcListener : public bmqio::ChannelFactoryOperationHandle,
 
     /// Return a reference providing modifiable access to the properties of
     /// this object.
-    bmqvt::PropertyBag& properties() BSLS_KEYWORD_OVERRIDE;
+    bmqvt::PropertyBag& properties() override;
 
     // ACCESSORS
 
@@ -570,7 +570,7 @@ class NtcListener : public bmqio::ChannelFactoryOperationHandle,
 
     /// Return a reference providing const access to the properties of this
     /// object.
-    const bmqvt::PropertyBag& properties() const BSLS_KEYWORD_OVERRIDE;
+    const bmqvt::PropertyBag& properties() const override;
 
     /// Return the allocator this object was created with.
     bslma::Allocator* allocator() const;

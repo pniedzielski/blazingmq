@@ -251,7 +251,7 @@ class StatContextTableInfoProvider : public bmqst::TableInfoProvider {
   public:
     // CREATORS
     StatContextTableInfoProvider(bslma::Allocator* basicAllocator = 0);
-    ~StatContextTableInfoProvider() BSLS_KEYWORD_OVERRIDE;
+    ~StatContextTableInfoProvider() override;
 
     // MANIPULATORS
 
@@ -351,24 +351,24 @@ class StatContextTableInfoProvider : public bmqst::TableInfoProvider {
     // bmqst::TableInfoProvider
 
     /// Return the number of data rows in the table
-    int numRows() const BSLS_KEYWORD_OVERRIDE;
+    int numRows() const override;
 
     /// Return the number of columns at the specified header `level`.
     /// `level == 0` is the first (bottom) header row, and is the actual
     /// number of columns in the table.  `level == 1` is the row above it,
     /// and so on.
-    int numColumns(int level) const BSLS_KEYWORD_OVERRIDE;
+    int numColumns(int level) const override;
 
     /// Return `true` if this table has a title, and `false` otherwise.
-    bool hasTitle() const BSLS_KEYWORD_OVERRIDE;
+    bool hasTitle() const override;
 
     /// Return the number of header rows in the table.  This must return at
     /// least `1`.
-    int numHeaderLevels() const BSLS_KEYWORD_OVERRIDE;
+    int numHeaderLevels() const override;
 
     /// Return the printed length of the value in the specified `column` of
     /// the specified `row` in the table.
-    int getValueSize(int row, int column) const BSLS_KEYWORD_OVERRIDE;
+    int getValueSize(int row, int column) const override;
 
     /// Print the value in the specified `column` of the specified `row` to
     /// the specified `stream` with the specified `width`.  The width of
@@ -377,19 +377,19 @@ class StatContextTableInfoProvider : public bmqst::TableInfoProvider {
     bsl::ostream& printValue(bsl::ostream& stream,
                              int           row,
                              int           column,
-                             int           width) const BSLS_KEYWORD_OVERRIDE;
+                             int           width) const override;
 
     /// Return the printed length of the header cell in the specified
     /// `column` at the specified header `level`.
-    int getHeaderSize(int level, int column) const BSLS_KEYWORD_OVERRIDE;
+    int getHeaderSize(int level, int column) const override;
 
     /// Return the header cell index in header `level + 1` which is above
     /// the specified `column` in the specified header `level`.
-    int getParentHeader(int level, int column) const BSLS_KEYWORD_OVERRIDE;
+    int getParentHeader(int level, int column) const override;
 
     /// Print the title of this table to the specified `stream`.  Return the
     /// `stream`.
-    bsl::ostream& printTitle(bsl::ostream& stream) const BSLS_KEYWORD_OVERRIDE;
+    bsl::ostream& printTitle(bsl::ostream& stream) const override;
 
     /// Print the header of the specified `column` at the specified
     /// header `level` to the specified `stream` with the specified
@@ -398,7 +398,7 @@ class StatContextTableInfoProvider : public bmqst::TableInfoProvider {
     bsl::ostream& printHeader(bsl::ostream& stream,
                               int           level,
                               int           column,
-                              int           width) const BSLS_KEYWORD_OVERRIDE;
+                              int           width) const override;
 };
 
 // ============================================================================

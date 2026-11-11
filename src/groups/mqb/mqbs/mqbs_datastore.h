@@ -585,7 +585,7 @@ class DataStore : public mqbi::DispatcherClient {
 
   public:
     // CREATORS
-    virtual ~DataStore() BSLS_KEYWORD_OVERRIDE;
+    virtual ~DataStore() override;
 
     // MANIPULATORS
 
