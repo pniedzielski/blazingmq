@@ -29,7 +29,6 @@
 #include <bdlb_randomdevice.h>
 #include <bdlb_stringrefutil.h>
 #include <bdlb_tokenizer.h>
-#include <bdlf_bind.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_algorithm.h>
 #include <bsl_cstdlib.h>
@@ -65,20 +64,22 @@ ReconnectingChannelFactoryConfig::ReconnectingChannelFactoryConfig(
 , d_reconnectIntervalFn(
       bsl::allocator_arg,
       basicAllocator,
-      bdlf::BindUtil::bind(
-          &ReconnectingChannelFactoryUtil::defaultConnectIntervalFn,
-          bdlf::PlaceHolders::_1,
-          bdlf::PlaceHolders::_2,
-          bdlf::PlaceHolders::_3,
-          bsls::TimeInterval(120.0),
-          bsls::TimeInterval(60.0)))
+      [](bsls::TimeInterval*       interval,
+         const ConnectOptions&     options,
+         const bsls::TimeInterval& timeSinceLastAttempt) {
+          ReconnectingChannelFactoryUtil::defaultConnectIntervalFn(
+              interval,
+              options,
+              timeSinceLastAttempt,
+              bsls::TimeInterval(120.0),
+              bsls::TimeInterval(60.0));
+      })
 , d_endpointResolveFn(
       bsl::allocator_arg,
       basicAllocator,
-      bdlf::BindUtil::bind(&ReconnectingChannelFactoryUtil::resolveEndpointFn,
-                           bdlf::PlaceHolders::_1,
-                           bdlf::PlaceHolders::_2,
-                           ';'))
+      [](bsl::vector<bsl::string>* out, const ConnectOptions& options) {
+          ReconnectingChannelFactoryUtil::resolveEndpointFn(out, options, ';');
+      })
 {
     BSLS_ASSERT(d_base_p);
 }
@@ -234,12 +235,12 @@ void ReconnectingChannelFactory::scheduleConnect(
                    << handle->d_options.endpoint() << "' in "
                    << handle->d_lastConnectInterval;
 
-    d_config.d_scheduler_p->scheduleEvent(
-        &handle->d_reconnectHandle,
-        d_config.d_scheduler_p->now() + handle->d_lastConnectInterval,
-        bdlf::BindUtil::bind(&ReconnectingChannelFactory::connectTimerCb,
-                             this,
-                             handle));
+    d_config.d_scheduler_p->scheduleEvent(&handle->d_reconnectHandle,
+                                          d_config.d_scheduler_p->now() +
+                                              handle->d_lastConnectInterval,
+                                          [this, handle]() {
+                                              connectTimerCb(handle);
+                                          });
 }
 
 void ReconnectingChannelFactory::doConnect(Status*                 status,
@@ -320,12 +321,11 @@ void ReconnectingChannelFactory::doConnect(Status*                 status,
         status,
         &handle->d_baseConnectHandle,
         options,
-        bdlf::BindUtil::bind(&ReconnectingChannelFactory::connectResultCb,
-                             this,
-                             handle,
-                             bdlf::PlaceHolders::_1,
-                             bdlf::PlaceHolders::_2,
-                             bdlf::PlaceHolders::_3));
+        [this, handle](ChannelFactoryEvent::Enum       event,
+                       const Status&                   resultStatus,
+                       const bsl::shared_ptr<Channel>& channel) {
+            connectResultCb(handle, event, resultStatus, channel);
+        });
 }
 
 void ReconnectingChannelFactory::connectTimerCb(const ConnectHandlePtr& handle)
@@ -378,10 +378,9 @@ void ReconnectingChannelFactory::connectResultCb(
             // Monitor this channel, so we can schedule a reconnect when it
             // gets disconnected.  Done after updating 'handle', since
             // 'onChannelDown' may be invoked immediately.
-            channel->onClose(bdlf::BindUtil::bind(
-                &ReconnectingChannelFactory::onChannelDown,
-                this,
-                handle));
+            channel->onClose([this, handle](const Status&) {
+                onChannelDown(handle);
+            });
         }
 
         handle->d_resultCallback(event, status, channel);
