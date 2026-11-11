@@ -85,9 +85,15 @@ static void test1_breathingTest()
 
     TestClock testClock;
     bmqu::Time::initialize(
-        bdlf::BindUtil::bind(&TestClock::realtimeClock, &testClock),
-        bdlf::BindUtil::bind(&TestClock::monotonicClock, &testClock),
-        bdlf::BindUtil::bind(&TestClock::highResTimer, &testClock));
+        [&testClock]() {
+            return testClock.realtimeClock();
+        },
+        [&testClock]() {
+            return testClock.monotonicClock();
+        },
+        [&testClock]() {
+            return testClock.highResTimer();
+        });
 
     PV("Testing real time clock");
     {
@@ -179,15 +185,27 @@ static void test3_customInitializeShutdown()
 
     // Initialize the 'Time'.
     BMQTST_ASSERT_SAFE_PASS(bmqu::Time::initialize(
-        bdlf::BindUtil::bind(&TestClock::realtimeClock, &testClock),
-        bdlf::BindUtil::bind(&TestClock::monotonicClock, &testClock),
-        bdlf::BindUtil::bind(&TestClock::highResTimer, &testClock)));
+        [&testClock]() {
+            return testClock.realtimeClock();
+        },
+        [&testClock]() {
+            return testClock.monotonicClock();
+        },
+        [&testClock]() {
+            return testClock.highResTimer();
+        }));
 
     // Initialize should be a no-op.
     BMQTST_ASSERT_SAFE_PASS(bmqu::Time::initialize(
-        bdlf::BindUtil::bind(&TestClock::realtimeClock, &testClock),
-        bdlf::BindUtil::bind(&TestClock::monotonicClock, &testClock),
-        bdlf::BindUtil::bind(&TestClock::highResTimer, &testClock)));
+        [&testClock]() {
+            return testClock.realtimeClock();
+        },
+        [&testClock]() {
+            return testClock.monotonicClock();
+        },
+        [&testClock]() {
+            return testClock.highResTimer();
+        }));
 
     // Shutdown the Time is a no-op.
     BMQTST_ASSERT_SAFE_PASS(bmqu::Time::shutdown());
