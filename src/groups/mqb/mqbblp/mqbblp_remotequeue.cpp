@@ -53,7 +53,6 @@
 #include <ball_severity.h>
 #include <bdlb_print.h>
 #include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdlt_currenttime.h>
 #include <bdlt_epochutil.h>
@@ -682,12 +681,14 @@ void RemoteQueue::releaseHandle(
     BSLS_ASSERT_SAFE(d_state_p->queue()->inDispatcherThread());
 
     mqbi::QueueHandle::HandleReleasedCallback onReleasedCallback =
-        bdlf::BindUtil::bind(&RemoteQueue::onHandleReleased,
-                             this,
-                             handleParameters,
+        [this, handleParameters, releasedCb](
+            const bsl::shared_ptr<mqbi::QueueHandle>& releasedHandle,
+            const mqbi::QueueHandleReleaseResult      result) {
+            onHandleReleased(handleParameters,
                              releasedCb,
-                             bdlf::PlaceHolders::_1,   // handle
-                             bdlf::PlaceHolders::_2);  // isDeleted
+                             releasedHandle,
+                             result);
+        };
 
     d_queueEngine_mp->releaseHandle(handle,
                                     handleParameters,

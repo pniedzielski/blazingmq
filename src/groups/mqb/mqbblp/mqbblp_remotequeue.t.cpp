@@ -177,19 +177,31 @@ TestBench::TestBench(bslma::Allocator* allocator_p)
 {
     d_params.flags() |= bmqt::QueueFlags::e_WRITE;
 
-    d_cluster._setPutFunctor(bdlf::BindUtil::bind(&TestBench::putProcessor,
-                                                  this,
-                                                  bdlf::PlaceHolders::_1,
-                                                  bdlf::PlaceHolders::_2,
-                                                  bdlf::PlaceHolders::_3,
-                                                  bdlf::PlaceHolders::_4,
-                                                  bdlf::PlaceHolders::_5,
-                                                  bdlf::PlaceHolders::_6));
+    d_cluster._setPutFunctor(
+        [this](int                                       partitionId,
+               const bmqp::PutHeader&                    putHeader,
+               const bsl::shared_ptr<bdlbb::Blob>&       appData,
+               const bsl::shared_ptr<bdlbb::Blob>&       options,
+               const bsl::shared_ptr<bmqu::AtomicState>& state,
+               bsls::Types::Uint64                       genCount) {
+            return putProcessor(partitionId,
+                                putHeader,
+                                appData,
+                                options,
+                                state,
+                                genCount);
+        });
 
     bmqu::Time::initialize(
-        bdlf::BindUtil::bind(&TestClock::realtimeClock, &d_testClock),
-        bdlf::BindUtil::bind(&TestClock::monotonicClock, &d_testClock),
-        bdlf::BindUtil::bind(&TestClock::highResTimer, &d_testClock));
+        [clock = &d_testClock]() {
+            return clock->realtimeClock();
+        },
+        [clock = &d_testClock]() {
+            return clock->monotonicClock();
+        },
+        [clock = &d_testClock]() {
+            return clock->highResTimer();
+        });
 
     bmqu::MemOutStream errorDescription(allocator_p);
 
@@ -294,9 +306,9 @@ TestBench::TestRemoteQueue::TestRemoteQueue(
 {
     d_queueState.setRoutingConfig(routingConfig);
     d_queue_sp->_setDispatcherEventHandler(
-        bdlf::BindUtil::bind(&mqbblp::RemoteQueue::onDispatcherEvent,
-                             &d_remoteQueue,
-                             bdlf::PlaceHolders::_1));  // event
+        [remoteQueue = &d_remoteQueue](const mqbi::DispatcherEvent& event) {
+            remoteQueue->onDispatcherEvent(event);
+        });
     d_remoteQueue.onOpenUpstream(1, bmqp::QueueId::k_DEFAULT_SUBQUEUE_ID);
 }
 
@@ -665,13 +677,18 @@ static void test2_broadcastBasic()
 
     pendingBroadcastPutsWithData = 0;
     pendingBroadcastPuts = theQueue.d_remoteQueue.iteratePendingMessages(
-        bdlf::BindUtil::bind(&verifyBroadfcastPut,
-                             bdlf::PlaceHolders::_1,  // putHeader
-                             bdlf::PlaceHolders::_2,  // appData
-                             bdlf::PlaceHolders::_3,  // options
-                             bdlf::PlaceHolders::_4,
-                             &z,  // source
-                             &pendingBroadcastPutsWithData));
+        [origin = &z, count = &pendingBroadcastPutsWithData](
+            const bmqp::PutHeader&              putHeader,
+            const bsl::shared_ptr<bdlbb::Blob>& appData,
+            const bsl::shared_ptr<bdlbb::Blob>& options,
+            mqbi::QueueHandle*                  source) {
+            verifyBroadfcastPut(putHeader,
+                                appData,
+                                options,
+                                source,
+                                origin,
+                                count);
+        });
 
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPuts);
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPutsWithData);
@@ -688,13 +705,18 @@ static void test2_broadcastBasic()
 
     pendingBroadcastPutsWithData = 0;
     pendingBroadcastPuts = theQueue.d_remoteQueue.iteratePendingMessages(
-        bdlf::BindUtil::bind(&verifyBroadfcastPut,
-                             bdlf::PlaceHolders::_1,  // putHeader
-                             bdlf::PlaceHolders::_2,  // appData
-                             bdlf::PlaceHolders::_3,  // options
-                             bdlf::PlaceHolders::_4,
-                             &z,  // source
-                             &pendingBroadcastPutsWithData));
+        [origin = &z, count = &pendingBroadcastPutsWithData](
+            const bmqp::PutHeader&              putHeader,
+            const bsl::shared_ptr<bdlbb::Blob>& appData,
+            const bsl::shared_ptr<bdlbb::Blob>& options,
+            mqbi::QueueHandle*                  source) {
+            verifyBroadfcastPut(putHeader,
+                                appData,
+                                options,
+                                source,
+                                origin,
+                                count);
+        });
 
     BMQTST_ASSERT_EQ(ackWindowSize, pendingBroadcastPuts);
     BMQTST_ASSERT_EQ(ackWindowSize, pendingBroadcastPutsWithData);
@@ -710,13 +732,18 @@ static void test2_broadcastBasic()
 
     pendingBroadcastPutsWithData = 0;
     pendingBroadcastPuts = theQueue.d_remoteQueue.iteratePendingMessages(
-        bdlf::BindUtil::bind(&verifyBroadfcastPut,
-                             bdlf::PlaceHolders::_1,  // putHeader
-                             bdlf::PlaceHolders::_2,  // appData
-                             bdlf::PlaceHolders::_3,  // options
-                             bdlf::PlaceHolders::_4,
-                             &z,  // source
-                             &pendingBroadcastPutsWithData));
+        [origin = &z, count = &pendingBroadcastPutsWithData](
+            const bmqp::PutHeader&              putHeader,
+            const bsl::shared_ptr<bdlbb::Blob>& appData,
+            const bsl::shared_ptr<bdlbb::Blob>& options,
+            mqbi::QueueHandle*                  source) {
+            verifyBroadfcastPut(putHeader,
+                                appData,
+                                options,
+                                source,
+                                origin,
+                                count);
+        });
 
     BMQTST_ASSERT_EQ(ackWindowSize, pendingBroadcastPuts);
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPutsWithData);
@@ -730,13 +757,18 @@ static void test2_broadcastBasic()
 
     pendingBroadcastPutsWithData = 0;
     pendingBroadcastPuts = theQueue.d_remoteQueue.iteratePendingMessages(
-        bdlf::BindUtil::bind(&verifyBroadfcastPut,
-                             bdlf::PlaceHolders::_1,  // putHeader
-                             bdlf::PlaceHolders::_2,  // appData
-                             bdlf::PlaceHolders::_3,  // options
-                             bdlf::PlaceHolders::_4,
-                             &z,  // source
-                             &pendingBroadcastPutsWithData));
+        [origin = &z, count = &pendingBroadcastPutsWithData](
+            const bmqp::PutHeader&              putHeader,
+            const bsl::shared_ptr<bdlbb::Blob>& appData,
+            const bsl::shared_ptr<bdlbb::Blob>& options,
+            mqbi::QueueHandle*                  source) {
+            verifyBroadfcastPut(putHeader,
+                                appData,
+                                options,
+                                source,
+                                origin,
+                                count);
+        });
 
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPuts);
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPutsWithData);
@@ -751,13 +783,18 @@ static void test2_broadcastBasic()
 
     pendingBroadcastPutsWithData = 0;
     pendingBroadcastPuts = theQueue.d_remoteQueue.iteratePendingMessages(
-        bdlf::BindUtil::bind(&verifyBroadfcastPut,
-                             bdlf::PlaceHolders::_1,  // putHeader
-                             bdlf::PlaceHolders::_2,  // appData
-                             bdlf::PlaceHolders::_3,  // options
-                             bdlf::PlaceHolders::_4,
-                             &z,  // source
-                             &pendingBroadcastPutsWithData));
+        [origin = &z, count = &pendingBroadcastPutsWithData](
+            const bmqp::PutHeader&              putHeader,
+            const bsl::shared_ptr<bdlbb::Blob>& appData,
+            const bsl::shared_ptr<bdlbb::Blob>& options,
+            mqbi::QueueHandle*                  source) {
+            verifyBroadfcastPut(putHeader,
+                                appData,
+                                options,
+                                source,
+                                origin,
+                                count);
+        });
 
     BMQTST_ASSERT_EQ(ackWindowSize, pendingBroadcastPuts);
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPutsWithData);
@@ -769,13 +806,18 @@ static void test2_broadcastBasic()
 
     pendingBroadcastPutsWithData = 0;
     pendingBroadcastPuts = theQueue.d_remoteQueue.iteratePendingMessages(
-        bdlf::BindUtil::bind(&verifyBroadfcastPut,
-                             bdlf::PlaceHolders::_1,  // putHeader
-                             bdlf::PlaceHolders::_2,  // appData
-                             bdlf::PlaceHolders::_3,  // options
-                             bdlf::PlaceHolders::_4,
-                             &z,  // source
-                             &pendingBroadcastPutsWithData));
+        [origin = &z, count = &pendingBroadcastPutsWithData](
+            const bmqp::PutHeader&              putHeader,
+            const bsl::shared_ptr<bdlbb::Blob>& appData,
+            const bsl::shared_ptr<bdlbb::Blob>& options,
+            mqbi::QueueHandle*                  source) {
+            verifyBroadfcastPut(putHeader,
+                                appData,
+                                options,
+                                source,
+                                origin,
+                                count);
+        });
 
     BMQTST_ASSERT_EQ(ackWindowSize, pendingBroadcastPuts);
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPutsWithData);
@@ -802,13 +844,18 @@ static void test2_broadcastBasic()
     // so all broadcasted PUTs are still pending.
     pendingBroadcastPutsWithData = 0;
     pendingBroadcastPuts = theQueue.d_remoteQueue.iteratePendingMessages(
-        bdlf::BindUtil::bind(&verifyBroadfcastPut,
-                             bdlf::PlaceHolders::_1,  // putHeader
-                             bdlf::PlaceHolders::_2,  // appData
-                             bdlf::PlaceHolders::_3,  // options
-                             bdlf::PlaceHolders::_4,
-                             &z,  // source
-                             &pendingBroadcastPutsWithData));
+        [origin = &z, count = &pendingBroadcastPutsWithData](
+            const bmqp::PutHeader&              putHeader,
+            const bsl::shared_ptr<bdlbb::Blob>& appData,
+            const bsl::shared_ptr<bdlbb::Blob>& options,
+            mqbi::QueueHandle*                  source) {
+            verifyBroadfcastPut(putHeader,
+                                appData,
+                                options,
+                                source,
+                                origin,
+                                count);
+        });
 
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPuts);
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPutsWithData);
@@ -822,13 +869,18 @@ static void test2_broadcastBasic()
 
     pendingBroadcastPutsWithData = 0;
     pendingBroadcastPuts = theQueue.d_remoteQueue.iteratePendingMessages(
-        bdlf::BindUtil::bind(&verifyBroadfcastPut,
-                             bdlf::PlaceHolders::_1,  // putHeader
-                             bdlf::PlaceHolders::_2,  // appData
-                             bdlf::PlaceHolders::_3,  // options
-                             bdlf::PlaceHolders::_4,
-                             &z,  // source
-                             &pendingBroadcastPutsWithData));
+        [origin = &z, count = &pendingBroadcastPutsWithData](
+            const bmqp::PutHeader&              putHeader,
+            const bsl::shared_ptr<bdlbb::Blob>& appData,
+            const bsl::shared_ptr<bdlbb::Blob>& options,
+            mqbi::QueueHandle*                  source) {
+            verifyBroadfcastPut(putHeader,
+                                appData,
+                                options,
+                                source,
+                                origin,
+                                count);
+        });
 
     BMQTST_ASSERT_EQ(ackWindowSize, pendingBroadcastPuts);
     BMQTST_ASSERT_EQ(ackWindowSize, pendingBroadcastPutsWithData);
@@ -843,13 +895,18 @@ static void test2_broadcastBasic()
 
     pendingBroadcastPutsWithData = 0;
     pendingBroadcastPuts = theQueue.d_remoteQueue.iteratePendingMessages(
-        bdlf::BindUtil::bind(&verifyBroadfcastPut,
-                             bdlf::PlaceHolders::_1,  // putHeader
-                             bdlf::PlaceHolders::_2,  // appData
-                             bdlf::PlaceHolders::_3,  // options
-                             bdlf::PlaceHolders::_4,
-                             &z,  // source
-                             &pendingBroadcastPutsWithData));
+        [origin = &z, count = &pendingBroadcastPutsWithData](
+            const bmqp::PutHeader&              putHeader,
+            const bsl::shared_ptr<bdlbb::Blob>& appData,
+            const bsl::shared_ptr<bdlbb::Blob>& options,
+            mqbi::QueueHandle*                  source) {
+            verifyBroadfcastPut(putHeader,
+                                appData,
+                                options,
+                                source,
+                                origin,
+                                count);
+        });
 
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPuts);
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPutsWithData);
@@ -868,13 +925,18 @@ static void test2_broadcastBasic()
 
     pendingBroadcastPutsWithData = 0;
     pendingBroadcastPuts = theQueue.d_remoteQueue.iteratePendingMessages(
-        bdlf::BindUtil::bind(&verifyBroadfcastPut,
-                             bdlf::PlaceHolders::_1,  // putHeader
-                             bdlf::PlaceHolders::_2,  // appData
-                             bdlf::PlaceHolders::_3,  // options
-                             bdlf::PlaceHolders::_4,
-                             &z,  // source
-                             &pendingBroadcastPutsWithData));
+        [origin = &z, count = &pendingBroadcastPutsWithData](
+            const bmqp::PutHeader&              putHeader,
+            const bsl::shared_ptr<bdlbb::Blob>& appData,
+            const bsl::shared_ptr<bdlbb::Blob>& options,
+            mqbi::QueueHandle*                  source) {
+            verifyBroadfcastPut(putHeader,
+                                appData,
+                                options,
+                                source,
+                                origin,
+                                count);
+        });
 
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPuts);
     BMQTST_ASSERT_EQ(0U, pendingBroadcastPutsWithData);
