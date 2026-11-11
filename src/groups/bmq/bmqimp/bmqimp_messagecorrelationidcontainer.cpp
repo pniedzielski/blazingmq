@@ -261,8 +261,8 @@ bool MessageCorrelationIdContainer::iterateAndInvoke(
 {
     bsls::SpinLockGuard guard(&d_lock);  // LOCK
 
-    for (size_t i = 0; i < keys.size(); ++i) {
-        CorrelationIdsMap::const_iterator cit = d_correlationIds.find(keys[i]);
+    for (const bmqt::MessageGUID& key : keys) {
+        CorrelationIdsMap::const_iterator cit = d_correlationIds.find(key);
         if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(cit ==
                                                   d_correlationIds.end())) {
             BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
@@ -292,11 +292,9 @@ bsls::TimeInterval MessageCorrelationIdContainer::getExpiredIds(
 
     bsls::TimeInterval minTs(0);
     // Iterate over each queue
-    for (QueueItemsMap::iterator qit = d_queueItems.begin();
-         qit != d_queueItems.end();
-         ++qit) {
+    for (const auto& [queueId, items] : d_queueItems) {
         // Get the queue expiration timeout
-        const int                                    qId = qit->first.id();
+        const int                                    qId = queueId.id();
         bsl::unordered_map<int, int>::const_iterator cit =
             queueExpirationTimeoutMap.find(qId);
 
@@ -306,11 +304,8 @@ bsls::TimeInterval MessageCorrelationIdContainer::getExpiredIds(
         const bool isOrphan = cit == queueExpirationTimeoutMap.end();
         if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(isOrphan)) {
             BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-            for (HandleAndExpirationTimeMap::iterator hit =
-                     qit->second.begin();
-                 hit != qit->second.end();
-                 ++hit) {
-                keys->push_back(hit->first);
+            for (const auto& [guid, sentTime] : items) {
+                keys->push_back(guid);
             }
             continue;  // CONTINUE
         }
@@ -320,11 +315,9 @@ bsls::TimeInterval MessageCorrelationIdContainer::getExpiredIds(
         BSLS_ASSERT_SAFE(queueTimeoutMs > 0);
 
         // Iterate over queue items (PUT message keys and timestamps)
-        for (HandleAndExpirationTimeMap::iterator hit = qit->second.begin();
-             hit != qit->second.end();
-             ++hit) {
+        for (const auto& [guid, sentTime] : items) {
             // Calculate message expiration time (sentTime + queueTimeout)
-            bsls::TimeInterval messageTimeout = hit->second;
+            bsls::TimeInterval messageTimeout = sentTime;
             messageTimeout.addMilliseconds(queueTimeoutMs);
 
             if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(messageTimeout >
@@ -336,7 +329,7 @@ bsls::TimeInterval MessageCorrelationIdContainer::getExpiredIds(
                 }
                 break;  // BREAK
             }
-            keys->push_back(hit->first);
+            keys->push_back(guid);
         }
     }
 
