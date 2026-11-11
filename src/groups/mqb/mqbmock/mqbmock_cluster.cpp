@@ -220,12 +220,12 @@ Cluster::Cluster(bslma::Allocator*        allocator,
 : d_allocator_p(allocator)
 , d_name(name, allocator)
 , d_bufferFactory(1024, allocator)
-, d_blobSpPool(bdlf::BindUtil::bind(&createBlob,
-                                    &d_bufferFactory,
-                                    bdlf::PlaceHolders::_1,   // arena
-                                    bdlf::PlaceHolders::_2),  // allocator
-               k_BLOB_POOL_GROWTH_STRATEGY,
-               allocator)
+, d_blobSpPool(
+      [this](void* arena, bslma::Allocator* blobAllocator) {
+          createBlob(&d_bufferFactory, arena, blobAllocator);
+      },
+      k_BLOB_POOL_GROWTH_STRATEGY,
+      allocator)
 , d_dispatcher(allocator)
 , d_scheduler(bsls::SystemClockType::e_MONOTONIC, allocator)
 , d_timeSource(&d_scheduler)
@@ -413,10 +413,9 @@ Cluster::sendRequest(const Cluster::RequestManagerType::RequestSp& request,
 
     return d_clusterData_mp->requestManager().sendRequest(
         request,
-        bdlf::BindUtil::bind(&mqbnet::ClusterNode::write,
-                             target,
-                             bdlf::PlaceHolders::_1,
-                             bmqp::EventType::e_CONTROL),
+        [target](const bsl::shared_ptr<bdlbb::Blob>& blob) {
+            return target->write(blob, bmqp::EventType::e_CONTROL);
+        },
         target->nodeDescription(),
         timeout);
 }
@@ -554,8 +553,9 @@ void Cluster::waitForScheduler()
 {
     bslmt::Semaphore sem;
 
-    d_scheduler.scheduleEvent(d_timeSource.now(),
-                              bdlf::BindUtil::bind(&schedulerWaitCb, &sem));
+    d_scheduler.scheduleEvent(d_timeSource.now(), [&sem]() {
+        schedulerWaitCb(&sem);
+    });
     sem.wait();
 }
 
