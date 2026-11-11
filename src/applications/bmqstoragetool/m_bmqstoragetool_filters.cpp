@@ -31,10 +31,9 @@ typedef bsl::vector<QueueInfo> QueueInfos;
 bool isQueueKeyMatch(const QueueInfos&                           queuesInfo,
                      const bsl::unordered_set<mqbu::StorageKey>& queueKeys)
 {
-    QueueInfos::const_iterator it = queuesInfo.cbegin();
-    for (; it != queuesInfo.cend(); ++it) {
+    for (const QueueInfo& queueInfo : queuesInfo) {
         mqbu::StorageKey key(mqbu::StorageKey::BinaryRepresentation(),
-                             it->key().data());
+                             queueInfo.key().data());
         // Match by queueKey
         if (queueKeys.find(key) != queueKeys.end()) {
             return true;  // RETURN
@@ -110,18 +109,16 @@ Filters::Filters(const bsl::vector<bsl::string>& queueKeys,
 {
     // Fill internal structures
     if (!queueKeys.empty()) {
-        bsl::vector<bsl::string>::const_iterator keyIt = queueKeys.cbegin();
-        for (; keyIt != queueKeys.cend(); ++keyIt) {
+        for (const bsl::string& queueKey : queueKeys) {
             d_queueKeys.emplace(
                 mqbu::StorageKey(mqbu::StorageKey::HexRepresentation(),
-                                 keyIt->c_str()));
+                                 queueKey.c_str()));
         }
     }
     if (!queueUris.empty()) {
-        bsl::vector<bsl::string>::const_iterator uriIt = queueUris.cbegin();
-        for (; uriIt != queueUris.cend(); ++uriIt) {
+        for (const bsl::string& queueUri : queueUris) {
             bsl::optional<mqbu::StorageKey> key = queueMap.findKeyByUri(
-                *uriIt);
+                queueUri);
             if (key.has_value()) {
                 d_queueKeys.insert(key.value());
             }
