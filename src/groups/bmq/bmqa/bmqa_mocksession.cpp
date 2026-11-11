@@ -925,7 +925,7 @@ void MockSession::processIfQueueEvent(Event* event)
     // queue in the TwoKey hashmap.
     QueueImplSp queueImpl = queues.begin()->second;
 
-    UriCorrIdToQueueMap::iterator qit =
+    auto qit =
         uriCorrIdToQueues(d_twoKeyHashMapBuffer).findByKey1(queueImpl->uri());
 
     QueueId   internalQueue = qit->value();
@@ -970,7 +970,7 @@ void MockSession::processIfQueueJob(Job* job)
     // queue in the TwoKey hashmap.
     QueueImplSp queueImpl = job->d_queue;
 
-    UriCorrIdToQueueMap::iterator qit =
+    auto qit =
         uriCorrIdToQueues(d_twoKeyHashMapBuffer).findByKey1(queueImpl->uri());
 
     QueueId   internalQueue = qit->value();
@@ -1168,7 +1168,7 @@ MockSession::~MockSession()
         bmqu::MemOutStream stream(d_allocator_p);
         stream << "Expected calls [";
 
-        CallQueue::iterator cit = d_calls.begin();
+        auto cit = d_calls.begin();
         stream << cit->methodName();
         ++cit;
         for (; cit != d_calls.end(); ++cit) {
@@ -1587,7 +1587,7 @@ void MockSession::stop()
 
     // Reset all queue's state to 'closed' to mimic the real implementation
     UriCorrIdToQueueMap& queueMap = uriCorrIdToQueues(d_twoKeyHashMapBuffer);
-    UriCorrIdToQueueMap::iterator qIt = queueMap.begin();
+    auto                 qIt      = queueMap.begin();
     while (qIt != queueMap.end()) {
         QueueImplSp& queueImpl = reinterpret_cast<QueueImplSp&>(qIt->value());
         queueImpl->setState(bmqimp::QueueState::e_CLOSED);
@@ -1609,7 +1609,7 @@ void MockSession::stopAsync()
 
     // Reset all queue's state to 'closed' to mimic the real implementation
     UriCorrIdToQueueMap& queueMap = uriCorrIdToQueues(d_twoKeyHashMapBuffer);
-    UriCorrIdToQueueMap::iterator qIt = queueMap.begin();
+    auto                 qIt      = queueMap.begin();
     while (qIt != queueMap.end()) {
         QueueImplSp& queueImpl = reinterpret_cast<QueueImplSp&>(qIt->value());
         queueImpl->setState(bmqimp::QueueState::e_CLOSED);
