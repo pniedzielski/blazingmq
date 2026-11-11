@@ -25,7 +25,6 @@
 
 // BDE
 #include <bdlbb_pooledblobbufferfactory.h>
-#include <bdlf_bind.h>
 #include <bsla_annotations.h>
 #include <bslmt_semaphore.h>
 #include <bslmt_threadutil.h>
@@ -99,7 +98,9 @@ void executeOnClosedChannelFunc(bmqio::NtcChannel*             channel,
     // These operations on a closed channel should be no-op
     channel->cancel();
     channel->cancelRead();
-    channel->execute(bdlf::BindUtil::bind(doFail));
+    channel->execute([]() {
+        doFail();
+    });
 
     // The second `close` should be no-op
     channel->close();
@@ -320,13 +321,11 @@ bsl::shared_ptr<bmqio::NtcChannel> Tester::connect()
     bslmt::Semaphore connectSemaphore, acceptSemaphore;
 
     bmqio::ChannelFactory::ResultCallback connectResultCb =
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &Tester::onChannelResult,
-                              this,
-                              &connectSemaphore,
-                              bdlf::PlaceHolders::_1,
-                              bdlf::PlaceHolders::_2,
-                              bdlf::PlaceHolders::_3);
+        [this, &connectSemaphore](ChannelFactoryEvent::Enum       event,
+                                  const Status&                   status,
+                                  const bsl::shared_ptr<Channel>& result) {
+            onChannelResult(&connectSemaphore, event, status, result);
+        };
 
     channel.createInplace(d_allocator_p,
                           d_interface_sp,
@@ -341,13 +340,15 @@ bsl::shared_ptr<bmqio::NtcChannel> Tester::connect()
     BMQTST_ASSERT_EQ(status.category(), bmqio::StatusCategory::e_SUCCESS);
 
     ntci::AcceptCallback acceptCallback = d_listener_sp->createAcceptCallback(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &Tester::onAcceptConnection,
-                              this,
-                              &acceptSemaphore,
-                              bdlf::PlaceHolders::_1,
-                              bdlf::PlaceHolders::_2,
-                              bdlf::PlaceHolders::_3),
+        [this, &acceptSemaphore](
+            const bsl::shared_ptr<ntci::Acceptor>&     acceptor,
+            const bsl::shared_ptr<ntci::StreamSocket>& streamSocket,
+            const ntca::AcceptEvent&                   event) {
+            onAcceptConnection(&acceptSemaphore,
+                               acceptor,
+                               streamSocket,
+                               event);
+        },
         d_allocator_p);
 
     ntsa::Error error = d_listener_sp->accept(ntca::AcceptOptions(),
@@ -405,11 +406,10 @@ static void test1_breathingTest()
     channel->write(&status, blob);
     BMQTST_ASSERT_EQ(status.category(), bmqio::StatusCategory::e_SUCCESS);
 
-    bmqio::Channel::CloseFn closeCb = bdlf::BindUtil::bindS(
-        bmqtst::TestHelperUtil::allocator(),
-        executeOnClosedChannelFunc,
-        channel.get(),
-        bdlf::PlaceHolders::_1);
+    bmqio::Channel::CloseFn closeCb =
+        [channelPtr = channel.get()](const Status& closeStatus) {
+            executeOnClosedChannelFunc(channelPtr, closeStatus);
+        };
     channel->onClose(closeCb);
 
     channel->close();
@@ -441,24 +441,18 @@ static void test2_onCloseAfterClose()
     Status           status1(bmqtst::TestHelperUtil::allocator());
     Status           status2(bmqtst::TestHelperUtil::allocator());
 
-    channel->onClose(bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                           saveCloseStatus,
-                                           &semaphore,
-                                           &status1,
-                                           channel,
-                                           bdlf::PlaceHolders::_1));
+    channel->onClose([&semaphore, &status1, channel](const Status& status) {
+        saveCloseStatus(&semaphore, &status1, channel, status);
+    });
 
     channel->close(Status(StatusCategory::e_CANCELED,
                           bmqtst::TestHelperUtil::allocator()));
     semaphore.wait();
     BMQTST_ASSERT_EQ(status1.category(), StatusCategory::e_CANCELED);
 
-    channel->onClose(bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                           saveCloseStatus,
-                                           &semaphore,
-                                           &status2,
-                                           channel,
-                                           bdlf::PlaceHolders::_1));
+    channel->onClose([&semaphore, &status2, channel](const Status& status) {
+        saveCloseStatus(&semaphore, &status2, channel, status);
+    });
 
     BMQTST_ASSERT_EQ(semaphore.tryWait(), 0);
     BMQTST_ASSERT_EQ(status2.category(), StatusCategory::e_CANCELED);
