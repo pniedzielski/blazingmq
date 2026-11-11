@@ -161,7 +161,7 @@ void printQueueInfo(bsl::ostream&     ostream,
     const QueueMap::QueueInfos& queueInfos = queueMap.queueInfos();
     if (!queueInfos.empty()) {
         ostream << ",\n";
-        QueueMap::QueueInfos::const_iterator itEnd = queueInfos.cend();
+        auto itEnd = queueInfos.cend();
         if (queueInfos.size() > queuesLimit) {
             ostream << "    \"First" << queuesLimit << "Queues\": [";
             itEnd = queueInfos.cbegin() + queuesLimit;
@@ -169,7 +169,7 @@ void printQueueInfo(bsl::ostream&     ostream,
         else {
             ostream << "    \"Queues\": [";
         }
-        QueueMap::QueueInfos::const_iterator it = queueInfos.cbegin();
+        auto it = queueInfos.cbegin();
         for (; it != itEnd; ++it) {
             if (it != queueInfos.cbegin()) {
                 ostream << ",";
@@ -371,15 +371,13 @@ void HumanReadableCslPrinter::printSummaryResult(
     if (!queueInfos.empty()) {
         size_t queueInfosSize = queueInfos.size();
         d_ostream << '\n' << queueInfosSize << " Queues found:\n";
-        bsl::vector<bmqp_ctrlmsg::QueueInfo>::const_iterator itEnd =
-            queueInfos.cend();
+        auto itEnd = queueInfos.cend();
         if (queueInfosSize > queuesLimit) {
             d_ostream << "Only first " << queuesLimit
                       << " queues are displayed.\n";
             itEnd = queueInfos.cbegin() + queuesLimit;
         }
-        bsl::vector<bmqp_ctrlmsg::QueueInfo>::const_iterator it =
-            queueInfos.cbegin();
+        auto it = queueInfos.cbegin();
         for (; it != itEnd; ++it) {
             d_ostream << *it << '\n';
         }
@@ -507,7 +505,7 @@ void JsonCslPrinter::printOffsetsNotFound(const OffsetsVec& offsets) const
 {
     closeBraceIfOpen();
     d_ostream << "  \"OffsetsNotFound\": [";
-    OffsetsVec::const_iterator it = offsets.cbegin();
+    auto it = offsets.cbegin();
     for (; it != offsets.cend(); ++it) {
         if (it != offsets.cbegin()) {
             d_ostream << ",";
@@ -522,7 +520,7 @@ void JsonCslPrinter::printCompositesNotFound(
 {
     closeBraceIfOpen();
     d_ostream << "  \"SequenceNumbersNotFound\": [";
-    CompositesVec::const_iterator it = seqNums.cbegin();
+    auto it = seqNums.cbegin();
     for (; it != seqNums.cend(); ++it) {
         if (it != seqNums.cbegin()) {
             d_ostream << ',';

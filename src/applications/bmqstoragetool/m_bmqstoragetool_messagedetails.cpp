@@ -40,7 +40,7 @@ bool findQueueAppIdByAppKey(
     if (appKey.isNull())
         return false;  // RETURN
 
-    bsl::vector<BloombergLP::bmqp_ctrlmsg::AppIdInfo>::const_iterator it =
+    auto it =
         bsl::find_if(appIds.cbegin(),
                      appIds.cend(),
                      [&appKey](const bmqp_ctrlmsg::AppIdInfo& appIdInfo) {

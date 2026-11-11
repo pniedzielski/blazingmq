@@ -138,8 +138,9 @@ bool Filters::apply(const mqbs::RecordHeader& recordHeader,
     // Apply `queue key` filter
     if (queueKey != mqbu::StorageKey::k_NULL_KEY && !d_queueKeys.empty()) {
         // Match by queueKey
-        bsl::unordered_set<mqbu::StorageKey>::const_iterator it =
-            bsl::find(d_queueKeys.cbegin(), d_queueKeys.cend(), queueKey);
+        auto it = bsl::find(d_queueKeys.cbegin(),
+                            d_queueKeys.cend(),
+                            queueKey);
         if (it == d_queueKeys.cend()) {
             // Not matched
             return false;  // RETURN

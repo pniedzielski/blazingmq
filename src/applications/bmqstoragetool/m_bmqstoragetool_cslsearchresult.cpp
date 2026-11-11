@@ -196,8 +196,7 @@ bool CslSearchSequenceNumberDecorator::processRecord(
 {
     CompositeSequenceNumber seqNum(header.electorTerm(),
                                    header.sequenceNumber());
-    bsl::vector<CompositeSequenceNumber>::const_iterator it =
-        bsl::find(d_seqNums.cbegin(), d_seqNums.cend(), seqNum);
+    auto it = bsl::find(d_seqNums.cbegin(), d_seqNums.cend(), seqNum);
     if (it != d_seqNums.cend()) {
         CslSearchResultDecorator::processRecord(header, record, recordId);
         // Remove processed sequence number.
@@ -237,8 +236,9 @@ bool CslSearchOffsetDecorator::processRecord(
     const bmqp_ctrlmsg::ClusterMessage&   record,
     const mqbsi::LedgerRecordId&          recordId)
 {
-    bsl::vector<bsls::Types::Int64>::const_iterator it =
-        bsl::find(d_offsets.cbegin(), d_offsets.cend(), recordId.offset());
+    auto it = bsl::find(d_offsets.cbegin(),
+                        d_offsets.cend(),
+                        recordId.offset());
     if (it != d_offsets.cend()) {
         CslSearchResultDecorator::processRecord(header, record, recordId);
         // Remove processed offset.

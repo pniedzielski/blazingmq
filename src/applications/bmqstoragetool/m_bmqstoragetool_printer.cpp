@@ -904,7 +904,7 @@ void JsonPrinter::printGuidsNotFound(const GuidsList& guids) const
 {
     closeBraceIfOpen();
     d_ostream << "  \"GuidsNotFound\": [";
-    GuidsList::const_iterator it = guids.cbegin();
+    auto it = guids.cbegin();
     for (; it != guids.cend(); ++it) {
         if (it != guids.cbegin()) {
             d_ostream << ',';
@@ -918,7 +918,7 @@ void JsonPrinter::printOffsetsNotFound(const OffsetsVec& offsets) const
 {
     closeBraceIfOpen();
     d_ostream << "  \"OffsetsNotFound\": [";
-    OffsetsVec::const_iterator it = offsets.cbegin();
+    auto it = offsets.cbegin();
     for (; it != offsets.cend(); ++it) {
         if (it != offsets.cbegin()) {
             d_ostream << ",";
@@ -932,7 +932,7 @@ void JsonPrinter::printCompositesNotFound(const CompositesVec& seqNums) const
 {
     closeBraceIfOpen();
     d_ostream << "  \"SequenceNumbersNotFound\": [";
-    CompositesVec::const_iterator it = seqNums.cbegin();
+    auto it = seqNums.cbegin();
     for (; it != seqNums.cend(); ++it) {
         if (it != seqNums.cbegin()) {
             d_ostream << ',';

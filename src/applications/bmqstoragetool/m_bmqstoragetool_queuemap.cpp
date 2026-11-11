@@ -49,7 +49,7 @@ void QueueMap::update(const bmqp_ctrlmsg::QueueInfoUpdate& queueInfoUpdate)
 {
     mqbu::StorageKey queueKey(mqbu::StorageKey::BinaryRepresentation(),
                               queueInfoUpdate.key().begin());
-    QueueKeyToInfoMap::iterator it = d_queueKeyToInfoMap.find(queueKey);
+    auto             it = d_queueKeyToInfoMap.find(queueKey);
     if (it != d_queueKeyToInfoMap.end()) {
         bsl::vector<bmqp_ctrlmsg::AppIdInfo>& appIds = it->second.appIds();
         // Remove AppIds
@@ -76,7 +76,7 @@ QueueMap::findInfoByKey(const mqbu::StorageKey& key) const
 {
     bsl::optional<bmqp_ctrlmsg::QueueInfo> result;
 
-    QueueKeyToInfoMap::const_iterator it = d_queueKeyToInfoMap.find(key);
+    auto it = d_queueKeyToInfoMap.find(key);
     if (it != d_queueKeyToInfoMap.end()) {
         result = it->second;
     }
@@ -88,7 +88,7 @@ QueueMap::findKeyByUri(const bsl::string& uri) const
 {
     bsl::optional<mqbu::StorageKey> result;
 
-    QueueUriToKeyMap::const_iterator it = d_queueUriToKeyMap.find(uri);
+    auto it = d_queueUriToKeyMap.find(uri);
     if (it != d_queueUriToKeyMap.end()) {
         result = it->second;
     }

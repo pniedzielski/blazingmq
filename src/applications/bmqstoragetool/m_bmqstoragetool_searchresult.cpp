@@ -375,7 +375,7 @@ bool SearchShortResult::processDeletionRecord(
     [[maybe_unused]] bsls::Types::Uint64 recordOffset)
 {
     if (!d_printImmediately && (d_printOnDelete || d_eraseDeleted)) {
-        GuidDataMap::iterator it = d_guidMap.find(record.messageGUID());
+        auto it = d_guidMap.find(record.messageGUID());
         if (it != d_guidMap.end()) {
             if (d_printOnDelete) {
                 outputGuidData(*it->second);
@@ -437,7 +437,7 @@ void SearchShortResult::outputResult(const GuidsList& guidFilter)
     // Print only Guids from `guidFilter`
     if (!d_printOnDelete) {
         for (const bmqt::MessageGUID& guid : guidFilter) {
-            GuidDataMap::const_iterator gIt = d_guidMap.find(guid);
+            auto gIt = d_guidMap.find(guid);
             if (gIt != d_guidMap.end()) {
                 outputGuidData(*gIt->second);
             }
@@ -520,7 +520,7 @@ bool SearchDetailResult::processConfirmRecord(
     bsls::Types::Uint64        recordOffset)
 {
     // Store record details for further output
-    DetailsMap::iterator it = d_messageDetailsMap.find(record.messageGUID());
+    auto it = d_messageDetailsMap.find(record.messageGUID());
     if (it != d_messageDetailsMap.end()) {
         it->second->addConfirmRecord(record, recordIndex, recordOffset);
     }
@@ -533,7 +533,7 @@ bool SearchDetailResult::processDeletionRecord(
     bsls::Types::Uint64         recordIndex,
     bsls::Types::Uint64         recordOffset)
 {
-    DetailsMap::iterator it = d_messageDetailsMap.find(record.messageGUID());
+    auto it = d_messageDetailsMap.find(record.messageGUID());
     if (it != d_messageDetailsMap.end()) {
         if (d_printImmediately) {
             // Print message details immediately
@@ -614,7 +614,7 @@ void SearchDetailResult::outputResult(const GuidsList& guidFilter)
     // Print only Guids from `guidFilter`
     if (!d_cleanUnprinted) {
         for (const bmqt::MessageGUID& guid : guidFilter) {
-            DetailsMap::const_iterator dIt = d_messageDetailsMap.find(guid);
+            auto dIt = d_messageDetailsMap.find(guid);
             if (dIt != d_messageDetailsMap.end()) {
                 outputMessageDetails(*dIt->second);
             }
@@ -638,7 +638,7 @@ void SearchDetailResult::addMessageDetails(const mqbs::MessageRecord& record,
     bsl::optional<bmqp_ctrlmsg::QueueInfo> queueInfo =
         d_queueMap.findInfoByKey(record.queueKey());
 
-    DetailsList::iterator detailsIt = d_messageDetailsList.insert(
+    auto detailsIt = d_messageDetailsList.insert(
         d_messageDetailsList.cend(),
         MessageDetails(record,
                        recordIndex,
@@ -906,8 +906,7 @@ bool SearchOutstandingDecorator::processDeletionRecord(
     SearchResultDecorator::processDeletionRecord(record,
                                                  recordIndex,
                                                  recordOffset);
-    bsl::unordered_set<bmqt::MessageGUID>::iterator it = d_guids.find(
-        record.messageGUID());
+    auto it = d_guids.find(record.messageGUID());
     if (it != d_guids.end()) {
         d_guids.erase(it);
         d_deletedMessagesCount++;
@@ -969,7 +968,7 @@ bool SearchPartiallyConfirmedDecorator::processConfirmRecord(
     SearchResultDecorator::processConfirmRecord(record,
                                                 recordIndex,
                                                 recordOffset);
-    GuidsMap::iterator it = d_notConfirmedGuids.find(record.messageGUID());
+    auto it = d_notConfirmedGuids.find(record.messageGUID());
     if (it != d_notConfirmedGuids.end()) {
         // Message is partially confirmed, move it to the dedicated map.
         d_partiallyConfirmedGuids.emplace(*it);
@@ -987,8 +986,7 @@ bool SearchPartiallyConfirmedDecorator::processDeletionRecord(
     SearchResultDecorator::processDeletionRecord(record,
                                                  recordIndex,
                                                  recordOffset);
-    GuidsMap::iterator it = d_partiallyConfirmedGuids.find(
-        record.messageGUID());
+    auto it = d_partiallyConfirmedGuids.find(record.messageGUID());
     if (it != d_partiallyConfirmedGuids.end()) {
         // Message is confirmed, remove it.
         d_guidsList.erase(it->second);
@@ -1042,7 +1040,7 @@ bool SearchGuidDecorator::processMessageRecord(
     bsls::Types::Uint64        recordIndex,
     bsls::Types::Uint64        recordOffset)
 {
-    GuidsMap::iterator it = d_guidsMap.find(record.messageGUID());
+    auto it = d_guidsMap.find(record.messageGUID());
     if (it != d_guidsMap.end()) {
         SearchResultDecorator::processMessageRecord(record,
                                                     recordIndex,
@@ -1098,8 +1096,7 @@ bool SearchOffsetDecorator::processMessageRecord(
     bsls::Types::Uint64        recordIndex,
     bsls::Types::Uint64        recordOffset)
 {
-    bsl::vector<bsls::Types::Int64>::const_iterator it =
-        bsl::find(d_offsets.cbegin(), d_offsets.cend(), recordOffset);
+    auto it = bsl::find(d_offsets.cbegin(), d_offsets.cend(), recordOffset);
     if (it != d_offsets.cend()) {
         SearchResultDecorator::processMessageRecord(record,
                                                     recordIndex,
@@ -1118,8 +1115,7 @@ bool SearchOffsetDecorator::processConfirmRecord(
     bsls::Types::Uint64        recordIndex,
     bsls::Types::Uint64        recordOffset)
 {
-    bsl::vector<bsls::Types::Int64>::const_iterator it =
-        bsl::find(d_offsets.cbegin(), d_offsets.cend(), recordOffset);
+    auto it = bsl::find(d_offsets.cbegin(), d_offsets.cend(), recordOffset);
     if (it != d_offsets.cend()) {
         SearchResultDecorator::processConfirmRecord(record,
                                                     recordIndex,
@@ -1138,8 +1134,7 @@ bool SearchOffsetDecorator::processDeletionRecord(
     bsls::Types::Uint64         recordIndex,
     bsls::Types::Uint64         recordOffset)
 {
-    bsl::vector<bsls::Types::Int64>::const_iterator it =
-        bsl::find(d_offsets.cbegin(), d_offsets.cend(), recordOffset);
+    auto it = bsl::find(d_offsets.cbegin(), d_offsets.cend(), recordOffset);
     if (it != d_offsets.cend()) {
         SearchResultDecorator::processDeletionRecord(record,
                                                      recordIndex,
@@ -1158,8 +1153,7 @@ bool SearchOffsetDecorator::processQueueOpRecord(
     bsls::Types::Uint64        recordIndex,
     bsls::Types::Uint64        recordOffset)
 {
-    bsl::vector<bsls::Types::Int64>::const_iterator it =
-        bsl::find(d_offsets.cbegin(), d_offsets.cend(), recordOffset);
+    auto it = bsl::find(d_offsets.cbegin(), d_offsets.cend(), recordOffset);
     if (it != d_offsets.cend()) {
         SearchResultDecorator::processQueueOpRecord(record,
                                                     recordIndex,
@@ -1177,8 +1171,7 @@ bool SearchOffsetDecorator::processJournalOpRecord(
     bsls::Types::Uint64          recordIndex,
     bsls::Types::Uint64          recordOffset)
 {
-    bsl::vector<bsls::Types::Int64>::const_iterator it =
-        bsl::find(d_offsets.cbegin(), d_offsets.cend(), recordOffset);
+    auto it = bsl::find(d_offsets.cbegin(), d_offsets.cend(), recordOffset);
     if (it != d_offsets.cend()) {
         SearchResultDecorator::processJournalOpRecord(record,
                                                       recordIndex,
@@ -1222,8 +1215,7 @@ bool SearchSequenceNumberDecorator::processMessageRecord(
 {
     CompositeSequenceNumber seqNum(record.header().primaryLeaseId(),
                                    record.header().sequenceNumber());
-    bsl::vector<CompositeSequenceNumber>::const_iterator it =
-        bsl::find(d_seqNums.cbegin(), d_seqNums.cend(), seqNum);
+    auto it = bsl::find(d_seqNums.cbegin(), d_seqNums.cend(), seqNum);
     if (it != d_seqNums.cend()) {
         SearchResultDecorator::processMessageRecord(record,
                                                     recordIndex,
@@ -1244,8 +1236,7 @@ bool SearchSequenceNumberDecorator::processConfirmRecord(
 {
     CompositeSequenceNumber seqNum(record.header().primaryLeaseId(),
                                    record.header().sequenceNumber());
-    bsl::vector<CompositeSequenceNumber>::const_iterator it =
-        bsl::find(d_seqNums.cbegin(), d_seqNums.cend(), seqNum);
+    auto it = bsl::find(d_seqNums.cbegin(), d_seqNums.cend(), seqNum);
     if (it != d_seqNums.cend()) {
         SearchResultDecorator::processConfirmRecord(record,
                                                     recordIndex,
@@ -1266,8 +1257,7 @@ bool SearchSequenceNumberDecorator::processDeletionRecord(
 {
     CompositeSequenceNumber seqNum(record.header().primaryLeaseId(),
                                    record.header().sequenceNumber());
-    bsl::vector<CompositeSequenceNumber>::const_iterator it =
-        bsl::find(d_seqNums.cbegin(), d_seqNums.cend(), seqNum);
+    auto it = bsl::find(d_seqNums.cbegin(), d_seqNums.cend(), seqNum);
     if (it != d_seqNums.cend()) {
         SearchResultDecorator::processDeletionRecord(record,
                                                      recordIndex,
@@ -1288,8 +1278,7 @@ bool SearchSequenceNumberDecorator::processQueueOpRecord(
 {
     CompositeSequenceNumber seqNum(record.header().primaryLeaseId(),
                                    record.header().sequenceNumber());
-    bsl::vector<CompositeSequenceNumber>::const_iterator it =
-        bsl::find(d_seqNums.cbegin(), d_seqNums.cend(), seqNum);
+    auto it = bsl::find(d_seqNums.cbegin(), d_seqNums.cend(), seqNum);
     if (it != d_seqNums.cend()) {
         SearchResultDecorator::processQueueOpRecord(record,
                                                     recordIndex,
@@ -1309,8 +1298,7 @@ bool SearchSequenceNumberDecorator::processJournalOpRecord(
 {
     CompositeSequenceNumber seqNum(record.header().primaryLeaseId(),
                                    record.header().sequenceNumber());
-    bsl::vector<CompositeSequenceNumber>::const_iterator it =
-        bsl::find(d_seqNums.cbegin(), d_seqNums.cend(), seqNum);
+    auto it = bsl::find(d_seqNums.cbegin(), d_seqNums.cend(), seqNum);
     if (it != d_seqNums.cend()) {
         SearchResultDecorator::processJournalOpRecord(record,
                                                       recordIndex,
@@ -1396,7 +1384,7 @@ bool SummaryProcessor::processConfirmRecord(
     d_totalRecordsCount++;
 
     if (d_processRecordTypes.d_message) {
-        GuidsSet::iterator it = d_notConfirmedGuids.find(record.messageGUID());
+        auto it = d_notConfirmedGuids.find(record.messageGUID());
         if (it != d_notConfirmedGuids.end()) {
             // Message is partially confirmed, move it to the dedicated set.
             d_partiallyConfirmedGuids.emplace(*it);
@@ -1425,8 +1413,7 @@ bool SummaryProcessor::processDeletionRecord(
     d_totalRecordsCount++;
 
     if (d_processRecordTypes.d_message) {
-        GuidsSet::iterator it = d_partiallyConfirmedGuids.find(
-            record.messageGUID());
+        auto it = d_partiallyConfirmedGuids.find(record.messageGUID());
         if (it != d_partiallyConfirmedGuids.end()) {
             // Message is confirmed, remove it.
             d_partiallyConfirmedGuids.erase(it);
