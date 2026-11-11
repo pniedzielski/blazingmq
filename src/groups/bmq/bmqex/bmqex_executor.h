@@ -500,8 +500,7 @@ class Executor {
     // ACCESSORS
 
     /// If `*this` has a target, return `true`.  Otherwise, return `false`.
-    BSLS_KEYWORD_EXPLICIT
-    operator bool() const noexcept;
+    explicit operator bool() const noexcept;
 
     template <class T>
     T* target() noexcept;
