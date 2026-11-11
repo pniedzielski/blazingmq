@@ -1004,7 +1004,7 @@ void PrometheusStatConsumer::setPublishInterval(
 const bmqst::StatContext*
 PrometheusStatConsumer::getStatContext(const char* name) const
 {
-    StatContextsMap::const_iterator cIt = d_contextsMap.find(name);
+    auto cIt = d_contextsMap.find(name);
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(cIt == d_contextsMap.end())) {
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         BSLS_ASSERT_SAFE(false &&
