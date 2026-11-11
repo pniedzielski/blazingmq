@@ -22,7 +22,6 @@
 #include <bmqt_messageguid.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bsl_functional.h>
 #include <bsl_unordered_map.h>
 #include <bsl_vector.h>
@@ -147,12 +146,11 @@ static void test2_iterateAndInvoke()
     bmqt::MessageGUID guid1 = bmqp::MessageGUIDGenerator::testGUID();
     bmqt::MessageGUID guid2 = bmqp::MessageGUIDGenerator::testGUID();
 
-    Callback callback = bdlf::BindUtil::bind(
-        &IterateAndInvokeHelper::insertIntoMap,
-        &helper,
-        bdlf::PlaceHolders::_1,
-        bdlf::PlaceHolders::_2,
-        bdlf::PlaceHolders::_3);
+    Callback callback = [&helper](bool*                    removeItem,
+                                  const bmqt::MessageGUID& key,
+                                  const QAC&               qac) {
+        return helper.insertIntoMap(removeItem, key, qac);
+    };
 
     // Insert into container
     container.add(guid1, bmqt::CorrelationId(1), bmqp::QueueId(1));
@@ -186,12 +184,11 @@ static void test3_associate()
     bmqt::MessageGUID guid2 = bmqp::MessageGUIDGenerator::testGUID();
     bmqt::MessageGUID emptyGuid;
 
-    Callback callback = bdlf::BindUtil::bind(
-        &IterateAndInvokeHelper::insertIntoMap,
-        &helper,
-        bdlf::PlaceHolders::_1,
-        bdlf::PlaceHolders::_2,
-        bdlf::PlaceHolders::_3);
+    Callback callback = [&helper](bool*                    removeItem,
+                                  const bmqt::MessageGUID& key,
+                                  const QAC&               qac) {
+        return helper.insertIntoMap(removeItem, key, qac);
+    };
 
     // Insert into container
     container.add(guid1, bmqt::CorrelationId(1), bmqp::QueueId(1));
