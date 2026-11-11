@@ -185,8 +185,7 @@ static void printTableRows(bsl::ostream&                   out,
 
     out << bsl::right << bsl::fixed;
 
-    for (size_t i = 0; i < tableRecords.size(); ++i) {
-        const TableRecord& record = tableRecords[i];
+    for (const TableRecord& record : tableRecords) {
         printRecord(out, record, headerCols);
     }
 }
@@ -211,8 +210,7 @@ printTableRows(bsl::ostream&                              out,
 
     out << bsl::right << bsl::fixed;
 
-    for (size_t i = 0; i < tableRecords.size(); ++i) {
-        const CompressionRatioRecord& record = tableRecords[i];
+    for (const CompressionRatioRecord& record : tableRecords) {
         printRecord(out, record, headerCols);
     }
 }
@@ -909,8 +907,8 @@ static void testN1_performanceCompressionDecompressionDefault()
 
     // Measure calculation time and report
     bsl::vector<TableRecord> tableRecords(bmqtst::TestHelperUtil::allocator());
-    for (unsigned i = 0; i < data.size(); ++i) {
-        const int length = data[i].size();
+    for (const bsl::string& payload : data) {
+        const int length = payload.size();
 
         bsl::cout << "-----------------------\n"
                   << " SIZE       = " << bmqu::PrintUtil::prettyBytes(length)
@@ -928,7 +926,7 @@ static void testN1_performanceCompressionDecompressionDefault()
             bsls::Types::Int64 decompressionTime = 0;
             eZlibCompressDecompressHelper(&compressionTime,
                                           &decompressionTime,
-                                          data[i]);
+                                          payload);
             compressionTotalTime += compressionTime;
             decompressionTotalTime += decompressionTime;
         }
@@ -1078,8 +1076,8 @@ static void testN3_performanceCompressionRatio()
                   << "---------------------\n";
         bsl::vector<CompressionRatioRecord> tableRecords(
             bmqtst::TestHelperUtil::allocator());
-        for (unsigned i = 0; i < data.size(); ++i) {
-            const int length = data[i].size();
+        for (const bsl::string& payload : data) {
+            const int length = payload.size();
 
             bsl::cout << "---------------------\n"
                       << " SIZE = " << bmqu::PrintUtil::prettyBytes(length)
@@ -1094,7 +1092,7 @@ static void testN3_performanceCompressionRatio()
             bsls::Types::Int64 compressedSize = 0;
             eZlibCompressionRatioHelper(&inputSize,
                                         &compressedSize,
-                                        data[i],
+                                        payload,
                                         level);
             // </Size>
 
