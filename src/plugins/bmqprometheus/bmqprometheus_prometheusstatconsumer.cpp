@@ -35,7 +35,6 @@
 #include <ball_log.h>
 #include <bdlb_arrayutil.h>
 #include <bdld_manageddatum.h>
-#include <bdlf_bind.h>
 #include <bdlt_currenttime.h>
 #include <bsl_atomic.h>
 #include <bsl_cstddef.h>
@@ -1195,12 +1194,11 @@ class PrometheusPushStatExporter : public PrometheusStatExporter {
     {
         d_threadStop = false;
         // create push thread
-        int rc = bslmt::ThreadUtil::create(
-            &d_prometheusPushThreadHandle,
-            bslmt::ThreadAttributes(),
-            bdlf::BindUtil::bind(
-                &PrometheusPushStatExporter::prometheusPushThread,
-                this));
+        int rc = bslmt::ThreadUtil::create(&d_prometheusPushThreadHandle,
+                                           bslmt::ThreadAttributes(),
+                                           [this]() {
+                                               prometheusPushThread();
+                                           });
         if (rc != 0) {
             BALL_LOG_ERROR << "#PROMETHEUS_REPORTING "
                            << "Failed to start prometheusPushThread thread"
