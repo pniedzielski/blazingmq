@@ -48,8 +48,8 @@ class PluginLibrary : public mqbplug::PluginLibrary {
 
   private:
     // NOT IMPLEMENTED
-    PluginLibrary(const PluginLibrary&);
-    PluginLibrary& operator=(const PluginLibrary&);
+    PluginLibrary(const PluginLibrary&)            = delete;
+    PluginLibrary& operator=(const PluginLibrary&) = delete;
     // Copy constructor and assignment operator are not implemented.
 
   public:
