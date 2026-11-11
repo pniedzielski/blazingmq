@@ -16,7 +16,6 @@
 #include <bmqu_atomicstate.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bslmt_semaphore.h>
 #include <bslmt_threadutil.h>
 
@@ -99,7 +98,9 @@ static void test3_lockThenProcess()
 
     bslmt::ThreadUtil::createWithAllocator(
         &threadHandle,
-        bdlf::BindUtil::bind(&threadFn, &result2, &state, &semaphore),
+        [&result2, &state, &semaphore]() {
+            threadFn(&result2, &state, &semaphore);
+        },
         bmqtst::TestHelperUtil::allocator());
     // wait for the thread to arrive at the start
     semaphore.wait();
