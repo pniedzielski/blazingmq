@@ -17,7 +17,6 @@
 
 // BDE
 #include <bdlcc_singleconsumerqueue.h>
-#include <bdlf_bind.h>
 #include <bdlmt_threadpool.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_iostream.h>
@@ -163,23 +162,19 @@ static void runPerformanceTest(bmqtst::Table* table,
     bslmt::Barrier startBarrier(numPushers + 2);
 
     bslmt::Latch popperDone(1);
-    threadPool.enqueueJob(
-        bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                              &queuePopper<QUEUE>,
-                              queue,
-                              &startBarrier,
-                              &popperDone));
+    threadPool.enqueueJob([queue, &startBarrier, &popperDone]() {
+        queuePopper<QUEUE>(queue, &startBarrier, &popperDone);
+    });
 
     bslmt::Latch pushersDone(numPushers);
 
     for (int i = 0; i < numPushers; ++i) {
-        threadPool.enqueueJob(
-            bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                  &queuePusher<QUEUE>,
-                                  numIterations / numPushers,
-                                  queue,
-                                  &startBarrier,
-                                  &pushersDone));
+        threadPool.enqueueJob([iterations = numIterations / numPushers,
+                               queue,
+                               &startBarrier,
+                               &pushersDone]() {
+            queuePusher<QUEUE>(iterations, queue, &startBarrier, &pushersDone);
+        });
     }
 
     startBarrier.wait();
