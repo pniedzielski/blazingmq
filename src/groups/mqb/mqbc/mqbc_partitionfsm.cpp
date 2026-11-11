@@ -79,28 +79,22 @@ void PartitionFSM::processEvent(PartitionStateTableEvent::Enum eventType,
     if (d_state != oldState) {
         switch (d_state) {
         case State::e_UNKNOWN: {
-            for (ObserversSetIter it = d_observers.begin();
-                 it != d_observers.end();
-                 ++it) {
-                (*it)->onTransitionToUnknown(partitionId, oldState);
+            for (const auto& observer : d_observers) {
+                observer->onTransitionToUnknown(partitionId, oldState);
             }
 
             break;  // BREAK
         }
         case State::e_PRIMARY_HEALED: {
-            for (ObserversSetIter it = d_observers.begin();
-                 it != d_observers.end();
-                 ++it) {
-                (*it)->onTransitionToPrimaryHealed(partitionId, oldState);
+            for (const auto& observer : d_observers) {
+                observer->onTransitionToPrimaryHealed(partitionId, oldState);
             }
 
             break;  // BREAK
         }
         case State::e_REPLICA_HEALED: {
-            for (ObserversSetIter it = d_observers.begin();
-                 it != d_observers.end();
-                 ++it) {
-                (*it)->onTransitionToReplicaHealed(partitionId, oldState);
+            for (const auto& observer : d_observers) {
+                observer->onTransitionToReplicaHealed(partitionId, oldState);
             }
 
             break;  // BREAK
@@ -124,10 +118,8 @@ void PartitionFSM::processEvent(PartitionStateTableEvent::Enum eventType,
             oldState == State::e_REPLICA_HEALED) {
             BSLS_ASSERT_SAFE(d_state != State::e_PRIMARY_HEALED &&
                              d_state != State::e_REPLICA_HEALED);
-            for (ObserversSetIter it = d_observers.begin();
-                 it != d_observers.end();
-                 ++it) {
-                (*it)->onTransitionOutOfHealed(partitionId, oldState);
+            for (const auto& observer : d_observers) {
+                observer->onTransitionOutOfHealed(partitionId, oldState);
             }
         }
     }
