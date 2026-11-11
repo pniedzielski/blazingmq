@@ -146,10 +146,8 @@ void StorageCollectionUtil::loadStorages(StorageList*       storages,
     BSLS_ASSERT_SAFE(storages);
 
     storages->reserve(storageMap.size());
-    for (StorageMapConstIter cit = storageMap.cbegin();
-         cit != storageMap.cend();
-         ++cit) {
-        storages->emplace_back(cit->second);
+    for (const auto& [queueKey, storage] : storageMap) {
+        storages->emplace_back(storage);
     }
 }
 
