@@ -96,7 +96,7 @@ class QueueState;
 ///
 /// The difference with RootQueueEngine is that they update queue handle
 /// immediately upon `configureHandle` while RelayQueueEngine waits for
-/// `onHandleConfiguredDispatched` to update the handle.  Hence the need to
+/// `processConfigureResponse` to update the handle.  Hence the need to
 /// have the (extra) cache which is updated immediately.
 struct RelayQueueEngine_AppState : QueueEngineUtil_AppState {
     struct CachedParameters {
@@ -220,9 +220,9 @@ class RelayQueueEngine final : public mqbi::QueueEngine {
     /// @param handle The handle being configured.
     /// @param downStreamParameters Stream parameters advertised downstream.
     /// @param routing_sp Routing advertised upstream, to be made effective
-    ///                   by `onHandleConfiguredDispatched`.
+    ///                   by `processConfigureResponse`.
     /// @param configuredCb Callback notifying the requester of the outcome,
-    ///                     invoked by `onHandleConfiguredDispatched`; may be
+    ///                     invoked by `processConfigureResponse`; may be
     ///                     empty.
     ///
     /// THREAD: This method is called from any thread.
@@ -255,7 +255,7 @@ class RelayQueueEngine final : public mqbi::QueueEngine {
     ///                     may be empty.
     ///
     /// THREAD: This method is called from the Queue's dispatcher thread.
-    void onHandleConfiguredDispatched(
+    void processConfigureResponse(
         const bsl::weak_ptr<RelayQueueEngine>&      self,
         const bmqp_ctrlmsg::Status&                 status,
         const bmqp_ctrlmsg::StreamParameters&       upStreamParameters,
@@ -276,7 +276,12 @@ class RelayQueueEngine final : public mqbi::QueueEngine {
         const bmqp_ctrlmsg::QueueHandleParameters&                   hp,
         const bsl::shared_ptr<QueueEngineUtil_ReleaseHandleProctor>& context);
 
-    void onHandleReleasedDispatched(
+    /// Process the release response from upstream of the specified `handle`
+    /// with the specified `hp` handle parameters per the specified `status`,
+    /// and release the specified `context` once done.
+    ///
+    /// THREAD: This method is called from the Queue's dispatcher thread.
+    void processReleaseResponse(
         const bmqp_ctrlmsg::Status&                                  status,
         mqbi::QueueHandle*                                           handle,
         const bmqp_ctrlmsg::QueueHandleParameters&                   hp,

@@ -444,7 +444,7 @@ void RelayQueueEngine::onHandleConfigured(
     // in the process of being destroyed, concurrently, on the queue's
     // dispatcher thread.  Use 'handle' (valid independently of the engine's
     // lifetime) to reach the queue, and forward 'self' as-is instead of
-    // re-deriving it from 'd_self'.  'onHandleConfiguredDispatched' performs
+    // re-deriving it from 'd_self'.  'processConfigureResponse' performs
     // the liveness check, once truly running on the queue's dispatcher
     // thread, and invokes 'configuredCb' there.
 
@@ -457,21 +457,21 @@ void RelayQueueEngine::onHandleConfigured(
          downStreamParameters,
          routing_sp,
          configuredCb]() {
-            onHandleConfiguredDispatched(self,
-                                         status,
-                                         upStreamParameters,
-                                         handle,
-                                         downStreamParameters,
-                                         routing_sp,
-                                         configuredCb);
+            processConfigureResponse(self,
+                                     status,
+                                     upStreamParameters,
+                                     handle,
+                                     downStreamParameters,
+                                     routing_sp,
+                                     configuredCb);
         },
         handle->queue());
 
-    // 'onHandleConfiguredDispatched' is now responsible for calling the
+    // 'processConfigureResponse' is now responsible for calling the
     // callback, on the queue's dispatcher thread.
 }
 
-void RelayQueueEngine::onHandleConfiguredDispatched(
+void RelayQueueEngine::processConfigureResponse(
     const bsl::weak_ptr<RelayQueueEngine>&                 self,
     const bmqp_ctrlmsg::Status&                            status,
     [[maybe_unused]] const bmqp_ctrlmsg::StreamParameters& upStreamParameters,
@@ -615,7 +615,7 @@ void RelayQueueEngine::onHandleReleased(
 {
     d_queueState_p->queue()->dispatcher()->execute(
         bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-                                 &RelayQueueEngine::onHandleReleasedDispatched,
+                                 &RelayQueueEngine::processReleaseResponse,
                                  d_self.acquireWeak()),
                              status,
                              handle,
@@ -624,7 +624,7 @@ void RelayQueueEngine::onHandleReleased(
         d_queueState_p->queue());
 }
 
-void RelayQueueEngine::onHandleReleasedDispatched(
+void RelayQueueEngine::processReleaseResponse(
     const bmqp_ctrlmsg::Status&                                  status,
     mqbi::QueueHandle*                                           handle,
     const bmqp_ctrlmsg::QueueHandleParameters&                   hp,
@@ -1614,10 +1614,7 @@ void RelayQueueEngine::releaseHandleImpl(
         status.category() = bmqp_ctrlmsg::StatusCategory::E_SUCCESS;
         status.message()  = "Shutting down.";
 
-        onHandleReleasedDispatched(status,
-                                   handle,
-                                   effectiveHandleParam,
-                                   proctor);
+        processReleaseResponse(status, handle, effectiveHandleParam, proctor);
     }
     else {
         // Send a close queue request upstream.
