@@ -50,9 +50,6 @@
 #include <ball_loggermanagerconfiguration.h>
 #include <ball_streamobserver.h>
 #include <bdlbb_blobutil.h>
-#include <bdlf_bind.h>
-#include <bdlf_memfn.h>
-#include <bdlf_placeholder.h>
 #include <bsl_fstream.h>
 #include <bsl_iomanip.h>
 #include <bsl_iostream.h>
@@ -564,10 +561,11 @@ int Application::initialize()
 
         // Schedule a clock to collect / dump stats
         bdlmt::EventScheduler::RecurringEventHandle handle;
-        d_scheduler.scheduleRecurringEvent(
-            &handle,
-            bsls::TimeInterval(1.0),
-            bdlf::BindUtil::bind(&Application::snapshotStats, this));
+        d_scheduler.scheduleRecurringEvent(&handle,
+                                           bsls::TimeInterval(1.0),
+                                           [this]() {
+                                               snapshotStats();
+                                           });
     }
 
     return e_OK;
@@ -624,7 +622,9 @@ void Application::onMessageEvent(const bmqa::MessageEvent& event)
             d_scheduler.scheduleRecurringEvent(
                 &handle,
                 bsls::TimeInterval(d_parameters.shutdownGrace()),
-                bdlf::BindUtil::bind(&Application::autoReadShutdown, this));
+                [this]() {
+                    autoReadShutdown();
+                });
         }
     }
 
@@ -961,9 +961,9 @@ int Application::run()
             d_numAcknowledged = 0;
 
             // Start the thread
-            rc = bslmt::ThreadUtil::create(
-                &d_runningThread,
-                bdlf::MemFnUtil::memFn(&Application::producerThread, this));
+            rc = bslmt::ThreadUtil::create(&d_runningThread, [this]() {
+                producerThread();
+            });
         }
     }
 
