@@ -386,7 +386,7 @@ void DomainResolver::clearCache(bsl::string_view domainName)
         BALL_LOG_INFO << "Clearing up domain resolver cache for '"
                       << domainName << "'";
 
-        CacheMap::iterator it = d_cache.find(domainName);
+        auto it = d_cache.find(domainName);
         d_cache.erase(it);
     }
 }

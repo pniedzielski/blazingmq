@@ -203,7 +203,7 @@ void ConfigProvider::clearCache(bsl::string_view domainName)
         d_cache.clear();
     }
     else {
-        CacheMap::iterator it = d_cache.find(domainName);
+        auto it = d_cache.find(domainName);
         if (it != d_cache.end()) {
             BALL_LOG_INFO << "Clearing up conf cache for '" << domainName
                           << "'";

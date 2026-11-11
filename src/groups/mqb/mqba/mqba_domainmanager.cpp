@@ -892,7 +892,7 @@ void DomainManager::createDomain(
 mqbi::Domain* DomainManager::getDomain(const bsl::string& name) const
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // mutex LOCKED
-    DomainSpMap::const_iterator    it = d_domains.find(name);
+    auto                           it = d_domains.find(name);
     return it == d_domains.end() ? 0 : it->second.get();
 }
 
