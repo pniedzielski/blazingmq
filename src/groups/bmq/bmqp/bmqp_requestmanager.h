@@ -133,15 +133,17 @@
 //  [...]
 //
 //  // Now set the response callback to be invoked
-//  request->setResponseCb(bdlf::BindUtil::bind(&MyClass::onOpenQueueResponse,
-//                                              this,
-//                                              bdlf::PlaceHolders::_1));
+//  request->setResponseCb(
+//      [this](const bmqp::RequestManager::RequestSp& context) {
+//          onOpenQueueResponse(context);
+//      });
 //
 //  // Now set the async notifier callback that will be invoked when signaling
 //  // on the request
-//  request->setAsyncNotifierCb(bdlf::BindUtil::bind(&MyClass::enqueueEvent,
-//                                                   this,
-//                                                   bdlf::PlaceHolders::_1));
+//  request->setAsyncNotifierCb(
+//      [this](const bmqp::RequestManager::RequestSp& context) {
+//          enqueueEvent(context);
+//      });
 //
 //  // Finally, we can send the request
 //  bmqio::StatusCategory::Enum rc = requestManager.sendRequest(
@@ -206,9 +208,10 @@
 //  [...]
 //
 //  // Now set the response callback to be invoked
-//  request->setResponseCb(bdlf::BindUtil::bind(&MyClass::onOpenQueueResponse,
-//                                              this,
-//                                              bdlf::PlaceHolders::_1));
+//  request->setResponseCb(
+//      [this](const bmqp::RequestManager::RequestSp& context) {
+//          onOpenQueueResponse(context);
+//      });
 //
 //  // For synchronous request, we don't need to specify an 'asyncNotifierCb'
 //
@@ -291,9 +294,10 @@
 //  [...]
 //
 //  // We can set either the response callback or the async notifier callback
-//  request->setResponseCb(bdlf::BindUtil::bind(&MyClass::onOpenQueueResponse,
-//                                              this,
-//                                              bdlf::PlaceHolders::_1));
+//  request->setResponseCb(
+//      [this](const bmqp::RequestManager::RequestSp& context) {
+//          onOpenQueueResponse(context);
+//      });
 //
 //  // Finally, we can send the request
 //  bmqio::StatusCategory::Enum rc = requestManager.sendRequest(

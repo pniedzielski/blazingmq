@@ -29,8 +29,6 @@
 
 // BDE
 #include <bdlbb_blob.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlmt_eventscheduler.h>
 #include <bsl_utility.h>
 #include <bsl_vector.h>
@@ -298,14 +296,14 @@ RequestManager::sendRequest(const RequestSp&          request,
                             bsls::Types::Int64        watermark,
                             bsl::string*              errorDescription)
 {
-    return sendRequest(request,
-                       bdlf::BindUtil::bind(&sendHelper,
-                                            channel,
-                                            bdlf::PlaceHolders::_1,  // blob
-                                            watermark),  // watermark
-                       nodeDescription,
-                       timeout,
-                       errorDescription);
+    return sendRequest(
+        request,
+        [channel, watermark](const bsl::shared_ptr<bdlbb::Blob>& blob_sp) {
+            return sendHelper(channel, blob_sp, watermark);
+        },
+        nodeDescription,
+        timeout,
+        errorDescription);
 }
 
 bmqt::GenericResult::Enum
@@ -367,23 +365,15 @@ RequestManager::sendRequest(const RequestSp&          request,
     }
 
     // Schedule a timeout
-    struct Local {
-        static void dispatch(bmqex::Executor*             executor,
-                             const bsl::function<void()>& callback)
-        {
-            executor->dispatch(callback);
-        }
+    const bsl::function<void()> timeoutCb = [this, requestId]() {
+        onRequestTimeout(requestId);
     };
 
-    d_scheduler_p->scheduleEvent(
-        &(request->d_timeoutSchedulerHandle),
-        bmqu::Time::nowMonotonicClock() + timeout,
-        bdlf::BindUtil::bind(&Local::dispatch,
-                             &d_executor,
-                             bsl::function<void()>(bdlf::BindUtil::bind(
-                                 &RequestManager::onRequestTimeout,
-                                 this,
-                                 requestId))));
+    d_scheduler_p->scheduleEvent(&(request->d_timeoutSchedulerHandle),
+                                 bmqu::Time::nowMonotonicClock() + timeout,
+                                 [this, timeoutCb]() {
+                                     d_executor.dispatch(timeoutCb);
+                                 });
 
     // Insert the request in the map
     [[maybe_unused]] bsl::pair<RequestMapIter, bool> insertRC =
