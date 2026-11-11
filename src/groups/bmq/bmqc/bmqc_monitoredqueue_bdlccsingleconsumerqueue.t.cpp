@@ -421,7 +421,6 @@ static void testN1_performance()
     const int k_NUM_ITERATIONS  = 10 * 1000 * 1000;  // 10 M
     const int k_QUEUE_SIZE      = 250 * 1000;        // 250K
     const int k_PUSHERS[]       = {1, 5};
-    const int k_NUM_PUSHER_SETS = sizeof(k_PUSHERS) / sizeof(k_PUSHERS[0]);
 
     typedef bmqc::MonitoredQueue<bdlcc::SingleConsumerQueue<int> >
                                             MonitoredIntQueue;
@@ -429,9 +428,7 @@ static void testN1_performance()
 
     bmqtst::Table table(bmqtst::TestHelperUtil::allocator());
 
-    for (int i = 0; i < k_NUM_PUSHER_SETS; ++i) {
-        const int numPushers = k_PUSHERS[i];
-
+    for (const int numPushers : k_PUSHERS) {
         {
             MonitoredIntQueue queue(k_QUEUE_SIZE,
                                     bmqtst::TestHelperUtil::allocator());
