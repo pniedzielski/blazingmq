@@ -665,12 +665,8 @@ void StorageManager::determineDataDestinations(
     }
 
     // Determine data push/drop destinations
-    typedef bsl::vector<NodeToPSNCtxMapCIter>::const_iterator
-        NodesToCheckCIter;
-    for (NodesToCheckCIter nit = nodesToCheck.cbegin();
-         nit != nodesToCheck.cend();
-         nit++) {
-        NodeToPSNCtxMapCIter cit = *nit;
+    for (const auto& nodeToCheck : nodesToCheck) {
+        NodeToPSNCtxMapCIter cit = nodeToCheck;
         if (cit->first->nodeId() == selfNode->nodeId()) {
             continue;  // CONTINUE
         }
@@ -778,11 +774,8 @@ void StorageManager::sendReplicaDataRequestPush(
     // Send ReplicaDataRequestPush to destination replicas
     const bsl::vector<NodeToPSNCtxMapCIter>& destinationReplicas =
         destinations.d_dataPushDestinations;
-    for (bsl::vector<NodeToPSNCtxMapCIter>::const_iterator cit =
-             destinationReplicas.cbegin();
-         cit != destinationReplicas.cend();
-         ++cit) {
-        mqbnet::ClusterNode* destNode = (*cit)->first;
+    for (const auto& destination : destinationReplicas) {
+        mqbnet::ClusterNode* destNode = destination->first;
         BSLS_ASSERT_SAFE(destNode->nodeId() != selfNode->nodeId());
 
         RequestSp request = d_clusterData_p->requestManager().createRequest();
@@ -802,7 +795,7 @@ void StorageManager::sendReplicaDataRequestPush(
             d_partitionInfoVec.at(partitionId).primaryLeaseId();
         replicaDataRqst.replicaDataType() =
             bmqp_ctrlmsg::ReplicaDataType::E_PUSH;
-        replicaDataRqst.beginSequenceNumber() = (*cit)->second.d_PSN;
+        replicaDataRqst.beginSequenceNumber() = destination->second.d_PSN;
         replicaDataRqst.endSequenceNumber() =
             nodeToPSNCtxMap.at(selfNode).d_PSN;
 
@@ -849,11 +842,8 @@ void StorageManager::sendReplicaDataRequestDrop(
     // Send ReplicaDataRequestDrop to replicas with obsolete data
     const bsl::vector<NodeToPSNCtxMapCIter>& destinationReplicas =
         destinations.d_dataDropDestinations;
-    for (bsl::vector<NodeToPSNCtxMapCIter>::const_iterator cit =
-             destinationReplicas.cbegin();
-         cit != destinationReplicas.cend();
-         ++cit) {
-        mqbnet::ClusterNode* destNode = (*cit)->first;
+    for (const auto& destination : destinationReplicas) {
+        mqbnet::ClusterNode* destNode = destination->first;
         BSLS_ASSERT_SAFE(destNode->nodeId() != selfNode->nodeId());
 
         RequestSp request = d_clusterData_p->requestManager().createRequest();
@@ -958,13 +948,10 @@ void StorageManager::startSendDataChunksAsPrimary(
     // For each node, check if we need to send data chunks
     const bsl::vector<NodeToPSNCtxMapCIter>& destinationReplicas =
         destinations.d_dataPushDestinations;
-    for (bsl::vector<NodeToPSNCtxMapCIter>::const_iterator cit =
-             destinationReplicas.begin();
-         cit != destinationReplicas.end();
-         ++cit) {
-        mqbnet::ClusterNode*                         destNode = (*cit)->first;
+    for (const auto& destination : destinationReplicas) {
+        mqbnet::ClusterNode* destNode = destination->first;
         const bmqp_ctrlmsg::PartitionSequenceNumber& beginPSN =
-            (*cit)->second.d_PSN;
+            destination->second.d_PSN;
         if (beginPSN == endPSN) {
             // Replica in-sync with primary: no need to send data chunks
             continue;  // CONTINUE
@@ -2120,12 +2107,7 @@ void StorageManager::do_replicaStateRequest(
     const bmqp_ctrlmsg::PartitionSequenceNumber selfFirstSyncAfterRolloverPSN =
         getSelfFirstSyncPointAfterRolloverPSN(partitionId);
 
-    for (bsl::vector<mqbnet::ClusterNode*>::const_iterator it =
-             replicas.cbegin();
-         it != replicas.cend();
-         ++it) {
-        mqbnet::ClusterNode* replica = *it;
-
+    for (mqbnet::ClusterNode* replica : replicas) {
         RequestSp contextSp =
             d_clusterData_p->requestManager().createRequest();
         contextSp->setComponentId(
@@ -3005,11 +2987,8 @@ void StorageManager::do_processBufferedLiveData(
                   << bufferedStorageEvents.size()
                   << " buffered storage events to the partition.";
 
-    for (bsl::vector<bsl::shared_ptr<bdlbb::Blob> >::const_iterator cit =
-             bufferedStorageEvents.cbegin();
-         cit != bufferedStorageEvents.cend();
-         ++cit) {
-        rc = fs->processRecoveryEvent(*cit);
+    for (const auto& storageEvent : bufferedStorageEvents) {
+        rc = fs->processRecoveryEvent(storageEvent);
         if (rc != 0) {
             BMQTSK_ALARMLOG_ALARM("RECOVERY")
                 << d_clusterData_p->identity().description() << " Partition ["
@@ -3703,14 +3682,12 @@ void StorageManager::do_findHighestSeq(
                 .d_firstSyncPointAfterRolloverPSN);
 
     // Find out highest PSN and number of up-to-date nodes.
-    for (NodeToPSNCtxMapCIter cit = nodeToPSNCtxMap.cbegin();
-         cit != nodeToPSNCtxMap.cend();
-         cit++) {
-        if (cit->second.d_PSN > highestPSN) {
-            highestPSNNode = cit->first;
-            highestPSN     = cit->second.d_PSN;
+    for (const auto& nodeToPSNCtx : nodeToPSNCtxMap) {
+        if (nodeToPSNCtx.second.d_PSN > highestPSN) {
+            highestPSNNode = nodeToPSNCtx.first;
+            highestPSN     = nodeToPSNCtx.second.d_PSN;
             highestPartitionFirstSyncPointAfterRolloverPSN =
-                cit->second.d_firstSyncPointAfterRolloverPSN;
+                nodeToPSNCtx.second.d_firstSyncPointAfterRolloverPSN;
         }
     }
 
@@ -4304,31 +4281,24 @@ void StorageManager::initializeQueueKeyInfoMap(
         return;  // RETURN
     }
 
-    for (QueueKeyInfoMapVec::iterator it = d_queueKeyInfoMapVec.begin();
-         it != d_queueKeyInfoMapVec.end();
-         ++it) {
-        BSLS_ASSERT_SAFE(!it->get());
-        it->reset(new (*d_allocator_p) QueueKeyInfoMap(d_allocator_p),
-                  d_allocator_p);
+    for (auto& queueKeyInfoMapSp : d_queueKeyInfoMapVec) {
+        BSLS_ASSERT_SAFE(!queueKeyInfoMapSp.get());
+        queueKeyInfoMapSp.reset(new (*d_allocator_p)
+                                    QueueKeyInfoMap(d_allocator_p),
+                                d_allocator_p);
     }
 
     // Populate 'd_queueKeyInfoMapVec' from cluster state
-    for (DomainStatesCIter dscit = clusterState.domainStates().cbegin();
-         dscit != clusterState.domainStates().cend();
-         ++dscit) {
-        for (UriToQueueInfoMapCIter cit = dscit->second->queuesInfo().cbegin();
-             cit != dscit->second->queuesInfo().cend();
-             ++cit) {
-            BSLS_ASSERT_SAFE(cit->second);
-            const ClusterStateQueueInfo& csQinfo = *(cit->second);
+    for (const auto& domainEntry : clusterState.domainStates()) {
+        for (const auto& queueEntry : domainEntry.second->queuesInfo()) {
+            BSLS_ASSERT_SAFE(queueEntry.second);
+            const ClusterStateQueueInfo& csQinfo = *(queueEntry.second);
 
             mqbs::DataStoreConfigQueueInfo qinfo;
             qinfo.setCanonicalQueueUri(csQinfo.uri().asString());
             qinfo.setPartitionId(csQinfo.partitionId());
-            for (AppInfosCIter appIdCit = csQinfo.appInfos().cbegin();
-                 appIdCit != csQinfo.appInfos().cend();
-                 ++appIdCit) {
-                qinfo.addAppInfo(appIdCit->first, appIdCit->second, true);
+            for (const auto& appInfo : csQinfo.appInfos()) {
+                qinfo.addAppInfo(appInfo.first, appInfo.second, true);
             }
 
             d_queueKeyInfoMapVec.at(csQinfo.partitionId())
