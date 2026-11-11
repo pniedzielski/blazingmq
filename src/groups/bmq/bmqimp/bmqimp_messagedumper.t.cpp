@@ -1039,11 +1039,7 @@ static void test2_parseCommand()
          0}  // dumpActionValue
     };
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        const Test& test = k_DATA[idx];
-
+    for (const Test& test : k_DATA) {
         PVV(test.d_line << ": parsing dump command: [command: "
                         << test.d_command
                         << "], expecting return code: " << test.d_expectedRc);
@@ -1113,11 +1109,8 @@ static void test3_processDumpCommand()
                   {L_, "OUT 1s", false, false, true, true},
                   {L_, "IN OFF", false, false, false, false}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        Tester      tester(bmqtst::TestHelperUtil::allocator());
-        const Test& test = k_DATA[idx];
+    for (const Test& test : k_DATA) {
+        Tester tester(bmqtst::TestHelperUtil::allocator());
 
         // 1. Process various DumpMessages commands and verify that dumping of
         //    corresponding events is enabled.
@@ -1185,11 +1178,8 @@ static void test4_processDumpCommand_invalidDumpMessage()
                   {L_, "OUT 1s", false, false, true, true},
                   {L_, "IN OFF", false, false, false, false}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        Tester      tester(bmqtst::TestHelperUtil::allocator());
-        const Test& test = k_DATA[idx];
+    for (const Test& test : k_DATA) {
+        Tester tester(bmqtst::TestHelperUtil::allocator());
 
         // a. Process the command and verify that dumping of the corresponding
         //    events is enabled.
@@ -1252,11 +1242,8 @@ static void test5_reset()
                   {L_, "OUT 1s", false, false, true, true},
                   {L_, "IN OFF", false, false, false, false}};
 
-    const size_t k_NUM_DATA = sizeof(k_DATA) / sizeof(*k_DATA);
-
-    for (size_t idx = 0; idx < k_NUM_DATA; ++idx) {
-        Tester      tester(bmqtst::TestHelperUtil::allocator());
-        const Test& test = k_DATA[idx];
+    for (const Test& test : k_DATA) {
+        Tester tester(bmqtst::TestHelperUtil::allocator());
 
         // 1. Process various DumpMessages commands and verify that dumping of
         //    corresponding events is enabled.  Then reset the MessageDumper
