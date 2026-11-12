@@ -338,8 +338,8 @@ void StorageManager::onPartitionRecovery(
                           << recoveryEvents.size()
                           << " buffered storage events to the partition.";
 
-            for (size_t i = 0; i < recoveryEvents.size(); ++i) {
-                rc = fs->processRecoveryEvent(recoveryEvents[i]);
+            for (const BlobSp& recoveryEvent : recoveryEvents) {
+                rc = fs->processRecoveryEvent(recoveryEvent);
                 if (0 != rc) {
                     BMQTSK_ALARMLOG_ALARM("RECOVERY")
                         << d_clusterData_p->identity().description()
@@ -1425,14 +1425,10 @@ void StorageManager::setPrimaryForPartition(int                  partitionId,
     BSLS_ASSERT_SAFE(fs);
 
     ClusterNodes peers;
-    typedef mqbc::ClusterMembership::ClusterNodeSessionMapIter
-        ClusterNodeSessionMapIter;
-    for (ClusterNodeSessionMapIter nodeIt =
-             d_clusterData_p->membership().clusterNodeSessionMap().begin();
-         nodeIt != d_clusterData_p->membership().clusterNodeSessionMap().end();
-         ++nodeIt) {
-        if (nodeIt->first != d_clusterData_p->membership().selfNode()) {
-            peers.push_back(nodeIt->first);
+    for (const auto& sessionEntry :
+         d_clusterData_p->membership().clusterNodeSessionMap()) {
+        if (sessionEntry.first != d_clusterData_p->membership().selfNode()) {
+            peers.push_back(sessionEntry.first);
         }
     }
 
