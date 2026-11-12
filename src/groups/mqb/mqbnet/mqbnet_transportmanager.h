@@ -189,7 +189,7 @@ class TransportManager {
     mqbstat::StatController* d_statController_p;
     // Stat controller
 
-    bslma::ManagedPtr<TCPSessionFactory> d_tcpSessionFactory_mp;
+    bmqu::UniquePtr<TCPSessionFactory> d_tcpSessionFactory_mp;
     // TCPSessionFactory
 
     ConnectionsStateMap d_connectionsState;

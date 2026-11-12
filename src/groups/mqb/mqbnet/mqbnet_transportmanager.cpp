@@ -94,15 +94,15 @@ int TransportManager::createAndStartTcpInterface(
 
     bslma::Allocator* alloc = d_allocators.get("Interface" +
                                                bsl::to_string(config.port()));
-    d_tcpSessionFactory_mp.load(new (*alloc)
-                                    TCPSessionFactory(config,
-                                                      d_scheduler_p,
-                                                      d_blobBufferFactory_p,
-                                                      d_authenticator_mp.get(),
-                                                      d_negotiator_mp.get(),
-                                                      d_statController_p,
-                                                      alloc),
-                                alloc);
+    d_tcpSessionFactory_mp  = bmqu::UniquePtrUtil::adopt<TCPSessionFactory>(
+        new (*alloc) TCPSessionFactory(config,
+                                       d_scheduler_p,
+                                       d_blobBufferFactory_p,
+                                       d_authenticator_mp.get(),
+                                       d_negotiator_mp.get(),
+                                       d_statController_p,
+                                       alloc),
+        alloc);
 
     return d_tcpSessionFactory_mp->start(errorDescription);
 }
@@ -334,7 +334,7 @@ TransportManager::TransportManager(
 , d_authenticator_mp(bsl::move(authenticator))
 , d_negotiator_mp(bsl::move(negotiator))
 , d_statController_p(statController)
-, d_tcpSessionFactory_mp(0)
+, d_tcpSessionFactory_mp()
 , d_connectionsState(allocator)
 {
     // PRECONDITIONS
@@ -471,7 +471,7 @@ void TransportManager::stop()
 
     // Destroy interfaces
     if (d_tcpSessionFactory_mp) {
-        d_tcpSessionFactory_mp.clear();
+        d_tcpSessionFactory_mp.reset();
     }
 
     // Clear map (so that a 'start' called after 'stop' will start 'fresh')
