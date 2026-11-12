@@ -189,7 +189,7 @@ void Cluster::startImpl(bsl::ostream* errorDescription, int* rc)
     mqbi::Dispatcher* clusterDispatcher = dispatcher();
 
     // Start the StorageManager
-    d_storageManager_mp.load(
+    d_storageManager_mp = bmqu::UniquePtrUtil::adopt<mqbi::StorageManager>(
         isFSMWorkflow()
             ? static_cast<mqbi::StorageManager*>(
                   new (*storageManagerAllocator) mqbc::StorageManager(

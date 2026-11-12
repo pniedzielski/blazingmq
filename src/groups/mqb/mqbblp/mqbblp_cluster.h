@@ -52,6 +52,7 @@
 #include <bmqt_uri.h>
 #include <bmqu_operationchain.h>
 #include <bmqu_throttledaction.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -144,7 +145,7 @@ class Cluster : public mqbi::Cluster,
     typedef mqbc::ClusterMembership::ClusterNodeSessionMapConstIter
         ClusterNodeSessionMapConstIter;
 
-    typedef bslma::ManagedPtr<mqbi::StorageManager> StorageManagerMp;
+    typedef bmqu::UniquePtr<mqbi::StorageManager> StorageManagerMp;
 
     typedef mqbnet::Cluster::NodesList NodeList;
 
