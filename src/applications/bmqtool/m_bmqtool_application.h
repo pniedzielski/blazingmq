@@ -40,6 +40,7 @@
 // BMQ
 #include <bmqst_statcontext.h>
 #include <bmqtsk_consoleobserver.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_multiplexobserver.h>
@@ -114,7 +115,7 @@ class Application : public bmqa::SessionEventHandler {
 
     bmqtsk::ConsoleObserver d_consoleObserver;
 
-    bslma::ManagedPtr<bmqa::Session> d_session_mp;
+    bmqu::UniquePtr<bmqa::Session> d_session_mp;
     // Session with the BlazingMQ broker.
 
     StorageInspector d_storageInspector;

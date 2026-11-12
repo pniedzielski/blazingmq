@@ -40,6 +40,7 @@
 #include <bmqu_memoutstream.h>
 #include <bmqu_outstreamformatsaver.h>
 #include <bmqu_printutil.h>
+#include <bmqu_uniqueptr.h>
 
 // BMQ
 #include <bmqst_statutil.h>
@@ -425,16 +426,16 @@ int Application::initialize()
 
     // Create the session
     if (d_parameters.noSessionEventHandler()) {
-        d_session_mp.load(new (*d_allocator_p)
-                              bmqa::Session(options, d_allocator_p),
-                          d_allocator_p);
+        d_session_mp = bmqu::UniquePtrUtil::adopt(
+            new (*d_allocator_p) bmqa::Session(options, d_allocator_p),
+            d_allocator_p);
     }
     else {
         bslma::ManagedPtr<bmqa::SessionEventHandler> managedHandler(
             this,
             d_allocator_p,
             bslma::ManagedPtrNilDeleter<bmqa::SessionEventHandler>::deleter);
-        d_session_mp.load(
+        d_session_mp = bmqu::UniquePtrUtil::adopt(
             new (*d_allocator_p)
                 bmqa::Session(managedHandler, options, d_allocator_p),
             d_allocator_p);
@@ -442,7 +443,7 @@ int Application::initialize()
 
     if (d_parameters.mode() == ParametersMode::e_CLI) {
         // Initialize the interactive mode
-        rc = d_interactive.initialize(d_session_mp.ptr(), this);
+        rc = d_interactive.initialize(d_session_mp.get(), this);
         if (rc != 0) {
             BALL_LOG_ERROR << "Failed init interactive [" << rc << "]";
             return e_INIT_INTERACTIVE_ERROR;  // RETURN

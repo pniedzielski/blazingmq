@@ -1011,7 +1011,7 @@ int Interactive::mainLoop()
 
     // Clear the unconfirmed message map: the blobs are coming from the IO, the
     // blob buffer factory is owned by the bmqa::Session which is destroyed
-    // when clearing the session ManagedPtr.
+    // when clearing the session pointer.
     {
         bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // MUTEX LOCKED
         d_uris.clear();
