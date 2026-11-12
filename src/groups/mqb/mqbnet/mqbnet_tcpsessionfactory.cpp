@@ -254,22 +254,6 @@ bool isClientOrProxy(const mqbnet::Session* session)
     return mqbnet::ClusterUtil::isClientOrProxy(session->negotiationMessage());
 }
 
-/// A predicate functor for comparing a [mqbcfg::TcpInterfaceListener] by their
-/// `port()` member.
-struct PortMatcher {
-    int d_port;
-
-    PortMatcher(int port)
-    : d_port(port)
-    {
-    }
-
-    bool operator()(const mqbcfg::TcpInterfaceListener& listener)
-    {
-        return listener.port() == d_port;
-    }
-};
-
 /// Helpers for building ChannelFactoryPipeline's
 struct ChannelFactoryBuilders {
     typedef bmqio::ChannelFactoryPipeline::ChannelFactorySP ChannelFactorySP;
@@ -1728,10 +1712,13 @@ bool TCPSessionFactory::isEndpointLoopback(bsl::string_view uri) const
         return endpoint.port() == d_config_mp->port();
     }
 
-    PortMatcher portMatcher(endpoint.port());
-    return bsl::any_of(d_config_mp->listeners().cbegin(),
-                       d_config_mp->listeners().cend(),
-                       portMatcher);
+    const int endpointPort = endpoint.port();
+    return bsl::any_of(
+        d_config_mp->listeners().cbegin(),
+        d_config_mp->listeners().cend(),
+        [endpointPort](const mqbcfg::TcpInterfaceListener& listener) {
+            return listener.port() == endpointPort;
+        });
 }
 
 // ------------------------------------
