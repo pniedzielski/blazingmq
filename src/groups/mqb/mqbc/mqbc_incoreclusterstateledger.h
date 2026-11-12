@@ -195,7 +195,7 @@ class IncoreClusterStateLedger final : public ClusterStateLedger {
     mqbsi::LedgerConfig d_ledgerConfig;
 
     /// Ledger owned by this object.
-    bslma::ManagedPtr<mqbsi::Ledger> d_ledger_mp;
+    bmqu::UniquePtr<mqbsi::Ledger> d_ledger_mp;
 
     /// Map of uncommitted (but not canceled) advisories and associated record
     /// id from LSN.

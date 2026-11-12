@@ -45,6 +45,7 @@
 #include <bmqu_blobobjectproxy.h>
 #include <bmqu_memoutstream.h>
 #include <bmqu_time.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bdlbb_blob.h>
@@ -1275,7 +1276,7 @@ IncoreClusterStateLedger::IncoreClusterStateLedger(
 , d_clusterData_p(clusterData)
 , d_clusterState_p(clusterState)
 , d_ledgerConfig(allocator)
-, d_ledger_mp(0)
+, d_ledger_mp()
 , d_uncommittedAdvisories(allocator)
 , d_gatedUpdateLsns(allocator)
 , d_appliedSnapshotTerm(0)
@@ -1362,9 +1363,9 @@ int IncoreClusterStateLedger::open()
     }
 
     // Create and open the ledger
-    d_ledger_mp.load(new (*d_allocator_p)
-                         mqbsl::Ledger(d_ledgerConfig, d_allocator_p),
-                     d_allocator_p);
+    d_ledger_mp = bmqu::UniquePtrUtil::adopt<mqbsi::Ledger>(
+        new (*d_allocator_p) mqbsl::Ledger(d_ledgerConfig, d_allocator_p),
+        d_allocator_p);
     int rc = d_ledger_mp->open(mqbsl::Ledger::e_CREATE_IF_MISSING);
     if (rc != 0) {
         return 10 * rc + rc_OPEN_FAILURE;  // RETURN
