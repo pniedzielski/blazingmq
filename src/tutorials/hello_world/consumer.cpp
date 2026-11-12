@@ -47,9 +47,10 @@
 #include <bdlbb_blob.h>
 #include <bdlbb_blobutil.h>
 #include <bsl_iostream.h>
+#include <bsl_memory.h>
 #include <bsl_ostream.h>
+#include <bsl_utility.h>
 #include <bsla_annotations.h>
-#include <bslma_managedptr.h>
 #include <bslmt_condition.h>
 #include <bslmt_lockguard.h>
 #include <bslmt_mutex.h>
@@ -62,9 +63,6 @@
 using namespace BloombergLP;
 
 namespace {
-// TYPES
-using ManagedHandler = bslma::ManagedPtr<bmqa::SessionEventHandler>;
-
 // CONSTANTS
 const char k_QUEUE_URL[] = "bmq://bmq.test.mem.priority/test-queue";
 
@@ -231,9 +229,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char* argv[])
     // the local broker by default, unless the 'Session' is created with an
     // optional 'SessionOptions' object.
 
-    EventHandler*  eventHandler = new EventHandler();
-    ManagedHandler eventHandlerMp(eventHandler);
-    bmqa::Session  session(eventHandlerMp);
+    // The session takes ownership of the event handler; keep a non-owning
+    // pointer to it so that it can be given access to the session.
+    bsl::unique_ptr<EventHandler> handler = bsl::make_unique<EventHandler>();
+    EventHandler*                 eventHandler = handler.get();
+    bmqa::Session                 session(bsl::move(handler));
     eventHandler->setSession(&session);
     int rc = session.start();
     if (rc != 0) {
