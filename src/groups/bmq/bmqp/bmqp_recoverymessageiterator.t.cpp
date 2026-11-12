@@ -108,8 +108,7 @@ void populateBlob(bdlbb::Blob*       blob,
     }
 
     // Set EventHeader length
-    bmqp::EventHeader* e = reinterpret_cast<bmqp::EventHeader*>(
-        blob->buffer(0).data());
+    auto* e = reinterpret_cast<bmqp::EventHeader*>(blob->buffer(0).data());
     e->setLength(eventLength);
 }
 
@@ -154,8 +153,7 @@ void appendMessage(bdlbb::Blob*                      blob,
     eventLength += (rh.messageWords() * bmqp::Protocol::k_WORD_SIZE);
 
     // set EventHeader length
-    bmqp::EventHeader* e = reinterpret_cast<bmqp::EventHeader*>(
-        blob->buffer(0).data());
+    auto* e = reinterpret_cast<bmqp::EventHeader*>(blob->buffer(0).data());
     e->setLength(eventLength);
 }
 
@@ -559,8 +557,7 @@ static void test5_emptyPayload()
                             rhdr.headerWords() * bmqp::Protocol::k_WORD_SIZE);
 
     // Set EventHeader length
-    bmqp::EventHeader* e = reinterpret_cast<bmqp::EventHeader*>(
-        eventBlob.buffer(0).data());
+    auto* e = reinterpret_cast<bmqp::EventHeader*>(eventBlob.buffer(0).data());
     e->setLength(sizeof(bmqp::EventHeader) +
                  (rhdr.messageWords() * bmqp::Protocol::k_WORD_SIZE));
 
@@ -778,7 +775,7 @@ static void test6_nextMethod()
                                         bmqp::Protocol::k_WORD_SIZE);
 
             // Set EventHeader length
-            bmqp::EventHeader* e = reinterpret_cast<bmqp::EventHeader*>(
+            auto* e = reinterpret_cast<bmqp::EventHeader*>(
                 blob.buffer(0).data());
             e->setLength(sizeof(bmqp::EventHeader) +
                          sizeof(bmqp::RecoveryHeader));
