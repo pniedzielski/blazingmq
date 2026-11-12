@@ -742,8 +742,8 @@ static void test6_nextMethod()
         malformedMessageWords.push_back(0);
         malformedMessageWords.push_back(k_HEADER_WORDS - 1);
 
-        for (size_t i = 0; i < malformedMessageWords.size(); ++i) {
-            PVV("MESSAGE WORDS: " << malformedMessageWords[i]);
+        for (int malformedWords : malformedMessageWords) {
+            PVV("MESSAGE WORDS: " << malformedWords);
 
             bdlbb::PooledBlobBufferFactory bufferFactory(
                 1024,
@@ -768,7 +768,7 @@ static void test6_nextMethod()
                 .setPartitionId(0)
                 .setChunkSequenceNumber(1)
                 .setFileChunkType(bmqp::RecoveryFileChunkType::e_JOURNAL)
-                .setMessageWords(malformedMessageWords[i]);
+                .setMessageWords(malformedWords);
             bdlbb::BlobUtil::append(&blob,
                                     reinterpret_cast<const char*>(&rhdr),
                                     rhdr.headerWords() *
