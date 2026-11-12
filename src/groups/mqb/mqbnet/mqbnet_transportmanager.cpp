@@ -56,9 +56,8 @@ namespace mqbnet {
 
 void TransportManager::onClusterReleased(void* object, void* transportManager)
 {
-    mqbnet::Cluster*  cluster = reinterpret_cast<Cluster*>(object);
-    TransportManager* self    = reinterpret_cast<TransportManager*>(
-        transportManager);
+    auto* cluster = reinterpret_cast<Cluster*>(object);
+    auto* self    = reinterpret_cast<TransportManager*>(transportManager);
 
     {
         bslmt::LockGuard<bslmt::Mutex> guard(&self->d_mutex);  // d_mutex LOCK
@@ -206,7 +205,7 @@ bool TransportManager::sessionResult(
 {
     // executed by one of the *IO* threads
 
-    ConnectionState* state = reinterpret_cast<ConnectionState*>(resultState);
+    auto* state = reinterpret_cast<ConnectionState*>(resultState);
 
     BALL_LOG_DEBUG << "SessionResult: [event: " << event
                    << ", status: " << status << "]";
