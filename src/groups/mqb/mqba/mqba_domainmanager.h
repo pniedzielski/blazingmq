@@ -37,6 +37,7 @@
 
 // BMQ
 #include <bmqt_uri.h>
+#include <bmqu_uniqueptr.h>
 #include <bmqvt_valueorerror.h>
 
 // BDE
@@ -136,7 +137,7 @@ class DomainManager final : public mqbi::DomainFactory {
     typedef bsl::unordered_map<bsl::string, FactoryMethod> FactoryMethodMap;
 
     /// Managed pointer to a domain resolver
-    typedef bslma::ManagedPtr<DomainResolver> DomainResolverMp;
+    typedef bmqu::UniquePtr<DomainResolver> DomainResolverMp;
 
     /// First element is the pointer to the domain. Second element is `true`
     /// if an insert was performed or `false` otherwise.

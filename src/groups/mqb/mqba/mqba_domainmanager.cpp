@@ -36,6 +36,7 @@
 #include <bmqu_sharedresource.h>
 #include <bmqu_stringutil.h>
 #include <bmqu_time.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <baljsn_decoder.h>
@@ -44,6 +45,7 @@
 #include <bsl_cstddef.h>
 #include <bsl_ios.h>
 #include <bsl_iostream.h>
+#include <bsl_utility.h>
 #include <bsla_annotations.h>
 #include <bslma_allocator.h>
 #include <bslmt_latch.h>
@@ -394,16 +396,17 @@ DomainManager::upsertDomain(UpsertDomainValue*             out,
         bslma::ManagedPtr<bmqst::StatContext> queuesStatContext =
             d_queuesStatContext_p->addSubcontext(statContextCfg);
 
-        bslma::ManagedPtr<mqbi::Domain> domainMp(
-            new (*d_allocator_p) mqbblp::Domain(domain,
-                                                d_dispatcher_p,
-                                                d_blobBufferFactory_p,
-                                                cluster,
-                                                d_domainsStatContext_p,
-                                                queuesStatContext,
-                                                d_allocator_p),
-            d_allocator_p);
-        domainSp = DomainSp(domainMp, d_allocator_p);
+        bmqu::UniquePtr<mqbi::Domain> domainMp =
+            bmqu::UniquePtrUtil::adopt<mqbi::Domain>(
+                new (*d_allocator_p) mqbblp::Domain(domain,
+                                                    d_dispatcher_p,
+                                                    d_blobBufferFactory_p,
+                                                    cluster,
+                                                    d_domainsStatContext_p,
+                                                    queuesStatContext,
+                                                    d_allocator_p),
+                d_allocator_p);
+        domainSp = DomainSp(bsl::move(domainMp), d_allocator_p);
     }
 
     // Configure the domain
@@ -515,9 +518,9 @@ int DomainManager::start(bsl::ostream& errorDescription)
     int ret = rc_SUCCESS;
 
     // Create the DomainResolver
-    d_domainResolver_mp.load(new (*d_allocator_p)
-                                 DomainResolver(d_allocator_p),
-                             d_allocator_p);
+    d_domainResolver_mp = bmqu::UniquePtrUtil::adopt<DomainResolver>(
+        new (*d_allocator_p) DomainResolver(d_allocator_p),
+        d_allocator_p);
     ret = d_domainResolver_mp->start(errorDescription);
     if (ret != 0) {
         return (ret * 10) + rc_DOMAIN_RESOLVER;  // RETURN
@@ -570,7 +573,7 @@ void DomainManager::stop()
 
     if (d_domainResolver_mp) {
         d_domainResolver_mp->stop();
-        d_domainResolver_mp.clear();
+        d_domainResolver_mp.reset();
     }
 
     // Notice that this invalidation is necessary.
