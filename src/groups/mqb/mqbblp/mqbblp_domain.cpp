@@ -245,10 +245,8 @@ class QueueReconfigureFunctor {
     {
         // Thread: CLUSTER DISPATCHER
 
-        for (QueueWeakPtrVector::const_iterator it = d_queues_sp->begin();
-             it != d_queues_sp->end();
-             ++it) {
-            bsl::shared_ptr<mqbi::Queue> queue = it->lock();
+        for (const bsl::weak_ptr<mqbi::Queue>& queueWp : *d_queues_sp) {
+            bsl::shared_ptr<mqbi::Queue> queue = queueWp.lock();
             if (queue) {
                 queue->configure(
                     static_cast<bsl::ostream*>(0),  // errorDescription
@@ -415,9 +413,8 @@ int Domain::configure(bsl::ostream&           errorDescription,
         {
             bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCK
             queues_sp->reserve(d_queues.size());
-            for (QueueMapCIter it = d_queues.begin(); it != d_queues.end();
-                 ++it) {
-                queues_sp->push_back(it->second);
+            for (const auto& [queueName, queueSp] : d_queues) {
+                queues_sp->push_back(queueSp);
             }
         }
 
@@ -723,7 +720,6 @@ int Domain::processCommand(mqbcmd::DomainResult*        result,
 
         typedef bsl::map<bsl::string, bsl::shared_ptr<mqbi::Queue> >
                                                 OrderedQueueMap;
-        typedef OrderedQueueMap::const_iterator OrderedQueueMapCIter;
 
         // Make a snapshot of queues.
         OrderedQueueMap map(d_allocator_p);
@@ -732,10 +728,9 @@ int Domain::processCommand(mqbcmd::DomainResult*        result,
             map.insert(d_queues.cbegin(), d_queues.cend());
         }
 
-        OrderedQueueMapCIter cit;
         domainInfo.queueUris().reserve(map.size());
-        for (cit = map.cbegin(); cit != map.cend(); ++cit) {
-            domainInfo.queueUris().push_back(cit->second->uri().asString());
+        for (const auto& [queueName, queueSp] : map) {
+            domainInfo.queueUris().push_back(queueSp->uri().asString());
         }
 
         mqbcmd::ClusterCommand clusterCommand;
@@ -841,9 +836,8 @@ int Domain::processCommand(mqbcmd::DomainResult*        result,
 
 void Domain::closeAllQueues(const QueueMap& queues)
 {
-    for (QueueMap::const_iterator cit = queues.begin(); cit != queues.end();
-         ++cit) {
-        const bsl::shared_ptr<mqbi::Queue>& queueSp = cit->second;
+    for (const auto& entry : queues) {
+        const bsl::shared_ptr<mqbi::Queue>& queueSp = entry.second;
         queueSp->close([this, queueSp]() {
             onQueueClosed(queueSp);
         });
@@ -922,9 +916,8 @@ void Domain::loadAllQueues(
 
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCK
 
-    for (QueueMapCIter cit = d_queues.cbegin(); cit != d_queues.cend();
-         ++cit) {
-        out->push_back(cit->second);
+    for (const auto& [queueName, queueSp] : d_queues) {
+        out->push_back(queueSp);
     }
 }
 
@@ -935,9 +928,8 @@ void Domain::loadAllQueues(bsl::vector<bmqt::Uri>* out) const
 
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCK
 
-    for (QueueMapCIter cit = d_queues.cbegin(); cit != d_queues.cend();
-         ++cit) {
-        out->push_back(cit->second->uri());
+    for (const auto& [queueName, queueSp] : d_queues) {
+        out->push_back(queueSp->uri());
     }
 }
 
