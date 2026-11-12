@@ -1493,8 +1493,8 @@ void TCPSessionFactory::closeClients()
         // 'd_mutex' must not be held here: 'invalidate' waits for the session
         // dispatcher threads, which may need 'd_mutex' to destroy a session.
 
-        for (size_t i = 0; i < clients.size(); ++i) {
-            bsl::shared_ptr<Session> session = clients[i].lock();
+        for (const bsl::weak_ptr<Session>& client_wp : clients) {
+            bsl::shared_ptr<Session> session = client_wp.lock();
             if (session) {
                 BALL_LOG_ERROR << d_name << ": invalidating '"
                                << session->description() << "'";
