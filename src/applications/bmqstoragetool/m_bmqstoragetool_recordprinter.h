@@ -38,6 +38,9 @@
 #include <mqbs_filestoreprotocolprinter.h>
 #include <mqbsi_ledger.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bsl_ostream.h>
 #include <bsl_string.h>
@@ -67,7 +70,7 @@ class RecordDetailsPrinter {
   private:
     bsl::ostream&                   d_ostream;
     bsl::vector<bsl::string>        d_fields;
-    bslma::ManagedPtr<PRINTER_TYPE> d_printer_mp;
+    bmqu::UniquePtr<PRINTER_TYPE>   d_printer_mp;
     bslma::Allocator*               d_allocator_p;
 
     // PRIVATE METHODS
@@ -183,8 +186,9 @@ void RecordDetailsPrinter<PRINTER_TYPE>::printCommonHeader(
 
     // The printer holds a reference to this vector, so appending fields
     // afterwards is safe; the reference stays valid even across reallocation.
-    d_printer_mp.load(new (*d_allocator_p) PRINTER_TYPE(d_ostream, d_fields),
-                      d_allocator_p);
+    d_printer_mp = bmqu::UniquePtrUtil::adopt(
+        new (*d_allocator_p) PRINTER_TYPE(d_ostream, d_fields),
+        d_allocator_p);
 
     *d_printer_mp << details.d_record.header().type() << details.d_recordIndex
                   << details.d_recordOffset
