@@ -78,7 +78,7 @@ int ClusterCatalog::createNetCluster(
     // PRECONDITIONS
     BSLMT_MUTEXASSERT_IS_LOCKED_SAFE(&d_mutex);  // mutex was LOCKED
 
-    const bool isMember = (d_myClusters.find(name) != d_myClusters.end());
+    const bool isMember = d_myClusters.contains(name);
 
     mqbnet::TransportManager::ConnectionMode connectionMode;
     if (isMember) {
@@ -143,7 +143,7 @@ int ClusterCatalog::createCluster(bsl::ostream& errorDescription,
     int rc = rc_SUCCESS;
 
     // Make sure the cluster doesn't exist already
-    if (d_clusters.find(name) != d_clusters.end()) {
+    if (d_clusters.contains(name)) {
         errorDescription << "A cluster with the same name ('" << name
                          << "') already exists !";
         return rc_NAME_NOT_UNIQUE;  // RETURN
@@ -758,7 +758,7 @@ bool ClusterCatalog::isClusterVirtual(const bslstl::StringRef& name) const
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // d_mutex LOCK
 
-    return d_myVirtualClusters.find(name) != d_myVirtualClusters.end();
+    return d_myVirtualClusters.contains(name);
 }
 
 void ClusterCatalog::getClusters(

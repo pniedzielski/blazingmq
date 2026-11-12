@@ -405,7 +405,7 @@ inline bool ClusterCatalog::isMemberOf(const bsl::string& clusterName) const
         return !d_myClusters.empty();  // RETURN
     }
 
-    return (d_myClusters.find(clusterName) != d_myClusters.end());
+    return d_myClusters.contains(clusterName);
 }
 
 inline ClusterCatalog::StopRequestManagerType&
