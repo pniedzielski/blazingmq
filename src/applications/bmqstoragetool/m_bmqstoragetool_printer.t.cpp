@@ -23,6 +23,9 @@
 #include <mqbs_filestoreprotocol.h>
 #include <mqbu_messageguidutil.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bdljsn_jsonutil.h>
 
@@ -192,13 +195,13 @@ static void test2_humanReadableMessageTest()
         false);
 
     // Prepare MessageDetails
-    bslma::ManagedPtr<MessageDetails> details;
+    bmqu::UniquePtr<MessageDetails> details;
     for (const JournalFile::NodeType& record : records) {
         RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
                 record.second.buffer());
-            details.load(
+            details = bmqu::UniquePtrUtil::adopt(
                 new (*bmqtst::TestHelperUtil::allocator())
                     MessageDetails(msg,
                                    msg.header().sequenceNumber(),
@@ -952,13 +955,13 @@ static void test10_jsonPrettyMessageTest()
         false);
 
     // Prepare MessageDetails
-    bslma::ManagedPtr<MessageDetails> details;
+    bmqu::UniquePtr<MessageDetails> details;
     for (const JournalFile::NodeType& record : records) {
         RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
                 record.second.buffer());
-            details.load(
+            details = bmqu::UniquePtrUtil::adopt(
                 new (*bmqtst::TestHelperUtil::allocator())
                     MessageDetails(msg,
                                    msg.header().sequenceNumber(),
@@ -1898,13 +1901,13 @@ static void test18_jsonLineMessageTest()
         false);
 
     // Prepare MessageDetails
-    bslma::ManagedPtr<MessageDetails> details;
+    bmqu::UniquePtr<MessageDetails> details;
     for (const JournalFile::NodeType& record : records) {
         RecordType::Enum rtype = record.first;
         if (rtype == RecordType::e_MESSAGE) {
             const MessageRecord& msg = *reinterpret_cast<const MessageRecord*>(
                 record.second.buffer());
-            details.load(
+            details = bmqu::UniquePtrUtil::adopt(
                 new (*bmqtst::TestHelperUtil::allocator())
                     MessageDetails(msg,
                                    msg.header().sequenceNumber(),
