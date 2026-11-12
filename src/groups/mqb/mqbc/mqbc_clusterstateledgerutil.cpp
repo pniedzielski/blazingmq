@@ -376,8 +376,7 @@ int ClusterStateLedgerUtil::appendRecord(
                      "The buffers allocated by the supplied bufferFactory "
                      "are too small");
 
-    ClusterStateRecordHeader* recordHeader = new (blob->buffer(0).data())
-        ClusterStateRecordHeader;
+    auto* recordHeader = new (blob->buffer(0).data()) ClusterStateRecordHeader;
     const int headerWords = ClusterStateRecordHeader::k_HEADER_NUM_WORDS;
     recordHeader->setHeaderWords(headerWords)
         .setRecordType(recordType)
