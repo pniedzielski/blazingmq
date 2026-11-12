@@ -546,8 +546,8 @@ inline void ProtocolUtil::buildReceipt(bdlbb::Blob*        blob,
     new (buffer) EventHeader(EventType::e_REPLICATION_RECEIPT);
     reinterpret_cast<EventHeader*>(buffer)->setLength(blob->length());
 
-    ReplicationReceipt* receipt = reinterpret_cast<ReplicationReceipt*>(
-        buffer + sizeof(EventHeader));
+    auto* receipt = reinterpret_cast<ReplicationReceipt*>(buffer +
+                                                          sizeof(EventHeader));
 
     (*receipt)
         .setPartitionId(partitionId)
