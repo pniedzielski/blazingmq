@@ -182,7 +182,7 @@ void QueueConsumptionMonitor::registerSubStream(const bsl::string& appId)
     // the cluster thread once upon queue creation.
 
     // PRECONDITIONS
-    BSLS_ASSERT_SAFE(d_subStreamInfos.find(appId) == d_subStreamInfos.end());
+    BSLS_ASSERT_SAFE(!d_subStreamInfos.contains(appId));
 
     d_subStreamInfos.insert(bsl::make_pair(appId, SubStreamInfo()));
 }
