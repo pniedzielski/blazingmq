@@ -108,8 +108,8 @@ void ControlMessageTransmitter::broadcastMessageHelper(
         sessions.push_back(sessIt.session());
     }
 
-    for (unsigned int i = 0; i < sessions.size(); ++i) {
-        bsl::shared_ptr<mqbnet::Session> sessionSp = sessions[i].lock();
+    for (const bsl::weak_ptr<mqbnet::Session>& session_wp : sessions) {
+        bsl::shared_ptr<mqbnet::Session> sessionSp = session_wp.lock();
         if (!sessionSp) {
             continue;  // CONTINUE
         }
