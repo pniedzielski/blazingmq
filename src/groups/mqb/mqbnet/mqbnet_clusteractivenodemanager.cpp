@@ -158,10 +158,10 @@ bool ClusterActiveNodeManager::findNewActiveNode()
     // same DataCenter.
     candidates.reserve(d_nodes.size());
 
-    for (NodesMap::const_iterator it = d_nodes.begin(); it != d_nodes.end();
-         ++it) {
-        mqbnet::ClusterNode* node = it->first;
-        if (it->second.d_status == bmqp_ctrlmsg::NodeStatus::E_AVAILABLE &&
+    for (const auto& nodeEntry : d_nodes) {
+        mqbnet::ClusterNode* node = nodeEntry.first;
+        if (nodeEntry.second.d_status ==
+                bmqp_ctrlmsg::NodeStatus::E_AVAILABLE &&
             (d_ignoreDataCenter || node->dataCenter() == d_dataCenter ||
              d_dataCenter == "UNSPECIFIED")) {
             candidates.push_back(node);
@@ -184,10 +184,10 @@ bool ClusterActiveNodeManager::findNewActiveNode()
     // requirement.
     candidates.clear();
 
-    for (NodesMap::const_iterator it = d_nodes.begin(); it != d_nodes.end();
-         ++it) {
-        mqbnet::ClusterNode* node = it->first;
-        if (it->second.d_status == bmqp_ctrlmsg::NodeStatus::E_AVAILABLE) {
+    for (const auto& nodeEntry : d_nodes) {
+        mqbnet::ClusterNode* node = nodeEntry.first;
+        if (nodeEntry.second.d_status ==
+            bmqp_ctrlmsg::NodeStatus::E_AVAILABLE) {
             candidates.push_back(node);
         }
     }
@@ -247,10 +247,7 @@ ClusterActiveNodeManager::ClusterActiveNodeManager(
 , d_isStopping(false)
 {
     bool clusterHasNodeInLocalDC = false;
-    for (mqbnet::Cluster::NodesList::const_iterator it = nodes.begin();
-         it != nodes.end();
-         ++it) {
-        mqbnet::ClusterNode* node = *it;
+    for (mqbnet::ClusterNode* node : nodes) {
         d_nodes[node].d_status    = bmqp_ctrlmsg::NodeStatus::E_UNAVAILABLE;
         clusterHasNodeInLocalDC   = clusterHasNodeInLocalDC ||
                                   d_dataCenter == node->dataCenter();
@@ -317,14 +314,14 @@ void ClusterActiveNodeManager::loadNodesInfo(mqbcmd::NodeStatuses* out) const
 {
     bsl::vector<mqbcmd::ClusterNodeInfo>& nodes = out->nodes();
     nodes.reserve(d_nodes.size());
-    for (NodesMap::const_iterator it = d_nodes.begin(); it != d_nodes.end();
-         ++it) {
+    for (const auto& nodeEntry : d_nodes) {
         nodes.resize(nodes.size() + 1);
         mqbcmd::ClusterNodeInfo& node = nodes.back();
-        node.description()            = it->first->nodeDescription();
-        node.isAvailable().makeValue(it->first->isAvailable());
-        [[maybe_unused]] int rc =
-            mqbcmd::NodeStatus::fromInt(&node.status(), it->second.d_status);
+        node.description()            = nodeEntry.first->nodeDescription();
+        node.isAvailable().makeValue(nodeEntry.first->isAvailable());
+        [[maybe_unused]] int rc = mqbcmd::NodeStatus::fromInt(
+            &node.status(),
+            nodeEntry.second.d_status);
         BSLS_ASSERT_SAFE(!rc && "Unsupported node status");
     }
 }
