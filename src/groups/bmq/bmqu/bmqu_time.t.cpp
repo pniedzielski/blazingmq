@@ -18,7 +18,6 @@
 #include <bmqu_printutil.h>
 
 // BDE
-#include <bdlf_bind.h>
 #include <bsl_functional.h>
 #include <bsls_systemtime.h>
 #include <bsls_timeinterval.h>
@@ -235,7 +234,7 @@ static void testN1_performance()
 //     per call.
 //
 // Testing:
-//   - Compare performance of bdlf::Bind vs bdlf::MemFn vs raw function ptr
+//   - Compare performance of a lambda vs bsl::function vs raw function ptr
 //
 // Results:
 //   (1): straight call to the function
@@ -246,10 +245,11 @@ static void testN1_performance()
 //   (3): call to the function via a bsl::function typedef
 //          typedef bsl::function<bsls::TimeInterval()> Fn;
 //          Fn fn = &bsls::SystemTime::nowMonotonicClock;
-//   (4): call to the function via a bdlf::Bind type
+//   (4): call to the function via a lambda stored in a bsl::function
 //          typedef bsl::function<bsls::TimeInterval()> Fn;
-//           Fn fn = bdlf::BindUtil::bind(
-//                                   &bsls::SystemTime::nowMonotonicClock);
+//          Fn fn = []() { return bsls::SystemTime::nowMonotonicClock(); };
+//        (the results below for (4) were measured with 'bdlf::Bind' in
+//        place of the lambda)
 //
 //          | Debug | Release |
 //          +-------+---------+
@@ -314,10 +314,12 @@ static void testN1_performance()
              << " nano seconds per call)." << endl;
     }
 
-    PV("bdlf::Bind");
+    PV("lambda");
     {
         typedef bsl::function<bsls::TimeInterval()> Fn;
-        Fn fn = bdlf::BindUtil::bind(&bsls::SystemTime::nowMonotonicClock);
+        Fn                                          fn = []() {
+            return bsls::SystemTime::nowMonotonicClock();
+        };
 
         bsls::Types::Int64 start = bsls::TimeUtil::getTimer();
         for (bsls::Types::Int64 i = 0; i < k_NUM_CALLS; ++i) {
@@ -382,11 +384,13 @@ static void testN1_bslPerformance_GoogleBenchmark(benchmark::State& state)
 
 static void testN1_bindPerformance_GoogleBenchmark(benchmark::State& state)
 {
-    // Binding performance
+    // Lambda performance
     bmqtst::TestHelper::printTestName("PERFORMANCE GOOGLE BENCHMARK");
 
     typedef bsl::function<bsls::TimeInterval()> Fn;
-    Fn fn = bdlf::BindUtil::bind(&bsls::SystemTime::nowMonotonicClock);
+    Fn                                          fn = []() {
+        return bsls::SystemTime::nowMonotonicClock();
+    };
 
     for (auto _ : state) {
         for (bsls::Types::Int64 i = 0; i < state.range(0); ++i) {
