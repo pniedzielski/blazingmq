@@ -47,12 +47,10 @@
 #include <bmqu_memoutstream.h>
 #include <bmqu_printutil.h>
 #include <bmqu_time.h>
-#include <bmqu_weakmemfn.h>
 
 // BDE
 #include <ball_severity.h>
 #include <bdlb_print.h>
-#include <bdlf_bind.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdlt_currenttime.h>
 #include <bdlt_epochutil.h>
@@ -1007,9 +1005,11 @@ void RemoteQueue::postMessage(const bmqp::PutHeader&              putHeaderIn,
             scheduler()->scheduleEvent(
                 &d_pendingMessagesTimerEventHandle,
                 time,
-                bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-                    &RemoteQueue::expirePendingMessages,
-                    d_self.acquireWeak())));
+                [weakSelf = d_self.acquireWeak()]() {
+                    if (bsl::shared_ptr<RemoteQueue> self = weakSelf.lock()) {
+                        self->expirePendingMessages();
+                    }
+                });
         }
     }
 
@@ -1391,9 +1391,11 @@ void RemoteQueue::expirePendingMessages()
 {
     // executed by the *SCHEDULER* thread
     d_state_p->queue()->dispatcher()->execute(
-        bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-            &RemoteQueue::nackExpiredPendingMessages,
-            d_self.acquireWeak())),
+        [weakSelf = d_self.acquireWeak()]() {
+            if (bsl::shared_ptr<RemoteQueue> self = weakSelf.lock()) {
+                self->nackExpiredPendingMessages();
+            }
+        },
         d_state_p->queue());
 }
 
@@ -1452,9 +1454,11 @@ void RemoteQueue::nackExpiredPendingMessages()
         scheduler()->scheduleEvent(
             &d_pendingMessagesTimerEventHandle,
             time,
-            bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-                &RemoteQueue::expirePendingMessages,
-                d_self.acquireWeak())));
+            [weakSelf = d_self.acquireWeak()]() {
+                if (bsl::shared_ptr<RemoteQueue> self = weakSelf.lock()) {
+                    self->expirePendingMessages();
+                }
+            });
 
         BALL_LOG_DEBUG << d_state_p->uri() << ": will check again to expire"
                        << " pending PUSH messages in "
