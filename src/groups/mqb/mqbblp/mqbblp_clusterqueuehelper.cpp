@@ -68,8 +68,6 @@
 #include <bdlb_nullablevalue.h>
 #include <bdlb_print.h>
 #include <bdlb_scopeexit.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_algorithm.h>
@@ -580,12 +578,10 @@ void ClusterQueueHelper::requestQueueAssignment(const bmqt::Uri& uri)
     queueAssignmentRequest.queueUri() = uri.asString();
 
     request->setResponseCb(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::onQueueAssignmentResponse,
-                              this,
-                              bdlf::PlaceHolders::_1,  // requestContext
-                              uri,
-                              d_clusterData_p->electorInfo().leaderNode()));
+        [this, uri, leaderNode = d_clusterData_p->electorInfo().leaderNode()](
+            const RequestSp& requestContext) {
+            onQueueAssignmentResponse(requestContext, uri, leaderNode);
+        });
 
     bsls::TimeInterval timeoutMs;
     timeoutMs.setTotalMilliseconds(d_clusterData_p->clusterConfig()
@@ -968,13 +964,11 @@ void ClusterQueueHelper::finishReopening(
                      streamParamsCopy,
                      queueptr->id(),
                      queueptr->uri(),
-                     bdlf::BindUtil::bindS(
-                         d_allocator_p,
-                         &ClusterQueueHelper::reconfigureCallback,
-                         this,
-                         bdlf::PlaceHolders::_1,
-                         bdlf::PlaceHolders::_2,
-                         cycle),
+                     [this, cycle](const bmqp_ctrlmsg::Status& status,
+                                   const bmqp_ctrlmsg::StreamParameters&
+                                       streamParameters) {
+                         reconfigureCallback(status, streamParameters, cycle);
+                     },
                      true,  // is a reconfigure-queue request
                      activeNode,
                      generationCount,
@@ -1268,12 +1262,9 @@ void ClusterQueueHelper::sendOpenQueueRequest(
         BSLS_ASSERT_SAFE(targetNode);
 
         request->setResponseCb(
-            bdlf::BindUtil::bindS(d_allocator_p,
-                                  &ClusterQueueHelper::onOpenQueueResponse,
-                                  this,
-                                  bdlf::PlaceHolders::_1,  // requestContext
-                                  context,
-                                  targetNode));
+            [this, context, targetNode](const RequestSp& requestContext) {
+                onOpenQueueResponse(requestContext, context, targetNode);
+            });
 
         bsls::TimeInterval timeoutMs;
         timeoutMs.setTotalMilliseconds(d_clusterData_p->clusterConfig()
@@ -1345,14 +1336,13 @@ bmqt::GenericResult::Enum ClusterQueueHelper::sendReopenQueueRequest(
         rc = bmqt::GenericResult::e_INVALID_ARGUMENT;
     }
     else {
-        request->setResponseCb(
-            bdlf::BindUtil::bindS(d_allocator_p,
-                                  &ClusterQueueHelper::onReopenQueueResponse,
-                                  this,
-                                  bdlf::PlaceHolders::_1,  //  requestContext
+        request->setResponseCb([this, activeNode, cycle, numAttempts](
+                                   const RequestSp& requestContext) {
+            onReopenQueueResponse(requestContext,
                                   activeNode,
                                   cycle,
-                                  numAttempts));
+                                  numAttempts);
+        });
 
         bsls::TimeInterval timeoutMs;
         timeoutMs.setTotalMilliseconds(d_clusterData_p->clusterConfig()
@@ -1657,14 +1647,9 @@ void ClusterQueueHelper::onReopenQueueResponse(
     }
 
     // Send Configure request first if any, and then pending Close requests
-    bdlb::ScopeExitAny guard(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::finishReopening,
-                              this,
-                              queueContext,
-                              sqit,
-                              activeNode,
-                              cycle));
+    bdlb::ScopeExitAny guard([this, queueContext, sqit, activeNode, cycle]() {
+        finishReopening(queueContext, sqit, activeNode, cycle);
+    });
 
     // Same upstream node, which means num pending request counter must be
     // non-zero.
@@ -1748,13 +1733,12 @@ void ClusterQueueHelper::onReopenQueueResponse(
         d_clusterData_p->scheduler().scheduleEvent(
             &subQueueContext.d_reopenRetryHandle,
             after,
-            bdlf::BindUtil::bindS(d_allocator_p,
-                                  &ClusterQueueHelper::onReopenQueueRetry,
-                                  this,
-                                  requestContext,
-                                  activeNode,
-                                  cycle,
-                                  numAttempts));
+            [this, requestContext, activeNode, cycle, numAttempts]() {
+                onReopenQueueRetry(requestContext,
+                                   activeNode,
+                                   cycle,
+                                   numAttempts);
+            });
         return;  // RETURN
     }
 
@@ -1906,14 +1890,12 @@ void ClusterQueueHelper::onReopenQueueRetry(
     }
 
     d_cluster_p->dispatcher()->execute(
-        bdlf::BindUtil::bindS(
-            d_allocator_p,
-            &ClusterQueueHelper::onReopenQueueRetryDispatched,
-            this,
-            requestContext,
-            activeNode,
-            cycle,
-            numAttempts),
+        [this, requestContext, activeNode, cycle, numAttempts]() {
+            onReopenQueueRetryDispatched(requestContext,
+                                         activeNode,
+                                         cycle,
+                                         numAttempts);
+        },
         d_cluster_p);
 }
 
@@ -2140,12 +2122,10 @@ bool ClusterQueueHelper::createQueue(
 
         mqbi::OpenQueueConfirmationCookieSp confirmationCookie(
             new (*d_allocator_p) mqbi::OpenQueueContext(),
-            bdlf::BindUtil::bindS(
-                d_allocator_p,
-                &ClusterQueueHelper::onOpenQueueConfirmationCookieReleased,
-                this,
-                bdlf::PlaceHolders::_1,  // queue handle*
-                context->d_handleParameters),
+            [this, handleParameters = context->d_handleParameters](
+                mqbi::OpenQueueContext* value) {
+                onOpenQueueConfirmationCookieReleased(value, handleParameters);
+            },
             d_allocator_p);
 
         bsl::shared_ptr<mqbi::Queue> queue =
@@ -2174,14 +2154,15 @@ bool ClusterQueueHelper::createQueue(
                 context->d_clientContext,
                 context->d_handleParameters,
                 upstreamSubQueueId,
-                bdlf::BindUtil::bindS(d_allocator_p,
-                                      &ClusterQueueHelper::onGetQueueHandle,
-                                      this,
-                                      bdlf::PlaceHolders::_1,  // status
-                                      bdlf::PlaceHolders::_2,  // handle
-                                      context,
-                                      openQueueResponse,
-                                      confirmationCookie));
+                [this, context, openQueueResponse, confirmationCookie](
+                    const bmqp_ctrlmsg::Status& status,
+                    mqbi::QueueHandle*          queueHandle) {
+                    onGetQueueHandle(status,
+                                     queueHandle,
+                                     context,
+                                     openQueueResponse,
+                                     confirmationCookie);
+                });
 
             return true;  // RETURN
         }
@@ -2352,10 +2333,9 @@ bsl::shared_ptr<mqbi::Queue> ClusterQueueHelper::createQueueFactory(
     /// corresponding storage.  Make sure we unset this if we exit the scope
     /// on error.
 
-    bdlb::ScopeExitAny queuePtrGuard(bdlf::BindUtil::bindS(d_allocator_p,
-                                                           &mqbi::Queue::close,
-                                                           queueSp.get(),
-                                                           VoidFunctor()));
+    bdlb::ScopeExitAny queuePtrGuard([queue = queueSp.get()]() {
+        queue->close(VoidFunctor());
+    });
 
     if (rc != 0) {
         // Queue.configure() failed.
@@ -2403,13 +2383,9 @@ void ClusterQueueHelper::onHandleReleased(
     // executed by the *QUEUE* dispatcher thread
 
     d_cluster_p->dispatcher()->execute(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::onHandleReleasedDispatched,
-                              this,
-                              handle,
-                              result,
-                              request,
-                              requester),
+        [this, handle, result, request, requester]() {
+            onHandleReleasedDispatched(handle, result, request, requester);
+        },
         d_cluster_p);
 }
 
@@ -2494,7 +2470,9 @@ void ClusterQueueHelper::onHandleReleasedDispatched(
         // We might call this callback with empty `handle`,
         // no need to keep it alive in dispatcher in this case
         handle->queue()->dispatcher()->execute(
-            bdlf::BindUtil::bindS(d_allocator_p, &handleHolderDummy, handle),
+            [handle]() {
+                handleHolderDummy(handle);
+            },
             handle->queue(),
             mqbi::DispatcherEventType::e_DISPATCHER);
     }
@@ -2555,12 +2533,9 @@ void ClusterQueueHelper::onHandleConfigured(
 
         // Need to rebuild Subscriptions in the Cluster thread.
         d_cluster_p->dispatcher()->execute(
-            bdlf::BindUtil::bind(
-                &ClusterQueueHelper::onHandleConfiguredDispatched,
-                this,
-                qId,
-                streamParameters,
-                requester),
+            [this, qId, streamParameters, requester]() {
+                onHandleConfiguredDispatched(qId, streamParameters, requester);
+            },
             d_cluster_p);
     }
 
@@ -2605,14 +2580,13 @@ void ClusterQueueHelper::onGetDomain(
     // executed by *ANY* thread
 
     d_cluster_p->dispatcher()->execute(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::onGetDomainDispatched,
-                              this,
-                              status,
-                              domain,
-                              request,
-                              requester,
-                              requesterId),
+        [this, status, domain, request, requester, requesterId]() {
+            onGetDomainDispatched(status,
+                                  domain,
+                                  request,
+                                  requester,
+                                  requesterId);
+        },
         d_cluster_p);
 }
 
@@ -2692,16 +2666,19 @@ void ClusterQueueHelper::onGetDomainDispatched(
         bmqt::Uri(handleParams.uri()),
         requester->handleRequesterContext(),
         handleParams,
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::onGetQueueHandleDispatched,
-                              this,
-                              bdlf::PlaceHolders::_1,  // status
-                              bdlf::PlaceHolders::_2,  // queueHandle
-                              bdlf::PlaceHolders::_3,  // openQueueResp
-                              bdlf::PlaceHolders::_4,  // confCookie
-                              request,
-                              requester,
-                              requesterId));
+        [this, request, requester, requesterId](
+            const bmqp_ctrlmsg::Status&                handleStatus,
+            mqbi::QueueHandle*                         queueHandle,
+            const bmqp_ctrlmsg::OpenQueueResponse&     openQueueResponse,
+            const mqbi::OpenQueueConfirmationCookieSp& confirmationCookie) {
+            onGetQueueHandleDispatched(handleStatus,
+                                       queueHandle,
+                                       openQueueResponse,
+                                       confirmationCookie,
+                                       request,
+                                       requester,
+                                       requesterId);
+        });
 }
 
 void ClusterQueueHelper::onGetQueueHandle(
@@ -2716,14 +2693,18 @@ void ClusterQueueHelper::onGetQueueHandle(
     BSLS_ASSERT_SAFE(context);
 
     d_cluster_p->dispatcher()->execute(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::finishOpening,
-                              this,
-                              context,
-                              status,
-                              queueHandle,
-                              openQueueResponse,
-                              confirmationCookie),
+        [this,
+         context,
+         status,
+         queueHandle,
+         openQueueResponse,
+         confirmationCookie]() {
+            finishOpening(context,
+                          status,
+                          queueHandle,
+                          openQueueResponse,
+                          confirmationCookie);
+        },
         d_cluster_p);
 }
 
@@ -2879,21 +2860,19 @@ void ClusterQueueHelper::notifyQueue(QueueContext*       queueContext,
         }
         else {
             queue->dispatcher()->execute(
-                bdlf::BindUtil::bindS(d_allocator_p,
-                                      &mqbi::Queue::onOpenUpstream,
-                                      queue,
-                                      generationCount,
-                                      upstreamSubQueueId,
-                                      isWriterOnly),
+                [queue, generationCount, upstreamSubQueueId, isWriterOnly]() {
+                    queue->onOpenUpstream(generationCount,
+                                          upstreamSubQueueId,
+                                          isWriterOnly);
+                },
                 queue);
         }
     }
     else {
         queue->dispatcher()->execute(
-            bdlf::BindUtil::bindS(d_allocator_p,
-                                  &mqbi::Queue::onOpenFailure,
-                                  queue,
-                                  upstreamSubQueueId),
+            [queue, upstreamSubQueueId]() {
+                queue->onOpenFailure(upstreamSubQueueId);
+            },
             queue);
     }
 }
@@ -3457,14 +3436,14 @@ bool ClusterQueueHelper::sendConfigureQueueRequest(
     }
 
     request->setResponseCb(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::onConfigureQueueResponse,
-                              this,
-                              bdlf::PlaceHolders::_1,  // requestContext
-                              uri,
-                              streamParameters,
-                              generationCount,
-                              callback));
+        [this, uri, streamParameters, generationCount, callback](
+            const RequestSp& requestContext) {
+            onConfigureQueueResponse(requestContext,
+                                     uri,
+                                     streamParameters,
+                                     generationCount,
+                                     callback);
+        });
 
     bsls::TimeInterval timeoutMs;
     timeoutMs.setTotalMilliseconds(d_cluster_p->isStopping()
@@ -3535,12 +3514,9 @@ void ClusterQueueHelper::sendCloseQueueRequest(
     req.handleParameters() = handleParameters;
     req.isFinal()          = false;
 
-    request->setResponseCb(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::onCloseQueueResponse,
-                              this,
-                              bdlf::PlaceHolders::_1,  // requestContext
-                              callback));
+    request->setResponseCb([this, callback](const RequestSp& requestContext) {
+        onCloseQueueResponse(requestContext, callback);
+    });
 
     bsls::TimeInterval timeoutMs;
     timeoutMs.setTotalMilliseconds(d_cluster_p->isStopping()
@@ -3811,11 +3787,10 @@ void ClusterQueueHelper::restoreStateCluster(int partitionId)
     if (!d_cluster_p->isFSMWorkflow() && isSelfPrimaryAndLeader) {
         // Note that this fails if there are data
         mqbc::ClusterState::AssignmentVisitor doubleAssignmentVisitor =
-            bdlf::BindUtil::bindS(d_allocator_p,
-                                  &mqbi::StorageManager::unregisterQueue,
-                                  d_storageManager_p,
-                                  bdlf::PlaceHolders::_1,   // uri
-                                  bdlf::PlaceHolders::_2);  // partitionId),
+            [storageManager = d_storageManager_p](const bmqt::Uri& uri,
+                                                  int assignedPartitionId) {
+                storageManager->unregisterQueue(uri, assignedPartitionId);
+            };
 
         d_clusterState_p->iterateDoubleAssignments(partitionId,
                                                    doubleAssignmentVisitor);
@@ -3917,12 +3892,9 @@ void ClusterQueueHelper::restoreStateCluster(int partitionId)
                       domain->config()->mode());
 
                 if (!removed.empty() || !added.empty()) {
-                    VoidFunctor park = bdlf::BindUtil::bindS(
-                        d_allocator_p,
-                        &ClusterQueueHelper::convertToLocal,
-                        this,
-                        queueContext,
-                        domain);
+                    VoidFunctor park = [this, queueContext, domain]() {
+                        convertToLocal(queueContext, domain);
+                    };
 
                     // Add to 'd_pendingUpdates' before calling
                     // 'updateAppIds' which is asynchronous (CSL commit)
@@ -4536,17 +4508,15 @@ void ClusterQueueHelper::onQueueUpdated(
 
         // TODO: replace with one call
         d_cluster_p->dispatcher()->execute(
-            bdlf::BindUtil::bindS(d_allocator_p,
-                                  afterAppIdRegisteredDispatched,
-                                  queue,
-                                  addedAppIds),
+            [queue, addedAppIds]() {
+                afterAppIdRegisteredDispatched(queue, addedAppIds);
+            },
             queue);
 
         d_cluster_p->dispatcher()->execute(
-            bdlf::BindUtil::bindS(d_allocator_p,
-                                  afterAppIdUnregisteredDispatched,
-                                  queue,
-                                  removedAppIds),
+            [queue, removedAppIds]() {
+                afterAppIdUnregisteredDispatched(queue, removedAppIds);
+            },
             queue);
     }
     // else, if there is no queue, then either 'createQueueFactory' (when the
@@ -4621,9 +4591,9 @@ void ClusterQueueHelper::onUpstreamNodeChange(mqbnet::ClusterNode* node,
             setStreamState(queueContextSp, SubQueueContext::k_CLOSED);
             // Replica makes all open queues buffer PUTs.
             queue->dispatcher()->execute(
-                bdlf::BindUtil::bindS(d_allocator_p,
-                                      &mqbi::Queue::onLostUpstream,
-                                      queue),
+                [queue]() {
+                    queue->onLostUpstream();
+                },
                 queue);
         }
     }
@@ -4688,13 +4658,11 @@ ClusterQueueHelper::ClusterQueueHelper(
 
     if (d_clusterStateManager_p) {
         d_clusterStateManager_p->setAfterPartitionPrimaryAssignmentCb(
-            bdlf::BindUtil::bindS(
-                d_allocator_p,
-                &ClusterQueueHelper::afterPartitionPrimaryAssignment,
-                this,
-                bdlf::PlaceHolders::_1,    // partitionId
-                bdlf::PlaceHolders::_2,    // primary
-                bdlf::PlaceHolders::_3));  // status
+            [this](int                                partitionId,
+                   mqbnet::ClusterNode*               primary,
+                   bmqp_ctrlmsg::PrimaryStatus::Value status) {
+                afterPartitionPrimaryAssignment(partitionId, primary, status);
+            });
     }
 }
 
@@ -4948,14 +4916,18 @@ void ClusterQueueHelper::configureQueue(
     BSLS_ASSERT_SAFE(queue->uri().isCanonical());
 
     d_cluster_p->dispatcher()->execute(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::configureQueueDispatched,
-                              this,
-                              queue->uri(),
-                              queue->id(),         // Use upstream queueId
-                              upstreamSubQueueId,  // Use upstream subQueueId
-                              streamParameters,
-                              callback),
+        [this,
+         uri     = queue->uri(),
+         queueId = queue->id(),  // Use upstream queueId
+         upstreamSubQueueId,     // Use upstream subQueueId
+         streamParameters,
+         callback]() {
+            configureQueueDispatched(uri,
+                                     queueId,
+                                     upstreamSubQueueId,
+                                     streamParameters,
+                                     callback);
+        },
         d_cluster_p);
 }
 
@@ -4980,12 +4952,9 @@ void ClusterQueueHelper::closeQueue(
     handleParams.qId()                               = queue->id();
 
     d_cluster_p->dispatcher()->execute(
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::closeQueueDispatched,
-                              this,
-                              handleParams,
-                              upstreamSubQueueId,
-                              callback),
+        [this, handleParams, upstreamSubQueueId, callback]() {
+            closeQueueDispatched(handleParams, upstreamSubQueueId, callback);
+        },
         d_cluster_p);
 }
 
@@ -5000,13 +4969,9 @@ void ClusterQueueHelper::onQueueHandleCreated(mqbi::Queue*     queue,
     BSLS_ASSERT_SAFE(uri.isCanonical());
 
     d_cluster_p->dispatcher()->execute(
-        bdlf::BindUtil::bindS(
-            d_allocator_p,
-            &ClusterQueueHelper::onQueueHandleCreatedDispatched,
-            this,
-            queue,
-            uri,
-            handleCreated),
+        [this, queue, uri, handleCreated]() {
+            onQueueHandleCreatedDispatched(queue, uri, handleCreated);
+        },
         d_cluster_p);
 }
 
@@ -5018,12 +4983,9 @@ void ClusterQueueHelper::onQueueHandleDestroyed(mqbi::Queue*     queue,
     BSLS_ASSERT_SAFE(uri.isCanonical());
 
     d_cluster_p->dispatcher()->execute(
-        bdlf::BindUtil::bindS(
-            d_allocator_p,
-            &ClusterQueueHelper::onQueueHandleDestroyedDispatched,
-            this,
-            queue,
-            uri),
+        [this, queue, uri]() {
+            onQueueHandleDestroyedDispatched(queue, uri);
+        },
         d_cluster_p);
 }
 
@@ -5087,15 +5049,14 @@ void ClusterQueueHelper::processPeerOpenQueueRequest(
     BSLS_ASSERT_SAFE(d_clusterData_p->domainFactory());
     d_clusterData_p->domainFactory()->createDomain(
         bmqt::Uri(handleParams.uri()).qualifiedDomain(),
-        bdlf::BindUtil::bindS(
-            d_allocator_p,
-            &ClusterQueueHelper::onGetDomain,
-            this,
-            bdlf::PlaceHolders::_1,  // status
-            bdlf::PlaceHolders::_2,  // domain
-            request,
-            requester,
-            requester->handleRequesterContext()->requesterId()));
+        [this,
+         request,
+         requester,
+         requesterId = requester->handleRequesterContext()->requesterId()](
+            const bmqp_ctrlmsg::Status& status,
+            mqbi::Domain*               domain) {
+            onGetDomain(status, domain, request, requester, requesterId);
+        });
 }
 
 void ClusterQueueHelper::processPeerConfigureStreamRequest(
@@ -5207,13 +5168,11 @@ void ClusterQueueHelper::processPeerConfigureStreamRequest(
 
     handle->configure(
         req.streamParameters(),
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::onHandleConfigured,
-                              this,
-                              bdlf::PlaceHolders::_1,  // status
-                              bdlf::PlaceHolders::_2,  // config
-                              request,
-                              requester));
+        [this, request, requester](
+            const bmqp_ctrlmsg::Status&           status,
+            const bmqp_ctrlmsg::StreamParameters& streamParameters) {
+            onHandleConfigured(status, streamParameters, request, requester);
+        });
 }
 
 void ClusterQueueHelper::processPeerCloseQueueRequest(
@@ -5303,13 +5262,11 @@ void ClusterQueueHelper::processPeerCloseQueueRequest(
     handle->release(
         req.handleParameters(),
         req.isFinal(),
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::onHandleReleased,
-                              this,
-                              bdlf::PlaceHolders::_1,  // handle
-                              bdlf::PlaceHolders::_2,  // result
-                              request,
-                              requester));
+        [this, request, requester](
+            const bsl::shared_ptr<mqbi::QueueHandle>& releasedHandle,
+            const mqbi::QueueHandleReleaseResult      result) {
+            onHandleReleased(releasedHandle, result, request, requester);
+        });
 }
 
 void ClusterQueueHelper::processShutdownEvent()
@@ -5385,9 +5342,9 @@ void ClusterQueueHelper::requestToStopQueues()
         }
 
         queue->dispatcher()->execute(
-            bdlf::BindUtil::bindS(d_allocator_p,
-                                  &mqbi::Queue::setStopping,
-                                  queue),
+            [queue]() {
+                queue->setStopping();
+            },
             queue);
     }
 }
@@ -5443,10 +5400,9 @@ ClusterQueueHelper::processNodeStoppingNotification(
 
     bsl::shared_ptr<StopContext> contextSp(
         new (*d_allocator_p) StopContext(clusterNode, callback, d_allocator_p),
-        bdlf::BindUtil::bindS(d_allocator_p,
-                              &ClusterQueueHelper::finishStopSequence,
-                              this,
-                              bdlf::PlaceHolders::_1),  // context
+        [this](StopContext* context) {
+            finishStopSequence(context);
+        },
         d_allocator_p);
 
     if (request) {
@@ -5524,12 +5480,9 @@ ClusterQueueHelper::processNodeStoppingNotification(
                      handles.begin();
                  cit != handles.end();
                  ++cit) {
-                cit->second.d_handle_p->deconfigureAll(
-                    bdlf::BindUtil::bindS(d_allocator_p,
-                                          &ClusterQueueHelper::contextHolder,
-                                          this,
-                                          contextSp,
-                                          VoidFunctor()));
+                cit->second.d_handle_p->deconfigureAll([this, contextSp]() {
+                    contextHolder(contextSp, VoidFunctor());
+                });
             }
             BALL_LOG_INFO << d_clusterData_p->identity().description()
                           << ": deconfiguring " << handles.size()
@@ -5591,20 +5544,15 @@ ClusterQueueHelper::processNodeStoppingNotification(
                 continue;  // CONTINUE
             }
 
-            VoidFunctor inner = bdlf::BindUtil::bindS(
-                d_allocator_p,
-                &mqbi::Queue::onOpenUpstream,
-                queue,
-                0,
-                bmqp::QueueId::k_DEFAULT_SUBQUEUE_ID,
-                true);
+            VoidFunctor inner = [queue]() {
+                queue->onOpenUpstream(0,
+                                      bmqp::QueueId::k_DEFAULT_SUBQUEUE_ID,
+                                      true);
+            };
 
-            VoidFunctor outer = bdlf::BindUtil::bindS(
-                d_allocator_p,
-                &ClusterQueueHelper::contextHolder,
-                this,
-                contextSp,
-                inner);
+            VoidFunctor outer = [this, contextSp, inner]() {
+                contextHolder(contextSp, inner);
+            };
 
             queue->dispatcher()->execute(
                 outer,
@@ -5666,11 +5614,9 @@ void ClusterQueueHelper::finishStopSequence(StopContext* context)
 {
     // executed by *ANY* thread
     d_cluster_p->dispatcher()->execute(
-        bdlf::BindUtil::bindS(
-            d_allocator_p,
-            &ClusterQueueHelper::finishStopSequenceDispatched,
-            this,
-            context),
+        [this, context]() {
+            finishStopSequenceDispatched(context);
+        },
         d_cluster_p);
 }
 
@@ -5701,12 +5647,9 @@ void ClusterQueueHelper::checkUnconfirmedV2(
     const bsl::function<void()>& completionCallback)
 {
     d_cluster_p->dispatcher()->execute(
-        bdlf::BindUtil::bindS(
-            d_allocator_p,
-            &ClusterQueueHelper::checkUnconfirmedV2Dispatched,
-            this,
-            whenToStop,
-            completionCallback),
+        [this, whenToStop, completionCallback]() {
+            checkUnconfirmedV2Dispatched(whenToStop, completionCallback);
+        },
         d_cluster_p);
 }
 
@@ -5730,11 +5673,11 @@ void ClusterQueueHelper::checkUnconfirmedV2Dispatched(
             continue;  // CONTINUE
         }
 
-        queue->dispatcher()->execute(bdlf::BindUtil::bindS(d_allocator_p,
-                                                           &countUnconfirmed,
-                                                           &result,
-                                                           queue),
-                                     queue);
+        queue->dispatcher()->execute(
+            [resultP = &result, queue]() {
+                countUnconfirmed(resultP, queue);
+            },
+            queue);
         queue->dispatcher()->synchronize(queue);
     }
 
@@ -5743,7 +5686,9 @@ void ClusterQueueHelper::checkUnconfirmedV2Dispatched(
     d_cluster_p->dispatcher()->executeOnAllQueues(
         mqbi::Dispatcher::VoidFunction(),  // empty
         mqbi::DispatcherClientType::e_QUEUE,
-        bdlf::BindUtil::bindS(d_allocator_p, &bslmt::Latch::arrive, &latch));
+        [latchP = &latch]() {
+            latchP->arrive();
+        });
 
     latch.wait();
 
@@ -5771,11 +5716,9 @@ void ClusterQueueHelper::checkUnconfirmedV2Dispatched(
         d_clusterData_p->scheduler().scheduleEvent(
             &eventHandle,
             t,
-            bdlf::BindUtil::bindS(d_allocator_p,
-                                  &ClusterQueueHelper::checkUnconfirmedV2,
-                                  this,
-                                  whenToStop,
-                                  completionCallback));
+            [this, whenToStop, completionCallback]() {
+                checkUnconfirmedV2(whenToStop, completionCallback);
+            });
 
         return;  // RETURN
     }
