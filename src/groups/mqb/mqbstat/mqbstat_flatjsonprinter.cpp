@@ -553,9 +553,14 @@ FlatJsonPrinter::FlatJsonPrinterImpl::printStats(bsl::ostream& stream,
 
 FlatJsonPrinter::FlatJsonPrinter(const StatContextsMap& statContextsMap,
                                  bslma::Allocator*      allocator)
-: d_impl_mp(bslma::ManagedPtrUtil::allocateManaged<FlatJsonPrinterImpl>(
+: d_impl_mp(bmqu::UniquePtrUtil::allocateUnique<FlatJsonPrinterImpl>(
       allocator,
       statContextsMap))
+{
+    // NOTHING
+}
+
+FlatJsonPrinter::~FlatJsonPrinter()
 {
     // NOTHING
 }

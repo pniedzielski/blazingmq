@@ -27,6 +27,7 @@
 // StatContexts) must be done before calling to this component.
 
 #include <bmqst_statcontext.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bsl_ostream.h>
@@ -51,8 +52,8 @@ class FlatJsonPrinter {
     class FlatJsonPrinterImpl;
 
     // DATA
-    /// Managed pointer to the printer implementation.
-    bslma::ManagedPtr<FlatJsonPrinterImpl> d_impl_mp;
+    /// Owning pointer to the printer implementation.
+    bmqu::UniquePtr<FlatJsonPrinterImpl> d_impl_mp;
 
   private:
     // NOT IMPLEMENTED
@@ -73,6 +74,9 @@ class FlatJsonPrinter {
     /// `statContextsMap` and the optionally specified `allocator`.
     explicit FlatJsonPrinter(const StatContextsMap& statContextsMap,
                              bslma::Allocator*      allocator = 0);
+
+    /// Destroy this object.
+    ~FlatJsonPrinter();
 
     // MANIPULATORS
 
