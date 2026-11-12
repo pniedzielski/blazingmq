@@ -109,8 +109,7 @@ void QueueState::add(const bmqp_ctrlmsg::QueueHandleParameters& params)
     // cumulative across all handles in one subStream
     const char* appId = bmqp::QueueUtil::extractAppId(params);
 
-    SubQueuesHandleParameters::iterator it = d_subQueuesHandleParameters.find(
-        appId);
+    auto it = d_subQueuesHandleParameters.find(appId);
 
     if (it == d_subQueuesHandleParameters.end()) {
         d_subQueuesHandleParameters.emplace(appId, params);
@@ -129,8 +128,7 @@ QueueState::subtract(const bmqp_ctrlmsg::QueueHandleParameters& params)
     // cumulative across all handles in one subStream
     const char* appId = bmqp::QueueUtil::extractAppId(params);
 
-    SubQueuesHandleParameters::iterator it = d_subQueuesHandleParameters.find(
-        appId);
+    auto it = d_subQueuesHandleParameters.find(appId);
 
     BSLS_ASSERT_SAFE(it != d_subQueuesHandleParameters.end());
 
