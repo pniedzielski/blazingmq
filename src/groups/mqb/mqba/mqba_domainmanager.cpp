@@ -36,14 +36,11 @@
 #include <bmqu_sharedresource.h>
 #include <bmqu_stringutil.h>
 #include <bmqu_time.h>
-#include <bmqu_weakmemfn.h>
 
 // BDE
 #include <baljsn_decoder.h>
 #include <baljsn_decoderoptions.h>
 #include <ball_log.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bsl_cstddef.h>
 #include <bsl_ios.h>
 #include <bsl_iostream.h>
@@ -551,11 +548,13 @@ void DomainManager::stop()
     bslmt::Latch latch(d_domains.size(), bsls::SystemClockType::e_MONOTONIC);
 
     for (const auto& [domainName, domainSp] : d_domains) {
-        domainSp->teardown(bdlf::BindUtil::bind(
-            bmqu::WeakMemFnUtil::weakMemFn(&DomainManager::onDomainClosed,
-                                           self.acquireWeak()),
-            bdlf::PlaceHolders::_1,  // Domain Name
-            &latch));
+        domainSp->teardown([weakSelf = self.acquireWeak(),
+                            &latch](const bsl::string& closedDomainName) {
+            if (bsl::shared_ptr<DomainManager> domainManager =
+                    weakSelf.lock()) {
+                domainManager->onDomainClosed(closedDomainName, &latch);
+            }
+        });
     }
 
     bsls::TimeInterval timeout = bmqu::Time::nowMonotonicClock().addSeconds(
@@ -767,11 +766,13 @@ int DomainManager::processCommand(mqbcmd::DomainsResult*        result,
             bmqu::SharedResource<DomainManager> self(this);
             bslmt::Latch latch(1, bsls::SystemClockType::e_MONOTONIC);
 
-            domainSp->teardownRemove(bdlf::BindUtil::bind(
-                bmqu::WeakMemFnUtil::weakMemFn(&DomainManager::onDomainClosed,
-                                               self.acquireWeak()),
-                bdlf::PlaceHolders::_1,  // Domain Name
-                &latch));
+            domainSp->teardownRemove([weakSelf = self.acquireWeak(), &latch](
+                                         const bsl::string& closedDomainName) {
+                if (bsl::shared_ptr<DomainManager> domainManager =
+                        weakSelf.lock()) {
+                    domainManager->onDomainClosed(closedDomainName, &latch);
+                }
+            });
 
             bsls::TimeInterval timeout =
                 bmqu::Time::nowMonotonicClock().addSeconds(
