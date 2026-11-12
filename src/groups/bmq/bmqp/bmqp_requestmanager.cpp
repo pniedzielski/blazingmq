@@ -77,7 +77,7 @@ void RequestManager::onRequestTimeout(int requestId)
     {
         bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // MUTEX LOCKED
 
-        RequestMapIter it = d_requests.find(requestId);
+        auto it = d_requests.find(requestId);
 
         if (it == d_requests.end()) {
             // The request must have completed at the same time from a
@@ -405,7 +405,7 @@ int RequestManager::processResponse(
     {
         bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // MUTEX LOCKED
 
-        RequestMapIter it = d_requests.find(response.rId().value());
+        auto it = d_requests.find(response.rId().value());
 
         if (it == d_requests.end()) {
             // The request must have completed at the same time from a
@@ -482,7 +482,7 @@ void RequestManager::cancelAllRequestsImpl(
 
         requestsCopy.reserve(d_requests.size());
 
-        RequestMapIter it = d_requests.begin();
+        auto it = d_requests.begin();
         while (it != d_requests.end()) {
             const bool matchGroup = (groupId == RequestType::k_NO_GROUP_ID) ||
                                     (groupId == it->second->groupId());
