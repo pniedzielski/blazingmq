@@ -39,6 +39,7 @@
 #include <bmqc_twokeyhashmap.h>
 #include <bmqp_ctrlmsg_messages.h>
 #include <bmqt_messageguid.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -119,11 +120,11 @@ class RootQueueEngine final : public mqbi::QueueEngine {
 
     /// Storage iterator to the logical stream of messages.  Queue Engine
     /// iterates this one sequentially.
-    bslma::ManagedPtr<mqbi::StorageIterator> d_storageIter_mp;
+    bmqu::UniquePtr<mqbi::StorageIterator> d_storageIter_mp;
 
     /// Storage iterator to access storage state.  Queue Engine uses this one
     /// to access random message (as in the case of redelivery).
-    bslma::ManagedPtr<mqbi::StorageIterator> d_realStorageIter_mp;
+    bmqu::UniquePtr<mqbi::StorageIterator> d_realStorageIter_mp;
 
     mqbu::FlowController d_flowController;
 
@@ -192,7 +193,7 @@ class RootQueueEngine final : public mqbi::QueueEngine {
     /// un-delivered messages for the specified `appId` it sets in the
     /// specified `alarmTime_p` calculated alarm time for the oldest
     /// un-delivered message.
-    bslma::ManagedPtr<mqbi::StorageIterator>
+    bmqu::UniquePtr<mqbi::StorageIterator>
     haveUndeliveredCb(bsls::TimeInterval*       alarmTime_p,
                       const bsl::string&        appId,
                       const bsls::TimeInterval& now) const;
@@ -200,8 +201,8 @@ class RootQueueEngine final : public mqbi::QueueEngine {
     /// Callback called by `d_consumptionMonitor` to log the alarm for the
     /// specified `appId` and `oldestMsgIt`.
     void logAlarmCb(
-        const bsl::string&                              appId,
-        const bslma::ManagedPtr<mqbi::StorageIterator>& oldestMsgIt) const;
+        const bsl::string&                            appId,
+        const bmqu::UniquePtr<mqbi::StorageIterator>& oldestMsgIt) const;
 
     void updateFlowControl(bsls::Types::Int64 nowMs);
     void onFlowControlTimer();
@@ -417,7 +418,7 @@ class RootQueueEngine final : public mqbi::QueueEngine {
 
     /// Return storage iterator to the 1st un-delivered message including
     /// 'put-aside' messages (those without matching Subscriptions).
-    bslma::ManagedPtr<mqbi::StorageIterator> head(const AppStateSp app) const;
+    bmqu::UniquePtr<mqbi::StorageIterator> head(const AppStateSp app) const;
 
     // ACCESSORS
     //   (virtual mqbi::QueueEngine)

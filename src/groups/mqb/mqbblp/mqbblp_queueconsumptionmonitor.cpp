@@ -259,7 +259,7 @@ void QueueConsumptionMonitor::onMessageSent(const bsl::string& appId)
         // past.
         bsls::TimeInterval now = d_queueState_p->scheduler()->now();
         bsls::TimeInterval alarmTime;
-        bslma::ManagedPtr<mqbi::StorageIterator> oldestMsgIt =
+        bmqu::UniquePtr<mqbi::StorageIterator> oldestMsgIt =
             d_haveUndeliveredCb(&alarmTime, appId, now);
         if (oldestMsgIt) {
             if (alarmTime <= now) {
@@ -471,7 +471,7 @@ void QueueConsumptionMonitor::processAlarmEvent()
 
         // Check un-delivered messages.
         bsls::TimeInterval                       alarmTime;
-        bslma::ManagedPtr<mqbi::StorageIterator> oldestMsgIt =
+        bmqu::UniquePtr<mqbi::StorageIterator>   oldestMsgIt =
             d_haveUndeliveredCb(&alarmTime, appId, now);
 
         if (!oldestMsgIt) {
@@ -533,7 +533,7 @@ void QueueConsumptionMonitor::processIdleEvent(const bsl::string& appId)
     // past.
     bsls::TimeInterval now = d_queueState_p->scheduler()->now();
     bsls::TimeInterval alarmTime;
-    bslma::ManagedPtr<mqbi::StorageIterator> oldestMsgIt =
+    bmqu::UniquePtr<mqbi::StorageIterator> oldestMsgIt =
         d_haveUndeliveredCb(&alarmTime, appId, now);
 
     if (oldestMsgIt) {

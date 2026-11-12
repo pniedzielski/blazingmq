@@ -35,6 +35,7 @@
 #include <bmqtst_scopedlogobserver.h>
 #include <bmqtst_testhelper.h>
 #include <bmqu_memoutstream.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_loggermanager.h>
@@ -242,14 +243,14 @@ struct Test : bmqtst::Test {
     void putMessage(const bsl::string& appId = bsl::string());
 
     // ACCESSORS
-    bslma::ManagedPtr<mqbi::StorageIterator>
+    bmqu::UniquePtr<mqbi::StorageIterator>
     haveUndeliveredCb(bsls::TimeInterval*       alarmTime_p,
                       const bsl::string&        appId,
                       const bsls::TimeInterval& now) const;
 
-    void loggingCb(
-        const bsl::string&                              appId,
-        const bslma::ManagedPtr<mqbi::StorageIterator>& oldestMsgIt) const;
+    void
+    loggingCb(const bsl::string&                            appId,
+              const bmqu::UniquePtr<mqbi::StorageIterator>& oldestMsgIt) const;
 };
 
 Test::Test()
@@ -274,8 +275,8 @@ Test::Test()
              const bsls::TimeInterval& now) {
           return haveUndeliveredCb(alarmTime_p, appId, now);
       },
-      [this](const bsl::string&                              appId,
-             const bslma::ManagedPtr<mqbi::StorageIterator>& oldestMsgIt) {
+      [this](const bsl::string&                            appId,
+             const bmqu::UniquePtr<mqbi::StorageIterator>& oldestMsgIt) {
           loggingCb(appId, oldestMsgIt);
       },
       d_allocator_p)
@@ -330,18 +331,20 @@ void Test::putMessage(const bsl::string& id)
     d_haveUndelivered.insert(id);
 }
 
-bslma::ManagedPtr<mqbi::StorageIterator>
+bmqu::UniquePtr<mqbi::StorageIterator>
 Test::haveUndeliveredCb(bsls::TimeInterval*       alarmTime_p,
                         const bsl::string&        appId,
                         const bsls::TimeInterval& now) const
 {
-    bslma::ManagedPtr<mqbi::StorageIterator> oldestMsgIt;
+    bmqu::UniquePtr<mqbi::StorageIterator> oldestMsgIt;
 
     const bool haveUndelivered = d_haveUndelivered.contains(appId);
     if (haveUndelivered) {
         MockStorageIterator* mockStorageIterator_p = new (*d_allocator_p)
             MockStorageIterator();
-        oldestMsgIt.load(mockStorageIterator_p, d_allocator_p);
+        oldestMsgIt = bmqu::UniquePtrUtil::adopt<mqbi::StorageIterator>(
+            mockStorageIterator_p,
+            d_allocator_p);
 
         if (alarmTime_p) {
             *alarmTime_p = now;
@@ -352,9 +355,9 @@ Test::haveUndeliveredCb(bsls::TimeInterval*       alarmTime_p,
 }
 
 void Test::loggingCb(
-    [[maybe_unused]] const bsl::string& id,
-    [[maybe_unused]] const bslma::ManagedPtr<mqbi::StorageIterator>&
-        oldestMsgIt) const
+    [[maybe_unused]] const bsl::string&                            id,
+    [[maybe_unused]] const bmqu::UniquePtr<mqbi::StorageIterator>& oldestMsgIt)
+    const
 {
     BALL_LOG_SET_CATEGORY("MQBBLP.QUEUECONSUMPTIONMONITORTEST");
 

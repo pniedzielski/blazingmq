@@ -200,7 +200,7 @@ void RootQueueEngine::deliverMessages(AppState* app)
     if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(0 == app->redeliveryListSize())) {
         if (!app->resumePoint().isUnset()) {
             // Position to the resumePoint
-            bslma::ManagedPtr<mqbi::StorageIterator> start;
+            bmqu::UniquePtr<mqbi::StorageIterator> start;
 
             if (d_queueState_p->storage()->getIterator(&start,
                                                        app->appKey(),
@@ -343,8 +343,8 @@ RootQueueEngine::RootQueueEngine(QueueState*             queueState,
              const bsls::TimeInterval& now) {
           return haveUndeliveredCb(alarmTime_p, appId, now);
       },
-      [this](const bsl::string&                              appId,
-             const bslma::ManagedPtr<mqbi::StorageIterator>& oldestMsgIt) {
+      [this](const bsl::string&                            appId,
+             const bmqu::UniquePtr<mqbi::StorageIterator>& oldestMsgIt) {
           logAlarmCb(appId, oldestMsgIt);
       },
       allocator)
@@ -1612,7 +1612,7 @@ int RootQueueEngine::onRejectMessage(
 
     BSLS_ASSERT_SAFE(!appKey.isNull());
 
-    bslma::ManagedPtr<mqbi::StorageIterator> message;
+    bmqu::UniquePtr<mqbi::StorageIterator>   message;
     int                                      counter = 0;
     mqbi::StorageResult::Enum                storageRc =
         d_queueState_p->storage()->getIterator(&message, appKey, msgGUID);
@@ -1880,7 +1880,7 @@ RootQueueEngine::logAppSubscriptionInfo(bsl::ostream&     stream,
 
     // Log the first (oldest) message in a put aside list and its properties
     if (!appState->putAsideList().empty()) {
-        bslma::ManagedPtr<mqbi::StorageIterator> storageIt_mp;
+        bmqu::UniquePtr<mqbi::StorageIterator>   storageIt_mp;
         mqbi::StorageResult::Enum                rc = storage->getIterator(
             &storageIt_mp,
             appState->appKey(),
@@ -1923,7 +1923,7 @@ RootQueueEngine::logAppSubscriptionInfo(bsl::ostream&     stream,
     return stream;
 }
 
-bslma::ManagedPtr<mqbi::StorageIterator>
+bmqu::UniquePtr<mqbi::StorageIterator>
 RootQueueEngine::haveUndeliveredCb(bsls::TimeInterval*       alarmTime_p,
                                    const bsl::string&        appId,
                                    const bsls::TimeInterval& now) const
@@ -1941,7 +1941,7 @@ RootQueueEngine::haveUndeliveredCb(bsls::TimeInterval*       alarmTime_p,
     const AppStateSp& app = cItApp->second;
 
     // Check if there are un-delivered messages
-    bslma::ManagedPtr<mqbi::StorageIterator> headIt = head(app);
+    bmqu::UniquePtr<mqbi::StorageIterator> headIt = head(app);
 
     if (headIt) {
         // Get the arrival time delta of the oldest un-delivered message.
@@ -1958,8 +1958,8 @@ RootQueueEngine::haveUndeliveredCb(bsls::TimeInterval*       alarmTime_p,
 }
 
 void RootQueueEngine::logAlarmCb(
-    const bsl::string&                              appId,
-    const bslma::ManagedPtr<mqbi::StorageIterator>& oldestMsgIt) const
+    const bsl::string&                            appId,
+    const bmqu::UniquePtr<mqbi::StorageIterator>& oldestMsgIt) const
 {
     // executed by the *QUEUE DISPATCHER* thread
 
@@ -2280,10 +2280,10 @@ void RootQueueEngine::evaluateAppSubscriptions(
     }
 }
 
-bslma::ManagedPtr<mqbi::StorageIterator>
+bmqu::UniquePtr<mqbi::StorageIterator>
 RootQueueEngine::head(const AppStateSp app) const
 {
-    bslma::ManagedPtr<mqbi::StorageIterator> out;
+    bmqu::UniquePtr<mqbi::StorageIterator> out;
 
     // Try to get the oldest message iterator from the
     // redelivery list, put aside list, or resume point.

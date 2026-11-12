@@ -47,6 +47,7 @@
 #include <bmqt_resultcode.h>
 #include <bmqt_uri.h>
 #include <bmqu_printutil.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bdlbb_blob.h>
@@ -506,7 +507,7 @@ class Storage {
     /// If the `appKey` is null, the returned  iterator can iterate states of
     /// all Apps; otherwise, the iterator can iterate states of the App
     /// corresponding to the `appKey`.
-    virtual bslma::ManagedPtr<StorageIterator>
+    virtual bmqu::UniquePtr<StorageIterator>
     getIterator(const mqbu::StorageKey& appKey) = 0;
 
     /// Load into the specified `out` an iterator for data stored in the
@@ -518,9 +519,9 @@ class Storage {
     /// Return zero on success, and a non-zero code if `msgGUID` was not
     /// found in the storage.
     virtual StorageResult::Enum
-    getIterator(bslma::ManagedPtr<StorageIterator>* out,
-                const mqbu::StorageKey&             appKey,
-                const bmqt::MessageGUID&            msgGUID) = 0;
+    getIterator(bmqu::UniquePtr<StorageIterator>* out,
+                const mqbu::StorageKey&           appKey,
+                const bmqt::MessageGUID&          msgGUID) = 0;
 
     /// Save the message contained in the specified `appData`, `options` and
     /// the associated `attributes` and `msgGUID` into this storage and the

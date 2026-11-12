@@ -419,16 +419,16 @@ FileBackedStorage::put(mqbi::StorageMessageAttributes*     attributes,
     return mqbi::StorageResult::e_SUCCESS;  // RETURN
 }
 
-bslma::ManagedPtr<mqbi::StorageIterator>
+bmqu::UniquePtr<mqbi::StorageIterator>
 FileBackedStorage::getIterator(const mqbu::StorageKey& appKey)
 {
     return d_virtualStorageCatalog.getIterator(appKey);
 }
 
 mqbi::StorageResult::Enum
-FileBackedStorage::getIterator(bslma::ManagedPtr<mqbi::StorageIterator>* out,
-                               const mqbu::StorageKey&  appKey,
-                               const bmqt::MessageGUID& msgGUID)
+FileBackedStorage::getIterator(bmqu::UniquePtr<mqbi::StorageIterator>* out,
+                               const mqbu::StorageKey&                 appKey,
+                               const bmqt::MessageGUID&                msgGUID)
 {
     return d_virtualStorageCatalog.getIterator(out, appKey, msgGUID);
 }

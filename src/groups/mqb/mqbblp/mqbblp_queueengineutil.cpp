@@ -1485,7 +1485,7 @@ void QueueEngineUtil_AppState::reportStats(
 }
 
 bool QueueEngineUtil_AppState::getOldestMessageIterator(
-    bslma::ManagedPtr<mqbi::StorageIterator>* out)
+    bmqu::UniquePtr<mqbi::StorageIterator>* out)
 {
     // PRECONDITIONS
 
@@ -1511,8 +1511,8 @@ bool QueueEngineUtil_AppState::getOldestMessageIterator(
 }
 
 bool QueueEngineUtil_AppState::getOldestMessageIteratorFromList(
-    bslma::ManagedPtr<mqbi::StorageIterator>* out,
-    RedeliveryList&                           list)
+    bmqu::UniquePtr<mqbi::StorageIterator>* out,
+    RedeliveryList&                         list)
 {
     if (list.empty()) {
         return false;  // RETURN

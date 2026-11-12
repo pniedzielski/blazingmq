@@ -89,6 +89,9 @@
 #include <mqbblp_queuestate.h>
 #include <mqbi_queue.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <ball_log.h>
 #include <bsl_functional.h>
@@ -165,7 +168,7 @@ class QueueConsumptionMonitor {
     /// un-delivered messages for the specified `appId` it sets in the
     /// specified `alarmTime_p` calculated alarm time for the oldest
     /// un-delivered message.
-    typedef bsl::function<bslma::ManagedPtr<mqbi::StorageIterator>(
+    typedef bsl::function<bmqu::UniquePtr<mqbi::StorageIterator>(
         bsls::TimeInterval*       alarmTime_p,
         const bsl::string&        appId,
         const bsls::TimeInterval& now)>
@@ -174,8 +177,8 @@ class QueueConsumptionMonitor {
     /// Callback function to log the alarm for the specified `appId` and
     /// `oldestMsgIt`.
     typedef bsl::function<void(
-        const bsl::string&                              appId,
-        const bslma::ManagedPtr<mqbi::StorageIterator>& oldestMsgIt)>
+        const bsl::string&                            appId,
+        const bmqu::UniquePtr<mqbi::StorageIterator>& oldestMsgIt)>
         LoggingCb;
 
   private:

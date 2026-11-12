@@ -102,7 +102,7 @@ int StoragePrintUtil::listMessages(mqbcmd::QueueContents* queueContents,
     }
 
     const bsls::Types::Int64 numMessages        = storage->numMessages(appKey);
-    bslma::ManagedPtr<mqbi::StorageIterator> it = storage->getIterator(appKey);
+    bmqu::UniquePtr<mqbi::StorageIterator> it   = storage->getIterator(appKey);
 
     if (offset < 0) {
         offset = -offset;

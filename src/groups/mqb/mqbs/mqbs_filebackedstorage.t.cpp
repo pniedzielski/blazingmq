@@ -1539,7 +1539,7 @@ BMQTST_TEST_F(Test, getIterator_noVirtualStorages)
     mqbs::ReplicatedStorage& storage = d_tester.storage();
 
     // Check Iterator
-    bslma::ManagedPtr<mqbi::StorageIterator> iterator;
+    bmqu::UniquePtr<mqbi::StorageIterator> iterator;
     iterator = storage.getIterator(mqbu::StorageKey::k_NULL_KEY);
 
     int msgData = 0;
@@ -1630,7 +1630,7 @@ BMQTST_TEST(getIterator_withVirtualStorages)
                      mqbi::StorageResult::e_SUCCESS);
 
     // Check Iterator
-    bslma::ManagedPtr<mqbi::StorageIterator> iterator;
+    bmqu::UniquePtr<mqbi::StorageIterator>   iterator;
     int                                      msgData = 0;
     // mqbu::StorageKey::k_NULL_KEY- Gives all messages in physical and virtual
     // (Total 60 messages)

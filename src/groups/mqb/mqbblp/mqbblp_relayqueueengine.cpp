@@ -1740,7 +1740,7 @@ int RelayQueueEngine::onRejectMessage(
 
     int result = 0;
 
-    bslma::ManagedPtr<mqbi::StorageIterator> message;
+    bmqu::UniquePtr<mqbi::StorageIterator> message;
     mqbi::StorageResult::Enum rc = storage()->getIterator(&message,
                                                           app->appKey(),
                                                           msgGUID);

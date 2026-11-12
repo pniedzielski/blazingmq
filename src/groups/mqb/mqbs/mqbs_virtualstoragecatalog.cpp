@@ -22,6 +22,7 @@
 #include <mqbstat_queuestats.h>
 
 #include <bmqtsk_alarmlog.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bdlbb_blob.h>
@@ -190,10 +191,10 @@ bsl::shared_ptr<mqbi::DataStreamMessage> VirtualStorageCatalog::insert(
     return dataStreamMessage;
 }
 
-bslma::ManagedPtr<mqbi::StorageIterator>
+bmqu::UniquePtr<mqbi::StorageIterator>
 VirtualStorageCatalog::getIterator(const mqbu::StorageKey& appKey)
 {
-    bslma::ManagedPtr<mqbi::StorageIterator> mp;
+    bmqu::UniquePtr<mqbi::StorageIterator> mp;
 
     if (!appKey.isNull()) {
         VirtualStoragesIter it = d_virtualStorages.findByKey2(appKey);
@@ -201,12 +202,12 @@ VirtualStorageCatalog::getIterator(const mqbu::StorageKey& appKey)
 
         VirtualStorage* vs = it->value().get();
 
-        mp.load(new (*d_allocator_p)
-                    VirtualStorageIterator(it->value().get(),
-                                           d_storage_p,
-                                           this,
-                                           d_dataStream.begin()),
-                d_allocator_p);
+        mp = bmqu::UniquePtrUtil::adopt<mqbi::StorageIterator>(
+            new (*d_allocator_p) VirtualStorageIterator(it->value().get(),
+                                                        d_storage_p,
+                                                        this,
+                                                        d_dataStream.begin()),
+            d_allocator_p);
 
         if (!mp->atEnd()) {
             if (!mp->appMessageView(vs->ordinal()).isPending()) {
@@ -216,18 +217,19 @@ VirtualStorageCatalog::getIterator(const mqbu::StorageKey& appKey)
         }
     }
     else {
-        mp.load(new (*d_allocator_p)
-                    StorageIterator(d_storage_p, this, d_dataStream.begin()),
-                d_allocator_p);
+        mp = bmqu::UniquePtrUtil::adopt<mqbi::StorageIterator>(
+            new (*d_allocator_p)
+                StorageIterator(d_storage_p, this, d_dataStream.begin()),
+            d_allocator_p);
     }
 
     return mp;
 }
 
-mqbi::StorageResult::Enum VirtualStorageCatalog::getIterator(
-    bslma::ManagedPtr<mqbi::StorageIterator>* out,
-    const mqbu::StorageKey&                   appKey,
-    const bmqt::MessageGUID&                  msgGUID)
+mqbi::StorageResult::Enum
+VirtualStorageCatalog::getIterator(bmqu::UniquePtr<mqbi::StorageIterator>* out,
+                                   const mqbu::StorageKey&  appKey,
+                                   const bmqt::MessageGUID& msgGUID)
 {
     DataStreamIterator data = d_dataStream.find(msgGUID);
 
@@ -241,9 +243,10 @@ mqbi::StorageResult::Enum VirtualStorageCatalog::getIterator(
 
         VirtualStorage* vs = it->value().get();
 
-        out->load(new (*d_allocator_p)
-                      VirtualStorageIterator(vs, d_storage_p, this, data),
-                  d_allocator_p);
+        *out = bmqu::UniquePtrUtil::adopt<mqbi::StorageIterator>(
+            new (*d_allocator_p)
+                VirtualStorageIterator(vs, d_storage_p, this, data),
+            d_allocator_p);
 
         const mqbi::AppMessage& appView = (*out)->appMessageView(
             vs->ordinal());
@@ -255,9 +258,9 @@ mqbi::StorageResult::Enum VirtualStorageCatalog::getIterator(
         }
     }
     else {
-        out->load(new (*d_allocator_p)
-                      StorageIterator(d_storage_p, this, data),
-                  d_allocator_p);
+        *out = bmqu::UniquePtrUtil::adopt<mqbi::StorageIterator>(
+            new (*d_allocator_p) StorageIterator(d_storage_p, this, data),
+            d_allocator_p);
     }
 
     return mqbi::StorageResult::e_SUCCESS;

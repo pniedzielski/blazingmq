@@ -149,16 +149,16 @@ void InMemoryStorage::close()
     // NOTHING
 }
 
-bslma::ManagedPtr<mqbi::StorageIterator>
+bmqu::UniquePtr<mqbi::StorageIterator>
 InMemoryStorage::getIterator(const mqbu::StorageKey& appKey)
 {
     return d_virtualStorageCatalog.getIterator(appKey);
 }
 
 mqbi::StorageResult::Enum
-InMemoryStorage::getIterator(bslma::ManagedPtr<mqbi::StorageIterator>* out,
-                             const mqbu::StorageKey&                   appKey,
-                             const bmqt::MessageGUID&                  msgGUID)
+InMemoryStorage::getIterator(bmqu::UniquePtr<mqbi::StorageIterator>* out,
+                             const mqbu::StorageKey&                 appKey,
+                             const bmqt::MessageGUID&                msgGUID)
 {
     return d_virtualStorageCatalog.getIterator(out, appKey, msgGUID);
 }

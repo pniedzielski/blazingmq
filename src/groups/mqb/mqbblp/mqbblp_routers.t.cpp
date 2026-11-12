@@ -59,7 +59,7 @@ struct TestStorage {
     mqbmock::Cluster                         d_cluster;
     mqbmock::Domain                          d_domain;
     mqbs::InMemoryStorage                    d_storage;
-    bslma::ManagedPtr<mqbi::StorageIterator> d_iterator;
+    bmqu::UniquePtr<mqbi::StorageIterator>   d_iterator;
     bdlbb::PooledBlobBufferFactory           d_bufferFactory;
 
     bsl::shared_ptr<mqbmock::Queue> d_queue_sp;

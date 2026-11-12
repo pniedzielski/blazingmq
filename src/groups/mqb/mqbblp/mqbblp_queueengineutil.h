@@ -33,6 +33,7 @@
 
 // BMQ
 #include <bmqp_ctrlmsg_messages.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -531,8 +532,7 @@ struct QueueEngineUtil_AppState {
     /// message. First look in the redelivery list, then in the put aside list,
     /// and finally in the resume point.  Return `true` if the iterator is
     /// loaded successfully, otherwise return `false`.
-    bool
-    getOldestMessageIterator(bslma::ManagedPtr<mqbi::StorageIterator>* out);
+    bool getOldestMessageIterator(bmqu::UniquePtr<mqbi::StorageIterator>* out);
 
     // ACCESSORS
 
@@ -585,8 +585,8 @@ struct QueueEngineUtil_AppState {
     /// message from the specified `list`.  Return `true` if the iterator is
     /// loaded successfully, `false` otherwise.
     bool getOldestMessageIteratorFromList(
-        bslma::ManagedPtr<mqbi::StorageIterator>* out,
-        RedeliveryList&                           list);
+        bmqu::UniquePtr<mqbi::StorageIterator>* out,
+        RedeliveryList&                         list);
 };
 
 // ==========================================

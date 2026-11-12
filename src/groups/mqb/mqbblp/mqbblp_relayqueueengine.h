@@ -50,6 +50,7 @@
 #include <bmqp_queueutil.h>
 #include <bmqt_messageguid.h>
 #include <bmqu_sharedresource.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -191,7 +192,7 @@ class RelayQueueEngine final : public mqbi::QueueEngine {
     bslma::ManagedPtr<PushStreamIterator> d_storageIter_mp;
 
     /// Storage iterator to access storage state.
-    bslma::ManagedPtr<mqbi::StorageIterator> d_realStorageIter_mp;
+    bmqu::UniquePtr<mqbi::StorageIterator> d_realStorageIter_mp;
 
     /// Allocator to use.
     bslma::Allocator* d_allocator_p;

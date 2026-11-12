@@ -42,6 +42,7 @@
 #include <bmqt_uri.h>
 
 #include <bmqc_orderedhashmapwithhistory.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -290,7 +291,7 @@ class InMemoryStorage final : public ReplicatedStorage {
     /// If the 'appKey' is null, the returned  iterator can iterate states of
     /// all Apps; otherwise, the iterator can iterate states of the App
     /// corresponding to the 'appKey'.
-    bslma::ManagedPtr<mqbi::StorageIterator>
+    bmqu::UniquePtr<mqbi::StorageIterator>
     getIterator(const mqbu::StorageKey& appKey) override;
 
     /// Load into the specified 'out' an iterator for data stored in the
@@ -302,9 +303,9 @@ class InMemoryStorage final : public ReplicatedStorage {
     /// Return zero on success, and a non-zero code if 'msgGUID' was not
     /// found in the storage.
     mqbi::StorageResult::Enum
-    getIterator(bslma::ManagedPtr<mqbi::StorageIterator>* out,
-                const mqbu::StorageKey&                   appKey,
-                const bmqt::MessageGUID&                  msgGUID) override;
+    getIterator(bmqu::UniquePtr<mqbi::StorageIterator>* out,
+                const mqbu::StorageKey&                 appKey,
+                const bmqt::MessageGUID&                msgGUID) override;
 
     /// Save the message contained in the specified 'appData', 'options' and
     /// the associated 'attributes' and 'msgGUID' into this storage and the

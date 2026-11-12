@@ -33,6 +33,7 @@
 
 // BMQ
 #include <bmqt_messageguid.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bsl_functional.h>
@@ -218,7 +219,7 @@ class VirtualStorageCatalog final {
     /// If the 'appKey' is null, the returned  iterator can iterate states of
     /// all Apps; otherwise, the iterator can iterate states of the App
     /// corresponding to the 'appKey'.
-    bslma::ManagedPtr<mqbi::StorageIterator>
+    bmqu::UniquePtr<mqbi::StorageIterator>
     getIterator(const mqbu::StorageKey& appKey);
 
     /// Load into the specified 'out' an iterator for items stored in the
@@ -230,9 +231,9 @@ class VirtualStorageCatalog final {
     /// Return zero on success, and a non-zero code if 'msgGUID' was not
     /// found in the storage.
     mqbi::StorageResult::Enum
-    getIterator(bslma::ManagedPtr<mqbi::StorageIterator>* out,
-                const mqbu::StorageKey&                   appKey,
-                const bmqt::MessageGUID&                  msgGUID);
+    getIterator(bmqu::UniquePtr<mqbi::StorageIterator>* out,
+                const mqbu::StorageKey&                 appKey,
+                const bmqt::MessageGUID&                msgGUID);
 
     /// Remove the message having the specified 'msgGUID' from the DataStream.
     /// Return 0 on success, or a non-zero return code if the 'msgGUID' was

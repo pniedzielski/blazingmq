@@ -46,6 +46,7 @@
 
 #include <bmqc_array.h>
 #include <bmqc_orderedhashmapwithhistory.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -413,7 +414,7 @@ class FileBackedStorage final : public ReplicatedStorage {
     /// If the 'appKey' is null, the returned  iterator can iterate states of
     /// all Apps; otherwise, the iterator can iterate states of the App
     /// corresponding to the 'appKey'.
-    bslma::ManagedPtr<mqbi::StorageIterator>
+    bmqu::UniquePtr<mqbi::StorageIterator>
     getIterator(const mqbu::StorageKey& appKey) override;
 
     /// Load into the specified 'out' an iterator for data stored in the
@@ -425,9 +426,9 @@ class FileBackedStorage final : public ReplicatedStorage {
     /// Return zero on success, and a non-zero code if 'msgGUID' was not
     /// found in the storage.
     mqbi::StorageResult::Enum
-    getIterator(bslma::ManagedPtr<mqbi::StorageIterator>* out,
-                const mqbu::StorageKey&                   appKey,
-                const bmqt::MessageGUID&                  msgGUID) override;
+    getIterator(bmqu::UniquePtr<mqbi::StorageIterator>* out,
+                const mqbu::StorageKey&                 appKey,
+                const bmqt::MessageGUID&                msgGUID) override;
 
     /// Update the App state corresponding to the specified 'msgGUID' and the
     /// specified 'appKey' in the DataStream.  Decrement the reference count of

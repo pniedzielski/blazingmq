@@ -242,7 +242,7 @@ static void test1_listMessage()
     for (int idx = 0; idx < K_NUM_APP_KEYS; ++idx) {
         mqbu::StorageKey appKey = K_APP_KEYS[idx];
 
-        for (bslma::ManagedPtr<mqbi::StorageIterator> it =
+        for (bmqu::UniquePtr<mqbi::StorageIterator> it =
                  tester.storage()->getIterator(appKey);
              !it->atEnd();
              it->advance()) {
