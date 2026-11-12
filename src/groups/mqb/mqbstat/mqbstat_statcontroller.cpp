@@ -733,23 +733,23 @@ StatController::StatController(const CommandProcessorFn& commandProcessor,
                                bdlmt::EventScheduler*    eventScheduler,
                                bslma::Allocator*         allocator)
 : d_allocators(allocator)
-, d_scheduler_mp(0)
+, d_scheduler_mp()
 , d_lastSnapshotTime()
 , d_snapshotThrottle()
 , d_allocatorsStatContext_p(allocatorsStatContext)
 , d_statContextsMap(allocator)
 , d_statContextChannelsLocal_mp(0)
 , d_statContextChannelsRemote_mp(0)
-, d_systemStatMonitor_mp(0)
+, d_systemStatMonitor_mp()
 , d_pluginManager_p(pluginManager)
 , d_bufferFactory_p(bufferFactory)
 , d_commandProcessorFn(bsl::allocator_arg, allocator, commandProcessor)
 , d_snapshotTracker()
-, d_tablePrinter_mp(0)
-, d_tableStatsFileLogger_mp(0)
-, d_jsonStatsFileLogger_mp(0)
-, d_jsonPrinter_mp(0)
-, d_flatJsonPrinter_mp(0)
+, d_tablePrinter_mp()
+, d_tableStatsFileLogger_mp()
+, d_jsonStatsFileLogger_mp()
+, d_jsonPrinter_mp()
+, d_flatJsonPrinter_mp()
 , d_statConsumers(allocator)
 , d_statConsumerMaxPublishInterval(0)
 , d_eventScheduler_p(eventScheduler)
@@ -764,6 +764,11 @@ StatController::StatController(const CommandProcessorFn& commandProcessor,
     // The throttle should be reinitialized during 'start()' with normal
     // values.
     d_snapshotThrottle.initialize(0, 1);
+}
+
+StatController::~StatController()
+{
+    // NOTHING
 }
 
 int StatController::start(bsl::ostream& errorDescription)
@@ -791,7 +796,7 @@ int StatController::start(bsl::ostream& errorDescription)
 
     // Start the scheduler
     d_scheduler_mp =
-        bslma::ManagedPtrUtil::allocateManaged<bdlmt::TimerEventScheduler>(
+        bmqu::UniquePtrUtil::allocateUnique<bdlmt::TimerEventScheduler>(
             d_allocator_p,
             bsls::SystemClockType::e_MONOTONIC);
     rc = d_scheduler_mp->start();
@@ -815,7 +820,7 @@ int StatController::start(bsl::ostream& errorDescription)
         maxInterval = bsl::max(maxInterval, pluginConfig.publishInterval());
     }
     d_systemStatMonitor_mp =
-        bslma::ManagedPtrUtil::allocateManaged<mqbstat::StatMonitor>(
+        bmqu::UniquePtrUtil::allocateUnique<mqbstat::StatMonitor>(
             d_allocator_p,
             maxInterval);
 
@@ -906,7 +911,7 @@ int StatController::start(bsl::ostream& errorDescription)
     }
 
     // Create the table printer
-    d_tablePrinter_mp = bslma::ManagedPtrUtil::allocateManaged<TablePrinter>(
+    d_tablePrinter_mp = bmqu::UniquePtrUtil::allocateUnique<TablePrinter>(
         d_allocator_p,
         ctxPtrMap,
         d_snapshotTracker.actionInterval() + 1);
@@ -918,7 +923,7 @@ int StatController::start(bsl::ostream& errorDescription)
 
         if (encoding & mqbcfg::StatsPrinterEncodingFormat::e_TABLE) {
             d_tableStatsFileLogger_mp =
-                bslma::ManagedPtrUtil::allocateManaged<StatsFileLogger>(
+                bmqu::UniquePtrUtil::allocateUnique<StatsFileLogger>(
                     d_allocator_p,
                     file,
                     d_eventScheduler_p);
@@ -927,7 +932,7 @@ int StatController::start(bsl::ostream& errorDescription)
 
         if (encoding & mqbcfg::StatsPrinterEncodingFormat::e_JSON) {
             d_jsonStatsFileLogger_mp =
-                bslma::ManagedPtrUtil::allocateManaged<StatsFileLogger>(
+                bmqu::UniquePtrUtil::allocateUnique<StatsFileLogger>(
                     d_allocator_p,
                     file + ".json",
                     d_eventScheduler_p);
@@ -936,13 +941,13 @@ int StatController::start(bsl::ostream& errorDescription)
     }
 
     // Create the json printer
-    d_jsonPrinter_mp = bslma::ManagedPtrUtil::allocateManaged<JsonPrinter>(
+    d_jsonPrinter_mp = bmqu::UniquePtrUtil::allocateUnique<JsonPrinter>(
         d_allocator_p,
         ctxPtrMap);
 
     d_flatJsonPrinter_mp =
-        bslma::ManagedPtrUtil::allocateManaged<FlatJsonPrinter>(d_allocator_p,
-                                                                ctxPtrMap);
+        bmqu::UniquePtrUtil::allocateUnique<FlatJsonPrinter>(d_allocator_p,
+                                                             ctxPtrMap);
 
     // Max value for the stat publish interval must be the minimum history size
     // of all stat contexts.
@@ -972,7 +977,7 @@ void StatController::stop()
 
 #define DESTROY_OBJ(OBJ, NAME)                                                \
     if (OBJ) {                                                                \
-        OBJ.clear();                                                          \
+        OBJ.reset();                                                          \
     }
 
     // Stop the scheduler and cancel all clocks first to prevent any additional

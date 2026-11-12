@@ -28,6 +28,7 @@
 
 // MQB
 #include <bmqma_countingallocatorstore.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -110,14 +111,14 @@ class StatController {
 
   private:
     // PRIVATE TYPES
-    typedef bslma::ManagedPtr<bdlmt::TimerEventScheduler> SchedulerMp;
+    typedef bmqu::UniquePtr<bdlmt::TimerEventScheduler>   SchedulerMp;
     typedef bslma::ManagedPtr<bmqst::StatContext>         StatContextMp;
     typedef bsl::shared_ptr<bmqst::StatContext>           StatContextSp;
-    typedef bslma::ManagedPtr<mqbstat::StatMonitor>       SystemStatMonitorMp;
-    typedef bslma::ManagedPtr<TablePrinter>               TablePrinterMp;
-    typedef bslma::ManagedPtr<StatsFileLogger>            StatsFileLoggerMp;
-    typedef bslma::ManagedPtr<FlatJsonPrinter>            FlatJsonPrinterMp;
-    typedef bslma::ManagedPtr<JsonPrinter>                JsonPrinterMp;
+    typedef bmqu::UniquePtr<mqbstat::StatMonitor>         SystemStatMonitorMp;
+    typedef bmqu::UniquePtr<TablePrinter>                 TablePrinterMp;
+    typedef bmqu::UniquePtr<StatsFileLogger>              StatsFileLoggerMp;
+    typedef bmqu::UniquePtr<FlatJsonPrinter>              FlatJsonPrinterMp;
+    typedef bmqu::UniquePtr<JsonPrinter>                  JsonPrinterMp;
     typedef bslma::ManagedPtr<mqbplug::StatConsumer>      StatConsumerMp;
 
     /// Tracks snapshot IDs and the action counter that determines when
@@ -324,6 +325,9 @@ class StatController {
                    bmqst::StatContext*       allocatorsStatContext,
                    bdlmt::EventScheduler*    eventScheduler,
                    bslma::Allocator*         allocator);
+
+    /// Destroy this object.
+    ~StatController();
 
     // MANIPULATORS
 
