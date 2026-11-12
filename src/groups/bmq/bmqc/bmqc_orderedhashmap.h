@@ -945,7 +945,7 @@ template <class VALUE>
 inline VALUE& OrderedHashMap_SequentialIterator<VALUE>::operator*() const
 {
     BSLS_ASSERT_SAFE(d_link_p);
-    Node* node = static_cast<Node*>(d_link_p);
+    auto* node = static_cast<Node*>(d_link_p);
     return node->value();
 }
 
@@ -953,7 +953,7 @@ template <class VALUE>
 inline VALUE* OrderedHashMap_SequentialIterator<VALUE>::operator->() const
 {
     BSLS_ASSERT_SAFE(d_link_p);
-    Node* node = static_cast<Node*>(d_link_p);
+    auto* node = static_cast<Node*>(d_link_p);
     return &(node->value());
 }
 
@@ -1030,7 +1030,7 @@ template <class VALUE>
 inline VALUE& OrderedHashMap_BucketIterator<VALUE>::operator*() const
 {
     BSLS_ASSERT_SAFE(d_link_p);
-    Node* node = static_cast<Node*>(d_link_p);
+    auto* node = static_cast<Node*>(d_link_p);
     return node->value();
 }
 
@@ -1038,7 +1038,7 @@ template <class VALUE>
 inline VALUE* OrderedHashMap_BucketIterator<VALUE>::operator->() const
 {
     BSLS_ASSERT_SAFE(d_link_p);
-    Node* node = static_cast<Node*>(d_link_p);
+    auto* node = static_cast<Node*>(d_link_p);
     return &(node->value());
 }
 
@@ -1080,7 +1080,7 @@ OrderedHashMap<KEY, VALUE, HASH, VALUE_TYPE>::findKeyInBucket(
 
     for (Link* link = bucket->d_first_p; link != 0;
          link       = link->nextInBucket()) {
-        Node* cursor = static_cast<Node*>(link);
+        auto* cursor = static_cast<Node*>(link);
 
         if (get_key(cursor->value()) == key) {
             return link;  // RETURN
@@ -1113,7 +1113,7 @@ template <class KEY, class VALUE, class HASH, class VALUE_TYPE>
 inline OrderedHashMap_Link*
 OrderedHashMap<KEY, VALUE, HASH, VALUE_TYPE>::createNewSentinel()
 {
-    Link* link = static_cast<Link*>(d_nodePool.allocate());
+    auto* link = static_cast<Link*>(d_nodePool.allocate());
     *link      = *d_sentinel_p;
     return link;
 }
@@ -1125,8 +1125,7 @@ inline void OrderedHashMap<KEY, VALUE, HASH, VALUE_TYPE>::constructNode(
 {
     typedef typename bsl::remove_cv<value_type>::type NcValueType;
 
-    OrderedHashMap_Node<NcValueType>* node =
-        static_cast<OrderedHashMap_Node<NcValueType>*>(link);
+    auto* node = static_cast<OrderedHashMap_Node<NcValueType>*>(link);
 
     bslalg::ScalarPrimitives::copyConstruct(&(node->value()),
                                             value,
@@ -1138,7 +1137,7 @@ inline OrderedHashMap_Link*
 OrderedHashMap<KEY, VALUE, HASH, VALUE_TYPE>::createNode(
     const value_type& value)
 {
-    Link* link = static_cast<Link*>(d_nodePool.allocate());
+    auto* link = static_cast<Link*>(d_nodePool.allocate());
     constructNode(link, value);
     return link;
 }
@@ -1217,7 +1216,7 @@ bool OrderedHashMap<KEY, VALUE, HASH, VALUE_TYPE>::rehashIfNeeded()
         // Destroy & deallocate old bucket array.
 
         for (size_t i = 0; i < oldBucketArraySize; ++i) {
-            Bucket* bucket = static_cast<Bucket*>(d_bucketArray_p + i);
+            auto* bucket = static_cast<Bucket*>(d_bucketArray_p + i);
             bucket->~Bucket();
         }
         d_allocator_p->deallocate(d_bucketArray_p);
@@ -1233,7 +1232,7 @@ bool OrderedHashMap<KEY, VALUE, HASH, VALUE_TYPE>::rehashIfNeeded()
         size_t numRehashed = 0;
         for (Link* link = d_sentinel_p->nextInList(); link != d_sentinel_p;
              link       = link->nextInList()) {
-            Node*   node   = static_cast<Node*>(link);
+            auto*   node   = static_cast<Node*>(link);
             Bucket* bucket = getBucketForKey(get_key(node->value()));
             appendNodeToBucket(link, bucket);
             ++numRehashed;
@@ -1377,7 +1376,7 @@ inline void OrderedHashMap<KEY, VALUE, HASH, VALUE_TYPE>::clear()
     Link*  cursor     = d_sentinel_p->nextInList();
     while (cursor != d_sentinel_p) {
         Link* thisCursor = cursor;
-        Node* node       = static_cast<Node*>(cursor);
+        auto* node       = static_cast<Node*>(cursor);
         node->value().~value_type();
         cursor = cursor->nextInList();
         thisCursor->~Link();
@@ -1401,7 +1400,7 @@ OrderedHashMap<KEY, VALUE, HASH, VALUE_TYPE>::erase(const_iterator position)
 {
     BSLS_ASSERT_SAFE(end() != position);
     iterator nextPosition(position.d_link_p->nextInList());
-    Node*    nodeToErase = static_cast<Node*>(position.d_link_p);
+    auto*    nodeToErase = static_cast<Node*>(position.d_link_p);
 
     size_t count = erase(get_key(nodeToErase->value()));
     BSLS_ASSERT(1 == count && "Invalid iterator provided");
@@ -1416,7 +1415,7 @@ size_t OrderedHashMap<KEY, VALUE, HASH, VALUE_TYPE>::erase(const key_type& key)
     Link*   prevInBucket = 0;
     for (Link* link = bucket->d_first_p; link != 0;
          link       = link->nextInBucket()) {
-        Node* node = static_cast<Node*>(link);
+        auto* node = static_cast<Node*>(link);
         if (get_key(node->value()) == key) {
             // Invoke destructor.
 
