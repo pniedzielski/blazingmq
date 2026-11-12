@@ -656,10 +656,8 @@ inline size_t Tester<Builder>::verify(
     size_t            counter    = 0;
     size_t            writeBlobs = 0;
 
-    for (BlobDeque::iterator itHistory = d_history.begin();
-         itHistory != d_history.end();
-         ++itHistory) {
-        const bsl::shared_ptr<BloombergLP::bdlbb::Blob>& blob_sp = *itHistory;
+    for (const bsl::shared_ptr<BloombergLP::bdlbb::Blob>& blob_sp :
+         d_history) {
         bmqp::Event       eventHistory(blob_sp.get(), d_allocator_p);
         Iterator<Builder> itHistoryEvents(&d_bufferFactory, d_allocator_p);
 
