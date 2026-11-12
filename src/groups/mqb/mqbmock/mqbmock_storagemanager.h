@@ -32,6 +32,9 @@
 // MQB
 #include <mqbi_storagemanager.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bsl_memory.h>
 #include <bsl_ostream.h>
@@ -266,7 +269,7 @@ class StorageManager final : public mqbi::StorageManager {
     mqbs::FileStore& fileStore(int partitionId) const override;
 
     /// Return a StorageManagerIterator for the specified `partitionId`.
-    bslma::ManagedPtr<mqbi::StorageManagerIterator>
+    bmqu::UniquePtr<mqbi::StorageManagerIterator>
     getIterator(int partitionId) const override;
 };
 

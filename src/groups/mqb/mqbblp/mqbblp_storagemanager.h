@@ -44,6 +44,7 @@
 // BMQ
 #include <bmqma_countingallocatorstore.h>
 #include <bmqt_uri.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -597,7 +598,7 @@ class StorageManager final : public mqbi::StorageManager {
     /// partition id.
     mqbs::FileStore& fileStore(int partitionId) const override;
 
-    bslma::ManagedPtr<mqbi::StorageManagerIterator>
+    bmqu::UniquePtr<mqbi::StorageManagerIterator>
     getIterator(int partitionId) const override;
 };
 
@@ -701,12 +702,13 @@ inline mqbs::FileStore& StorageManager::fileStore(int partitionId) const
     return *d_fileStores[partitionId].get();
 }
 
-inline bslma::ManagedPtr<mqbi::StorageManagerIterator>
+inline bmqu::UniquePtr<mqbi::StorageManagerIterator>
 StorageManager::getIterator(int partitionId) const
 {
-    bslma::ManagedPtr<mqbi::StorageManagerIterator> mp(
-        new (*d_allocator_p) StorageManagerIterator(partitionId, this),
-        d_allocator_p);
+    bmqu::UniquePtr<mqbi::StorageManagerIterator> mp =
+        bmqu::UniquePtrUtil::adopt<mqbi::StorageManagerIterator>(
+            new (*d_allocator_p) StorageManagerIterator(partitionId, this),
+            d_allocator_p);
 
     return mp;
 }

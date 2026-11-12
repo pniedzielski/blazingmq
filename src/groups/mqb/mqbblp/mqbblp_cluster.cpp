@@ -1738,7 +1738,7 @@ void Cluster::processRecoveryStatus(
         // StorageMgr and register the recovered queue uri/key info with
         // 'ClusterOrchestrator'.
         for (size_t pid = 0; pid < d_state.partitions().size(); ++pid) {
-            bslma::ManagedPtr<mqbi::StorageManagerIterator> itMp;
+            bmqu::UniquePtr<mqbi::StorageManagerIterator> itMp;
             itMp = d_storageManager_mp->getIterator(pid);
             while (itMp && *itMp) {
                 const bmqt::Uri uri(itMp->uri().canonical());

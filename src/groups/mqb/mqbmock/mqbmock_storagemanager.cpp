@@ -275,10 +275,10 @@ StorageManager::fileStore([[maybe_unused]] int partitionId) const
     BSLS_ASSERT_INVOKE_NORETURN("Unimplemented");
 }
 
-bslma::ManagedPtr<mqbi::StorageManagerIterator>
+bmqu::UniquePtr<mqbi::StorageManagerIterator>
 StorageManager::getIterator([[maybe_unused]] int partitionId) const
 {
-    return bslma::ManagedPtr<mqbi::StorageManagerIterator>();
+    return bmqu::UniquePtr<mqbi::StorageManagerIterator>();
 }
 
 }  // close package namespace

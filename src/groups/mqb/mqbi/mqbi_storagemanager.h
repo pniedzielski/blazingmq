@@ -38,6 +38,7 @@
 // BMQ
 #include <bmqp_event.h>
 #include <bmqt_uri.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -430,7 +431,7 @@ class StorageManager {
     virtual mqbs::FileStore& fileStore(int partitionId) const = 0;
 
     /// Return a StorageManagerIterator for the specified `partitionId`.
-    virtual bslma::ManagedPtr<StorageManagerIterator>
+    virtual bmqu::UniquePtr<StorageManagerIterator>
     getIterator(int partitionId) const = 0;
 };
 
