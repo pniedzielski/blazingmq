@@ -543,8 +543,8 @@ void ClusterOrchestrator::dropPeerQueues(mqbc::ClusterNodeSession* ns)
     // is equivalent to the scenario when a client stops or crashes without
     // explicitly closing all the queues.
 
-    QueueHandleMap&    qhMap = ns->queueHandles();
-    QueueHandleMapIter qit   = qhMap.begin();
+    QueueHandleMap& qhMap = ns->queueHandles();
+    auto            qit   = qhMap.begin();
 
     while (qit != qhMap.end()) {
         mqbi::QueueHandle* qh = qit->second.d_handle_p;
