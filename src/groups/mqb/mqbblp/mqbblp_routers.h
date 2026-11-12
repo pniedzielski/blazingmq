@@ -238,7 +238,7 @@ class Routers {
                 bslalg::ScalarPrimitives::copyConstruct(d_value.address(),
                                                         value,
                                                         allocator);
-                BSLS_ASSERT_SAFE(d_owner.find(d_key) != d_owner.end());
+                BSLS_ASSERT_SAFE(d_owner.contains(d_key));
             }
 
             ~Item()
@@ -335,10 +335,7 @@ class Routers {
         }
         const_iterator begin() const { return d_impl.begin(); }
         const_iterator end() const { return d_impl.end(); }
-        bool           hasItem(const KEY& key) const
-        {
-            return d_impl.find(key) != d_impl.end();
-        }
+        bool hasItem(const KEY& key) const { return d_impl.contains(key); }
         static VALUE& value(const_iterator& cit)
         {
             return cit->second.lock()->value();
