@@ -28,6 +28,9 @@
 #include <m_bmqstoragetool_commandprocessor.h>
 #include <m_bmqstoragetool_searchresult.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // MQB
 #include <mqbs_datafileiterator.h>
 #include <mqbs_filestoreprotocol.h>
@@ -74,7 +77,7 @@ class JournalFileProcessor : public CommandProcessor {
   private:
     // PRIVATE DATA
     const Parameters*                    d_parameters;
-    const bslma::ManagedPtr<FileManager> d_fileManager;
+    const bmqu::UniquePtr<FileManager>   d_fileManager;
     bsl::ostream&                        d_ostream;
     bsl::shared_ptr<SearchResult>        d_searchResult_p;
     bslma::Allocator*                    d_allocator_p;
@@ -86,7 +89,7 @@ class JournalFileProcessor : public CommandProcessor {
     /// Constructor using the specified `params`, 'fileManager',
     /// 'searchResult_p', 'ostream' and 'allocator'.
     JournalFileProcessor(const Parameters*                    params,
-                         bslma::ManagedPtr<FileManager>&      fileManager,
+                         bmqu::UniquePtr<FileManager>&        fileManager,
                          const bsl::shared_ptr<SearchResult>& searchResult_p,
                          bsl::ostream&                        ostream,
                          bslma::Allocator*                    allocator);

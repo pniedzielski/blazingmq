@@ -27,11 +27,11 @@ namespace m_bmqstoragetool {
 // =========================
 
 bsl::shared_ptr<SearchResult> SearchResultFactory::createSearchResult(
-    const Parameters*                     params,
-    const bslma::ManagedPtr<FileManager>& fileManager,
-    const bsl::shared_ptr<Printer>&       printer,
-    bmqu::UniquePtr<PayloadDumper>&       payloadDumper,
-    bslma::Allocator*                     allocator)
+    const Parameters*                   params,
+    const bmqu::UniquePtr<FileManager>& fileManager,
+    const bsl::shared_ptr<Printer>&     printer,
+    bmqu::UniquePtr<PayloadDumper>&     payloadDumper,
+    bslma::Allocator*                   allocator)
 {
     // PRECONDITIONS
     BSLS_ASSERT(params);

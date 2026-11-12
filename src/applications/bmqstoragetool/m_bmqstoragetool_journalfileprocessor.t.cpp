@@ -76,7 +76,7 @@ typedef bsl::list<bmqt::MessageGUID> GuidsList;
 bslma::ManagedPtr<CommandProcessor>
 createCommandProcessor(const Parameters*               params,
                        const bsl::shared_ptr<Printer>& printer,
-                       bslma::ManagedPtr<FileManager>& fileManager,
+                       bmqu::UniquePtr<FileManager>&   fileManager,
                        bsl::ostream&                   ostream,
                        bslma::Allocator*               allocator)
 {
@@ -368,7 +368,7 @@ static void test1_breathingTest()
     // Prepare parameters
     Parameters params = createTestParameters();
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -458,7 +458,7 @@ static void test2_searchGuidTest()
         .InSequence(s);
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -522,7 +522,7 @@ static void test3_searchNonExistingGuidTest()
     }
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -620,7 +620,7 @@ static void test4_searchExistingAndNonExistingGuidTest()
     EXPECT_CALL(*printer, printGuidsNotFound(notFoundGuids)).InSequence(s);
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -673,7 +673,7 @@ static void test5_searchOutstandingMessagesTest()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -746,7 +746,7 @@ static void test6_searchConfirmedMessagesTest()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -821,7 +821,7 @@ static void test7_searchPartiallyConfirmedMessagesTest()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -898,7 +898,7 @@ static void test8_searchMessagesByQueueKeyTest()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -972,7 +972,7 @@ static void test9_searchMessagesByQueueNameTest()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -1050,7 +1050,7 @@ static void test10_searchMessagesByQueueNameAndQueueKeyTest()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -1110,7 +1110,7 @@ static void test11_searchMessagesByTimestamp()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -1190,7 +1190,7 @@ static void test12_printMessagesDetailsTest()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -1301,7 +1301,7 @@ static void test13_searchMessagesWithPayloadDumpTest()
     params.d_confirmed   = true;
     params.d_dumpPayload = true;
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -1394,7 +1394,7 @@ static void test14_summaryTest()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -1747,7 +1747,7 @@ static void test17_searchMessagesBySequenceNumbersRange()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -1824,7 +1824,7 @@ static void test18_searchMessagesByOffsetsRange()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -1900,7 +1900,7 @@ static void test19_searchQueueOpRecords()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -1978,7 +1978,7 @@ static void test20_searchJournalOpRecords()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -2057,7 +2057,7 @@ static void test21_searchAllTypesRecords()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -2159,7 +2159,7 @@ static void test22_searchQueueOpRecordsByOffset()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -2235,7 +2235,7 @@ static void test23_searchJournalOpRecordsBySeqNumber()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -2316,7 +2316,7 @@ static void test24_searchConfirmAndDeletionRecordsByOffset()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -2413,7 +2413,7 @@ static void test25_searchConfirmAndDeletionRecordsBySeqNumber()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());
@@ -2523,7 +2523,7 @@ static void test26_summaryWithQueueDetailsTest()
         bmqtst::TestHelperUtil::allocator());
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(journalFile),
         bmqtst::TestHelperUtil::allocator());

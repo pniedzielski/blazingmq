@@ -28,6 +28,9 @@
 #include <m_bmqstoragetool_commandprocessor.h>
 #include <m_bmqstoragetool_cslsearchresult.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bsl_memory.h>
 #include <bsl_ostream.h>
@@ -44,7 +47,7 @@ class CslFileProcessor : public CommandProcessor {
     // PRIVATE DATA
 
     const Parameters*                    d_parameters;
-    const bslma::ManagedPtr<FileManager> d_fileManager_mp;
+    const bmqu::UniquePtr<FileManager>   d_fileManager_mp;
     bsl::ostream&                        d_ostream;
     bsl::shared_ptr<CslSearchResult>     d_searchResult_sp;
     bslma::Allocator*                    d_allocator_p;
@@ -56,7 +59,7 @@ class CslFileProcessor : public CommandProcessor {
     /// 'searchResult_p', 'ostream' and 'allocator'.
     explicit CslFileProcessor(
         const Parameters*                       params,
-        bslma::ManagedPtr<FileManager>&         fileManager_mp,
+        bmqu::UniquePtr<FileManager>&           fileManager_mp,
         const bsl::shared_ptr<CslSearchResult>& searchResult_sp,
         bsl::ostream&                           ostream,
         bslma::Allocator*                       allocator = 0);

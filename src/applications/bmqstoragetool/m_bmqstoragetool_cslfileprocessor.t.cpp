@@ -254,7 +254,7 @@ void writeRecord(bsl::vector<RecordInfo>*                   recordInfos,
 bslma::ManagedPtr<CommandProcessor>
 createCommandProcessor(const Parameters*                  params,
                        const bsl::shared_ptr<CslPrinter>& printer,
-                       bslma::ManagedPtr<FileManager>&    fileManager,
+                       bmqu::UniquePtr<FileManager>&      fileManager,
                        bsl::ostream&                      ostream,
                        bslma::Allocator*                  allocator)
 {
@@ -493,7 +493,7 @@ static void test1_breathingTest()
     params.d_processCslRecordTypes.d_ack      = true;
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(&incoreCslIt),
         bmqtst::TestHelperUtil::allocator());
@@ -663,7 +663,7 @@ static void test2_searchRecordsByTypeTest()
     params.d_processCslRecordTypes.d_commit   = true;
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(&incoreCslIt),
         bmqtst::TestHelperUtil::allocator());
@@ -832,7 +832,7 @@ static void test3_searchRecordsByQueueKeyTest()
     params.d_queueKey.push_back("3333333333");
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(&incoreCslIt),
         bmqtst::TestHelperUtil::allocator());
@@ -978,7 +978,7 @@ static void test4_searchRecordsByTimestampRangeTest()
     params.d_range.d_timestampLt              = 100005U;
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(&incoreCslIt),
         bmqtst::TestHelperUtil::allocator());
@@ -1122,7 +1122,7 @@ static void test5_searchRecordsByOffsetRangeTest()
     params.d_range.d_offsetLt                 = 300U;
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(&incoreCslIt),
         bmqtst::TestHelperUtil::allocator());
@@ -1268,7 +1268,7 @@ static void test6_searchRecordsBySeqNumberRangeTest()
     params.d_range.d_seqNumLt = CompositeSequenceNumber(2U, 3U);
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(&incoreCslIt),
         bmqtst::TestHelperUtil::allocator());
@@ -1414,7 +1414,7 @@ static void test7_searchRecordsByOffsetTest()
     params.d_offset.push_back(256U);
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(&incoreCslIt),
         bmqtst::TestHelperUtil::allocator());
@@ -1559,7 +1559,7 @@ static void test8_searchRecordsBySeqNumberTest()
     params.d_seqNum.push_back(CompositeSequenceNumber(2U, 2U));
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(&incoreCslIt),
         bmqtst::TestHelperUtil::allocator());
@@ -1722,7 +1722,7 @@ static void test9_summaryTest()
     params.d_cslSummaryQueuesLimit            = 123;
 
     // Prepare file manager
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator())
             FileManagerMock(&incoreCslIt),
         bmqtst::TestHelperUtil::allocator());

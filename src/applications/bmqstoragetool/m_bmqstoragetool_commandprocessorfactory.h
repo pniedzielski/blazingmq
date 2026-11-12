@@ -28,6 +28,9 @@
 #include <m_bmqstoragetool_commandprocessor.h>
 #include <m_bmqstoragetool_parameters.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bsl_ostream.h>
 #include <bslma_managedptr.h>
@@ -46,10 +49,10 @@ class CommandProcessorFactory {
     /// Create command processor for specified 'params' using specified
     /// 'ostream' and 'allocator'.
     static bslma::ManagedPtr<CommandProcessor>
-    createCommandProcessor(const Parameters*               params,
-                           bslma::ManagedPtr<FileManager>& fileManager,
-                           bsl::ostream&                   ostream,
-                           bslma::Allocator*               allocator);
+    createCommandProcessor(const Parameters*             params,
+                           bmqu::UniquePtr<FileManager>& fileManager,
+                           bsl::ostream&                 ostream,
+                           bslma::Allocator*             allocator);
 };
 
 }  // close package namespace

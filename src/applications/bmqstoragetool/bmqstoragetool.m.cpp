@@ -22,6 +22,9 @@
 #include <m_bmqstoragetool_commandprocessorfactory.h>
 #include <m_bmqstoragetool_parameters.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <balcl_commandline.h>
 #include <bdls_filesystemutil.h>
@@ -235,15 +238,15 @@ int main(int argc, const char* argv[])
     Parameters parameters(arguments, allocator);
 
     // Create file manager
-    bslma::ManagedPtr<FileManager> fileManager;
+    bmqu::UniquePtr<FileManager> fileManager;
     try {
-        fileManager.load(new (*allocator)
-                             FileManagerImpl(arguments.d_journalFile,
+        fileManager = bmqu::UniquePtrUtil::adopt(
+            new (*allocator) FileManagerImpl(arguments.d_journalFile,
                                              arguments.d_dataFile,
                                              arguments.d_cslFile,
                                              arguments.d_cslFromBegin,
                                              allocator),
-                         allocator);
+            allocator);
         if (!arguments.d_cslFile.empty()) {
             fileManager->fillQueueMapFromCslFile(&parameters.d_queueMap);
             parameters.validateQueueNames();

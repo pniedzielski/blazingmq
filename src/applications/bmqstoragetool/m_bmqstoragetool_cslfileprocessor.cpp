@@ -30,12 +30,12 @@ namespace m_bmqstoragetool {
 
 CslFileProcessor::CslFileProcessor(
     const Parameters*                       params,
-    bslma::ManagedPtr<FileManager>&         fileManager,
+    bmqu::UniquePtr<FileManager>&           fileManager,
     const bsl::shared_ptr<CslSearchResult>& searchResult_p,
     bsl::ostream&                           ostream,
     bslma::Allocator*                       allocator)
 : d_parameters(params)
-, d_fileManager_mp(fileManager)
+, d_fileManager_mp(bsl::move(fileManager))
 , d_ostream(ostream)
 , d_searchResult_sp(searchResult_p)
 , d_allocator_p(allocator)

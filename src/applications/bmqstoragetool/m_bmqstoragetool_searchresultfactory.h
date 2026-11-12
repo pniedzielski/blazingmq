@@ -51,11 +51,11 @@ class SearchResultFactory {
     /// Create SearchResult object for the specified 'params' using specified
     /// 'ostream' and 'allocator'.
     static bsl::shared_ptr<SearchResult>
-    createSearchResult(const Parameters*                     params,
-                       const bslma::ManagedPtr<FileManager>& fileManager,
-                       const bsl::shared_ptr<Printer>&       printer,
-                       bmqu::UniquePtr<PayloadDumper>&       payloadDumper,
-                       bslma::Allocator*                     allocator);
+    createSearchResult(const Parameters*                   params,
+                       const bmqu::UniquePtr<FileManager>& fileManager,
+                       const bsl::shared_ptr<Printer>&     printer,
+                       bmqu::UniquePtr<PayloadDumper>&     payloadDumper,
+                       bslma::Allocator*                   allocator);
 
     /// Create CslSearchResult object for the specified 'params' using
     /// specified 'ostream' and 'allocator'.

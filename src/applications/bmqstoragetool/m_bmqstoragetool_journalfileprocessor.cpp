@@ -146,12 +146,12 @@ bool MoreThanLowerBoundFn::operator()(
 
 JournalFileProcessor::JournalFileProcessor(
     const Parameters*                    params,
-    bslma::ManagedPtr<FileManager>&      fileManager,
+    bmqu::UniquePtr<FileManager>&        fileManager,
     const bsl::shared_ptr<SearchResult>& searchResult_p,
     bsl::ostream&                        ostream,
     bslma::Allocator*                    allocator)
 : d_parameters(params)
-, d_fileManager(fileManager)
+, d_fileManager(bsl::move(fileManager))
 , d_ostream(ostream)
 , d_searchResult_p(searchResult_p)
 , d_allocator_p(allocator)

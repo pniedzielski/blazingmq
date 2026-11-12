@@ -48,7 +48,7 @@ static void test1_breathingTest()
     // Empty parameters
     CommandLineArguments arguments(bmqtst::TestHelperUtil::allocator());
     Parameters params(arguments, bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<FileManager> fileManager(
+    bmqu::UniquePtr<FileManager> fileManager = bmqu::UniquePtrUtil::adopt(
         new (*bmqtst::TestHelperUtil::allocator()) FileManagerMock(),
         bmqtst::TestHelperUtil::allocator());
 

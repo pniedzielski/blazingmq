@@ -31,10 +31,10 @@ namespace m_bmqstoragetool {
 
 bslma::ManagedPtr<CommandProcessor>
 CommandProcessorFactory::createCommandProcessor(
-    const Parameters*               params,
-    bslma::ManagedPtr<FileManager>& fileManager,
-    bsl::ostream&                   ostream,
-    bslma::Allocator*               allocator)
+    const Parameters*             params,
+    bmqu::UniquePtr<FileManager>& fileManager,
+    bsl::ostream&                 ostream,
+    bslma::Allocator*             allocator)
 {
     // PRECONDITIONS
     BSLS_ASSERT(params);
