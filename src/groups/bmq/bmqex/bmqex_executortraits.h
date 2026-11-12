@@ -45,15 +45,11 @@ namespace bmqex {
 
 /// Provides a metafunction to detect if an executor has a proper `dispatch`
 /// member function.
-template <class EXECUTOR, class FUNCTION, class = void>
-struct ExecutorTraits_CanDispatch : bsl::false_type {};
-
 template <class EXECUTOR, class FUNCTION>
-struct ExecutorTraits_CanDispatch<
-    EXECUTOR,
-    FUNCTION,
-    bsl::void_t<decltype(bsl::declval<const EXECUTOR&>().dispatch(
-        bsl::declval<FUNCTION>()))> > : bsl::true_type {};
+    struct ExecutorTraits_CanDispatch : bsl::integral_constant < bool,
+    requires(const EXECUTOR& executor, FUNCTION&& f) {
+    executor.dispatch(bsl::forward<FUNCTION>(f));
+}>{};
 
 // =========================
 // struct ExecutorTraits_Imp
