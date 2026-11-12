@@ -52,6 +52,7 @@
 #include <bmqst_basictableinfoprovider.h>
 #include <bmqst_statcontext.h>
 #include <bmqst_table.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -134,8 +135,7 @@ class Application {
 
     /// The stack of channel factories used for customizing
     /// connection/listening logic
-    bslma::ManagedPtr<bmqio::ChannelFactoryPipeline>
-        d_channelFactoryPipeline_mp;
+    bmqu::UniquePtr<bmqio::ChannelFactoryPipeline> d_channelFactoryPipeline_mp;
 
     ChannelFactoryOpHandleMp d_connectHandle_mp;
 

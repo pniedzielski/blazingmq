@@ -42,6 +42,7 @@
 #include <bmqu_memoutstream.h>
 #include <bmqu_printutil.h>
 #include <bmqu_time.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -142,7 +143,7 @@ ntcCreateInterfaceConfig(const bmqt::SessionOptions& sessionOptions,
     return config;
 }
 
-bslma::ManagedPtr<bmqio::ChannelFactoryPipeline> makeChannelFactoryPipeline(
+bmqu::UniquePtr<bmqio::ChannelFactoryPipeline> makeChannelFactoryPipeline(
     bslma::Allocator*                           allocator,
     bdlbb::BlobBufferFactory*                   blobBufferFactory,
     bdlmt::EventScheduler*                      scheduler,
@@ -262,8 +263,9 @@ bslma::ManagedPtr<bmqio::ChannelFactoryPipeline> makeChannelFactoryPipeline(
                 sessionOptions.connectTimeout(),
                 blobSpPool);
         });
-    return bslma::ManagedPtrUtil::allocateManaged<
-        bmqio::ChannelFactoryPipeline>(allocator, bsl::move(builder));
+    return bmqu::UniquePtrUtil::allocateUnique<bmqio::ChannelFactoryPipeline>(
+        allocator,
+        bsl::move(builder));
 }
 
 }  // close unnamed namespace
