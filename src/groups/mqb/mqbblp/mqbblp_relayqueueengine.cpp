@@ -534,8 +534,8 @@ void RelayQueueEngine::processConfigureResponse(
         // and handle deleted before de-confgiure response.
         // Need to erase routing associated with this handle.  The handle may
         // not have SubStreamInfo anymore, so search for affected apps.
-        for (AppsMap::iterator it = d_apps.begin(); it != d_apps.end(); ++it) {
-            App_State& app(*it->second);
+        for (const auto& appEntry : d_apps) {
+            App_State& app(*appEntry.second);
             app.invalidate(handle);
         }
 
@@ -1052,16 +1052,13 @@ void RelayQueueEngine::rebuildUpstreamState(Routers::AppContext* context,
 
     context->reset();
 
-    for (App_State::CachedParametersMap::iterator iter =
-             appState->d_cache.begin();
-         iter != appState->d_cache.end();
-         ++iter) {
+    for (const auto& cacheEntry : appState->d_cache) {
         const bmqp_ctrlmsg::StreamParameters& streamParameters =
-            iter->second.d_streamParameters;
+            cacheEntry.second.d_streamParameters;
         bmqu::MemOutStream errorStream(d_allocator_p);
-        context->load(iter->first,
+        context->load(cacheEntry.first,
                       &errorStream,
-                      iter->second.d_downstreamSubQueueId,
+                      cacheEntry.second.d_downstreamSubQueueId,
                       upstreamSubQueueId,
                       streamParameters,
                       appState->routing().get());
@@ -1147,10 +1144,8 @@ void RelayQueueEngine::applyConfiguration(
         consumer.registerSubscriptions(handle);
     }
     if (!invalid.empty()) {
-        for (InvalidItems::const_iterator cit = invalid.cbegin();
-             cit != invalid.cend();
-             ++cit) {
-            cit->lock()->invalidate();
+        for (const auto& invalidItem : invalid) {
+            invalidItem.lock()->invalidate();
         }
         app.routing()->finalize();
     }
@@ -1212,10 +1207,10 @@ void RelayQueueEngine::close()
 
 void RelayQueueEngine::resetState(bool isShuttingDown)
 {
-    for (AppsMap::iterator it = d_apps.begin(); it != d_apps.end(); ++it) {
-        it->second->undoRouting();
+    for (const auto& appEntry : d_apps) {
+        appEntry.second->undoRouting();
         if (isShuttingDown) {
-            it->second->routing()->reset();
+            appEntry.second->routing()->reset();
         }
         // else, keep the routing which new engine can reuse
     }
@@ -1851,8 +1846,8 @@ void RelayQueueEngine::afterQueuePurged(const bsl::string&      appId,
 
         d_pushStream.removeAll();
 
-        for (AppsMap::iterator it = d_apps.begin(); it != d_apps.end(); ++it) {
-            it->second->clear();
+        for (const auto& appEntry : d_apps) {
+            appEntry.second->clear();
         }
         d_storageIter_mp->reset();
     }
@@ -1924,29 +1919,25 @@ void RelayQueueEngine::loadInternals(mqbcmd::QueueEngine* out) const
             relayQueueEngine.subStreams();
         subStreams.reserve(appIdKeyPairs.size());
 
-        for (mqbi::Storage::AppInfos::const_iterator cit =
-                 appIdKeyPairs.cbegin();
-             cit != appIdKeyPairs.cend();
-             ++cit) {
+        for (const auto& appInfo : appIdKeyPairs) {
             subStreams.resize(subStreams.size() + 1);
             mqbcmd::RelayQueueEngineSubStream& subStream = subStreams.back();
-            subStream.appId()                            = cit->first;
+            subStream.appId()                            = appInfo.first;
             bmqu::MemOutStream appKey;
-            appKey << cit->second;
+            appKey << appInfo.second;
             subStream.appKey()      = appKey.str();
             subStream.numMessages() = d_queueState_p->storage()->numMessages(
-                cit->second);
+                appInfo.second);
         }
     }
 
     relayQueueEngine.appStates().reserve(d_apps.size());
-    for (AppsMap::const_iterator it = d_apps.begin(); it != d_apps.end();
-         ++it) {
+    for (const auto& appEntry : d_apps) {
         relayQueueEngine.appStates().resize(
             relayQueueEngine.appStates().size() + 1);
         mqbcmd::AppState& appState = relayQueueEngine.appStates().back();
 
-        it->second->loadInternals(&appState);
+        appEntry.second->loadInternals(&appState);
     }
 
     d_queueState_p->routingContext().loadInternals(
@@ -2265,15 +2256,12 @@ void RelayQueueEngine::storePushIfProxy(
             BSLS_ASSERT_SAFE(dataStreamMessage);
 
             // Reusing previously cached ordinals.
-            for (bmqp::Protocol::SubQueueInfosArray::const_iterator cit =
-                     subQueueIds.begin();
-                 cit != subQueueIds.end();
-                 ++cit) {
-                if (cit->id() > 0) {
-                    const int         ordinal = cit->id() - 1;
+            for (const auto& subQueueInfo : subQueueIds) {
+                if (subQueueInfo.id() > 0) {
+                    const int         ordinal = subQueueInfo.id() - 1;
                     mqbi::AppMessage& appMsg = dataStreamMessage->app(ordinal);
                     appMsg.setPushState();
-                    appMsg.d_rdaInfo = cit->rdaInfo();
+                    appMsg.d_rdaInfo = subQueueInfo.rdaInfo();
                 }
             }
         }
