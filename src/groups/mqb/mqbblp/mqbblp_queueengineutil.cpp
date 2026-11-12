@@ -855,19 +855,18 @@ void QueueEngineUtil_AppsDeliveryContext::deliverMessage()
     BSLS_ASSERT_SAFE(d_currentMessage_p);
 
     if (!d_consumers.empty()) {
-        for (Consumers::const_iterator it = d_consumers.begin();
-             it != d_consumers.end();
-             ++it) {
-            BSLS_ASSERT_SAFE(!it->second.empty());
+        for (const auto& consumerEntry : d_consumers) {
+            BSLS_ASSERT_SAFE(!consumerEntry.second.empty());
 
             if (QueueEngineUtil::isBroadcastMode(d_queue_p)) {
-                it->first->deliverMessageNoTrack(*d_currentMessage_p,
-                                                 it->second);
+                consumerEntry.first->deliverMessageNoTrack(
+                    *d_currentMessage_p,
+                    consumerEntry.second);
             }
             else {
-                it->first->deliverMessage(*d_currentMessage_p,
-                                          it->second,
-                                          false);
+                consumerEntry.first->deliverMessage(*d_currentMessage_p,
+                                                    consumerEntry.second,
+                                                    false);
             }
         }
     }
