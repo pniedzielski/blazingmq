@@ -82,6 +82,7 @@
 #include <bmqio_channelfactory.h>
 #include <bmqio_status.h>
 #include <bmqu_sharedresource.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bdlbb_blob.h>
@@ -227,7 +228,7 @@ class TCPSessionFactory {
         /// The event processor of Events received on this channel.
         SessionEventProcessor* d_eventProcessor_p;
 
-        bslma::ManagedPtr<bmqp::HeartbeatMonitor> d_monitor_mp;
+        bmqu::UniquePtr<bmqp::HeartbeatMonitor> d_monitor_mp;
 
         // CREATORS
 
@@ -413,7 +414,7 @@ class TCPSessionFactory {
     bool d_isStarted;
 
     // Config to use for setting up this SessionFactory
-    bslma::ManagedPtr<mqbcfg::TcpInterfaceConfig> d_config_mp;
+    bmqu::UniquePtr<mqbcfg::TcpInterfaceConfig> d_config_mp;
 
     /// The name of this object: `TCPSessionFactory '<name>'`
     bsl::string d_name;
@@ -441,8 +442,7 @@ class TCPSessionFactory {
     /// Executor context used for performing DNS resolution
     bsl::shared_ptr<bmqex::SequentialContext> d_resolutionContext_sp;
 
-    bslma::ManagedPtr<bmqio::ChannelFactoryPipeline>
-        d_channelFactoryPipeline_mp;
+    bmqu::UniquePtr<bmqio::ChannelFactoryPipeline> d_channelFactoryPipeline_mp;
 
     bslma::ManagedPtr<bmqio::ReconnectingChannelFactory>
         d_reconnectingChannelFactory_mp;

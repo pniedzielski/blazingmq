@@ -1172,10 +1172,9 @@ TCPSessionFactory::TCPSessionFactory(
     bslma::Allocator*                 allocator)
 : d_self(this)  // use default allocator
 , d_isStarted(false)
-, d_config_mp(
-      bslma::ManagedPtrUtil::allocateManaged<mqbcfg::TcpInterfaceConfig>(
-          allocator,
-          config))
+, d_config_mp(bmqu::UniquePtrUtil::allocateUnique<mqbcfg::TcpInterfaceConfig>(
+      allocator,
+      config))
 , d_name("TCPSessionFactory '" + d_config_mp->name() + "'", allocator)
 , d_scheduler_p(scheduler)
 , d_blobBufferFactory_p(blobBufferFactory)
@@ -1340,12 +1339,12 @@ int TCPSessionFactory::start(bsl::ostream& errorDescription)
         config.addWith(resolvingChannelFactoryBuilder)
             .addWith(reconnectingChannelFactoryBuilder)
             .addWith(statChannelFactoryBuilder);
-        bslma::ManagedPtr<bmqio::ChannelFactoryPipeline>
-            channelFactoryPipeline_mp = bslma::ManagedPtrUtil::allocateManaged<
+        bmqu::UniquePtr<bmqio::ChannelFactoryPipeline>
+            channelFactoryPipeline_mp = bmqu::UniquePtrUtil::allocateUnique<
                 bmqio::ChannelFactoryPipeline>(d_allocator_p,
                                                bsl::move(config));
 
-        d_channelFactoryPipeline_mp = channelFactoryPipeline_mp;
+        d_channelFactoryPipeline_mp = bsl::move(channelFactoryPipeline_mp);
     }
 
     if (const int rc = d_channelFactoryPipeline_mp->start()) {
@@ -1742,7 +1741,7 @@ TCPSessionFactory::ChannelInfo::ChannelInfo(
 , d_authenticationClient_sp(authenticationClient)
 , d_session_sp(monitoredSession)
 , d_eventProcessor_p(eventProcessor)
-, d_monitor_mp(bslma::ManagedPtrUtil::allocateManaged<bmqp::HeartbeatMonitor>(
+, d_monitor_mp(bmqu::UniquePtrUtil::allocateUnique<bmqp::HeartbeatMonitor>(
       allocator,
       maxMissedHeartbeats,
       initialMissedHeartbeatCounter))
