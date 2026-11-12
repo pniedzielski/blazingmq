@@ -146,18 +146,20 @@
 //      // NOTHING
 //  }
 //..
-// Now, each time we spawn an async operation, we bind the shared resource to
-// to the callback.
+// Now, each time we spawn an async operation, we capture the shared resource
+// in the callback.
 //..
 //  void
 //  MyService::asyncDoStuff()
 //  {
-//      // acquire the shared resource and bind to the async operation
-//      d_threadPool_p->enqueueJob(bdlf::BindUtil::bind(&MyService::doStuff,
-//                                                      d_self.acquire()));
+//      // acquire the shared resource and capture it in the async operation
+//      d_threadPool_p->enqueueJob([self = d_self.acquire()]() {
+//          self->doStuff();
+//      });
 //  }
 //..
-// That works nicely, because 'bind' works with shared pointers out-of-the-box.
+// The captured shared pointer keeps the shared resource in use until the
+// callback is destroyed.
 //
 // When 'MyService' is destroyed we invalidate the shared resource.  That will
 // block the calling thread until the shared resource is out of use.
@@ -169,25 +171,27 @@
 //..
 //
 // So far so good.  But what if we don't want the destructor to wait for async
-// operations to complete?  In that case we might bind a weak pointer to the
-// async operation.  Unfortunately, 'bind' doesn't work with weak pointers the
-// same way it does with shared pointers.  Helpfully, the 'bmqu' package
-// provides an utility component 'bmqu_weakmemfn', that can help us with that.
+// operations to complete?  In that case we might capture a weak pointer in the
+// async operation instead, and only call 'doStuff' if the shared resource is
+// still valid when the callback is invoked:
 //..
 //  void
 //  MyService::asyncDoStuff()
 //  {
-//      // acquire the shared resource and bind to the async operation
-//      d_threadPool_p->enqueueJob(bmqu::WeakMemFnUtil::weakMemFn(
-//                                                      &MyService::doStuff,
-//                                                      d_self.acquireWeak()));
+//      // acquire the shared resource weakly and capture it in the async
+//      // operation
+//      d_threadPool_p->enqueueJob([weakSelf = d_self.acquireWeak()]() {
+//          if (bsl::shared_ptr<MyService> self = weakSelf.lock()) {
+//              self->doStuff();
+//          }
+//      });
 //  }
 //..
-// In the implementation above we bind a weak pointer to the callback in a way
-// that 'MyService::doStuff' will only be invoked if at the moment of the
-// callback invocation the pointer is still valid.  This way, unless there is
-// an invocation of 'MyService::doStuff' in progress, the destructor of
-// 'MyService' will no block.
+// In the implementation above 'MyService::doStuff' will only be invoked if at
+// the moment of the callback invocation the pointer is still valid.  This
+// way, unless there is an invocation of 'MyService::doStuff' in progress, the
+// destructor of 'MyService' will not block.  (The 'bmqu_weakmemfn' component
+// provides a reusable function object with the same behavior.)
 
 // BDE
 #include <bdlma_deleter.h>
