@@ -254,8 +254,8 @@ class PartitionFSM {
 
   private:
     // NOT IMPLEMENTED
-    PartitionFSM(const PartitionFSM&);
-    PartitionFSM& operator=(const PartitionFSM&);
+    PartitionFSM(const PartitionFSM&)            = delete;
+    PartitionFSM& operator=(const PartitionFSM&) = delete;
 
     // PRIVATE MANIPULATORS
 

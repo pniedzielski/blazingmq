@@ -254,8 +254,8 @@ class ClusterFSM {
 
   private:
     // NOT IMPLEMENTED
-    ClusterFSM(const ClusterFSM&);
-    ClusterFSM& operator=(const ClusterFSM&);
+    ClusterFSM(const ClusterFSM&)            = delete;
+    ClusterFSM& operator=(const ClusterFSM&) = delete;
 
     // PRIVATE MANIPULATORS
 
