@@ -2940,13 +2940,12 @@ StorageUtil::createQueueStorageImpl(mqbs::FileStore*        fs,
     return rs_sp;
 }
 
-void StorageUtil::removeQueueStorageDispatched(
-    StorageSpMap*           storageMap,
-    bslmt::Mutex*           storagesLock,
-    mqbs::FileStore*        fs,
-    const bmqt::Uri&        uri,
-    const mqbu::StorageKey& queueKey,
-    const mqbu::StorageKey& appKey)
+void StorageUtil::removeQueueStorage(StorageSpMap*           storageMap,
+                                     bslmt::Mutex*           storagesLock,
+                                     mqbs::FileStore*        fs,
+                                     const bmqt::Uri&        uri,
+                                     const mqbu::StorageKey& queueKey,
+                                     const mqbu::StorageKey& appKey)
 {
     // executed by *QUEUE_DISPATCHER* thread associated with `partitionId`
 

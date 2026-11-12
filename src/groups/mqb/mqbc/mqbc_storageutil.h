@@ -673,12 +673,12 @@ struct StorageUtil {
                                             const AppInfos& appIdKeyPairs,
                                             mqbi::Domain*   domain);
 
-    static void removeQueueStorageDispatched(StorageSpMap*    storageMap,
-                                             bslmt::Mutex*    storagesLock,
-                                             mqbs::FileStore* fs,
-                                             const bmqt::Uri& uri,
-                                             const mqbu::StorageKey& queueKey,
-                                             const mqbu::StorageKey& appKey);
+    static void removeQueueStorage(StorageSpMap*           storageMap,
+                                   bslmt::Mutex*           storagesLock,
+                                   mqbs::FileStore*        fs,
+                                   const bmqt::Uri&        uri,
+                                   const mqbu::StorageKey& queueKey,
+                                   const mqbu::StorageKey& appKey);
 
     static void
     updateQueueStorageDispatched(StorageSpMap*           storageMap,

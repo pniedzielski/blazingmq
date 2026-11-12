@@ -202,13 +202,12 @@ void StorageManager::queueDeletionCb(int                     partitionId,
     // This routine is executed at replica nodes when they received a queue
     // deletion record from the primary in the partition stream.
 
-    mqbc::StorageUtil::removeQueueStorageDispatched(
-        &d_storages[partitionId],
-        d_storageLockVec[partitionId].get(),
-        d_fileStores[partitionId].get(),
-        uri,
-        queueKey,
-        appKey);
+    mqbc::StorageUtil::removeQueueStorage(&d_storages[partitionId],
+                                          d_storageLockVec[partitionId].get(),
+                                          d_fileStores[partitionId].get(),
+                                          uri,
+                                          queueKey,
+                                          appKey);
 }
 
 void StorageManager::recoveredQueuesCb(int                    partitionId,
