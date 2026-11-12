@@ -29,7 +29,6 @@
 #include <bsl_memory.h>
 #include <bslma_allocator.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqp {
@@ -92,19 +91,15 @@ RecoveryEventBuilder::packMessage(unsigned int                partitionId,
     unsigned int payloadLen = static_cast<unsigned int>(chunkBuffer.size());
     BSLS_ASSERT_SAFE(0 == payloadLen % Protocol::k_WORD_SIZE);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            payloadLen > RecoveryHeader::k_MAX_PAYLOAD_SIZE_SOFT)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (payloadLen > RecoveryHeader::k_MAX_PAYLOAD_SIZE_SOFT) [[unlikely]] {
         return bmqt::EventBuilderResult::e_PAYLOAD_TOO_BIG;  // RETURN
     }
 
     // Ensure event has enough space left for this message.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            EventHeader::k_MAX_SIZE_SOFT <
-            static_cast<int>(eventSize() + sizeof(RecoveryHeader) +
-                             payloadLen))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (EventHeader::k_MAX_SIZE_SOFT <
+        static_cast<int>(eventSize() + sizeof(RecoveryHeader) + payloadLen))
+        [[unlikely]] {
         return bmqt::EventBuilderResult::e_EVENT_TOO_BIG;  // RETURN
     }
 

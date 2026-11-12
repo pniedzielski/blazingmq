@@ -86,7 +86,6 @@
 #include <bslmt_once.h>
 #include <bslmt_threadattributes.h>
 #include <bslmt_threadutil.h>
-#include <bsls_performancehint.h>
 #include <bsls_platform.h>
 #include <bsls_systemclocktype.h>
 #include <bsls_systemtime.h>
@@ -119,8 +118,7 @@ void setCurrentThreadNameOnce(const bsl::string& value)
 {
     static thread_local bool s_named = false;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!s_named)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!s_named) [[unlikely]] {
         bslmt::ThreadUtil::setThreadName(value);
         s_named = true;
     }
@@ -464,18 +462,15 @@ void TCPSessionFactory::readCallback(const bmqio::Status& status,
 {
     // executed by one of the *IO* threads
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            status.category() == bmqio::StatusCategory::e_CANCELED)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (status.category() == bmqio::StatusCategory::e_CANCELED) [[unlikely]] {
         // There is nothing to do in the event of a 'e_CANCELED' event, so
         // simply return.
 
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            status.category() == bmqio::StatusCategory::e_CONNECTION)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (status.category() == bmqio::StatusCategory::e_CONNECTION)
+        [[unlikely]] {
         // There is a slight difference in behavior between BTE and NTZ when
         // the peer shuts down the connection. BTE implicitly calls channel
         // close(), and vast majority of the time does not trigger a read
@@ -493,8 +488,7 @@ void TCPSessionFactory::readCallback(const bmqio::Status& status,
     BSLS_ASSERT_SAFE(channelInfo->d_eventProcessor_p &&
                      "EventProcessor must be set at this point");
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!status)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!status) [[unlikely]] {
         BALL_LOG_ERROR << "#TCP_READ_ERROR "
                        << channelInfo->d_session_sp->description()
                        << ": ReadCallback error [status: " << status
@@ -514,8 +508,7 @@ void TCPSessionFactory::readCallback(const bmqio::Status& status,
         numNeeded,
         blob);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         BALL_LOG_ERROR << "#TCP_READ_ERROR "
                        << channelInfo->d_session_sp->description()
                        << ": ReadCallback unrecoverable error "
@@ -547,9 +540,7 @@ void TCPSessionFactory::read(ChannelInfo*       channelInfo,
     // Not updating d_heartbeatMonitor until there is a valid event
 
     bmqp::Event event(readBlob, d_allocator_p);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!event.isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!event.isValid()) [[unlikely]] {
         BALL_LOG_ERROR << "#TCP_INVALID_PACKET "
                        << channelInfo->d_session_sp->description()
                        << ": Received an invalid packet:\n"

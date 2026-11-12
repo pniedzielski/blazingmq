@@ -23,7 +23,6 @@
 // BDE
 #include <bsl_memory.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqa {
@@ -68,14 +67,12 @@ bmqt::EventBuilderResult::Enum ConfirmEventBuilder::addMessageConfirmation(
         reinterpret_cast<const bsl::shared_ptr<bmqimp::Queue>&>(
             cookie.queueId());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!queue->isOpened())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!queue->isOpened()) [[unlikely]] {
         return bmqt::EventBuilderResult::e_QUEUE_INVALID;  // RETURN
     }
 
     // Ensure confirm messages are expected by the queue
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(queue->atMostOnce())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (queue->atMostOnce()) [[unlikely]] {
         return bmqt::EventBuilderResult::e_SUCCESS;  // RETURN
     }
 

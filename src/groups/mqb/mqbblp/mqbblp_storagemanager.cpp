@@ -742,8 +742,7 @@ void StorageManager::applyStorageEvent(
     BSLS_ASSERT_SAFE(d_fileStores.size() >
                      static_cast<unsigned int>(partitionId));
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_isStarted)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_isStarted) [[unlikely]] {
         BALL_LOG_INFO << d_clusterData_p->identity().description()
                       << " Dropping storage event as storage has been closed.";
         return;  // RETURN
@@ -1572,8 +1571,7 @@ void StorageManager::processStorageEvent(const mqbevt::StorageEvent& event)
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_cluster_p->inDispatcherThread());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_isStarted)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_isStarted) [[unlikely]] {
         BALL_LOG_INFO << d_clusterData_p->identity().description()
                       << " Dropping storage event as storage has been closed.";
         return;  // RETURN

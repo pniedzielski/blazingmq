@@ -23,7 +23,6 @@
 #include <bsl_iostream.h>
 #include <bsla_annotations.h>
 #include <bslmt_lockguard.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqio {
@@ -64,8 +63,7 @@ void StatChannel::readCbWrapper(const Channel::ReadCallback& userCb,
 {
     const int length = blob->length();
     userCb(status, numNeeded, blob);
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(status &&
-                                            (length > blob->length()))) {
+    if (status && (length > blob->length())) [[likely]] {
         d_config.d_statContext_sp->adjustValue(Stat::e_BYTES_IN, length);
     }
 }
@@ -111,14 +109,13 @@ void StatChannel::write(Status*            status,
     // 'status' is an optional parameter, but here we want to ensure to always
     // have one
     Status localStatus;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!status)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!status) [[unlikely]] {
         status = &localStatus;
     }
 
     d_config.d_channel_sp->write(status, blob, highWatermark);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(*status)) {
+    if (*status) [[likely]] {
         d_config.d_statContext_sp->adjustValue(Stat::e_BYTES_OUT,
                                                blob.length());
     }

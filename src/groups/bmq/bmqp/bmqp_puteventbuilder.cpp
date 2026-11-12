@@ -87,9 +87,7 @@ PutEventBuilder::packMessageInternal(const bdlbb::Blob& appData, int queueId)
                                                               appDataLength);
 
     // Validate payload is not too big
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            appDataLength > PutHeader::k_MAX_PAYLOAD_SIZE_SOFT)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (appDataLength > PutHeader::k_MAX_PAYLOAD_SIZE_SOFT) [[unlikely]] {
         return Result::e_PAYLOAD_TOO_BIG;  // RETURN
     }
 
@@ -97,9 +95,7 @@ PutEventBuilder::packMessageInternal(const bdlbb::Blob& appData, int queueId)
                               static_cast<int>(sizeof(PutHeader)) +
                               appDataLength + numPaddingBytes;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(sizeNoOptions >
-                                              PutHeader::k_MAX_SIZE_SOFT)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (sizeNoOptions > PutHeader::k_MAX_SIZE_SOFT) [[unlikely]] {
         return Result::e_EVENT_TOO_BIG;  // RETURN
     }
 
@@ -122,13 +118,11 @@ PutEventBuilder::packMessageInternal(const bdlbb::Blob& appData, int queueId)
             OptionType::e_MSG_GROUP_ID,
             static_cast<int>(d_msgGroupId.value().length()));
         Result::Enum res = OptionUtil::isValidMsgGroupId(d_msgGroupId.value());
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(res != Result::e_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (res != Result::e_SUCCESS) [[unlikely]] {
             return res;  // RETURN
         }
         res = optionBox.canAdd(sizeNoOptions, msgGroupId);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(res != Result::e_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (res != Result::e_SUCCESS) [[unlikely]] {
             return res;  // RETURN
         }
         optionBox.add(
@@ -293,10 +287,9 @@ PutEventBuilder::packMessageInOldStyle(int queueId)
                                        *applicationData_sp,
                                        &error,
                                        d_allocator_p);
-        if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-                rc == Result::e_SUCCESS &&
-                compressedApplicationData_sp->length() <
-                    applicationData_sp->length())) {
+        if (rc == Result::e_SUCCESS && compressedApplicationData_sp->length() <
+                                           applicationData_sp->length())
+            [[likely]] {
             // Compression is successful and is worth using!
             d_crc32c = Crc32c::calculate(*compressedApplicationData_sp);
 
@@ -385,9 +378,8 @@ bmqt::EventBuilderResult::Enum PutEventBuilder::packMessage(int queueId)
                                        *payloadBlob,
                                        &error,
                                        d_allocator_p);
-        if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-                rc == Result::e_SUCCESS &&
-                compressedPayloadBlob_sp->length() < payloadBlob->length())) {
+        if (rc == Result::e_SUCCESS && compressedPayloadBlob_sp->length() <
+                                           payloadBlob->length()) [[likely]] {
             // Compression is successful and is worth using!
 
             // Keep track of the compression ratio.

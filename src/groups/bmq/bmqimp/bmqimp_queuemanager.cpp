@@ -54,8 +54,7 @@ QueueManager::lookupQueueLocked(const bmqp::QueueId& queueId) const
 
     // Lookup queue
     auto it = d_queues.findByKey1(queueId);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(it == d_queues.end())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (it == d_queues.end()) [[unlikely]] {
         return QueueSp();  // RETURN
     }
 
@@ -88,9 +87,7 @@ QueueManager::QueueSp QueueManager::lookupQueueBySubscriptionIdLocked(
 
     auto cit = d_queuesBySubscriptionIds.find(id);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            cit == d_queuesBySubscriptionIds.end())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (cit == d_queuesBySubscriptionIds.end()) [[unlikely]] {
         return QueueSp();  // RETURN
     }
 
@@ -352,8 +349,7 @@ int QueueManager::onPushEvent(QueueManager::EventInfos* eventInfos,
 
         bmqp::OptionsView optionsView(d_allocator_p);
         rc = msgIterator.loadOptionsView(&optionsView);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY((rc != 0) ||
-                                                  !optionsView.isValid())) {
+        if ((rc != 0) || !optionsView.isValid()) [[unlikely]] {
             // Corrupted message options
             BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
             return rc * 10 + rc_OPTIONS_LOAD_ERROR;  // RETURN
@@ -400,14 +396,11 @@ int QueueManager::onPushEvent(QueueManager::EventInfos* eventInfos,
 
             bmqp::Protocol::SubQueueInfosArray subQueueInfos(&lsa);
             rc = optionsView.loadSubQueueInfosOption(&subQueueInfos);
-            if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-                BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+            if (rc != 0) [[unlikely]] {
                 return rc * 10 + rc_SUB_QUEUE_IDS_LOAD_ERROR;  // RETURN
             }
 
-            if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(subQueueInfos.size() >
-                                                      1)) {
-                BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+            if (subQueueInfos.size() > 1) [[unlikely]] {
                 *hasMessageWithMultipleSubQueueIds = true;
             }
             else {
@@ -434,8 +427,7 @@ int QueueManager::onPushEvent(QueueManager::EventInfos* eventInfos,
     }
 
     // Check if encountered an error while iterating
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return rc * 10 + rc_ITERATION_ERROR;  // RETURN
     }
 
@@ -481,16 +473,14 @@ int QueueManager::updateStatsOnPutEvent(
         // Check that the queue is writable and is valid, which means not only
         // the OPENED state but it also may be in PENDING or REOPENING states
         // and still accept PUT messages.
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                !queue->isValid() ||
-                !bmqt::QueueFlagsUtil::isWriter(queue->flags()))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (!queue->isValid() ||
+            !bmqt::QueueFlagsUtil::isWriter(queue->flags())) [[unlikely]] {
             return rc * 10 + rc_INVALID_QUEUE;  // RETURN
         }
 
         // When executed as a part of unit test, queue stat context may be
         // not initialized
-        if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(queue->statContext())) {
+        if (queue->statContext()) [[likely]] {
             queue->statUpdateOnMessage(putIterator.applicationDataSize(),
                                        true);
         }
@@ -499,8 +489,7 @@ int QueueManager::updateStatsOnPutEvent(
     }
 
     // Check if encountered an error while iterating
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return rc * 10 + rc_ITERATION_ERROR;  // RETURN
     }
 
@@ -601,7 +590,7 @@ QueueManager::lookupQueue(const bmqt::CorrelationId& correlationId) const
     bsls::SpinLockGuard guard(&d_queuesLock);  // d_queuesLock LOCKED
 
     auto it = d_queues.findByKey2(correlationId);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(it == d_queues.end())) {
+    if (it == d_queues.end()) [[unlikely]] {
         return QueueSp();  // RETURN
     }
 

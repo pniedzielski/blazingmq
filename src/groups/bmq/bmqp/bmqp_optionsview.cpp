@@ -25,7 +25,6 @@
 
 // BDE
 #include <bsl_iostream.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqp {
@@ -166,8 +165,7 @@ int OptionsView::loadOptionPositionAndSize(
                                             *d_blob_p,
                                             headerPos,
                                             sizeof(OptionHeader));
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return rc;  // RETURN
     }
 
@@ -183,8 +181,7 @@ int OptionsView::loadOptionPositionAndSize(
     const int optionTotalSizeBytes = words * Protocol::k_WORD_SIZE;
     const int optionLenBytes       = (oh->words() - 1) * Protocol::k_WORD_SIZE;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!hasPadding)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!hasPadding) [[unlikely]] {
         *payloadSizeBytes = optionLenBytes;
         return rc;  // RETURN
     }
@@ -194,8 +191,7 @@ int OptionsView::loadOptionPositionAndSize(
                                         *d_blob_p,
                                         headerPos,
                                         optionTotalSizeBytes - 1);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return rc;  // RETURN
     }
 
@@ -248,8 +244,7 @@ int OptionsView::loadSubQueueIdsOption(
     const int rc = loadSubQueueInfosOptionHelper(
         &tempVec,
         OptionType::e_SUB_QUEUE_IDS_OLD);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return rc_LOAD_FAILURE;  // RETURN
     }
 
@@ -301,9 +296,7 @@ int OptionsView::loadSubQueueInfosOption(
 
         // Only items of exactly 'sizeof(SubQueueInfo)' can be decoded.
         const int itemSize = oh->typeSpecific() * Protocol::k_WORD_SIZE;
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                itemSize != static_cast<int>(sizeof(SubQueueInfo)))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (itemSize != static_cast<int>(sizeof(SubQueueInfo))) [[unlikely]] {
             return rc_INVALID_ITEM_SIZE;  // RETURN
         }
 
@@ -316,8 +309,7 @@ int OptionsView::loadSubQueueInfosOption(
         const int rc = loadSubQueueInfosOptionHelper(
             &tempVec,
             OptionType::e_SUB_QUEUE_INFOS);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (rc != 0) [[unlikely]] {
             return rc_LOAD_FAILURE;  // RETURN
         }
 
@@ -336,8 +328,7 @@ int OptionsView::loadSubQueueInfosOption(
         const int rc = loadSubQueueInfosOptionHelper(
             &tempVec,
             OptionType::e_SUB_QUEUE_IDS_OLD);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (rc != 0) [[unlikely]] {
             return rc_LOAD_FAILURE;  // RETURN
         }
 
@@ -375,8 +366,7 @@ int OptionsView::loadMsgGroupIdOption(Protocol::MsgGroupId* msgGroupId) const
                                        &msgGroupIdSizeBytes,
                                        OptionType::e_MSG_GROUP_ID,
                                        true);  // hasPadding
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         // Will happen if the range
         // [headerPos, headerPos + sizeof(OptionHeader)] does not fall within
         // the blob.
@@ -385,15 +375,13 @@ int OptionsView::loadMsgGroupIdOption(Protocol::MsgGroupId* msgGroupId) const
 
     // If there's no Group Id information, the OptionHeader shouldn't be set.
     // Empty Group Ids are currently invalid.
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(msgGroupIdSizeBytes == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (msgGroupIdSizeBytes == 0) [[unlikely]] {
         return rc_INVALID_LENGTH;  // RETURN
     }
 
     // The maximum allowed value is Protocol::k_MSG_GROUP_ID_MAX_LENGTH.
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            msgGroupIdSizeBytes > Protocol::k_MSG_GROUP_ID_MAX_LENGTH)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (msgGroupIdSizeBytes > Protocol::k_MSG_GROUP_ID_MAX_LENGTH)
+        [[unlikely]] {
         return rc_INVALID_LENGTH;  // RETURN
     }
 
@@ -403,8 +391,7 @@ int OptionsView::loadMsgGroupIdOption(Protocol::MsgGroupId* msgGroupId) const
                                     *d_blob_p,
                                     msgGroupIdStartPos,
                                     msgGroupIdSizeBytes);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         msgGroupId->clear();
         // The range
         // [msgGroupIdStartPos, msgGroupIdStartPos + msgGroupIdSizeBytes]

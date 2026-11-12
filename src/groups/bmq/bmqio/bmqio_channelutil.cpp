@@ -53,12 +53,12 @@ isValidPacketLength(int*                      packetLength,
 {
     void* offsetByte = inBlob.buffer(pos.buffer()).data() + pos.byte();
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-            (bmqu::BlobUtil::bufferSize(inBlob, pos.buffer()) - pos.byte()) >=
-                k_MINIMUM_PACKET_LENGTH &&
-            bsls::AlignmentUtil::calculateAlignmentOffset(
-                offsetByte,
-                bsls::AlignmentFromType<bdlb::BigEndianUint32>::VALUE) == 0)) {
+    if ((bmqu::BlobUtil::bufferSize(inBlob, pos.buffer()) - pos.byte()) >=
+            k_MINIMUM_PACKET_LENGTH &&
+        bsls::AlignmentUtil::calculateAlignmentOffset(
+            offsetByte,
+            bsls::AlignmentFromType<bdlb::BigEndianUint32>::VALUE) == 0)
+        [[likely]] {
         // All length bytes are in one contiguous buffer at a position that is
         // aligned, so we can directly read from it.
         const auto* lengthBE = reinterpret_cast<const bdlb::BigEndianUint32*>(
@@ -81,9 +81,7 @@ isValidPacketLength(int*                      packetLength,
     }
 
     // Sanity check
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(*packetLength <=
-                                              k_MINIMUM_PACKET_LENGTH)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (*packetLength <= k_MINIMUM_PACKET_LENGTH) [[unlikely]] {
         // Fatal unrecoverable error, the packet's length is smaller than the
         // minimum size of a packet.
         return false;  // RETURN
@@ -108,9 +106,7 @@ int ChannelUtil::handleRead(bdlbb::Blob* outPacket,
 
     // We need at least 'k_MINIMUM_PACKET_LENGTH' bytes in the blob, since
     // those first bytes are encoding the full length (in bytes) of the packet.
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(inBlob->length() <
-                                              k_MINIMUM_PACKET_LENGTH)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (inBlob->length() < k_MINIMUM_PACKET_LENGTH) [[unlikely]] {
         *numNeeded = k_MINIMUM_PACKET_LENGTH;
         return 0;  // RETURN
     }
@@ -122,16 +118,12 @@ int ChannelUtil::handleRead(bdlbb::Blob* outPacket,
     int packetLength = 0;  // The full length of the packet, as extracted from
                            // reading the first bytes of the 'inBlob'.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !isValidPacketLength(&packetLength, *inBlob))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValidPacketLength(&packetLength, *inBlob)) [[unlikely]] {
         return -1;  // RETURN
     }
 
     // We need the full message
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(inBlob->length() <
-                                              packetLength)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (inBlob->length() < packetLength) [[unlikely]] {
         *numNeeded = packetLength;
         return 0;  // RETURN
     }
@@ -172,18 +164,15 @@ int ChannelUtil::handleRead(const Reader& reader,
             bmqu::BlobUtil::findOffset(&offset, *inBlob, offset, packetLength);
         BSLS_ASSERT_OPT(rc == 0);
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                !isValidPacketLength(&packetLength, *inBlob, offset))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (!isValidPacketLength(&packetLength, *inBlob, offset))
+            [[unlikely]] {
             // Erase the read bytes from the input blob and return error
             bdlbb::BlobUtil::erase(inBlob, 0, consumedBytes);
             return -1;  // RETURN
         }
 
         // We need the full message
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                (inBlob->length() - consumedBytes) < packetLength)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if ((inBlob->length() - consumedBytes) < packetLength) [[unlikely]] {
             // Erase the read bytes from the input blob and schedule read of
             // the next packet
             bdlbb::BlobUtil::erase(inBlob, 0, consumedBytes);

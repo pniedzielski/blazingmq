@@ -181,10 +181,7 @@ QueueStatsDomain::findAppIdContext(const bsl::string& appId) const
     bsl::unordered_map<bsl::string, bmqst::StatContext*>::const_iterator it =
         d_subContextsLookup.find(appId);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(it ==
-                                              d_subContextsLookup.cend())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (it == d_subContextsLookup.cend()) [[unlikely]] {
         BALL_LOG_SET_CATEGORY(k_LOG_CATEGORY);
         BALL_LOGTHROTTLE_WARN(k_MAX_INSTANT_MESSAGES, k_NS_PER_MESSAGE)
             << "[THROTTLED] No matching StatContext for domain: "

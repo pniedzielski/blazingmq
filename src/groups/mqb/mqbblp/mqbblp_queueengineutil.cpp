@@ -49,7 +49,6 @@
 #include <bsl_string.h>
 #include <bsla_annotations.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 #include <bsls_timeinterval.h>
 
 // SYS
@@ -997,17 +996,13 @@ size_t QueueEngineUtil_AppState::catchUp(
 
                 ++numMessages;
             }
-            else if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                         result == Routers::e_NO_CAPACITY ||
-                         result == Routers::e_NO_SUBSCRIPTION)) {
-                BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+            else if (result == Routers::e_NO_CAPACITY ||
+                     result == Routers::e_NO_SUBSCRIPTION) [[unlikely]] {
                 putAside(current->guid());
                 // Do not block other Subscriptions. Continue.
             }
-            else if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                         result == Routers::e_NO_CAPACITY_ALL ||
-                         result == Routers::e_DELAY)) {
+            else if (result == Routers::e_NO_CAPACITY_ALL ||
+                     result == Routers::e_DELAY) [[unlikely]] {
                 d_resumePoint = current->guid();
                 break;
             }
@@ -1134,7 +1129,7 @@ QueueEngineUtil_AppState::processDeliveryList(bsls::TimeInterval*    delay,
                                               mqbi::StorageIterator* reader,
                                               RedeliveryList&        list)
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(list.empty())) {
+    if (list.empty()) [[likely]] {
         return 0;  // RETURN
     }
 
@@ -1149,17 +1144,14 @@ QueueEngineUtil_AppState::processDeliveryList(bsls::TimeInterval*    delay,
         // Retrieve message from the storage
         reader->reset(*it);
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(reader->atEnd())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (reader->atEnd()) [[unlikely]] {
             // The message got gc'ed or purged
             BMQ_LOGTHROTTLE_INFO << "#STORAGE_UNKNOWN_MESSAGE " << "Queue: '"
                                  << d_queue_p->description() << "', app: '"
                                  << appId() << "' could not redeliver GUID: '"
                                  << *it << "' (not in the storage)";
         }
-        else if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                     !reader->appMessageView(ordinal()).isPending())) {
+        else if (!reader->appMessageView(ordinal()).isPending()) [[unlikely]] {
             BMQ_LOGTHROTTLE_INFO
                 << "#STORAGE_UNKNOWN_MESSAGE " << "Queue: '"
                 << d_queue_p->description() << "', app: '" << appId()

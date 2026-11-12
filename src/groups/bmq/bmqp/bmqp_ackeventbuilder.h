@@ -186,8 +186,7 @@ inline int AckEventBuilder::maxMessageCount() const
 
 inline int AckEventBuilder::eventSize() const
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(messageCount() == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (messageCount() == 0) [[unlikely]] {
         return 0;  // RETURN
     }
 

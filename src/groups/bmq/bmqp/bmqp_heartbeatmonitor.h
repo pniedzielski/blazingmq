@@ -113,18 +113,13 @@ inline bool HeartbeatMonitor::checkData(bmqio::Channel*    channel,
 
     // Process heartbeat: if we receive a heartbeat request, simply reply
     // with a heartbeat response.
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(event.isHeartbeatReqEvent())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (event.isHeartbeatReqEvent()) [[unlikely]] {
         channel->write(0,  // status
                        heartbeatRspBlob());
         // We explicitly ignore any failure as failure implies issues with
         // the channel, which is what the heartbeat is trying to expose.
     }
-    else if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                 event.isHeartbeatRspEvent())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    else if (event.isHeartbeatRspEvent()) [[unlikely]] {
         // Nothing to be done, we already updated the packet's counter
         // above, just 'drop' that event now.
     }

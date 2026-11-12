@@ -31,7 +31,6 @@
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bslma_default.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqp {
@@ -84,8 +83,7 @@ void PushMessageIterator::initCachedOptionsView() const
     BSLS_ASSERT_SAFE(isValid());
     BSLS_ASSERT_SAFE(hasOptions());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_optionsView.isNull())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_optionsView.isNull()) [[unlikely]] {
         // Load options iterator
         [[maybe_unused]] int rc = loadOptionsView(&d_optionsView.makeValue());
         BSLS_ASSERT_SAFE(rc == 0);
@@ -99,8 +97,7 @@ int PushMessageIterator::loadOptions(bdlbb::Blob* blob) const
 {
     BSLS_ASSERT_SAFE(isValid());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!hasOptions())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!hasOptions()) [[unlikely]] {
         return 0;  // RETURN
     }
 
@@ -122,8 +119,7 @@ int PushMessageIterator::compressedApplicationDataSize() const
                                             *d_blobIter.blob(),
                                             d_blobIter.position(),
                                             msgLenPadded - 1);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         // This should not happen, because we checked for 'isValid' (that
         // ensured the blob and the header were consistent).  But in case
         // BSLS_ASSERT is not enabled, 'gracefully' handle this error condition
@@ -134,9 +130,7 @@ int PushMessageIterator::compressedApplicationDataSize() const
                         ->buffer(lastBytePos.buffer())
                         .data()[lastBytePos.byte()];
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !isValidWordPaddingByte(lastByte))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValidWordPaddingByte(lastByte)) [[unlikely]] {
         // If the 'lastByte' is not a padding byte then message is malformed
         return -1;  // RETURN
     }
@@ -227,8 +221,7 @@ int PushMessageIterator::loadApplicationData(bdlbb::Blob* blob) const
                                           d_applicationDataPosition,
                                           applicationDataSize());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         // This can only fail if the [appDataPos, appDataPos +
         // applicationDataSize()] doesn't fall within the d_blobIter.blob(),
         // which should not happen because we checked for 'isValid' (that
@@ -261,8 +254,7 @@ int PushMessageIterator::loadMessageProperties(bdlbb::Blob* blob) const
         return rc_IMPLICIT_APP_DATA;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!hasMessageProperties())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!hasMessageProperties()) [[unlikely]] {
         blob->removeAll();
         return rc_SUCCESS;  // RETURN
     }
@@ -275,8 +267,7 @@ int PushMessageIterator::loadMessageProperties(bdlbb::Blob* blob) const
                                           d_applicationData,
                                           bmqu::BlobPosition(),
                                           d_messagePropertiesSize);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return (rc * 10 + rc_INVALID_MSG_PROPS_OFFSET);  // RETURN
     }
 
@@ -314,15 +305,13 @@ int PushMessageIterator::loadMessageProperties(
 
     bdlbb::Blob propertiesBlob;
     int         rc = loadMessageProperties(&propertiesBlob);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(0 != rc)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (0 != rc) [[unlikely]] {
         return rc_BLOB_FAILURE + 100 * rc;  // RETURN
     }
 
     rc = properties->streamIn(propertiesBlob,
                               MessagePropertiesInfo::hasSchema(d_header));
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(0 != rc)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (0 != rc) [[unlikely]] {
         return rc_STREAMIN_FAILURE + 100 * rc;  // RETURN
     }
 
@@ -370,8 +359,7 @@ int PushMessageIterator::loadMessagePayloadPosition() const
                                             bmqu::BlobPosition(),
                                             d_messagePropertiesSize);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         d_lazyMessagePayloadPosition = bmqu::BlobPosition();
         return (rc * 10 + rc_INVALID_PAYLOAD_OFFSET);  // RETURN
     }
@@ -414,8 +402,7 @@ int PushMessageIterator::loadMessagePayload(bdlbb::Blob* blob) const
                                           d_applicationData,
                                           d_lazyMessagePayloadPosition,
                                           messagePayloadSize());
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         // This can only fail if the [payloadPos, payloadPos + msgPayloadSize]
         // doesn't fall within the d_blobIter.blob().
         return (rc * 10 + rc_INVALID_PAYLOAD_LENGTH);  // RETURN
@@ -475,8 +462,7 @@ void PushMessageIterator::extractMsgGroupId(
     BSLS_ASSERT_SAFE(msgGroupId);
     BSLS_ASSERT_SAFE(isValid());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!hasOptions())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!hasOptions()) [[unlikely]] {
         return;  // RETURN
     }
 
@@ -487,10 +473,8 @@ void PushMessageIterator::extractMsgGroupId(
     OptionsView& optionsView = d_optionsView.value();
     BSLS_ASSERT_SAFE(optionsView.isValid());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            optionsView.find(OptionType::e_MSG_GROUP_ID) ==
-            optionsView.end())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (optionsView.find(OptionType::e_MSG_GROUP_ID) == optionsView.end())
+        [[unlikely]] {
         return;  // RETURN
     }
 
@@ -528,8 +512,7 @@ int PushMessageIterator::next()
         rc_INVALID_APPLICATION_DATA_SIZE   = -8
     };
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValid()) [[unlikely]] {
         return rc_INVALID;  // RETURN
     }
 
@@ -559,25 +542,21 @@ int PushMessageIterator::next()
                                              true,
                                              false);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!header.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!header.isSet()) [[unlikely]] {
         // We couldn't read a PushHeader.. set the state of this iterator to
         // invalid
         return rc_NO_PUSH_HEADER;  // RETURN
     }
 
     const int headerSize = header->headerWords() * Protocol::k_WORD_SIZE;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(headerSize <
-                                              PushHeader::k_MIN_HEADER_SIZE)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (headerSize < PushHeader::k_MIN_HEADER_SIZE) [[unlikely]] {
         // Header is declaring less bytes than expected, probably this is
         // because header is malformed
         return rc_NO_PUSH_HEADER;  // RETURN
     }
 
     header.resize(headerSize);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!header.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!header.isSet()) [[unlikely]] {
         return rc_NO_PUSH_HEADER;  // RETURN
     }
 
@@ -585,16 +564,13 @@ int PushMessageIterator::next()
     const int messageSize = d_header.messageWords() * Protocol::k_WORD_SIZE;
     // Validation: must ensure that 'messageSize > 0', or iteration process
     // via 'next()' might be infinite
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(messageSize == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (messageSize == 0) [[unlikely]] {
         // Set the state of this iterator to invalid
         return rc_INVALID_MESSAGE_SIZE;  // RETURN
     }
 
     // Validation: make sure blob has enough data as indicated by PushHeader
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_blobIter.remaining() <
-                                              messageSize)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_blobIter.remaining() < messageSize) [[unlikely]] {
         // Set the state of this iterator to invalid
         return rc_NOT_ENOUGH_BYTES;  // RETURN
     }
@@ -605,8 +581,7 @@ int PushMessageIterator::next()
         *d_blobIter.blob(),
         header.position(),
         d_header);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!loadOptionsPosition)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!loadOptionsPosition) [[unlikely]] {
         // Will happen if we could not find position of options area or if the
         // range [optionsPosition, optionsPosition + optionsSize] does not fall
         // within the blob.
@@ -622,8 +597,7 @@ int PushMessageIterator::next()
         header.position(),
         (d_header.headerWords() + d_header.optionsWords()) *
             bmqp::Protocol::k_WORD_SIZE);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         d_applicationDataPosition = bmqu::BlobPosition();
         return (rc * 10 + rc_INVALID_APPLICATION_DATA_OFFSET);  // RETURN
     }
@@ -646,8 +620,7 @@ int PushMessageIterator::next()
     // subtracted size of the padding bytes section.
     //: o Negative 'length' is a sign that packet is malformed.
     //: o Zero 'length' is not supported.
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(length <= 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (length <= 0) [[unlikely]] {
         return rc_INVALID_APPLICATION_DATA_SIZE;  // RETURN
     }
 
@@ -705,8 +678,7 @@ int PushMessageIterator::reset(const bdlbb::Blob* blob,
 
     bool rc = d_blobIter.advance(eventHeader.headerWords() *
                                  Protocol::k_WORD_SIZE);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!rc)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!rc) [[unlikely]] {
         // Set the iterator to invalid state
         d_advanceLength = -1;
         return rc_INVALID_EVENTHEADER;  // RETURN

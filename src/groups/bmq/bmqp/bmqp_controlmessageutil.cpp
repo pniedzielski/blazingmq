@@ -18,7 +18,6 @@
 #include <bmqscm_version.h>
 // BDE
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqp {
@@ -61,16 +60,12 @@ int ControlMessageUtil::validate(
         return rc_SUCCESS;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(controlMessage.rId().isNull() ||
-                                              controlMessage.rId().value() <
-                                                  0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (controlMessage.rId().isNull() || controlMessage.rId().value() < 0)
+        [[unlikely]] {
         return rc_INVALID_ID;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            controlMessage.choice().isUndefinedValue())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (controlMessage.choice().isUndefinedValue()) [[unlikely]] {
         return rc_INVALID_CHOICE_SELECTION;  // RETURN
     }
 

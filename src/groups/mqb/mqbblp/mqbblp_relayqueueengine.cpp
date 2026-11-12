@@ -58,7 +58,6 @@
 #include <bsla_annotations.h>
 #include <bsla_unreachable.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 #include <bsls_timeinterval.h>
 #include <bsls_types.h>
 
@@ -874,15 +873,14 @@ void RelayQueueEngine::processAppRedelivery(unsigned int upstreamSubQueueId,
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queueState_p->queue()->inDispatcherThread());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!app->hasConsumers())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!app->hasConsumers()) [[unlikely]] {
         return;  // RETURN
     }
 
     bsls::TimeInterval delay;
     app->processDeliveryLists(&delay, d_realStorageIter_mp.get());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(0 == app->redeliveryListSize())) {
+    if (0 == app->redeliveryListSize()) [[likely]] {
         // We only attempt to deliver new messages if we successfully
         // redelivered all messages in the redelivery list.
 
@@ -1636,18 +1634,15 @@ void RelayQueueEngine::onHandleUsable(mqbi::QueueHandle* handle,
 
     // Note that specified 'subQueueId' is the downstream subId.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !d_queueState_p->handleCatalog().hasHandle(handle))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_queueState_p->handleCatalog().hasHandle(handle)) [[unlikely]] {
         BMQ_LOGTHROTTLE_ERROR << "#CLIENT_IMPROPER_BEHAVIOR "
                               << "Making unknown handle available.";
         BSLS_ASSERT_SAFE(false && "Making unknown handle available.");
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!bmqt::QueueFlagsUtil::isReader(
-            handle->handleParameters().flags()))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!bmqt::QueueFlagsUtil::isReader(handle->handleParameters().flags()))
+        [[unlikely]] {
         return;  // RETURN
     }
     unsigned int upstreamSubQueueId = 0;
@@ -2242,10 +2237,7 @@ void RelayQueueEngine::storePushIfProxy(
             bsl::shared_ptr<bdlbb::Blob>(),
             &dataStreamMessage);  // No options
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                result != mqbi::StorageResult::e_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (result != mqbi::StorageResult::e_SUCCESS) [[unlikely]] {
             BMQ_LOGTHROTTLE_INFO << d_queueState_p->uri()
                                  << " failed to store GUID [" << msgGUID
                                  << "], result = " << result;

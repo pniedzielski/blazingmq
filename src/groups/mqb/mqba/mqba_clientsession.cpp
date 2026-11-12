@@ -425,8 +425,7 @@ void ClientSession::writePacket(const bsl::shared_ptr<bdlbb::Blob>& blob,
     // This method is the centralized *single* place where we should try to
     // send data to the client over the channel.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(isDisconnected())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (isDisconnected()) [[unlikely]] {
         return;  // RETURN
     }
 
@@ -439,17 +438,14 @@ void ClientSession::writePacket(const bsl::shared_ptr<bdlbb::Blob>& blob,
     //       than a couple milliseconds (or eventually seconds if there are
     //       gigabytes of data) in this buffer queue.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !d_state.d_channelBufferQueue.empty())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_state.d_channelBufferQueue.empty()) [[unlikely]] {
         // If the channelBuffer is not empty, we can't send, we have to enqueue
         // to guarantee ordering of messages.
         d_state.d_channelBufferQueue.push_back(blob);
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(flushBuilders)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (flushBuilders) [[unlikely]] {
         // 'flushBuilders' should only be used when sending control messages,
         // so not on the likely path.
 
@@ -467,9 +463,7 @@ void ClientSession::writePacket(const bsl::shared_ptr<bdlbb::Blob>& blob,
     // get the lowWatermark notification.
     bmqio::Status status;
     d_channel_sp->write(&status, *blob);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            status.category() != bmqio::StatusCategory::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (status.category() != bmqio::StatusCategory::e_SUCCESS) [[unlikely]] {
         if (status.category() == bmqio::StatusCategory::e_CONNECTION) {
             // This code relies on the fact that `e_CONNECTION` error cannot be
             // returned without calling `tearDown`.
@@ -499,8 +493,7 @@ void ClientSession::flushChannelBufferQueue()
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(inDispatcherThread());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(isDisconnected())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (isDisconnected()) [[unlikely]] {
         return;  // RETURN
     }
 
@@ -546,10 +539,7 @@ void ClientSession::sendAck(bmqt::AckResult::Enum    status,
     //       does not care about them.
 
     const bmqt::Uri* uri_p = NULL;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(status !=
-                                              bmqt::AckResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (status != bmqt::AckResult::e_SUCCESS) [[unlikely]] {
         // When we receive a PUT event for an unknown queue (likely the queue
         // was already closed), we NACK it with e_INVALID_ARGUMENT; in this
         // case, the queue is expected not to be found in the d_queues map, and
@@ -622,9 +612,7 @@ void ClientSession::sendAck(bmqt::AckResult::Enum    status,
     }
 
     mqbstat::QueueStatsClient* queueStats = 0;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(queueState == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (queueState == 0) [[unlikely]] {
         // Invalid/unknown queue
         queueStats = invalidQueueStats();
     }
@@ -634,10 +622,8 @@ void ClientSession::sendAck(bmqt::AckResult::Enum    status,
             queueState->d_subQueueInfosMap.findBySubIdSafe(
                 bmqp::QueueId::k_DEFAULT_SUBQUEUE_ID);
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                subQueueCiter == queueState->d_subQueueInfosMap.end())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (subQueueCiter == queueState->d_subQueueInfosMap.end())
+            [[unlikely]] {
             // Invalid/unknown subStream
             // Producer has closed the queue before receiving ACKs
 
@@ -1373,8 +1359,7 @@ void ClientSession::onAckEvent(const mqbevt::AckEvent& event)
         handle_p  = context_p->d_handle_p;
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!handle_p)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!handle_p) [[unlikely]] {
         BMQ_LOGTHROTTLE_WARN
             << description()
             << ": Dropping received ACK (due to the client ungraceful"
@@ -1464,9 +1449,7 @@ void ClientSession::onConfirmEvent(const mqbevt::ConfirmEvent& event)
     bmqp::ConfirmMessageIterator confIt;
     rawEvent.loadConfirmMessageIterator(&confIt);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!confIt.isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!confIt.isValid()) [[unlikely]] {
         BALL_LOG_ERROR_BLOCK
         {
             BALL_LOG_OUTPUT_STREAM << "#CORRUPTED_EVENT " << description()
@@ -1519,9 +1502,7 @@ void ClientSession::onConfirmEvent(const mqbevt::ConfirmEvent& event)
         }
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc < 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (rc < 0) [[unlikely]] {
         BALL_LOG_ERROR_BLOCK
         {
             BALL_LOG_OUTPUT_STREAM
@@ -1550,9 +1531,7 @@ void ClientSession::onRejectEvent(const mqbevt::RejectEvent& event)
     bmqp::RejectMessageIterator rejectIt;
     rawEvent.loadRejectMessageIterator(&rejectIt);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!rejectIt.isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!rejectIt.isValid()) [[unlikely]] {
         BALL_LOG_ERROR_BLOCK
         {
             BALL_LOG_OUTPUT_STREAM << "#CORRUPTED_EVENT " << description()
@@ -1604,9 +1583,7 @@ void ClientSession::onRejectEvent(const mqbevt::RejectEvent& event)
         }
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc < 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (rc < 0) [[unlikely]] {
         BALL_LOG_ERROR_BLOCK
         {
             BALL_LOG_OUTPUT_STREAM
@@ -1628,10 +1605,7 @@ bool ClientSession::validateMessage(mqbi::QueueHandle**   queueHandle,
 
     ClientSessionState::QueueStateMap::iterator queueIt =
         d_queueSessionManager.queues().find(queueId.id());
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            queueIt == d_queueSessionManager.queues().end())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (queueIt == d_queueSessionManager.queues().end()) [[unlikely]] {
         if (eventType == bmqp::EventType::e_CONFIRM) {
             // Update invalid queue stats
             invalidQueueStats()->onEvent(
@@ -1652,20 +1626,14 @@ bool ClientSession::validateMessage(mqbi::QueueHandle**   queueHandle,
     *queueHandle = queueIt->second.d_handle_p;
     BSLS_ASSERT_SAFE(queueHandle);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            queueIt->second.d_hasReceivedFinalCloseQueue)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (queueIt->second.d_hasReceivedFinalCloseQueue) [[unlikely]] {
         *errorStream << "for queue for which final closeQueue request was "
                         "already received";
 
         return false;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            (*queueHandle)->queue()->isAtMostOnce())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if ((*queueHandle)->queue()->isAtMostOnce()) [[unlikely]] {
         *errorStream << "for queue in broadcast mode";
 
         return false;  // RETURN
@@ -1673,20 +1641,15 @@ bool ClientSession::validateMessage(mqbi::QueueHandle**   queueHandle,
 
     // Can be optimized out
     if ((*queueHandle)->queue()->hasMultipleSubStreams()) {
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                !bmqp::QueueUtil::isValidFanoutConsumerSubQueueId(
-                    queueId.subId()))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (!bmqp::QueueUtil::isValidFanoutConsumerSubQueueId(queueId.subId()))
+            [[unlikely]] {
             *errorStream << "for queue in fanout mode with invalid subId";
 
             return false;  // RETURN
         }
     }
-    else if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                 bmqp::QueueId::k_DEFAULT_SUBQUEUE_ID != queueId.subId())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    else if (bmqp::QueueId::k_DEFAULT_SUBQUEUE_ID != queueId.subId())
+        [[unlikely]] {
         // SubId must be the default one in non-fanout mode.
         *errorStream << "for queue in non-fanout mode with invalid subId";
 
@@ -1718,8 +1681,7 @@ void ClientSession::onPushEvent(const mqbevt::PushEvent& event)
         handle_p  = context_p->d_handle_p;
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!handle_p)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!handle_p) [[unlikely]] {
         // This is likely due to the client ungracefully went down while there
         // were in flight push event being delivered; no need to log anything,
         // messages will be redelivered by upstream to another client.
@@ -1827,10 +1789,8 @@ void ClientSession::onPushEvent(const mqbevt::PushEvent& event)
             // So, the below condition is always 'true' when the downstream is
             // a broker and the queue is broadcast.
 
-            if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                    subQueueCiter == context_p->d_subQueueInfosMap.end())) {
-                BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+            if (subQueueCiter == context_p->d_subQueueInfosMap.end())
+                [[unlikely]] {
                 if (!isBroadcastBroker ||
                     subscriptionId !=
                         bmqp::Protocol::k_DEFAULT_SUBSCRIPTION_ID) {
@@ -1954,9 +1914,7 @@ void ClientSession::onPutEvent(const mqbevt::PutEvent& event)
     BSLS_ASSERT_SAFE(rawEvent.isPutEvent());
     rawEvent.loadPutMessageIterator(&putIt);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!putIt.isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!putIt.isValid()) [[unlikely]] {
         BALL_LOG_ERROR_BLOCK
         {
             BALL_LOG_OUTPUT_STREAM << "#CORRUPTED_EVENT " << description()
@@ -1982,14 +1940,11 @@ void ClientSession::onPutEvent(const mqbevt::PutEvent& event)
             d_state.d_blobSpPool_p->getObject();
         bsl::shared_ptr<bdlbb::Blob> optionsSp;
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                !validatePutMessage(&queueStatePtr,
-                                    &subQueueInfoPtr,
-                                    &appDataSp,
-                                    &optionsSp,
-                                    putIt))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (!validatePutMessage(&queueStatePtr,
+                                &subQueueInfoPtr,
+                                &appDataSp,
+                                &optionsSp,
+                                putIt)) [[unlikely]] {
             // Update invalid queue stats
             invalidQueueStats()->onEvent(
                 mqbstat::QueueStatsClient::EventType::e_PUT,
@@ -2016,9 +1971,7 @@ void ClientSession::onPutEvent(const mqbevt::PutEvent& event)
 
         // Generate a GUID at the first hop if message's source is a
         // legacy SDK client.
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                isFirstHop && !d_isClientGeneratingGUIDs)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (isFirstHop && !d_isClientGeneratingGUIDs) [[unlikely]] {
             // A message will only go once through a first hop, so on
             // average, this is the unlikely case (except for localQueues).
 
@@ -2033,10 +1986,7 @@ void ClientSession::onPutEvent(const mqbevt::PutEvent& event)
             const bool correlationIdSet =
                 bmqp::AckMessage::k_NULL_CORRELATION_ID != correlationId;
 
-            if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(isAckRequested !=
-                                                      correlationIdSet)) {
-                BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+            if (isAckRequested != correlationIdSet) [[unlikely]] {
                 BALL_LOG_WARN
                     << "#CLIENT_INVALID_PUT " << description()
                     << ": PUT message with incompatible correlationId and "
@@ -2095,10 +2045,7 @@ void ClientSession::onPutEvent(const mqbevt::PutEvent& event)
                                    ClientSessionState::UnackedMessageInfo(
                                        correlationId,
                                        bmqu::Time::highResolutionTimer())));
-            if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(insertRc.second ==
-                                                      false)) {
-                BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+            if (insertRc.second == false) [[unlikely]] {
                 // GUID collision :(
                 // There are several scenarios when this can occur:
                 // - client session generated non-unique GUIDs for
@@ -2140,9 +2087,7 @@ void ClientSession::onPutEvent(const mqbevt::PutEvent& event)
     }
 
     // Check if the PUT event was valid
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc < 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (rc < 0) [[unlikely]] {
         if (d_state.d_throttledFailedPutMessages.requestPermission()) {
             BALL_LOG_ERROR_BLOCK
             {
@@ -2162,10 +2107,7 @@ mqbstat::QueueStatsClient* ClientSession::invalidQueueStats()
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(inDispatcherThread());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            d_state.d_invalidQueueStats.isNull())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (d_state.d_invalidQueueStats.isNull()) [[unlikely]] {
         d_state.d_invalidQueueStats.makeValue();
         d_state.d_invalidQueueStats.value().initialize(
             "bmq://invalid/queue",
@@ -2206,18 +2148,15 @@ bool ClientSession::validatePutMessage(QueueState**   queueState,
 
     QueueStateMapIter queueStateIter = d_queueSessionManager.queues().find(
         queueId.id());
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-            queueStateIter != d_queueSessionManager.queues().end())) {
+    if (queueStateIter != d_queueSessionManager.queues().end()) [[likely]] {
         // Queue is found
         *queueState = &(queueStateIter->second);
 
         // Populate subQueueInfo output ptr
         StreamsMap::iterator subQueueIter =
             (*queueState)->d_subQueueInfosMap.findBySubIdSafe(queueId.subId());
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                subQueueIter == (*queueState)->d_subQueueInfosMap.end())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (subQueueIter == (*queueState)->d_subQueueInfosMap.end())
+            [[unlikely]] {
             // default subStream not found
             *subQueueInfo = 0;
         }
@@ -2233,9 +2172,7 @@ bool ClientSession::validatePutMessage(QueueState**   queueState,
 
     // Retrieve the payload of that message
     int rc = putIt.loadApplicationData((*appDataSp).get());
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (rc != 0) [[unlikely]] {
         if (d_state.d_throttledFailedPutMessages.requestPermission()) {
             BALL_LOG_ERROR_BLOCK
             {
@@ -2259,8 +2196,7 @@ bool ClientSession::validatePutMessage(QueueState**   queueState,
         ackStatus      = bmqt::AckResult::e_INVALID_ARGUMENT;
         ackDescription = "putEvent::failedLoadApplicationData";
     }
-    else if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(*queueState == 0 ||
-                                                   *subQueueInfo == 0)) {
+    else if (*queueState == 0 || *subQueueInfo == 0) [[unlikely]] {
         // Check if queueId represents a valid queue (or subStream of the
         // queue)
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
@@ -2274,8 +2210,7 @@ bool ClientSession::validatePutMessage(QueueState**   queueState,
         ackStatus      = bmqt::AckResult::e_INVALID_ARGUMENT;
         ackDescription = "putEvent::unknownQueue";
     }
-    else if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                 (*queueState)->d_hasReceivedFinalCloseQueue)) {
+    else if ((*queueState)->d_hasReceivedFinalCloseQueue) [[unlikely]] {
         // Has this client already sent the 'final' closeQueue request?
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
 
@@ -2289,7 +2224,7 @@ bool ClientSession::validatePutMessage(QueueState**   queueState,
         ackStatus      = bmqt::AckResult::e_REFUSED;
         ackDescription = "putEvent::afterFinalCloseQueue";
     }
-    else if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(putIt.hasOptions())) {
+    else if (putIt.hasOptions()) [[unlikely]] {
         // Retrieve the message options.
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
 
@@ -2298,9 +2233,7 @@ bool ClientSession::validatePutMessage(QueueState**   queueState,
         // 'loadOptions()' operation is ok right now.  Revisit this if
         // there are any options you don't want to propagate.
         rc = putIt.loadOptions((*optionsSp).get());
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (rc != 0) [[unlikely]] {
             if (d_state.d_throttledFailedPutMessages.requestPermission()) {
                 BALL_LOG_ERROR_BLOCK
                 {
@@ -2325,9 +2258,8 @@ bool ClientSession::validatePutMessage(QueueState**   queueState,
             ackDescription = "putEvent::failedLoadOptions";
         }
     }
-    else if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                 isFirstHop && d_isClientGeneratingGUIDs &&
-                 putIt.header().messageGUID().isUnset())) {
+    else if (isFirstHop && d_isClientGeneratingGUIDs &&
+             putIt.header().messageGUID().isUnset()) [[unlikely]] {
         // Check if SDK sent PUT with non-empty GUID
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
 
@@ -2341,10 +2273,7 @@ bool ClientSession::validatePutMessage(QueueState**   queueState,
         ackDescription = "putEvent::unsetGUID";
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(ackStatus !=
-                                              bmqt::AckResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (ackStatus != bmqt::AckResult::e_SUCCESS) [[unlikely]] {
         if (isFirstHop && !d_isClientGeneratingGUIDs) {
             sendAck(ackStatus,
                     putIt.header().correlationId(),
@@ -2470,8 +2399,7 @@ void ClientSession::processEvent(const bmqp::Event&                    event,
 {
     // executed by the *IO* thread
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(event.isAuthenticationEvent())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (event.isAuthenticationEvent()) [[unlikely]] {
         BALL_LOG_ERROR << "#CLIENT_IMPROPER_BEHAVIOR " << description()
                        << ": Dropping unexpected AuthenticationEvent in "
                        << "processEvent: " << event;
@@ -2498,7 +2426,7 @@ void ClientSession::processEvent(const bmqp::Event&                    event,
                                                    &localAllocator);
 
         rc = bmqp::ControlMessageUtil::validate(controlMessage);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
+        if (rc != 0) [[unlikely]] {
             // Malformed control message should be rejected
             BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
             BALL_LOG_ERROR << "#CORRUPTED_CONTROL_MESSAGE " << description()

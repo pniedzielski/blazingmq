@@ -28,7 +28,6 @@
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bslma_allocator.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqp {
@@ -66,9 +65,7 @@ bmqt::EventBuilderResult::Enum PushEventBuilder::packMessageImp(
     const int payloadLen = payload.length();
 
     // Validate payload is not too big
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            payloadLen > PushHeader::k_MAX_PAYLOAD_SIZE_SOFT)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (payloadLen > PushHeader::k_MAX_PAYLOAD_SIZE_SOFT) [[unlikely]] {
         eraseCurrentMessage();
         return bmqt::EventBuilderResult::e_PAYLOAD_TOO_BIG;  // RETURN
     }
@@ -78,11 +75,9 @@ bmqt::EventBuilderResult::Enum PushEventBuilder::packMessageImp(
                                                         payloadLen);
 
     // Ensure event has enough space left for this message
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            EventHeader::k_MAX_SIZE_SOFT <
-            static_cast<int>((eventSize() + sizeof(PushHeader) + optionsSize +
-                              payloadLen + numPaddingBytes)))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (EventHeader::k_MAX_SIZE_SOFT <
+        static_cast<int>((eventSize() + sizeof(PushHeader) + optionsSize +
+                          payloadLen + numPaddingBytes))) [[unlikely]] {
         // The total size of this event would exceed the enforced maximum.
         eraseCurrentMessage();
         return bmqt::EventBuilderResult::e_EVENT_TOO_BIG;  // RETURN
@@ -246,8 +241,7 @@ bmqt::EventBuilderResult::Enum PushEventBuilder::addSubQueueIdsOption(
                                               static_cast<int>(size));
 
     const Result::Enum rc = d_options.canAdd(currentSize, option);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != Result::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != Result::e_SUCCESS) [[unlikely]] {
         eraseCurrentMessage();
         return rc;  // RETURN
     }
@@ -323,8 +317,7 @@ bmqt::EventBuilderResult::Enum PushEventBuilder::addSubQueueInfosOption(
 
     const int          currentSize = eventSize() + sizeof(PushHeader);
     const Result::Enum rc          = d_options.canAdd(currentSize, option);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != Result::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != Result::e_SUCCESS) [[unlikely]] {
         eraseCurrentMessage();
         return rc;  // RETURN
     }
@@ -401,15 +394,13 @@ PushEventBuilder::addMsgGroupIdOption(const Protocol::MsgGroupId& msgGroupId)
         OptionType::e_MSG_GROUP_ID,
         static_cast<int>(size));
     Result::Enum rc = d_options.canAdd(currentSize, option);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != Result::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != Result::e_SUCCESS) [[unlikely]] {
         eraseCurrentMessage();
         return rc;  // RETURN
     }
 
     rc = OptionUtil::isValidMsgGroupId(msgGroupId);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != Result::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != Result::e_SUCCESS) [[unlikely]] {
         eraseCurrentMessage();
         return rc;  // RETURN
     }

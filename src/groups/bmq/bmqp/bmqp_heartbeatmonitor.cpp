@@ -97,16 +97,13 @@ bool HeartbeatMonitor::checkHeartbeat(bmqio::Channel* channel)
 
     bool result = true;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(d_packetReceived.loadRelaxed() !=
-                                            0)) {
+    if (d_packetReceived.loadRelaxed() != 0) [[likely]] {
         // A packet was received on the channel since the last heartbeat
         // check, simply reset the associated counters.
         d_packetReceived.storeRelaxed(0);
         d_missedHeartbeatCounter = 0;
     }
-    else {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    else [[unlikely]] {
         if (d_missedHeartbeatCounter < d_maxMissedHeartbeats) {
             // Send heartbeat
             channel->write(0,  // status

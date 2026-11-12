@@ -394,10 +394,9 @@ inline void MonitoredQueue<QUEUE, QUEUE_TRAITS>::incrementLength()
 {
     const bsls::Types::Int64 newLength = ++d_queueLength;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            newLength >= d_highWatermark2 &&
-            d_state < MonitoredQueueState::e_HIGH_WATERMARK_2_REACHED)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (newLength >= d_highWatermark2 &&
+        d_state < MonitoredQueueState::e_HIGH_WATERMARK_2_REACHED)
+        [[unlikely]] {
         if (setState(MonitoredQueueState::e_HIGH_WATERMARK_2_REACHED)) {
             if (d_stateChangedCb) {
                 d_stateChangedCb(
@@ -673,8 +672,7 @@ inline int MonitoredQueue<QUEUE, QUEUE_TRAITS>::timedPopFront(
             break;           // BREAK
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(status != 0)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (status != 0) [[unlikely]] {
             // Error returned from 'timedWait'.  Likely corruption either in
             // the application or glibc.
             return rc_UNKNOWN_ERROR;  // RETURN

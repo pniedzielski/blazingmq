@@ -379,9 +379,7 @@ void MessageDumper::dumpPushEvent(bsl::ostream& out, const bmqp::Event& event)
             out << "** Failed to extract msg **\n";
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                decrementMessageCount(&d_pushContext))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (decrementMessageCount(&d_pushContext)) [[unlikely]] {
             // We've exhausted the number of PUSH messages to dump.
             break;  // BREAK
         }
@@ -418,9 +416,7 @@ void MessageDumper::dumpAckEvent(bsl::ostream& out, const bmqp::Event& event)
             << ", messageGUID: " << iter.message().messageGUID() << "]"
             << "\n";
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                decrementMessageCount(&d_ackContext))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (decrementMessageCount(&d_ackContext)) [[unlikely]] {
             // We've exhausted the number of ACK messages to dump.
             break;  // BREAK
         }
@@ -477,9 +473,7 @@ void MessageDumper::dumpPutEvent(bsl::ostream&             out,
             out << "** Failed to extract msg **\n";
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                decrementMessageCount(&d_putContext))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (decrementMessageCount(&d_putContext)) [[unlikely]] {
             // We've exhausted the number of PUT messages to dump.
             break;  // BREAK
         }
@@ -512,9 +506,7 @@ void MessageDumper::dumpConfirmEvent(bsl::ostream&      out,
             << ", queueId: " << queueId << "]"
             << "\n";
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                decrementMessageCount(&d_confirmContext))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (decrementMessageCount(&d_confirmContext)) [[unlikely]] {
             // We've exhausted the number of CONFIRM messages to dump.
             break;  // BREAK
         }

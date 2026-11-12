@@ -36,7 +36,6 @@
 #include <bslma_managedptr.h>
 #include <bslmt_lockguard.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 #include <bsls_systemclocktype.h>
 
 namespace BloombergLP {
@@ -168,11 +167,9 @@ void RequestManager::applyResponse(
 
     // Convert timeout code: If an incoming Status response has a timeout
     // category, then set the code to the remote timeout code
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            response.choice().isStatusValue() &&
-            (response.choice().status().category() ==
-             bmqp_ctrlmsg::StatusCategory::E_TIMEOUT))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (response.choice().isStatusValue() &&
+        (response.choice().status().category() ==
+         bmqp_ctrlmsg::StatusCategory::E_TIMEOUT)) [[unlikely]] {
         request->response().choice().status().code() = k_CODE_TIMEOUT_REMOTE;
     }
 

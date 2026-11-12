@@ -546,7 +546,7 @@ inline mqbi::Queue* QueueHandle::queue()
 
 inline mqbi::DispatcherClient* QueueHandle::client()
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(d_haveClient)) {
+    if (d_haveClient) [[likely]] {
         return d_clientContext_sp->client();
     }
 
@@ -586,7 +586,7 @@ QueueHandle::downstream(unsigned int downstreamSubQueueId) const
 
 inline const mqbi::DispatcherClient* QueueHandle::client() const
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(d_haveClient)) {
+    if (d_haveClient) [[likely]] {
         return d_clientContext_sp->client();
     }
 

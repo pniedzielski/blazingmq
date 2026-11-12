@@ -257,7 +257,7 @@ class MessageDumper final {
 // ACCESSORS
 inline bool MessageDumper::DumpContext::isEnabled() const
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(!d_isEnabled)) {
+    if (!d_isEnabled) [[likely]] {
         // Short-circuit 'isEnabled' computation because we can ascertain it's
         // going to be false
         return false;  // RETURN

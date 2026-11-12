@@ -27,7 +27,6 @@
 // BDE
 #include <bsl_utility.h>
 #include <bsl_vector.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqimp {
@@ -188,8 +187,7 @@ int MessageCorrelationIdContainer::remove(const bmqt::MessageGUID& key,
     bsls::SpinLockGuard guard(&d_lock);  // LOCK
 
     CorrelationIdsMap::const_iterator cit = d_correlationIds.find(key);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_correlationIds.end() == cit)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_correlationIds.end() == cit) [[unlikely]] {
         return -1;  // RETURN
     }
 
@@ -210,8 +208,7 @@ void MessageCorrelationIdContainer::associateMessageData(
     bsls::SpinLockGuard guard(&d_lock);  // LOCK
 
     auto it = d_correlationIds.find(header.messageGUID());
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(it == d_correlationIds.end())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (it == d_correlationIds.end()) [[unlikely]] {
         BSLS_ASSERT_SAFE(false && "Key not found");
         return;  // RETURN
     }
@@ -226,7 +223,7 @@ void MessageCorrelationIdContainer::associateMessageData(
         header.flags(),
         bmqp::PutHeaderFlags::e_ACK_REQUESTED);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(isAckRequested)) {
+    if (isAckRequested) [[likely]] {
         // Add a per queue item with sending timestamp
         addQueueItem(it->second.d_queueId, header.messageGUID(), sentTime);
     }
@@ -262,9 +259,7 @@ bool MessageCorrelationIdContainer::iterateAndInvoke(
 
     for (const bmqt::MessageGUID& key : keys) {
         CorrelationIdsMap::const_iterator cit = d_correlationIds.find(key);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(cit ==
-                                                  d_correlationIds.end())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (cit == d_correlationIds.end()) [[unlikely]] {
             BSLS_ASSERT_SAFE(false && "Key not found");
             continue;  // CONTINUE
         }
@@ -300,8 +295,7 @@ bsls::TimeInterval MessageCorrelationIdContainer::getExpiredIds(
         // is no longer opened. All its pending messages should be removed, so
         // add them to the expired list.
         const bool isOrphan = cit == queueExpirationTimeoutMap.end();
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(isOrphan)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (isOrphan) [[unlikely]] {
             for (const auto& [guid, sentTime] : items) {
                 keys->push_back(guid);
             }
@@ -318,8 +312,7 @@ bsls::TimeInterval MessageCorrelationIdContainer::getExpiredIds(
             bsls::TimeInterval messageTimeout = sentTime;
             messageTimeout.addMilliseconds(queueTimeoutMs);
 
-            if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(messageTimeout >
-                                                    expirationTime)) {
+            if (messageTimeout > expirationTime) [[likely]] {
                 // No more expired items in the current queue.  Check the next
                 // expiration time.
                 if ((minTs == 0) || (minTs > messageTimeout)) {
@@ -340,8 +333,7 @@ int MessageCorrelationIdContainer::find(bmqt::CorrelationId*     correlationId,
     bsls::SpinLockGuard guard(&d_lock);  // LOCK
 
     auto cit = d_correlationIds.find(key);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_correlationIds.end() == cit)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_correlationIds.end() == cit) [[unlikely]] {
         return -1;  // RETURN
     }
 

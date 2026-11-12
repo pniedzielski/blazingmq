@@ -159,10 +159,8 @@ void QueueHandle::processConfirm(const bmqt::MessageGUID& msgGUID,
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queue_sp->inDispatcherThread());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !bmqt::QueueFlagsUtil::isReader(handleParameters().flags()))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!bmqt::QueueFlagsUtil::isReader(handleParameters().flags()))
+        [[unlikely]] {
         // NOTE: While we should never receive a CONFIRM for a queue which was
         //       not opened with READ flag, we can't assert that here because
         //       the SDK can not guarantee it at this time, and so it's
@@ -192,10 +190,7 @@ void QueueHandle::processConfirm(const bmqt::MessageGUID& msgGUID,
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !validateDownstreamId(downstreamSubQueueId))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!validateDownstreamId(downstreamSubQueueId)) [[unlikely]] {
         BMQ_LOGTHROTTLE_WARN
             << "#CLIENT_IMPROPER_BEHAVIOR "
             << "Received a CONFIRM message from client '"
@@ -237,10 +232,8 @@ void QueueHandle::processReject(const bmqt::MessageGUID& msgGUID,
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queue_sp->inDispatcherThread());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !bmqt::QueueFlagsUtil::isReader(handleParameters().flags()))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!bmqt::QueueFlagsUtil::isReader(handleParameters().flags()))
+        [[unlikely]] {
         // NOTE: We should not be receiving a REJECT for a queue which was not
         //       opened with READ flag.
         BMQ_LOGTHROTTLE_WARN << "#CLIENT_IMPROPER_BEHAVIOR "
@@ -253,10 +246,7 @@ void QueueHandle::processReject(const bmqt::MessageGUID& msgGUID,
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !validateDownstreamId(downstreamSubQueueId))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!validateDownstreamId(downstreamSubQueueId)) [[unlikely]] {
         BMQ_LOGTHROTTLE_WARN
             << "#CLIENT_IMPROPER_BEHAVIOR "
             << "Received a REJECT message from client '"
@@ -272,9 +262,7 @@ void QueueHandle::processReject(const bmqt::MessageGUID& msgGUID,
     const mqbi::QueueHandle::RedeliverySp& messages = subStream->d_data;
 
     UnconfirmedMessageInfoMap::iterator it = messages->find(msgGUID);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(it == messages->end())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (it == messages->end()) [[unlikely]] {
         // This can happen when switching primaries and the new Primary did not
         // get a chance to PUSH the 'msgGUID' (which the old Primary did)
         // _before_ the Downstream generated the Reject.
@@ -325,9 +313,7 @@ QueueHandle::updateMonitor(const bsl::shared_ptr<Downstream>& subStream,
 
     mqbi::QueueHandle::UnconfirmedMessageInfoMap::iterator it = messages->find(
         msgGUID);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(it == messages->end())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (it == messages->end()) [[unlikely]] {
         // The GUID was not found in the pending unconfirmed messages, one of
         // these happened (either rejection or confirmation):
         //
@@ -968,9 +954,7 @@ void QueueHandle::deliverMessage(
                 iter.guid(),
                 mqbi::UnconfirmedMessageInfo(msgSize, now, subscriptionId)));
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc.second == false)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (rc.second == false) [[unlikely]] {
             // This message was already delivered to this specific client.
             // This could happen in case of primary switch, where the new
             // primary will redistribute outstanding messages.  If (by luck)
@@ -1005,12 +989,10 @@ void QueueHandle::deliverMessage(
         //       would be receiving a message bigger than it's
         //       maxUnconfirmedBytes.
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                subscription->d_unconfirmedMonitor.state() ==
-                    mqbu::ResourceUsageMonitorState::e_STATE_FULL &&
-                subscription->d_unconfirmedMonitor.messageCapacity() > 1)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (subscription->d_unconfirmedMonitor.state() ==
+                mqbu::ResourceUsageMonitorState::e_STATE_FULL &&
+            subscription->d_unconfirmedMonitor.messageCapacity() > 1)
+            [[unlikely]] {
             // We do NOT log when 'maxUnconfirmedMessages == 1' because this is
             // a 'legitimate' special case that consumers willing to have more
             // fine grained control over message distribution load may use
@@ -1038,8 +1020,7 @@ void QueueHandle::deliverMessage(
         }
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(targetSubscriptions.empty())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (targetSubscriptions.empty()) [[unlikely]] {
         return;  // RETURN
     }
 
@@ -1103,12 +1084,10 @@ void QueueHandle::applyStreamParameters(
                   << ", appId: " << streamParameters.appId()
                   << "] with streamParameters: " << streamParameters;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(d_haveClient)) {
+    if (d_haveClient) [[likely]] {
         d_queue_sp->configureHandle(this, streamParameters, configuredCb);
     }
-    else {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    else [[unlikely]] {
         BALL_LOG_ERROR << "#CLIENT_IMPROPER_BEHAVIOR "
                        << "Attempting to configure handle [" << this
                        << "] without a client, queue '" << d_queue_sp->uri()
@@ -1280,8 +1259,7 @@ void QueueHandle::onAckMessage(const bmqp::AckMessage& ackMessage)
 
     // NOTE: ACK comes from upstream, and client may have gone away, so we
     //       check for it here.
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_haveClient)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_haveClient) [[unlikely]] {
         if (d_throttledFailedAckMessages.requestPermission()) {
             BALL_LOG_INFO << "#CLIENT_ACK_FAILURE: Received an ACK from "
                           << "upstream for unavailable client "
@@ -1322,10 +1300,7 @@ void QueueHandle::onAckMessage(const bmqp::AckMessage& ackMessage)
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(status !=
-                                              bmqt::AckResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (status != bmqt::AckResult::e_SUCCESS) [[unlikely]] {
         // Throttle error log if this is a 'failed Ack': note that we log at
         // INFO level in order not to overwhelm the dashboard, if a queue is
         // full, every post will nack, which could be a lot.

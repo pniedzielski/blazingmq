@@ -47,7 +47,6 @@
 #include <bslmt_mutex.h>
 #include <bslmt_threadattributes.h>
 #include <bslmt_threadutil.h>
-#include <bsls_performancehint.h>
 
 // PROMETHEUS
 #include "prometheus/exposer.h"
@@ -1005,8 +1004,7 @@ const bmqst::StatContext*
 PrometheusStatConsumer::getStatContext(const char* name) const
 {
     auto cIt = d_contextsMap.find(name);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(cIt == d_contextsMap.end())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (cIt == d_contextsMap.end()) [[unlikely]] {
         BSLS_ASSERT_SAFE(false &&
                          "StatContext not found in PrometheusStatConsumer");
         return 0;  // RETURN

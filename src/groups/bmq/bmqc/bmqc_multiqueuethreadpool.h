@@ -689,9 +689,7 @@ inline void MultiQueueThreadPool<TYPE>::processQueue(QueueInfo& info)
             info.d_queue_p->popFront(&event);
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(0 == event)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (0 == event) [[unlikely]] {
             // Process monitor event
             if (0 == info.d_processQueueRefCount.subtractRelaxed(1)) {
                 // 0 ref count means that:
@@ -923,8 +921,7 @@ inline int MultiQueueThreadPool<TYPE>::enqueueEventOnAllQueues(EventSp&& event)
         // [try to] Push back item
         const int pushRet = queueSp->d_queue_p->pushBack(eventObj);
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(0 != pushRet)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (0 != pushRet) [[unlikely]] {
             lastError = pushRet;
         }
     }

@@ -340,8 +340,8 @@ void StatValueUtil::loadUpdateImp(bmqstm::StatValueUpdate* update,
 
     bool                       full = fullUpdate;
     const StatValue::Snapshot* last = 0;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !full && 1 == value.historySize(0) && 1 == value.numLevels())) {
+    if (!full && 1 == value.historySize(0) && 1 == value.numLevels())
+        [[unlikely]] {
         full = true;
     }
     else {

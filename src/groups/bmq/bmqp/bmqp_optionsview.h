@@ -442,14 +442,11 @@ int OptionsView::loadSubQueueInfosOptionHelper(
                                        &subQueueInfosSize,
                                        optionType,
                                        false);  // hasPadding
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return rc_INVALID_BLOB;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(subQueueInfosSize %
-                                              k_ITEM_SIZE)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (subQueueInfosSize % k_ITEM_SIZE) [[unlikely]] {
         return rc_INVALID_PAYLOAD_SIZE;  // RETURN
     }
     out->resize(subQueueInfosSize / k_ITEM_SIZE);
@@ -460,8 +457,7 @@ int OptionsView::loadSubQueueInfosOptionHelper(
                                     firstSubQueueInfoPos,
                                     subQueueInfosSize);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         // The range
         // [firstSubQueueInfoPos, firstSubQueueInfoPos + subQueueInfosSize]
         // doesn't fall within the blob.

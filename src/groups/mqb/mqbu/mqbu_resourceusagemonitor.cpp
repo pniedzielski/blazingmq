@@ -168,29 +168,22 @@ ResourceUsageMonitor::updateValueInternal(ResourceAttributes* attributes,
     //       undergo a state transition and none of the second-level if
     //       statements hit true.
     if (delta > 0) {
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                attributes->state() == RUMState::e_STATE_NORMAL &&
-                attributes->value() >= attributes->highWatermark())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (attributes->state() == RUMState::e_STATE_NORMAL &&
+            attributes->value() >= attributes->highWatermark()) [[unlikely]] {
             // 'NORMAL' -> 'HIGH_WATERMARK'
             attributes->setState(RUMState::e_STATE_HIGH_WATERMARK);
             ret = RUMStateTransition::e_HIGH_WATERMARK;
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                attributes->state() == RUMState::e_STATE_HIGH_WATERMARK &&
-                attributes->value() >= attributes->capacity())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (attributes->state() == RUMState::e_STATE_HIGH_WATERMARK &&
+            attributes->value() >= attributes->capacity()) [[unlikely]] {
             // 'HIGH_WATERMARK' -> 'FULL'
             attributes->setState(RUMState::e_STATE_FULL);
             ret = RUMStateTransition::e_FULL;
         }
     }
     else if (delta < 0) {
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(attributes->capacity() ==
-                                                  0)) {
+        if (attributes->capacity() == 0) [[unlikely]] {
             // Capacity is set to 0. In other circumstances there might be a
             // change of state if the new value crosses from HIGH/FULL boundary
             // limit into low watermark.  However, in this specific case it
@@ -203,21 +196,15 @@ ResourceUsageMonitor::updateValueInternal(ResourceAttributes* attributes,
             return RUMStateTransition::e_NO_CHANGE;  // RETURN
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                attributes->state() == RUMState::e_STATE_FULL &&
-                attributes->value() <= attributes->highWatermark())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (attributes->state() == RUMState::e_STATE_FULL &&
+            attributes->value() <= attributes->highWatermark()) [[unlikely]] {
             // 'FULL' -> 'HIGH_WATERMARK'
             attributes->setState(RUMState::e_STATE_HIGH_WATERMARK);
             // no state change notification
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                attributes->state() == RUMState::e_STATE_HIGH_WATERMARK &&
-                attributes->value() <= attributes->lowWatermark())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (attributes->state() == RUMState::e_STATE_HIGH_WATERMARK &&
+            attributes->value() <= attributes->lowWatermark()) [[unlikely]] {
             // 'HIGH_WATERMARK' -> 'NORMAL'
             attributes->setState(RUMState::e_STATE_NORMAL);
             ret = RUMStateTransition::e_LOW_WATERMARK;
@@ -471,7 +458,7 @@ ResourceUsageMonitor::update(bsls::Types::Int64 bytesDelta,
 
     // An individual resource's state might have changed and yet the overall
     // state of the monitor has not.
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(stateBefore == stateAfter)) {
+    if (stateBefore == stateAfter) [[likely]] {
         // Monitor state has not changed
         return RUMStateTransition::e_NO_CHANGE;  // RETURN
     }

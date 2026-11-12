@@ -24,7 +24,6 @@
 #include <bsl_climits.h>
 #include <bsl_functional.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqu {
@@ -81,9 +80,7 @@ bool StringUtil::contains(const bsl::string&       str,
 bool StringUtil::isPrintable(const bslstl::StringRef& str)
 {
     for (char c : str) {
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                !bdlb::CharType::isPrint(c))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (!bdlb::CharType::isPrint(c)) [[unlikely]] {
             return false;  // RETURN
         }
     }
@@ -97,9 +94,7 @@ bsl::string& StringUtil::sanitize(bsl::string* str)
     BSLS_ASSERT(str);
 
     for (char& c : *str) {
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                !bdlb::CharType::isPrint(c))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (!bdlb::CharType::isPrint(c)) [[unlikely]] {
             c = '?';
         }
     }

@@ -22,7 +22,6 @@
 #include <bslmt_lockguard.h>
 #include <bslmt_threadattributes.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 #include <bsls_systemtime.h>
 
 #include <bmqu_printutil.h>
@@ -36,8 +35,7 @@ namespace mqbnet {
 
 size_t Channel::ControlArgs::eventSize() const
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(messageCount() == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (messageCount() == 0) [[unlikely]] {
         return 0;  // RETURN
     }
 
@@ -532,10 +530,7 @@ Channel::writeBufferedItem(bool*                                  isConsumed,
                             x,
                             item.d_state);
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                rc == bmqt::GenericResult::e_NOT_READY)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (rc == bmqt::GenericResult::e_NOT_READY) [[unlikely]] {
             // not keeping the control pseudo builder
             *isConsumed = false;
         }
@@ -579,8 +574,7 @@ bmqt::EventBuilderResult::Enum Channel::pack(bmqp::PushEventBuilder& builder,
 
     bmqt::EventBuilderResult::Enum rc = builder.addSubQueueInfosOption(
         args.d_subQueueInfos);
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-            rc == bmqt::EventBuilderResult::e_SUCCESS)) {
+    if (rc == bmqt::EventBuilderResult::e_SUCCESS) [[likely]] {
         rc = builder.packMessage(*args.d_data_sp,
                                  args.d_queueId,
                                  args.d_msgId,
@@ -600,8 +594,7 @@ bmqt::EventBuilderResult::Enum Channel::pack(bmqp::PushEventBuilder& builder,
 
     bmqt::EventBuilderResult::Enum rc = builder.addSubQueueInfosOption(
         args.d_subQueueInfos);
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-            rc == bmqt::EventBuilderResult::e_SUCCESS)) {
+    if (rc == bmqt::EventBuilderResult::e_SUCCESS) [[likely]] {
         rc = builder.packMessage(args.d_queueId,
                                  args.d_msgId,
                                  args.d_flags,
@@ -672,33 +665,23 @@ Channel::flushAll(const bsl::shared_ptr<bmqio::Channel>& channel)
     bmqio::StatusCategory::Enum rc;
 
     rc = flushBuilder(d_pushBuilder, channel);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqio::StatusCategory::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != bmqio::StatusCategory::e_SUCCESS) [[unlikely]] {
         return rc;  // RETURN
     }
     rc = flushBuilder(d_confirmBuilder, channel);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqio::StatusCategory::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != bmqio::StatusCategory::e_SUCCESS) [[unlikely]] {
         return rc;  // RETURN
     }
     rc = flushBuilder(d_putBuilder, channel);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqio::StatusCategory::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != bmqio::StatusCategory::e_SUCCESS) [[unlikely]] {
         return rc;  // RETURN
     }
     rc = flushBuilder(d_ackBuilder, channel);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqio::StatusCategory::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != bmqio::StatusCategory::e_SUCCESS) [[unlikely]] {
         return rc;  // RETURN
     }
     rc = flushBuilder(d_rejectBuilder, channel);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqio::StatusCategory::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != bmqio::StatusCategory::e_SUCCESS) [[unlikely]] {
         return rc;  // RETURN
     }
 
@@ -947,9 +930,7 @@ void Channel::threadFn()
             bmqt::GenericResult::Enum rc =
                 writeBufferedItem(&isConsumed, channel, description, *item);
 
-            if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                    rc == bmqt::GenericResult::e_NOT_READY)) {
-                BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+            if (rc == bmqt::GenericResult::e_NOT_READY) [[unlikely]] {
                 BALL_LOG_WARN << "Reached a limit while writing event "
                               << item->d_type << " to " << description
                               << " with " << numItems() << " items and "
@@ -962,8 +943,7 @@ void Channel::threadFn()
                     setState(e_HWM);
                 }
             }
-            else if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                         rc == bmqt::GenericResult::e_NOT_CONNECTED)) {
+            else if (rc == bmqt::GenericResult::e_NOT_CONNECTED) [[unlikely]] {
                 // Set the state to e_CLOSE to avoid repeated attempts to write
                 // until 'OnClose' calls 'resetChannel'.
 

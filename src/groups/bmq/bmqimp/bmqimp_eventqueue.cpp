@@ -39,7 +39,6 @@
 #include <bslma_allocator.h>
 #include <bslmt_threadutil.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 #include <bsls_timeutil.h>
 
 namespace BloombergLP {
@@ -165,10 +164,7 @@ bool EventQueue::hasPriorityEvents(bsl::shared_ptr<Event>* event)
     BSLS_ASSERT_SAFE(event);
 
     // Check if should emit a SlowConsumer::HighWatermark event
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            d_shouldEmitHighWatermark.testAndSwap(1, 0) == 1)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (d_shouldEmitHighWatermark.testAndSwap(1, 0) == 1) [[unlikely]] {
         // Create a SlowConsumer::HighWatermark event
         *event = getEvent();
         (*event)->configureAsSessionEvent(
@@ -253,8 +249,7 @@ void EventQueue::dispatchNextEvent()
     while (true) {
         const bsl::shared_ptr<Event> eventSp = popFront();
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!eventSp)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (!eventSp) [[unlikely]] {
             // Empty event is the poison pill signal; terminate the thread
             break;  // BREAK
         }
@@ -518,8 +513,7 @@ int EventQueue::pushBack(bsl::shared_ptr<Event>& event)
         rc = d_queue.tryPushBack(item);
     }  // d_pushBackSpinlock UNLOCKED
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         BSLS_ASSERT_SAFE(false && "Impossible - failed to enqueue");
         BALL_LOG_ERROR << id() << "Failed to enqueue: " << *item.d_event_sp;
         return -1;  // RETURN
@@ -538,8 +532,7 @@ bsl::shared_ptr<Event> EventQueue::popFront()
     bsl::shared_ptr<Event> event;
 
     // Check for priority events first
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(hasPriorityEvents(&event))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (hasPriorityEvents(&event)) [[unlikely]] {
         afterEventPopped(QueueItem(event, bmqu::Time::highResolutionTimer()));
         return event;  // RETURN
     }
@@ -560,8 +553,7 @@ EventQueue::timedPopFront(const bsls::TimeInterval& timeout,
     bsl::shared_ptr<Event> event;
 
     // Check for priority events first
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(hasPriorityEvents(&event))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (hasPriorityEvents(&event)) [[unlikely]] {
         afterEventPopped(QueueItem(event, bmqu::Time::highResolutionTimer()));
         return event;  // RETURN
     }
@@ -570,19 +562,16 @@ EventQueue::timedPopFront(const bsls::TimeInterval& timeout,
     // Look in the queue
     QueueItem item;
     const int rc = d_queue.timedPopFront(&item, absTimeOut);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (rc != 0) [[unlikely]] {
         bmqt::SessionEventType::Enum type;
         bslstl::StringRef            errorDescription;
-        if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(rc == -1)) {
+        if (rc == -1) [[likely]] {
             // We timed out.. create a timeout event
             type             = bmqt::SessionEventType::e_TIMEOUT;
             errorDescription = "No events to pop from queue during the "
                                "specified timeInterval";
         }
-        else {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        else [[unlikely]] {
             // Error occurred
             type             = bmqt::SessionEventType::e_ERROR;
             errorDescription = "An error occurred while attempting to pop from"

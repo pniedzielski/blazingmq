@@ -69,7 +69,7 @@ AtomicValidator* AtomicValidatorGuard::release()
     AtomicValidator* v = d_validator_p;
     d_validator_p      = 0;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(d_isAcquired)) {
+    if (d_isAcquired) [[likely]] {
         // Clear acquisition flag
         d_isAcquired = false;
         return v;  // RETURN

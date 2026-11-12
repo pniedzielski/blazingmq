@@ -29,7 +29,6 @@
 #include <bsl_memory.h>
 #include <bslma_managedptr.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqa {
@@ -99,25 +98,19 @@ MessageEventBuilder::packMessage(const bmqa::QueueId& queueId)
     // Check that the queue is valid, which means not only the OPENED state but
     // it also may be in PENDING or REOPENING states and still accept PUT
     // messages.
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!queueSpRef->isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!queueSpRef->isValid()) [[unlikely]] {
         return bmqt::EventBuilderResult::e_QUEUE_INVALID;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !bmqt::QueueFlagsUtil::isWriter(queueSpRef->flags()))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!bmqt::QueueFlagsUtil::isWriter(queueSpRef->flags())) [[unlikely]] {
         return bmqt::EventBuilderResult::e_QUEUE_READONLY;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(queueSpRef->isSuspended())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (queueSpRef->isSuspended()) [[unlikely]] {
         return bmqt::EventBuilderResult::e_QUEUE_SUSPENDED;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(builder->unpackedMessageSize() <=
-                                              0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (builder->unpackedMessageSize() <= 0) [[unlikely]] {
         return bmqt::EventBuilderResult::e_PAYLOAD_EMPTY;  // RETURN
     }
 
@@ -151,8 +144,7 @@ MessageEventBuilder::packMessage(const bmqa::QueueId& queueId)
         rc = builder->packMessage(queueSpRef->id());
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-            rc == bmqt::EventBuilderResult::e_SUCCESS)) {
+    if (rc == bmqt::EventBuilderResult::e_SUCCESS) [[likely]] {
         if (builder->lastPackedMesageCompressionRatio() != 1) {
             BSLS_ASSERT_SAFE(builder->lastPackedMesageCompressionRatio() !=
                              -1);

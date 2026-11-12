@@ -151,17 +151,14 @@ void AdminSession::sendPacket()
     // This method is the centralized *single* place where we should try to
     // send data to the client over the channel.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_running)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_running) [[unlikely]] {
         return;  // RETURN
     }
 
     // Try to send the data, or drop it if we fail due to high watermark limit.
     bmqio::Status status;
     d_channel_sp->write(&status, blob);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            status.category() != bmqio::StatusCategory::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (status.category() != bmqio::StatusCategory::e_SUCCESS) [[unlikely]] {
         if (status.category() == bmqio::StatusCategory::e_CONNECTION) {
             // This code relies on the fact that `e_CONNECTION` error cannot be
             // returned without calling `tearDown`.
@@ -349,7 +346,7 @@ void AdminSession::processEvent(const bmqp::Event&                    event,
                   << ": Received control message: " << controlMessage;
 
     rc = bmqp::ControlMessageUtil::validate(controlMessage);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
+    if (rc != 0) [[unlikely]] {
         // Malformed control message should be rejected
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         BALL_LOG_ERROR << "#CORRUPTED_CONTROL_MESSAGE " << description()

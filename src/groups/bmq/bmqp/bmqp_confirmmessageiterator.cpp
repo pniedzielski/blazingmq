@@ -19,7 +19,6 @@
 // BDE
 #include <bdlbb_blob.h>
 #include <bsl_iostream.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqp {
@@ -72,8 +71,7 @@ int ConfirmMessageIterator::next()
         rc_INVALID_ADVANCE_LENGTH = -3
     };
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValid()) [[unlikely]] {
         return rc_INVALID;  // RETURN
     }
 
@@ -91,8 +89,7 @@ int ConfirmMessageIterator::next()
 
     // Validation: must ensure that 'd_advanceLength > 0' after update, or
     // iteration process via 'next()' might be infinite
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_advanceLength == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_advanceLength == 0) [[unlikely]] {
         return rc_INVALID_ADVANCE_LENGTH;  // RETURN
     }
 
@@ -104,8 +101,7 @@ int ConfirmMessageIterator::next()
                     true,
                     false);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_message.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_message.isSet()) [[unlikely]] {
         return rc_NOT_ENOUGH_BYTES;  // RETURN
     }
 
@@ -138,8 +134,7 @@ int ConfirmMessageIterator::reset(const bdlbb::Blob* blob,
     bool rc = d_blobIter.advance(eventHeader.headerWords() *
                                  Protocol::k_WORD_SIZE);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!rc)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!rc) [[unlikely]] {
         // Set the iterator to invalid state
         d_header.reset();
         return rc_INVALID_EVENTHEADER;  // RETURN
@@ -158,15 +153,12 @@ int ConfirmMessageIterator::reset(const bdlbb::Blob* blob,
                    true,
                    false);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_header.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_header.isSet()) [[unlikely]] {
         return rc_INVALID_CONFIRMHEADER;  // RETURN
     }
 
     const int headerSize = d_header->headerWords() * Protocol::k_WORD_SIZE;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            headerSize < ConfirmHeader::k_MIN_HEADER_SIZE)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (headerSize < ConfirmHeader::k_MIN_HEADER_SIZE) [[unlikely]] {
         // Header is declaring less bytes than expected, probably this is
         // because header is malformed.
         // Explicitly reset the proxy so that isValid() returns false.
@@ -174,9 +166,7 @@ int ConfirmMessageIterator::reset(const bdlbb::Blob* blob,
         return rc_INVALID_CONFIRMHEADER;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(headerSize >
-                                              d_blobIter.remaining())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (headerSize > d_blobIter.remaining()) [[unlikely]] {
         // The header is declaring more bytes than are left in the blob.
         // Explicitly reset the proxy so that isValid() returns false.
         d_header.reset();
@@ -184,8 +174,7 @@ int ConfirmMessageIterator::reset(const bdlbb::Blob* blob,
     }
 
     d_header.resize(headerSize);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_header.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_header.isSet()) [[unlikely]] {
         return rc_INVALID_CONFIRMHEADER;  // RETURN
     }
 

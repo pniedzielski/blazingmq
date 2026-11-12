@@ -300,10 +300,7 @@ FileBackedStorage::put(mqbi::StorageMessageAttributes*     attributes,
     mqbu::CapacityMeter::CommitResult capacity =
         d_capacityMeter.commitUnreserved(1, msgSize);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            capacity != mqbu::CapacityMeter::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (capacity != mqbu::CapacityMeter::e_SUCCESS) [[unlikely]] {
         return (capacity == mqbu::CapacityMeter::e_LIMIT_MESSAGES
                     ? mqbi::StorageResult::e_LIMIT_MESSAGES
                     : mqbi::StorageResult::e_LIMIT_BYTES);  // RETURN
@@ -374,9 +371,7 @@ FileBackedStorage::put(mqbi::StorageMessageAttributes*     attributes,
                                        appData,
                                        options,
                                        d_queueKey);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (rc != 0) [[unlikely]] {
         d_virtualStorageCatalog.gcAutoConfirms(*dataStreamMessage);
         // Delete all items pointed by all handles for this GUID.
         const RecordHandlesArray& handles = item->d_array;
@@ -402,8 +397,7 @@ FileBackedStorage::put(mqbi::StorageMessageAttributes*     attributes,
     dataStreamMessage = d_virtualStorageCatalog.insert(msgGUID,
                                                        dataStreamMessage);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(out)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (out) [[unlikely]] {
         d_virtualStorageCatalog.setup(dataStreamMessage.get());
         *out = dataStreamMessage.get();
     }

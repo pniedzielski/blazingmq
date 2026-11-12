@@ -64,7 +64,6 @@
 #include <bslmt_once.h>
 #include <bslmt_threadattributes.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 #include <bsls_platform.h>
 #include <bsls_systemclocktype.h>
 #include <bsls_systemtime.h>
@@ -306,8 +305,7 @@ void Application::readCb(
 {
     // executed by the *IO* thread
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!status)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!status) [[unlikely]] {
         if (status.category() != bmqio::StatusCategory::e_CANCELED) {
             BALL_LOG_ERROR << id() << "#TCP_READ_ERROR " << channel->peerUri()
                            << ": ReadCallback error [status: " << status
@@ -326,8 +324,7 @@ void Application::readCb(
     const int rc = bmqio::ChannelUtil::handleRead(readBlob.get(),
                                                   numNeeded,
                                                   blob);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         BALL_LOG_ERROR << id() << "#TCP_READ_ERROR " << channel->peerUri()
                        << ": ReadCallback unrecoverable error "
                        << "[status: " << status << "]:\n"
@@ -337,8 +334,7 @@ void Application::readCb(
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(readBlob->length() == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (readBlob->length() == 0) [[unlikely]] {
         // Don't yet have a full blob
         return;  // RETURN
     }

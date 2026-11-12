@@ -26,7 +26,6 @@
 #include <bsl_algorithm.h>
 #include <bsl_ostream.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace mqbu {
@@ -277,10 +276,8 @@ void CapacityMeter::commit(bsls::Types::Int64 messages,
         // Update monitor
         ResourceUsageMonitorStateTransition::Enum monitorStateTransition =
             d_monitor.update(bytes, messages);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                monitorStateTransition !=
-                ResourceUsageMonitorStateTransition::e_NO_CHANGE)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (monitorStateTransition !=
+            ResourceUsageMonitorStateTransition::e_NO_CHANGE) [[unlikely]] {
             logOnMonitorStateTransition(monitorStateTransition);
         }
     }  // close lock guard scope
@@ -309,9 +306,7 @@ CapacityMeter::commitUnreserved(bsls::Types::Int64 messages,
     bool hasBytesCapacity = d_monitor.bytes() + d_nbBytesReserved <=
                             d_monitor.byteCapacity();
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!hasMessagesCapacity ||
-                                              !hasBytesCapacity)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!hasMessagesCapacity || !hasBytesCapacity) [[unlikely]] {
         // Self doesn't have enough capacity
         return !hasMessagesCapacity ? e_LIMIT_MESSAGES
                                     : e_LIMIT_BYTES;  // RETURN
@@ -321,8 +316,7 @@ CapacityMeter::commitUnreserved(bsls::Types::Int64 messages,
     // on the parent.
     if (d_parent_p) {
         CommitResult res = d_parent_p->commitUnreserved(messages, bytes);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(res != e_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (res != e_SUCCESS) [[unlikely]] {
             return res;  // RETURN
         }
     }
@@ -330,10 +324,8 @@ CapacityMeter::commitUnreserved(bsls::Types::Int64 messages,
     // Update monitor
     ResourceUsageMonitorStateTransition::Enum monitorStateTransition =
         d_monitor.update(bytes, messages);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            monitorStateTransition !=
-            ResourceUsageMonitorStateTransition::e_NO_CHANGE)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (monitorStateTransition !=
+        ResourceUsageMonitorStateTransition::e_NO_CHANGE) [[unlikely]] {
         logOnMonitorStateTransition(monitorStateTransition);
     }
 

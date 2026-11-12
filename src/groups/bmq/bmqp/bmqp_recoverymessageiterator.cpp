@@ -18,7 +18,6 @@
 #include <bmqscm_version.h>
 // BDE
 #include <bsl_iostream.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqp {
@@ -64,8 +63,7 @@ int RecoveryMessageIterator::next()
         rc_INVALID_MESSAGE_SIZE = -4
     };
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValid()) [[unlikely]] {
         return rc_INVALID;  // RETURN
     }
 
@@ -83,8 +81,7 @@ int RecoveryMessageIterator::next()
                    true,
                    false);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_header.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_header.isSet()) [[unlikely]] {
         // We couldn't read a RecoveryHeader.. set the state of this iterator
         // to invalid
         d_advanceLength = -1;
@@ -92,32 +89,26 @@ int RecoveryMessageIterator::next()
     }
 
     const int headerSize = d_header->headerWords() * Protocol::k_WORD_SIZE;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            headerSize < RecoveryHeader::k_MIN_HEADER_SIZE)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (headerSize < RecoveryHeader::k_MIN_HEADER_SIZE) [[unlikely]] {
         d_advanceLength = -1;
         return rc_NO_RECOVERYHEADER;  // RETURN
     }
 
     d_header.resize(headerSize);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_header.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_header.isSet()) [[unlikely]] {
         d_advanceLength = -1;
         return rc_NO_RECOVERYHEADER;  // RETURN
     }
 
     const int messageSize = d_header->messageWords() * Protocol::k_WORD_SIZE;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(messageSize < headerSize)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (messageSize < headerSize) [[unlikely]] {
         d_advanceLength = -1;
         return rc_INVALID_MESSAGE_SIZE;  // RETURN
     }
 
     // Validation: make sure blob has enough data as indicated by
     // RecoveryHeader
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_blobIter.remaining() <
-                                              messageSize)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_blobIter.remaining() < messageSize) [[unlikely]] {
         // Set the state of this iterator to invalid
         d_advanceLength = -1;
         return rc_NOT_ENOUGH_BYTES;  // RETURN
@@ -148,8 +139,7 @@ int RecoveryMessageIterator::reset(const bdlbb::Blob* blob,
 
     bool rc = d_blobIter.advance(eventHeader.headerWords() *
                                  Protocol::k_WORD_SIZE);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!rc)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!rc) [[unlikely]] {
         // Set the state of this iterator to invalid
         d_advanceLength = -1;
         return rc_INVALID_EVENTHEADER;  // RETURN

@@ -254,14 +254,12 @@ int SchemaEventBuilder::setMessage(const TYPE& message, EventType::Enum type)
                                          message,
                                          d_encodingType,
                                          d_allocator_p);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_errorStream.isEmpty())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_errorStream.isEmpty()) [[unlikely]] {
         BALL_LOG_DEBUG << d_errorStream.str();
         d_errorStream.reset();
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         // Failed to encode
         return rc;  // RETURN
     }
@@ -273,9 +271,7 @@ int SchemaEventBuilder::setMessage(const TYPE& message, EventType::Enum type)
     eventHeader->setLength(d_blob_sp->length());
 
     // Guard against too big events
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_blob_sp->length() >
-                                              EventHeader::k_MAX_SIZE_SOFT)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_blob_sp->length() > EventHeader::k_MAX_SIZE_SOFT) [[unlikely]] {
         reset();
         return -1;  // RETURN
     }

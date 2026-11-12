@@ -25,7 +25,6 @@
 #include <bdlbb_blobutil.h>
 #include <bsl_cstring.h>  // for bsl::memset
 #include <bsla_annotations.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqp {
@@ -139,8 +138,7 @@ void OptionUtil::OptionsBox::add(bdlbb::Blob*      blob,
         bdlbb::BlobUtil::append(blob, payload, payloadSize);
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(option.padding())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (option.padding()) [[unlikely]] {
         // Write padding
         ProtocolUtil::appendPadding(blob, payloadSize);
     }
@@ -158,34 +156,26 @@ OptionUtil::OptionsBox::canAdd(int currentSize, const OptionMeta& option) const
 
     const int size = option.size();
     // Validate option size vs. maximum allowed per option
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(size >
-                                              OptionHeader::k_MAX_SIZE)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (size > OptionHeader::k_MAX_SIZE) [[unlikely]] {
         // The total size of this option would exceed the maximum allowed.
         return bmqt::EventBuilderResult::e_OPTION_TOO_BIG;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_optionsCount + 1 >
-                                              OptionHeader::k_MAX_TYPE)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_optionsCount + 1 > OptionHeader::k_MAX_TYPE) [[unlikely]] {
         // More options than the maximum allowed.
         return bmqt::EventBuilderResult::e_UNKNOWN;  // RETURN
     }
 
     const int allOptionsSize = d_optionsSize + size;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(allOptionsSize >
-                                              Protocol::k_MAX_OPTIONS_SIZE)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (allOptionsSize > Protocol::k_MAX_OPTIONS_SIZE) [[unlikely]] {
         // The total options size would exceed the enforced maximum.
         return bmqt::EventBuilderResult::e_OPTION_TOO_BIG;  // RETURN
     }
 
     const int evtSize = currentSize + allOptionsSize;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(evtSize >
-                                              EventHeader::k_MAX_SIZE_SOFT)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (evtSize > EventHeader::k_MAX_SIZE_SOFT) [[unlikely]] {
         // The total size of this event would exceed the enforced maximum.
         return bmqt::EventBuilderResult::e_OPTION_TOO_BIG;  // RETURN
     }
@@ -205,7 +195,7 @@ bool OptionUtil::loadOptionsPosition(int*                      optionsSize,
     const int myOptionsSize = optionsWords * Protocol::k_WORD_SIZE;
 
     // At the moment, this is called always, so expected that no options exist
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(myOptionsSize == 0)) {
+    if (myOptionsSize == 0) [[likely]] {
         return true;  // RETURN
     }
 
@@ -217,8 +207,7 @@ bool OptionUtil::loadOptionsPosition(int*                      optionsSize,
                                             blob,
                                             startPosition,
                                             headerSize);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return false;  // RETURN
     }
 
@@ -229,8 +218,7 @@ bool OptionUtil::loadOptionsPosition(int*                      optionsSize,
                                         blob,
                                         myOptionsPosition,
                                         myOptionsSize);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return false;  // RETURN
     }
 

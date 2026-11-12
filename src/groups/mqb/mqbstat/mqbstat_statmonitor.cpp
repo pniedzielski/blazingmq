@@ -280,8 +280,7 @@ void StatMonitor::snapshot()
 
     struct rusage ru;
     static bool   failureLogged = false;
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(::getrusage(RUSAGE_SELF, &ru) ==
-                                            0)) {
+    if (::getrusage(RUSAGE_SELF, &ru) == 0) [[likely]] {
         d_osStatContext_mp->setValue(k_STAT_OS_MINOR_PAGE_FAULTS,
                                      ru.ru_minflt);
         d_osStatContext_mp->setValue(k_STAT_OS_MAJOR_PAGE_FAULTS,
@@ -295,8 +294,7 @@ void StatMonitor::snapshot()
     else {
         // Log getrusage() failure only once during a process's lifetime
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(failureLogged == false)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (failureLogged == false) [[unlikely]] {
             BALL_LOG_WARN << "getrusage() failure with errno: " << errno
                           << " [" << bsl::strerror(errno) << "]";
             failureLogged = true;
@@ -323,9 +321,7 @@ StatMonitorUtil::getSystemStat(const bmqst::StatContext& statContext,
         statValue,
         bmqst::StatValue::SnapshotLocation(0, 0),
         bmqst::StatValue::SnapshotLocation(0, snapshotId));
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            value == bsl::numeric_limits<bsls::Types::Int64>::min())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (value == bsl::numeric_limits<bsls::Types::Int64>::min()) [[unlikely]] {
         return static_cast<bsls::Types::Int64>(0);  // RETURN
     }
 
@@ -345,7 +341,7 @@ double StatMonitorUtil::getCpuStat(const bmqst::StatContext& statContext,
     double value = bmqst::StatUtil::averagePerEventReal(statValue,
                                                         firstSnapshot,
                                                         secondSnapshot);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(value != value)) {
+    if (value != value) [[unlikely]] {
         // In floating point arithmetic (IEEE 754), if, and only if, a value is
         // NaN, the comparison '<val> != <val>' returns true.
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
@@ -368,9 +364,7 @@ StatMonitorUtil::getMemStat(const bmqst::StatContext& statContext,
         statValue,
         bmqst::StatValue::SnapshotLocation(0, 0),
         bmqst::StatValue::SnapshotLocation(0, snapshotId));
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            value == bsl::numeric_limits<bsls::Types::Int64>::min())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (value == bsl::numeric_limits<bsls::Types::Int64>::min()) [[unlikely]] {
         return static_cast<bsls::Types::Int64>(0);  // RETURN
     }
 

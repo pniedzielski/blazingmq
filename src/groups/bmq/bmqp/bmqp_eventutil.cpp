@@ -235,7 +235,7 @@ int Flattener::cloneAndPackEachSubQId(
 
         const CloneSingleStatus result = cloneAndPackSingle(subQInfo);
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(result.first == k_SUCCESS)) {
+        if (result.first == k_SUCCESS) [[likely]] {
             ++selectedSubId;
             subsequentRetry = false;
         }
@@ -278,15 +278,13 @@ Flattener::cloneAndPackSingle(const Protocol::SubQueueInfosArray& subQInfo)
     // Step 2. Copy all options (excluding SubQueueId and rdaCounter which
     //                           was done on Step 1.)
     result = importOptions();
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(result != k_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (result != k_SUCCESS) [[unlikely]] {
         return CloneSingleStatus(result, rc_ADD_OPTION_ERROR);  // RETURN
     }
 
     // Step 3. Pack this message using 'd_builder'.
     result = packMesage(subQInfo);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(result != k_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (result != k_SUCCESS) [[unlikely]] {
         return CloneSingleStatus(result, rc_PACK_MESSAGE_ERROR);  // RETURN
     }
 
@@ -307,9 +305,7 @@ Flattener::EventBuilderResult Flattener::importOptions()
     for (const OptionType::Enum type : d_optionsView) {
         const int intI = static_cast<int>(type);
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                !(lowI <= intI && intI <= highI))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (!(lowI <= intI && intI <= highI)) [[unlikely]] {
             // Not supported in this version
             continue;  // CONTINUE
         }
@@ -345,8 +341,7 @@ Flattener::EventBuilderResult Flattener::importOptions()
         }
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(result != k_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (result != k_SUCCESS) [[unlikely]] {
             break;  // BREAK
         }
     }
@@ -362,8 +357,7 @@ Flattener::packMesage(const Protocol::SubQueueInfosArray& subQInfo)
     const PushHeader& header = d_msgIterator.header();
 
     const EventBuilderResult result = d_builder.packMessage(d_appData, header);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(result != k_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (result != k_SUCCESS) [[unlikely]] {
         return result;  // RETURN
     }
 
@@ -455,15 +449,12 @@ int Flattener::flattenPushEvent()
         d_appData.removeAll();
 
         rc = d_msgIterator.loadApplicationData(&d_appData);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != rc_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (rc != rc_SUCCESS) [[unlikely]] {
             return packError(rc, rc_APP_DATA_LOAD_ERROR);  // RETURN
         }
 
         rc = d_msgIterator.loadOptionsView(&d_optionsView);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                (rc != rc_SUCCESS) || (!d_optionsView.isValid()))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if ((rc != rc_SUCCESS) || (!d_optionsView.isValid())) [[unlikely]] {
             return packError(rc, rc_OPTIONS_LOAD_ERROR);  // RETURN
         }
 
@@ -474,8 +465,7 @@ int Flattener::flattenPushEvent()
         if (hasSubQueues(d_optionsView)) {
             rc = d_optionsView.loadSubQueueInfosOption(&subQInfos);
         }
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != rc_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (rc != rc_SUCCESS) [[unlikely]] {
             return packError(rc, rc_SUB_QUEUE_IDS_LOAD_ERROR);  // RETURN
         }
 
@@ -496,8 +486,7 @@ int Flattener::flattenPushEvent()
     }
 
     // 'd_msgIterator.next()' didn't return '0' or '1'
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return packError(rc, rc_ITERATION_ERROR);  // RETURN
     }
 

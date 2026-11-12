@@ -108,8 +108,8 @@ void ProtocolUtil::appendPaddingRaw(bdlbb::Blob* destination,
     const bdlbb::BlobBuffer& lastBuffer = destination->buffer(
         destination->numDataBuffers() - 1);
     const int lastBufferDataLength = destination->lastDataBufferLength();
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-            lastBuffer.size() - lastBufferDataLength >= numPaddingBytes)) {
+    if (lastBuffer.size() - lastBufferDataLength >= numPaddingBytes)
+        [[likely]] {
         // The last buffer has enough capacity left for the padding bytes,
         // simply expand the buffer's data length and copy the padding bytes.
         destination->setLength(destination->length() + numPaddingBytes);
@@ -117,8 +117,7 @@ void ProtocolUtil::appendPaddingRaw(bdlbb::Blob* destination,
                     k_PADDING_DATA[numPaddingBytes],
                     numPaddingBytes);
     }
-    else {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    else [[unlikely]] {
         // The last buffer doesn't have enough capacity, append the already
         // pre-formatted padding-bytes blob buffer.
         destination->appendDataBuffer(getPaddingBlobBuffer(numPaddingBytes));
@@ -482,24 +481,21 @@ int ProtocolUtil::readPropertiesSize(int*                      size,
         true,    // read flag
         false);  // write flag
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!mpsHeader.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!mpsHeader.isSet()) [[unlikely]] {
         return rc_INCOMPLETE_MSG_PROPERTIES_HEADER;  // RETURN
     }
 
     const int mpsHeaderSize = mpsHeader->headerSize();
 
     mpsHeader.resize(mpsHeaderSize);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!mpsHeader.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!mpsHeader.isSet()) [[unlikely]] {
         return rc_INCOMPLETE_MSG_PROPERTIES_HEADER;  // RETURN
     }
 
     *size = mpsHeader->messagePropertiesAreaWords() *
             bmqp::Protocol::k_WORD_SIZE;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(*size > blob.length())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (*size > blob.length()) [[unlikely]] {
         // MessagePropertiesHeader indicates more bytes than in the blob
         return rc_CORRUPT_MESSAGE;  // RETURN
     }
@@ -537,10 +533,9 @@ int ProtocolUtil::parse(bdlbb::Blob*              messagePropertiesOutput,
     BSLS_ASSERT_SAFE(messagePropertiesSize);
     BSLS_ASSERT_SAFE(dataOutput);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            cat < bmqt::CompressionAlgorithmType::k_LOWEST_SUPPORTED_TYPE ||
-            cat > bmqt::CompressionAlgorithmType::k_HIGHEST_SUPPORTED_TYPE)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (cat < bmqt::CompressionAlgorithmType::k_LOWEST_SUPPORTED_TYPE ||
+        cat > bmqt::CompressionAlgorithmType::k_HIGHEST_SUPPORTED_TYPE)
+        [[unlikely]] {
         // Unsupported compression algorithm type: possibly malformed message
         // or mismatch between broker/client library available compression
         // algorithms
@@ -625,8 +620,7 @@ int ProtocolUtil::parse(bdlbb::Blob*              messagePropertiesOutput,
                                        &error,
                                        allocator);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         // This failure means that the compressed message is possibly corrupt.
 
         return rc * 10 + rc_DECOMPRESSION_FAILURE;  // RETURN

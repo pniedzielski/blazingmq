@@ -30,7 +30,6 @@
 #include <bslma_allocator.h>
 #include <bslmt_lockguard.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace mqbnet {
@@ -94,8 +93,7 @@ ClusterNodeImp::setChannel(const bsl::weak_ptr<bmqio::Channel>& value,
 bool ClusterNodeImp::enableRead()
 {
     const bsl::shared_ptr<bmqio::Channel> channelSp = d_channel.channel();
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!channelSp)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!channelSp) [[unlikely]] {
         return false;  // RETURN
     }
 
@@ -247,11 +245,8 @@ void ClusterImp::writeAll(const bsl::shared_ptr<bdlbb::Blob>& blob,
         if (clusterNode.nodeId() != selfNodeId()) {
             bmqt::GenericResult::Enum rc = clusterNode.write(blob, type);
 
-            if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                    bmqt::GenericResult::e_SUCCESS != rc &&
-                    bmqt::GenericResult::e_NOT_CONNECTED != rc)) {
-                BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+            if (bmqt::GenericResult::e_SUCCESS != rc &&
+                bmqt::GenericResult::e_NOT_CONNECTED != rc) [[unlikely]] {
                 if (d_failedWritesThrottler.requestPermission()) {
                     BALL_LOG_ERROR << "#CLUSTER_SEND_FAILURE "
                                    << "Failed to write blob of length ["

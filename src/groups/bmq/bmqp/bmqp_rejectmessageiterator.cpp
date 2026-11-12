@@ -17,7 +17,6 @@
 
 #include <bmqscm_version.h>
 // BDE
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqp {
@@ -64,8 +63,7 @@ int RejectMessageIterator::next()
         rc_NOT_ENOUGH_BYTES = -2
     };
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValid()) [[unlikely]] {
         return rc_INVALID;  // RETURN
     }
 
@@ -87,8 +85,7 @@ int RejectMessageIterator::next()
                     d_blobIter.position(),
                     d_header->perMessageWords() * Protocol::k_WORD_SIZE);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_message.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_message.isSet()) [[unlikely]] {
         return rc_NOT_ENOUGH_BYTES;  // RETURN
     }
 
@@ -121,8 +118,7 @@ int RejectMessageIterator::reset(const bdlbb::Blob* blob,
     bool rc = d_blobIter.advance(eventHeader.headerWords() *
                                  Protocol::k_WORD_SIZE);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!rc)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!rc) [[unlikely]] {
         // Set the iterator to invalid state
         d_header.reset();
         return rc_INVALID_EVENTHEADER;  // RETURN
@@ -139,15 +135,12 @@ int RejectMessageIterator::reset(const bdlbb::Blob* blob,
                    d_blobIter.position(),
                    -RejectHeader::k_MIN_HEADER_SIZE);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_header.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_header.isSet()) [[unlikely]] {
         return rc_INVALID_REJECTHEADER;  // RETURN
     }
 
     const int headerSize = d_header->headerWords() * Protocol::k_WORD_SIZE;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(headerSize >
-                                              d_blobIter.remaining())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (headerSize > d_blobIter.remaining()) [[unlikely]] {
         // The header is declaring more bytes than are left in the blob.
         // Explicitly reset the proxy so that isValid() returns false.
         d_header.reset();
@@ -155,8 +148,7 @@ int RejectMessageIterator::reset(const bdlbb::Blob* blob,
     }
 
     d_header.resize(headerSize);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_header.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_header.isSet()) [[unlikely]] {
         return rc_INVALID_REJECTHEADER;  // RETURN
     }
 

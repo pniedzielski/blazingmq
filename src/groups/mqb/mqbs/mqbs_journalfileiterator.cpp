@@ -25,7 +25,6 @@
 
 // BDE
 #include <bsl_limits.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace mqbs {
@@ -205,24 +204,19 @@ int JournalFileIterator::advance(const bsls::Types::Uint64 distance)
         rc_MAGIC_MISMATCH = -4
     };
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValid()) [[unlikely]] {
         return rc_INVALID;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            d_blockIter.advance(distance == 1
-                                    ? d_advanceLength
-                                    : distance * d_recordSize) == false)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_blockIter.advance(distance == 1 ? d_advanceLength
+                                          : distance * d_recordSize) == false)
+        [[unlikely]] {
         clear();
         return rc_AT_END;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            d_blockIter.isForwardIterator() &&
-            d_blockIter.remaining() < d_recordSize)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_blockIter.isForwardIterator() &&
+        d_blockIter.remaining() < d_recordSize) [[unlikely]] {
         // At the end (if math was correct, d_blockIter.remaining() == 0)
         clear();
         return rc_AT_END;  // RETURN
@@ -231,17 +225,13 @@ int JournalFileIterator::advance(const bsls::Types::Uint64 distance)
     // Validate RecordHeader.
     OffsetPtr<const RecordHeader> recHeader(*d_blockIter.block(),
                                             d_blockIter.position());
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(recHeader->type() ==
-                                              RecordType::e_UNDEFINED)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (recHeader->type() == RecordType::e_UNDEFINED) [[unlikely]] {
         clear();
         return rc_INVALID_RECORD_TYPE;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            recHeader->primaryLeaseId() == 0 ||
-            recHeader->sequenceNumber() == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (recHeader->primaryLeaseId() == 0 || recHeader->sequenceNumber() == 0)
+        [[unlikely]] {
         clear();
         return rc_INVALID_SEQ_NUM;  // RETURN
     }
@@ -251,9 +241,7 @@ int JournalFileIterator::advance(const bsls::Types::Uint64 distance)
         *d_blockIter.block(),
         d_blockIter.position() + d_recordSize - sizeof(bdlb::BigEndianUint32));
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(*magic !=
-                                              RecordHeader::k_MAGIC)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (*magic != RecordHeader::k_MAGIC) [[unlikely]] {
         clear();
         return rc_MAGIC_MISMATCH;  // RETURN
     }

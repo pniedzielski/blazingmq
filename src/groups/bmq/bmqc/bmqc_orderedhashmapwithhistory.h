@@ -710,8 +710,7 @@ OrderedHashMapWithHistory<KEY, VALUE, HASH, VALUE_TYPE>::gc(TimeType now,
     // the end of collection.
 
     d_lastGCTime = now;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_gcIt == endGc())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_gcIt == endGc()) [[unlikely]] {
         d_gcIt = beginGc();
     }
     const size_t initialHistorySize = d_historySize;

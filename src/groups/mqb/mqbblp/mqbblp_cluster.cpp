@@ -396,10 +396,7 @@ void Cluster::sendAck(bmqt::AckResult::Enum           status,
     // that queue looked up, because not all code path calling 'sendAck' have
     // it).
     const bmqt::Uri* uri_p = NULL;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(status !=
-                                              bmqt::AckResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (status != bmqt::AckResult::e_SUCCESS) [[unlikely]] {
         QueueHandleMap::const_iterator it = nodeSession->queueHandles().find(
             queueId);
         if (it != nodeSession->queueHandles().end()) {
@@ -465,10 +462,7 @@ void Cluster::sendAck(bmqt::AckResult::Enum           status,
             messageGUID,
             queueId);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqt::GenericResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (rc != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
         // This is non-recoverable, so we drop the ACK msg and log it.
 
         BMQU_THROTTLEDACTION_THROTTLE(
@@ -773,9 +767,7 @@ void Cluster::onPutEvent(const mqbevt::PutEvent& event)
     BSLS_ASSERT_SAFE(rawEvent.isPutEvent());
     rawEvent.loadPutMessageIterator(&putIt);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!putIt.isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!putIt.isValid()) [[unlikely]] {
         bmqu::MemOutStream out;
         out << description() << ": received an invalid PUT event from node "
             << source->nodeDescription() << "\n";
@@ -787,11 +779,8 @@ void Cluster::onPutEvent(const mqbevt::PutEvent& event)
 
     bmqp_ctrlmsg::NodeStatus::Value selfStatus =
         d_clusterData.membership().selfNodeStatus();
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            bmqp_ctrlmsg::NodeStatus::E_AVAILABLE != selfStatus &&
-            bmqp_ctrlmsg::NodeStatus::E_STOPPING != selfStatus)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (bmqp_ctrlmsg::NodeStatus::E_AVAILABLE != selfStatus &&
+        bmqp_ctrlmsg::NodeStatus::E_STOPPING != selfStatus) [[unlikely]] {
         // This node is either starting, in maintenance mode, or shut down.
         // Inform event's source of PUT failure.
         while (putIt.next() == 1) {
@@ -815,10 +804,7 @@ void Cluster::onPutEvent(const mqbevt::PutEvent& event)
             queueId.id());
 
         // Check if queueId represents a valid queue
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(queueIt ==
-                                                  ns->queueHandles().end())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (queueIt == ns->queueHandles().end()) [[unlikely]] {
             BMQU_THROTTLEDACTION_THROTTLE(
                 d_throttledFailedPutMessages,
                 BALL_LOG_ERROR << description()
@@ -844,10 +830,7 @@ void Cluster::onPutEvent(const mqbevt::PutEvent& event)
 
         // Ensure that final closeQueue request has not been sent.
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                queueState.d_isFinalCloseQueueReceived)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (queueState.d_isFinalCloseQueueReceived) [[unlikely]] {
             BMQU_THROTTLEDACTION_THROTTLE(
                 d_throttledFailedPutMessages,
                 BALL_LOG_WARN << description()
@@ -869,9 +852,7 @@ void Cluster::onPutEvent(const mqbevt::PutEvent& event)
         bsl::shared_ptr<bdlbb::Blob> appDataSp =
             d_clusterData.blobSpPool().getObject();
         rc = putIt.loadApplicationData(appDataSp.get());
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (rc != 0) [[unlikely]] {
             BMQU_THROTTLEDACTION_THROTTLE(
                 d_throttledFailedPutMessages,
                 BMQTSK_ALARMLOG_ALARM("CLUSTER")
@@ -944,9 +925,7 @@ void Cluster::onPutEvent(const mqbevt::PutEvent& event)
     }
 
     // Check if the PUT event was valid
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc < 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (rc < 0) [[unlikely]] {
         BMQU_THROTTLEDACTION_THROTTLE(
             d_throttledFailedPutMessages,
             BALL_LOG_ERROR_BLOCK {
@@ -973,11 +952,8 @@ void Cluster::onRelayAckEvent(const mqbevt::AckEvent& event)
 
     bmqp_ctrlmsg::NodeStatus::Value selfStatus =
         d_clusterData.membership().selfNodeStatus();
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            bmqp_ctrlmsg::NodeStatus::E_AVAILABLE != selfStatus &&
-            bmqp_ctrlmsg::NodeStatus::E_STOPPING != selfStatus)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (bmqp_ctrlmsg::NodeStatus::E_AVAILABLE != selfStatus &&
+        bmqp_ctrlmsg::NodeStatus::E_STOPPING != selfStatus) [[unlikely]] {
         // Drop ACK messages coz self is down
         BMQU_THROTTLEDACTION_THROTTLE(
             d_throttledFailedAckMessages,
@@ -1237,19 +1213,14 @@ Cluster::validateMessage(mqbi::QueueHandle**             queueHandle,
     const QueueHandleMap&   queueHandles = ns->queueHandles();
     QueueHandleMapConstIter queueIt      = queueHandles.find(queueId.id());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(queueIt == queueHandles.end())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (queueIt == queueHandles.end()) [[unlikely]] {
         return ValidationResult::k_UNKNOWN_QUEUE;  // RETURN
     }
 
     const QueueState& queueState = queueIt->second;
     *queueHandle                 = queueState.d_handle_p;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            queueState.d_isFinalCloseQueueReceived)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (queueState.d_isFinalCloseQueueReceived) [[unlikely]] {
         return ValidationResult::k_FINAL;  // RETURN
     }
 
@@ -1288,10 +1259,7 @@ void Cluster::onRelayRejectEvent(const mqbevt::RejectEvent& event)
                 queueId.id(),
                 queueId.subId(),
                 rejectMessage.messageGUID());
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                rc != bmqt::GenericResult::e_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (rc != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
             // This is non-recoverable, so we drop the REJECT msg and log it.
             BMQU_THROTTLEDACTION_THROTTLE(
                 d_throttledDroppedRejectMessages,
@@ -1365,10 +1333,7 @@ Cluster::sendConfirmInline(int                         partitionId,
         message.subQueueId(),
         message.messageGUID());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqt::GenericResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (rc != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
         return mqbi::InlineResult::e_CHANNEL_ERROR;  // RETURN
     }
 
@@ -1408,7 +1373,7 @@ mqbi::InlineResult::Enum Cluster::sendPutInline(
     bsls::Types::Uint64              leaseId =
         d_state.partition(partitionId).primaryLeaseId();
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(genCount != leaseId)) {
+    if (genCount != leaseId) [[unlikely]] {
         return mqbi::InlineResult::e_INVALID_GEN_COUNT;  // RETURN
     }
 
@@ -1438,10 +1403,7 @@ mqbi::InlineResult::Enum Cluster::sendPutInline(
                                                                appData,
                                                                state);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqt::GenericResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (rc != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
         return mqbi::InlineResult::e_CHANNEL_ERROR;  // RETURN
     }
 
@@ -1463,10 +1425,8 @@ bool Cluster::validateRelayMessage(mqbc::ClusterNodeSession** ns,
 
     bmqp_ctrlmsg::NodeStatus::Value selfStatus =
         d_clusterData.membership().selfNodeStatus();
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            bmqp_ctrlmsg::NodeStatus::E_AVAILABLE != selfStatus &&
-            bmqp_ctrlmsg::NodeStatus::E_STOPPING != selfStatus)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (bmqp_ctrlmsg::NodeStatus::E_AVAILABLE != selfStatus &&
+        bmqp_ctrlmsg::NodeStatus::E_STOPPING != selfStatus) [[unlikely]] {
         // Drop this relay-REJECT event
         *errorStream << "Reason: self (replica node) not available. "
                      << "Node status: " << selfStatus;
@@ -1523,10 +1483,7 @@ void Cluster::onRelayPushEvent(const mqbevt::PushEvent& event)
 
     bmqp_ctrlmsg::NodeStatus::Value selfStatus =
         d_clusterData.membership().selfNodeStatus();
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            bmqp_ctrlmsg::NodeStatus::E_AVAILABLE != selfStatus)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (bmqp_ctrlmsg::NodeStatus::E_AVAILABLE != selfStatus) [[unlikely]] {
         // Drop relay-PUSH messages coz self is going down
         BMQU_THROTTLEDACTION_THROTTLE(
             d_throttledFailedPushMessages,
@@ -1550,9 +1507,7 @@ void Cluster::onRelayPushEvent(const mqbevt::PushEvent& event)
 
         mqbi::Queue* queue = d_clusterOrchestrator.queueHelper().lookupQueue(
             pushHeader.queueId());
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(queue == 0)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (queue == 0) [[unlikely]] {
             BMQU_THROTTLEDACTION_THROTTLE(
                 d_throttledFailedPushMessages,
                 BMQTSK_ALARMLOG_ALARM("CLUSTER")
@@ -1573,10 +1528,7 @@ void Cluster::onRelayPushEvent(const mqbevt::PushEvent& event)
         // We expect that when we're in at-most-once mode, the payload will be
         // explicit and when it's not in at-most-once mode, it will be
         // implicit.  We show an error message if that isn't the case.
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(implicitPayload ==
-                                                  atMostOnce)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (implicitPayload == atMostOnce) [[unlikely]] {
             BMQU_THROTTLEDACTION_THROTTLE(
                 d_throttledFailedPushMessages,
                 BMQTSK_ALARMLOG_ALARM("CLUSTER")
@@ -2736,7 +2688,7 @@ void Cluster::processEvent(const bmqp::Event&   event,
                        << " from " << source->nodeDescription();
 
         rc = bmqp::ControlMessageUtil::validate(message);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
+        if (rc != 0) [[unlikely]] {
             // Malformed control message should be rejected
             BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
             BALL_LOG_ERROR << "#CORRUPTED_CONTROL_MESSAGE " << description()

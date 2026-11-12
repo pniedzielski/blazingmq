@@ -788,8 +788,7 @@ void mqba::Dispatcher::EventCallback::flushClients()
     // executed by the *DISPATCHER* thread
 
     bmqu::GateKeeper::Status status(*d_flushClientsGate_p);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!status.isOpen())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!status.isOpen()) [[unlikely]] {
         return;  // RETURN
     }
 

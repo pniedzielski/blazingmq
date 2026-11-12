@@ -181,8 +181,7 @@ inline int ConfirmEventBuilder::maxMessageCount() const
 
 inline int ConfirmEventBuilder::eventSize() const
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(messageCount() == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (messageCount() == 0) [[unlikely]] {
         return 0;  // RETURN
     }
 

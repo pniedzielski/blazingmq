@@ -964,8 +964,7 @@ inline Channel::Item::Item(int                      queueId,
 , d_state(state)
 , d_numBytes(0)
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(type ==
-                                            bmqp::EventType::e_CONFIRM)) {
+    if (type == bmqp::EventType::e_CONFIRM) [[likely]] {
         d_numBytes = sizeof(bmqp::ConfirmMessage);
     }
     else if (type == bmqp::EventType::e_REJECT) {
@@ -1057,9 +1056,7 @@ inline bmqio::StatusCategory::Enum Channel::flushBuilder<Channel::ControlArgs>(
         rc = flushBuilder(d_pushBuilder, channel);
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqio::StatusCategory::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != bmqio::StatusCategory::e_SUCCESS) [[unlikely]] {
         return rc;  // RETURN
     }
 
@@ -1069,8 +1066,7 @@ inline bmqio::StatusCategory::Enum Channel::flushBuilder<Channel::ControlArgs>(
 
     channel->write(&st, args.blob());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-            st.category() == bmqio::StatusCategory::e_SUCCESS)) {
+    if (st.category() == bmqio::StatusCategory::e_SUCCESS) [[likely]] {
         args.reset();
     }
 
@@ -1090,8 +1086,7 @@ Channel::flushBuilder(Builder&                               builder,
     if (builder.messageCount()) {
         channel->write(&st, *builder.blob());
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-                st.category() == bmqio::StatusCategory::e_SUCCESS)) {
+        if (st.category() == bmqio::StatusCategory::e_SUCCESS) [[likely]] {
             builder.reset();
         }
     }

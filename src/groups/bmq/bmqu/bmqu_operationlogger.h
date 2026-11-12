@@ -160,9 +160,8 @@ class OperationLogger final {
 
 inline bsl::ostream& OperationLogger::start()
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            d_beginTimestamp != 0 || !d_currentOpDescription.isEmpty())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_beginTimestamp != 0 || !d_currentOpDescription.isEmpty())
+        [[unlikely]] {
         BALL_LOG_WARN << "Trying to start OperationLogger with non-stopped "
                       << "operation: d_beginTimestamp = " << d_beginTimestamp
                       << ", d_currentOpDescription = \""
@@ -176,8 +175,7 @@ inline bsl::ostream& OperationLogger::start()
 
 inline bsl::ostream& OperationLogger::operation()
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_beginTimestamp == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_beginTimestamp == 0) [[unlikely]] {
         BALL_LOG_WARN << "Trying to access the name of an operation that was "
                       << "not started";
     }
@@ -186,14 +184,11 @@ inline bsl::ostream& OperationLogger::operation()
 
 inline void OperationLogger::stop()
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_beginTimestamp == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_beginTimestamp == 0) [[unlikely]] {
         BALL_LOG_WARN << "Calling `OperationLogger::stop` multiple times";
         return;  // RETURN
     }
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            d_currentOpDescription.isEmpty())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_currentOpDescription.isEmpty()) [[unlikely]] {
         BALL_LOG_WARN << "Empty operation description in OperationLogger: "
                       << "operation was not set on `start` call.";
         return;  // RETURN

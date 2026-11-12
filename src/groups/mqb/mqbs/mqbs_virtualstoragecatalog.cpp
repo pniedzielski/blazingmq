@@ -418,8 +418,7 @@ bsls::Types::Int64 VirtualStorageCatalog::seek(DataStreamIterator*   it,
         }
         // else 'dataStreamMessage' is older than this VirtualStorage
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(bytes)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (bytes) [[unlikely]] {
             *bytes += data.d_size;
         }
     }

@@ -68,9 +68,8 @@ AlarmLogObserver::~AlarmLogObserver()
 void AlarmLogObserver::publish(const ball::Record&                   record,
                                [[maybe_unused]] const ball::Context& context)
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-            (record.fixedFields().severity() > ball::Severity::e_ERROR) ||
-            (record.customFields().length() == 0))) {
+    if ((record.fixedFields().severity() > ball::Severity::e_ERROR) ||
+        (record.customFields().length() == 0)) [[likely]] {
         // We are only interested in ERROR severity, and only the ones which
         // have a userField (the alarm type) set.
         return;  // RETURN

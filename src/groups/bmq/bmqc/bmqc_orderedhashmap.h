@@ -1201,8 +1201,7 @@ bool OrderedHashMap<KEY, VALUE, HASH, VALUE_TYPE>::rehashIfNeeded()
 
         size_t oldBucketArraySize = d_bucketArraySize;
         d_bucketArraySize         = ImpDetails::nextPrime(d_numElements);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(0 == d_bucketArraySize)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (0 == d_bucketArraySize) [[unlikely]] {
             throw bsl::runtime_error("HashTable ran out of prime numbers");
         }
 
@@ -1491,8 +1490,7 @@ OrderedHashMap<KEY, VALUE, HASH, VALUE_TYPE>::insert(const VALUE_TYPE& value)
     }
     // Element does not exist in the container
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rehashIfNeeded())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rehashIfNeeded()) [[unlikely]] {
         // Find bucket for key again in case table was rehashed
         bucket = getBucketForKey(get_key(value));
     }
@@ -1522,8 +1520,7 @@ OrderedHashMap<KEY, VALUE, HASH, VALUE_TYPE>::rinsert(const VALUE_TYPE& value)
     }
     // Element does not exist in the container
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rehashIfNeeded())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rehashIfNeeded()) [[unlikely]] {
         // Find bucket for key again in case table was rehashed
         bucket = getBucketForKey(get_key(value));
     }

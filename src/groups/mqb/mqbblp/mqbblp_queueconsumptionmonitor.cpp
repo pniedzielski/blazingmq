@@ -41,7 +41,6 @@
 #include <bsl_string.h>
 #include <bsl_vector.h>
 #include <bslma_stdallocator.h>
-#include <bsls_performancehint.h>
 #include <bslstl_stringref.h>
 
 namespace BloombergLP {
@@ -248,8 +247,7 @@ void QueueConsumptionMonitor::onMessageSent(const bsl::string& appId)
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queueState_p->queue()->inDispatcherThread());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(isMonitoringDisabled())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (isMonitoringDisabled()) [[unlikely]] {
         return;  // RETURN
     }
 
@@ -446,8 +444,7 @@ void QueueConsumptionMonitor::processAlarmEvent()
         d_alarmEventHandle.release();
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(isMonitoringDisabled())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (isMonitoringDisabled()) [[unlikely]] {
         return;  // RETURN
     }
 
@@ -510,8 +507,7 @@ void QueueConsumptionMonitor::processIdleEvent(const bsl::string& appId)
 
     auto iter = d_subStreamInfos.find(appId);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(iter ==
-                                              d_subStreamInfos.end())) {
+    if (iter == d_subStreamInfos.end()) [[unlikely]] {
         return;  // RETURN
     }
 
@@ -521,9 +517,7 @@ void QueueConsumptionMonitor::processIdleEvent(const bsl::string& appId)
         info.d_idleEventHandle.release();
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(isMonitoringDisabled() ||
-                                              info.d_state != State::e_IDLE)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (isMonitoringDisabled() || info.d_state != State::e_IDLE) [[unlikely]] {
         return;  // RETURN
     }
 

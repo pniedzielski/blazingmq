@@ -53,7 +53,6 @@
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bslma_allocator.h>
-#include <bsls_performancehint.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {
@@ -419,10 +418,8 @@ void LocalQueue::postMessage(const bmqp::PutHeader&              putHeader,
             source->schemaLearnerContext(),
             bmqp::MessagePropertiesInfo(putHeader));
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!bmqt::QueueFlagsUtil::isWriter(
-            source->handleParameters().flags()))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!bmqt::QueueFlagsUtil::isWriter(source->handleParameters().flags()))
+        [[unlikely]] {
         // Either queue was not opened in the WRITE mode (which should have
         // been caught in the SDK) or client is posting a message after closing
         // or reconfiguring the queue (which may not be caught in the SDK).
@@ -507,8 +504,7 @@ void LocalQueue::postMessage(const bmqp::PutHeader&              putHeader,
         source->onAckMessage(ackMessage);
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(res ==
-                                            mqbi::StorageResult::e_SUCCESS)) {
+    if (res == mqbi::StorageResult::e_SUCCESS) [[likely]] {
         // Message has been saved in the storage, but we don't indicate the
         // engine yet of the new message.  This is because storage (replicated)
         // messages are nagled, and we don't want to indicate to a peer to
@@ -524,9 +520,7 @@ void LocalQueue::postMessage(const bmqp::PutHeader&              putHeader,
 
         d_queueEngine_mp->afterPostMessage();
     }
-    else {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    else [[unlikely]] {
         if (res == mqbi::StorageResult::e_DUPLICATE) {
             if (d_throttledDuplicateMessages.requestPermission()) {
                 BALL_LOG_WARN << "Duplicate PUT message queue ["
@@ -611,15 +605,12 @@ void LocalQueue::confirmMessage(const bmqt::MessageGUID& msgGUID,
                                                 msgGUID,
                                                 upstreamSubQueueId);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc == 1)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (rc == 1) [[unlikely]] {
         // Still some references to that message, we can't delete it.
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc < 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc < 0) [[unlikely]] {
         // Engine failed to process confirm message.  Some of the possible
         // reasons:
         // 1) GUID doesn't exist.
@@ -636,10 +627,7 @@ void LocalQueue::confirmMessage(const bmqt::MessageGUID& msgGUID,
     mqbi::StorageResult::Enum res     = d_state_p->storage()->remove(msgGUID,
                                                                  &msgSize);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            res != mqbi::StorageResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (res != mqbi::StorageResult::e_SUCCESS) [[unlikely]] {
         BALL_LOG_WARN << "#QUEUE_CONFIRM_FAILURE "
                       << "Error '" << res
                       << "' while writing deletion record for queue:"

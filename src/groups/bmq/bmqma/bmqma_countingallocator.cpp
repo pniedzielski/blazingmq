@@ -31,7 +31,6 @@
 #include <bsla_annotations.h>
 #include <bsls_alignmentutil.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqma {
@@ -279,8 +278,7 @@ void* CountingAllocator::allocate(size_type size)
     // The 'd_statContext_mp' can adjust value working with values up to
     // and including the max of 'bsls::Types::Int64'.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(size == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (size == 0) [[unlikely]] {
         return 0;  // RETURN
     }
 
@@ -306,8 +304,7 @@ void* CountingAllocator::allocate(size_type size)
 
 void CountingAllocator::deallocate(void* address)
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(address == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (address == 0) [[unlikely]] {
         return;  // RETURN
     }
 
@@ -320,10 +317,7 @@ void CountingAllocator::deallocate(void* address)
     // We're recording stats
     Header* header = static_cast<Header*>(address) - 1;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(header->d_data.d_magic !=
-                                              k_MAGIC)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (header->d_data.d_magic != k_MAGIC) [[unlikely]] {
         // Attempting to free either:
         //  1. Previously freed memory; or
         //  2. Unallocated memory
@@ -358,9 +352,7 @@ void CountingAllocator::AllocationLimitChecker::update(
     const bsls::Types::Uint64 totalAllocated = d_allocated.addRelaxed(
         deltaValue);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            d_allocationLimit < totalAllocated && !d_alarmTriggered)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_allocationLimit < totalAllocated && !d_alarmTriggered) [[unlikely]] {
         if (d_alarmTriggered.swap(true) != true) {
             // Use an atomic swap to only invoke the callback the first time
             // limit is crossed.

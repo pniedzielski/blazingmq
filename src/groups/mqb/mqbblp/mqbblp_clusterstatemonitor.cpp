@@ -228,7 +228,7 @@ ClusterStateMonitor::checkAndUpdateState(State*             state,
     BSLS_ASSERT_SAFE(dispatcherClient()->inDispatcherThread());
 
     const StateType previousState = state->d_state;
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(isValid)) {
+    if (isValid) [[likely]] {
         state->d_state     = e_VALID;
         state->d_lastValid = now;
         if (previousState == e_ALARMING || previousState == e_THRESHOLD) {

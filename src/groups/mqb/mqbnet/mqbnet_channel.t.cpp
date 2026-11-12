@@ -443,12 +443,9 @@ template <class Builder>
 inline void Tester<Builder>::test()
 {
     bmqt::EventBuilderResult::Enum rc = build();
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            bmqt::EventBuilderResult::e_EVENT_TOO_BIG == rc ||
-            bmqt::EventBuilderResult::e_PAYLOAD_TOO_BIG == rc ||
-            bmqt::EventBuilderResult::e_OPTION_TOO_BIG == rc)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (bmqt::EventBuilderResult::e_EVENT_TOO_BIG == rc ||
+        bmqt::EventBuilderResult::e_PAYLOAD_TOO_BIG == rc ||
+        bmqt::EventBuilderResult::e_OPTION_TOO_BIG == rc) [[unlikely]] {
         d_history.push_back(d_builder.blob());
         d_builder.reset();
 

@@ -257,8 +257,7 @@ HashBenchmarkStats benchmarkHash(const bsl::string& name)
 
     const bsls::Types::Int64 begin = bsls::TimeUtil::getTimer();
     for (size_t i = 0; i < k_NUM_ITERATIONS; ++i) {
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(hasher(guid) == i)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (hasher(guid) == i) [[unlikely]] {
             // To prevent this loop from being optimized out in Release
             bsl::cout << bsl::endl;
         }

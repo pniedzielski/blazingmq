@@ -355,8 +355,7 @@ int ProtocolUtil::encodeMessage(bsl::ostream&      errorDescription,
 
         // Debug print message if any
         bslstl::StringRef logStr = encoder.loggedMessages();
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!logStr.empty())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (!logStr.empty()) [[unlikely]] {
             errorDescription << "BER encoder returned the following "
                              << "[rc: " << rc << "]\n"
                              << logStr;
@@ -372,8 +371,7 @@ int ProtocolUtil::encodeMessage(bsl::ostream&      errorDescription,
 
         // Debug print message if any
         bsl::string logStr = encoder.loggedMessages();
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!logStr.empty())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (!logStr.empty()) [[unlikely]] {
             errorDescription << "JSON encoder returned the following "
                              << "[rc: " << rc << "]\n"
                              << logStr;
@@ -428,8 +426,7 @@ int ProtocolUtil::decodeMessage(bsl::ostream&      errorDescription,
 
         // Debug print message if any
         bslstl::StringRef logStr = decoder.loggedMessages();
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!logStr.empty())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (!logStr.empty()) [[unlikely]] {
             errorDescription << "BER decoder returned the following "
                              << "[rc: " << rc << "]\n"
                              << logStr;
@@ -446,8 +443,7 @@ int ProtocolUtil::decodeMessage(bsl::ostream&      errorDescription,
 
         // Debug print message if any
         bsl::string logStr = decoder.loggedMessages();
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!logStr.empty())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (!logStr.empty()) [[unlikely]] {
             errorDescription << "JSON decoder returned the following "
                              << "[rc: " << rc << "]\n"
                              << logStr;
@@ -506,10 +502,7 @@ inline bmqt::EventBuilderResult::Enum ProtocolUtil::buildEvent(
     BSLS_ASSERT_SAFE(overflowCb);
 
     bmqt::EventBuilderResult::Enum rc = action();
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            bmqt::EventBuilderResult::e_EVENT_TOO_BIG == rc)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (bmqt::EventBuilderResult::e_EVENT_TOO_BIG == rc) [[unlikely]] {
         overflowCb();
         rc = action();
     }
@@ -522,10 +515,7 @@ ProtocolUtil::buildEvent(ACTION_FUNCTOR_TYPE&   actionCb,
                          OVERFLOW_FUNCTOR_TYPE& overflowCb)
 {
     bmqt::EventBuilderResult::Enum rc = actionCb();
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            bmqt::EventBuilderResult::e_EVENT_TOO_BIG == rc)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (bmqt::EventBuilderResult::e_EVENT_TOO_BIG == rc) [[unlikely]] {
         overflowCb();
         rc = actionCb();
     }

@@ -92,9 +92,7 @@ ConfirmEventBuilder::appendMessage(int                      queueId,
     // 'bmqt::EventBuilderResult::Enum' values because the return value is
     // directly exposed to the client.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(messageCount() ==
-                                              maxMessageCount())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (messageCount() == maxMessageCount()) [[unlikely]] {
         return bmqt::EventBuilderResult::e_EVENT_TOO_BIG;  // RETURN
     }
 
@@ -127,8 +125,7 @@ const bsl::shared_ptr<bdlbb::Blob>& ConfirmEventBuilder::blob() const
     BSLS_ASSERT_SAFE(d_blob_sp->length() <= EventHeader::k_MAX_SIZE_SOFT);
 
     // Empty event
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(messageCount() == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (messageCount() == 0) [[unlikely]] {
         return d_emptyBlob_sp;  // RETURN
     }
 

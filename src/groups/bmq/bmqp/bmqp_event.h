@@ -278,16 +278,13 @@ inline void Event::initialize(const bdlbb::Blob* blob)
                    true,
                    false);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_header.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_header.isSet()) [[unlikely]] {
         // Failed to read required minimum worth of EventHeader
         return;  // RETURN
     }
 
     const int headerSize = d_header->headerWords() * Protocol::k_WORD_SIZE;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            headerSize < EventHeader::k_MIN_HEADER_SIZE)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (headerSize < EventHeader::k_MIN_HEADER_SIZE) [[unlikely]] {
         // Header is declaring less bytes than expected, probably this is
         // because header is malformed.
         // Explicitly reset the proxy so that isValid() returns false.
@@ -295,9 +292,7 @@ inline void Event::initialize(const bdlbb::Blob* blob)
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(headerSize >
-                                              d_blob_p->length())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (headerSize > d_blob_p->length()) [[unlikely]] {
         // Header is declaring more bytes than the blob actually has.
         // Explicitly reset the proxy so that isValid() returns false.
         d_header.reset();
@@ -305,8 +300,7 @@ inline void Event::initialize(const bdlbb::Blob* blob)
     }
 
     d_header.resize(headerSize);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_header.isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_header.isSet()) [[unlikely]] {
         BSLS_ASSERT_SAFE(false && "Invalid event");
         // This should never happen
         return;  // RETURN
@@ -317,10 +311,8 @@ inline void Event::initialize(const bdlbb::Blob* blob)
     // Perform some validation:
     //:  o the fragment bit must not be set on a valid EventHeader
     //:  o the type must not be undefined
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_header->fragmentBit() != 0 ||
-                                              d_header->type() ==
-                                                  EventType::e_UNDEFINED)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_header->fragmentBit() != 0 ||
+        d_header->type() == EventType::e_UNDEFINED) [[unlikely]] {
         // Invalidate the header
         d_header.reset();
         return;  // RETURN
@@ -334,8 +326,7 @@ int Event::loadSchemaEvent(TYPE* message) const
     BSLS_ASSERT_SAFE(isControlEvent() || isElectorEvent() ||
                      isAuthenticationEvent());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValid()) [[unlikely]] {
         // No need to assert 'isValid', this is already captured by the above
         // preconditions check.
         return -1;  // RETURN
@@ -356,8 +347,7 @@ int Event::loadSchemaEvent(TYPE* message) const
                                          // Skip the EventHeader
                                          encodingType,
                                          d_allocator_p);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!os.isEmpty())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!os.isEmpty()) [[unlikely]] {
         BALL_LOG_DEBUG << os.str();
     }
 
@@ -417,7 +407,7 @@ inline Event::Event(Event&& src, bslma::Allocator* allocator)
 
 inline Event& Event::operator=(const Event& rhs)
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(this == &rhs)) {
+    if (this == &rhs) [[unlikely]] {
         // Return early on self-assignment.
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         return *this;
@@ -430,7 +420,7 @@ inline Event& Event::operator=(const Event& rhs)
 
 inline Event& Event::operator=(Event&& rhs)
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(this == &rhs)) {
+    if (this == &rhs) [[unlikely]] {
         // Return early on self-assignment.
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         return *this;

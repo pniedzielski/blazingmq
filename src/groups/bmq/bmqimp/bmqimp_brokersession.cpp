@@ -80,8 +80,7 @@ void setCurrentThreadNameOnce(const bsl::string& value)
 {
     static thread_local bool s_named = false;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!s_named)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!s_named) [[unlikely]] {
         bslmt::ThreadUtil::setThreadName(value);
         s_named = true;
     }
@@ -969,8 +968,7 @@ void BrokerSession::SessionFsm::logOperationTime(const char* operation)
                       << elapsed << " nanoseconds)";
         d_beginTimestamp = 0;
     }
-    else {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    else [[unlikely]] {
         BALL_LOG_WARN << "d_beginTimestamp was not initialized with timestamp";
     }
 }
@@ -3120,7 +3118,7 @@ BrokerSession::sendRequest(const RequestSp&     context,
 
     bsl::string nodeDescription("pending buffer", d_allocator_p);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(d_channel_sp)) {
+    if (d_channel_sp) [[likely]] {
         nodeDescription = d_channel_sp->peerUri();
     }
 
@@ -3147,10 +3145,8 @@ void BrokerSession::sendConfirm(const bsl::shared_ptr<const bdlbb::Blob>& blob,
     BSLS_ASSERT_SAFE(d_fsmThreadChecker.inSameThread());
 
     // Dump if enabled
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            d_messageDumper
-                .isEventDumpEnabled<bmqp::EventType::e_CONFIRM>())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_messageDumper.isEventDumpEnabled<bmqp::EventType::e_CONFIRM>())
+        [[unlikely]] {
         const bmqp::Event event(blob, d_allocator_p);
         BALL_LOG_INFO_BLOCK
         {
@@ -3164,10 +3160,7 @@ void BrokerSession::sendConfirm(const bsl::shared_ptr<const bdlbb::Blob>& blob,
     // If write failed due to HWM, the event is in the extention buffer and
     // will be resent, so update the statistics as it was sent successfully.
     // For any other error return without updating the stats.
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            res != bmqt::GenericResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (res != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
         BALL_LOG_ERROR << id() << "Unable to confirm " << msgCount
                        << " message(s) [reason: 'NOT_CONNECTED']";
         return;  // RETURN
@@ -3194,7 +3187,7 @@ void BrokerSession::fsmThreadLoop()
 
         [[maybe_unused]] const int rc = d_fsmEventQueue.popFront(&event);
         BSLS_ASSERT_SAFE(rc == 0);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!event)) {  // PoisonPill
+        if (!event) [[unlikely]] {  // PoisonPill
             BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
             // Drain left over events (there should be none)
             while (d_fsmEventQueue.tryPopFront(&event) == 0) {
@@ -3253,20 +3246,18 @@ void BrokerSession::eventHandlerCbWrapper(
     if (event->eventCallback()) {
         event->eventCallback()(event);
     }
-    else if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(!isDisconnected)) {
+    else if (!isDisconnected) [[likely]] {
         eventHandlerCb(event);
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(isDisconnected)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (isDisconnected) [[unlikely]] {
         d_isStopping = true;
     }
 
     // If the session is stopping and there are no more active handlers we
     // release the stop semaphore.
     const int remaining = --d_inProgressEventHandlerCount;
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_isStopping)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_isStopping) [[unlikely]] {
         if (remaining == 0) {
             if (d_isStopping.testAndSwap(true, false) == true) {
                 d_stopSemaphore.post();
@@ -3400,8 +3391,7 @@ void BrokerSession::processRawEvent(const bmqp::Event& event)
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_fsmThreadChecker.inSameThread());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(event.isControlEvent())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (event.isControlEvent()) [[unlikely]] {
         processControlEvent(event);
     }
     else if (event.isPushEvent()) {
@@ -3475,10 +3465,7 @@ void BrokerSession::enableMessageRetransmission(
 
     bdlbb::Blob appData(d_bufferFactory_p, d_allocator_p);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            putIter.loadApplicationData(&appData) != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (putIter.loadApplicationData(&appData) != 0) [[unlikely]] {
         BALL_LOG_ERROR << id() << "Failed to load message payload";
         BSLS_ASSERT_SAFE(false && "Failed to load message payload");
         return;  // RETURN
@@ -3514,16 +3501,13 @@ void BrokerSession::processPutEvent(const bmqp::Event& event)
 
     bool readyToSend = isStarted() && (d_numPendingReopenQueues == 0);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(readyToSend)) {
+    if (readyToSend) [[likely]] {
         // Post the event.
         bmqt::GenericResult::Enum res = writeOrBuffer(
             *event.blob(),
             d_sessionOptions.channelHighWatermark());
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                res != bmqt::GenericResult::e_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (res != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
             BALL_LOG_ERROR << id()
                            << "Unable to post event [reason: 'NOT_CONNECTED']";
 
@@ -3551,8 +3535,7 @@ void BrokerSession::processPutEvent(const bmqp::Event& event)
         // shouldn't be retransmitted.
         const bool noNeedToResend = readyToSend && !ackRequested;
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(noNeedToResend)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (noNeedToResend) [[unlikely]] {
             BALL_LOG_DEBUG << "PUT message is not added for retransmission";
 
             continue;  // CONTINUE
@@ -3571,8 +3554,7 @@ void BrokerSession::processConfirmEvent(const bmqp::Event& event)
 
     BSLS_ASSERT_SAFE(d_fsmThreadChecker.inSameThread());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isStarted())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isStarted()) [[unlikely]] {
         // Not connected to broker, can't post the event.
         BALL_LOG_ERROR << id() << "Unable to send confirm event "
                        << "[reason: 'NOT_CONNECTED']";
@@ -3589,8 +3571,7 @@ void BrokerSession::processConfirmEvent(const bmqp::Event& event)
         ++msgCount;
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc < 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc < 0) [[unlikely]] {
         BALL_LOG_ERROR << id()
                        << "Unable to confirm event [reason: 'Iteration failed'"
                        << ",rc: " << rc << "]";
@@ -3613,8 +3594,7 @@ void BrokerSession::processPushEvent(const bmqp::Event& event)
     bdlma::LocalSequentialAllocator<1024> iteratorLsa(d_allocator_p);
     bmqp::PushMessageIterator msgIterator(d_bufferFactory_p, &iteratorLsa);
     event.loadPushMessageIterator(&msgIterator);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!msgIterator.isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!msgIterator.isValid()) [[unlikely]] {
         BALL_LOG_ERROR << id() << "Unable to process PUSH event "
                        << "[reason: 'Invalid PushIterator']";
         return;  // RETURN
@@ -3637,8 +3617,7 @@ void BrokerSession::processPushEvent(const bmqp::Event& event)
                                         &hasMessageWithMultipleSubQueueIds,
                                         msgIterator);
     // Check for invalid message
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         BALL_LOG_ERROR << id() << "Unable to process push event "
                        << "[reason: 'Iteration failed', rc: " << rc << "]";
         return;  // RETURN
@@ -3655,8 +3634,7 @@ void BrokerSession::processPushEvent(const bmqp::Event& event)
                                                d_blobSpPool_p,
                                                d_queueManager.schemaLearner(),
                                                d_allocator_p);
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (rc != 0) [[unlikely]] {
             BALL_LOG_ERROR << id() << "Unable to flatten PUSH event"
                            << " [rc: " << rc
                            << ", length: " << event.blob()->length()
@@ -3699,10 +3677,8 @@ void BrokerSession::processPushEvent(const bmqp::Event& event)
 
         if (hasMessageWithMultipleSubQueueIds || i == eventInfos.size()) {
             // Dump if enabled
-            if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                    d_messageDumper
-                        .isEventDumpEnabled<bmqp::EventType::e_PUSH>())) {
-                BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+            if (d_messageDumper.isEventDumpEnabled<bmqp::EventType::e_PUSH>())
+                [[unlikely]] {
                 BALL_LOG_INFO_BLOCK
                 {
                     d_messageDumper.dumpPushEvent(BALL_LOG_OUTPUT_STREAM,
@@ -3727,18 +3703,16 @@ void BrokerSession::processAckEvent(const bmqp::Event& event)
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_fsmThreadChecker.inSameThread());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            d_messageDumper.isEventDumpEnabled<bmqp::EventType::e_ACK>())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_messageDumper.isEventDumpEnabled<bmqp::EventType::e_ACK>())
+        [[unlikely]] {
         BALL_LOG_INFO_BLOCK
         {
             d_messageDumper.dumpAckEvent(BALL_LOG_OUTPUT_STREAM, event);
         }
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            state() == bmqimp::BrokerSession::State::e_CLOSING_SESSION)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (state() == bmqimp::BrokerSession::State::e_CLOSING_SESSION)
+        [[unlikely]] {
         // Disconnecting from the broker. Pending PUTs have been already NACKed
         // locally.
         BALL_LOG_WARN << "Ignore ACK event [reason: 'DISCONNECTING']";
@@ -4328,8 +4302,7 @@ void BrokerSession::doHandleChannelWatermark(
                             d_extensionBlobBuffer.front(),
                             d_sessionOptions.channelHighWatermark());
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!status)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (!status) [[unlikely]] {
             BALL_LOG_ERROR << id()
                            << "Failed to send buffered control messages ";
 
@@ -4532,9 +4505,8 @@ void BrokerSession::transferAckEvent(bmqp::AckEventBuilder*  ackBuilder,
 
     bmqp::Event event(ackBuilder->blob(), d_allocator_p);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            d_messageDumper.isEventDumpEnabled<bmqp::EventType::e_ACK>())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_messageDumper.isEventDumpEnabled<bmqp::EventType::e_ACK>())
+        [[unlikely]] {
         BALL_LOG_INFO_BLOCK
         {
             d_messageDumper.dumpAckEvent(BALL_LOG_OUTPUT_STREAM, event);
@@ -4642,9 +4614,7 @@ bool BrokerSession::cancelPendingMessageImp(
         }
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(qac.d_messageType ==
-                                              bmqp::EventType::e_CONTROL)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (qac.d_messageType == bmqp::EventType::e_CONTROL) [[unlikely]] {
         // Buffered CONTROL message will be deleted when related request is
         // cancelled.  If the cancelation is for the particular queue fire
         // assert because such item should have been already deleted.
@@ -4656,10 +4626,7 @@ bool BrokerSession::cancelPendingMessageImp(
         return res;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            qac.d_queueId.id() == bmqimp::Queue::k_INVALID_QUEUE_ID)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (qac.d_queueId.id() == bmqimp::Queue::k_INVALID_QUEUE_ID) [[unlikely]] {
         // The item has no associated queueId.  This may happen if the user has
         // started an event but hasn't post it yet.  In this case the NACK
         // should not be sent and the item should not be removed at this point.
@@ -4776,10 +4743,7 @@ bool BrokerSession::retransmitControlMessage(
         qac.d_messageData,
         d_sessionOptions.channelHighWatermark());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            res != bmqt::GenericResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (res != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
         BALL_LOG_ERROR << id()
                        << "Failed to send pending CONTROL message: " << res;
 
@@ -4816,8 +4780,7 @@ bool BrokerSession::appendOrSend(
 
     const bmqt::EventBuilderResult::Enum result = builder.packMessageRaw(
         qac.d_queueId.id());
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-            result == bmqt::EventBuilderResult::e_SUCCESS)) {
+    if (result == bmqt::EventBuilderResult::e_SUCCESS) [[likely]] {
         return true;  // RETURN
     }
 
@@ -4827,10 +4790,7 @@ bool BrokerSession::appendOrSend(
             *builder.blob(),
             d_sessionOptions.channelHighWatermark());
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                res != bmqt::GenericResult::e_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (res != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
             BALL_LOG_ERROR << id()
                            << "Failed to send pending PUT event: " << res;
 
@@ -4863,20 +4823,14 @@ bool BrokerSession::handlePendingMessage(
     *deleteItem    = false;
     bool interrupt = false;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(qac.d_messageType ==
-                                              bmqp::EventType::e_UNDEFINED)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (qac.d_messageType == bmqp::EventType::e_UNDEFINED) [[unlikely]] {
         // The item my be added from the user thread but not yet handled in the
         // FSM.  Skip it.
         BALL_LOG_DEBUG << "Skip pending message [no payload]. GUID: " << guid;
         return interrupt;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(qac.d_messageType ==
-                                              bmqp::EventType::e_CONTROL)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (qac.d_messageType == bmqp::EventType::e_CONTROL) [[unlikely]] {
         return retransmitControlMessage(deleteItem, qac);  // RETURN
     }
 
@@ -4892,14 +4846,11 @@ bool BrokerSession::handlePendingMessage(
     // fails due to PAYLOAD_TOO_BIG error, build and send the current event,
     // start a new one and repeat the message appending.
     bool appended = appendOrSend(&interrupt, builder, qac);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(interrupt)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (interrupt) [[unlikely]] {
         return interrupt;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!appended)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!appended) [[unlikely]] {
         // Second attemt to append.
         appended = appendOrSend(&interrupt, builder, qac);
     }
@@ -4951,10 +4902,7 @@ void BrokerSession::retransmitPendingMessages()
             *putBuilder.blob(),
             d_sessionOptions.channelHighWatermark());
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                res != bmqt::GenericResult::e_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (res != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
             BALL_LOG_ERROR << id()
                            << "Failed to send pending PUT event: " << res;
         }
@@ -4979,8 +4927,7 @@ BrokerSession::enqueueFsmEvent(bsl::shared_ptr<Event>& event)
 
     int rc = d_fsmEventQueue.pushBack(bsl::move(event));
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         BSLS_ASSERT_SAFE(false && "Impossible - failed to enqueue FSM event");
         BALL_LOG_ERROR << id() << "Failed to enqueue FSM event: " << *event;
         return bmqt::GenericResult::e_REFUSED;  // RETURN
@@ -5619,9 +5566,7 @@ BrokerSession::requestWriterCb(const RequestSp&                    context,
                                     d_allocator_p));
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_channel_sp)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!d_channel_sp) [[unlikely]] {
         BSLS_ASSERT_SAFE(isBuffered);
 
         // The request is stored for further retransmission once the session is
@@ -5631,10 +5576,7 @@ BrokerSession::requestWriterCb(const RequestSp&                    context,
 
     bmqt::GenericResult::Enum res = writeOrBuffer(*blob_sp, watermark);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            res != bmqt::GenericResult::e_SUCCESS && isBuffered)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (res != bmqt::GenericResult::e_SUCCESS && isBuffered) [[unlikely]] {
         // The channel is bad, but the request is already stored for further
         // retransmission once the session is reconnected.
         res = bmqt::GenericResult::e_SUCCESS;
@@ -5655,10 +5597,7 @@ BrokerSession::writeOrBuffer(const bdlbb::Blob& eventBlob,
     bmqio::Status             status(d_allocator_p);
     bmqt::GenericResult::Enum res = bmqt::GenericResult::e_SUCCESS;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !d_extensionBlobBuffer.empty())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!d_extensionBlobBuffer.empty()) [[unlikely]] {
         BSLS_ASSERT_SAFE(!d_extensionBufferEmpty);
 
         // Buffer the blob and return success
@@ -5670,9 +5609,7 @@ BrokerSession::writeOrBuffer(const bdlbb::Blob& eventBlob,
                         eventBlob,
                         highWaterMark - k_CONTROL_DATA_WATERMARK_EXTRA);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!status)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!status) [[unlikely]] {
         if (status.category() == bmqio::StatusCategory::e_LIMIT) {
             d_extensionBlobBuffer.push_back(eventBlob);
             d_extensionBufferEmpty = false;
@@ -5858,8 +5795,7 @@ BrokerSession::processPacket(const bmqp::Event& event)
 
     enum { e_NUM_BYTES_IN_BLOB_TO_DUMP = 256 };
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!event.isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!event.isValid()) [[unlikely]] {
         BALL_LOG_ERROR << id() << "Received an invalid packet: "
                        << bmqu::BlobStartHexDumper(
                               event.blob(),
@@ -6634,11 +6570,9 @@ BrokerSession::nextEvent(const bsls::TimeInterval& timeout)
     const bsls::TimeInterval beginTime = bmqu::Time::nowMonotonicClock();
     bsl::shared_ptr<Event>   event     = d_eventQueue.timedPopFront(timeout);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            event->type() == Event::EventType::e_SESSION &&
-            event->sessionEventType() ==
-                bmqt::SessionEventType::e_DISCONNECTED)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (event->type() == Event::EventType::e_SESSION &&
+        event->sessionEventType() == bmqt::SessionEventType::e_DISCONNECTED)
+        [[unlikely]] {
         // By contract with the user, the 'DISCONNECTED' event is the event
         // that their event loop should use to exit.  We have no control over
         // how many threads the user have which are calling 'nextEvent',
@@ -6956,9 +6890,7 @@ int BrokerSession::toFsm(const bmqimp::BrokerSession::FsmCallback& fsmCallback,
         rc = enqueueFsmEvent(queueEvent);
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqt::GenericResult::e_SUCCESS && everCallBack)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != bmqt::GenericResult::e_SUCCESS && everCallBack) [[unlikely]] {
         // Since FSM did not work, need to execute the `eventCallback`.
         fsmCallback(0);  // empty context indicates "failed to enqueue".
     }
@@ -7101,9 +7033,7 @@ bool BrokerSession::acceptUserEvent(
 {
     // executed by the APPLICATION thread
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_extensionBufferEmpty)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!d_extensionBufferEmpty) [[unlikely]] {
         const bsls::TimeInterval& timeout =
             d_sessionOptions.channelWriteTimeout();
 
@@ -7200,8 +7130,7 @@ int BrokerSession::post(const bsl::shared_ptr<const bdlbb::Blob>& blob_sp)
     }
 
     bmqp::Event event(blob_sp, d_allocator_p);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!event.isPutEvent())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!event.isPutEvent()) [[unlikely]] {
         BALL_LOG_ERROR << id()
                        << "Unable to post event [reason: 'Not a PUT event']";
         return bmqt::PostResult::e_INVALID_ARGUMENT;  // RETURN
@@ -7209,8 +7138,7 @@ int BrokerSession::post(const bsl::shared_ptr<const bdlbb::Blob>& blob_sp)
 
     bmqp::PutMessageIterator putIter(d_bufferFactory_p, d_allocator_p);
     event.loadPutMessageIterator(&putIter);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!putIter.isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!putIter.isValid()) [[unlikely]] {
         BALL_LOG_ERROR << id() << "Unable to post event "
                        << "[reason: 'Invalid PutIterator']";
         return bmqt::PostResult::e_INVALID_ARGUMENT;  // RETURN
@@ -7232,16 +7160,14 @@ int BrokerSession::post(const bsl::shared_ptr<const bdlbb::Blob>& blob_sp)
     // their associated stats.
     int msgCount = 0;
     int rc       = d_queueManager.updateStatsOnPutEvent(&msgCount, putIter);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         BALL_LOG_ERROR << id() << "Unable to post event "
                        << "[reason: 'Invalid event', rc: " << rc << "]";
 
         return bmqt::PostResult::e_INVALID_ARGUMENT;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_acceptRequests)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_acceptRequests) [[unlikely]] {
         // In the process of stopping or not started, can't post the event.
         BALL_LOG_ERROR << id()
                        << "Unable to post event [reason: 'SESSION_STOPPED']";
@@ -7249,17 +7175,14 @@ int BrokerSession::post(const bsl::shared_ptr<const bdlbb::Blob>& blob_sp)
     }
 
     bool isAccepted = acceptUserEvent(blob_sp);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isAccepted)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!isAccepted) [[unlikely]] {
         BALL_LOG_ERROR << id() << "Unable to post event [reason: 'LIMIT']";
         return bmqt::PostResult::e_BW_LIMIT;  // RETURN
     }
 
     // Dump the PUT event, if requested by a dump command
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            d_messageDumper.isEventDumpEnabled<bmqp::EventType::e_PUT>())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_messageDumper.isEventDumpEnabled<bmqp::EventType::e_PUT>())
+        [[unlikely]] {
         BALL_LOG_INFO_BLOCK
         {
             d_messageDumper.dumpPutEvent(BALL_LOG_OUTPUT_STREAM,
@@ -7283,34 +7206,27 @@ int BrokerSession::confirmMessage(const bsl::shared_ptr<bmqimp::Queue>& queue,
     BSLS_ASSERT(queue && "non-null 'queue' must be specified");
 
     // Ensure the queueId is valid, and the queue is not being closed
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(queue->id() ==
-                                              Queue::k_INVALID_QUEUE_ID)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (queue->id() == Queue::k_INVALID_QUEUE_ID) [[unlikely]] {
         return bmqt::GenericResult::e_INVALID_ARGUMENT;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !bmqt::QueueFlagsUtil::isReader(queue->flags()))) {
+    if (!bmqt::QueueFlagsUtil::isReader(queue->flags())) [[unlikely]] {
         // Confirmation requires a queue opened in read mode.
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         return bmqt::GenericResult::e_INVALID_ARGUMENT;  // RETURN
     }
 
     // Ensure the queueId is valid, and the queue is not being closed
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(queue->state() !=
-                                              QueueState::e_OPENED)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (queue->state() != QueueState::e_OPENED) [[unlikely]] {
         return bmqt::GenericResult::e_NOT_CONNECTED;  // RETURN
     }
 
     // Ensure confirm messages are expected by the queue
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(queue->atMostOnce())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (queue->atMostOnce()) [[unlikely]] {
         return bmqt::GenericResult::e_SUCCESS;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_acceptRequests)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_acceptRequests) [[unlikely]] {
         // In the process of stopping or not started, can't send confirmation
         // message.
         BALL_LOG_ERROR << id() << "Unable to confirm message "
@@ -7326,18 +7242,14 @@ int BrokerSession::confirmMessage(const bsl::shared_ptr<bmqimp::Queue>& queue,
     // no handling bmqt::EventBuilderResult::e_EVENT_TOO_BIG error since there
     // is exactly one message being appended.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqt::EventBuilderResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != bmqt::EventBuilderResult::e_SUCCESS) [[unlikely]] {
         BALL_LOG_ERROR << id()
                        << "Unable to append confirm message to the builder: "
                        << rc;
         return rc;  // RETURN
     }
     bool isAccepted = acceptUserEvent(builder.blob());
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isAccepted)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!isAccepted) [[unlikely]] {
         BALL_LOG_ERROR << id()
                        << "Unable to send confirm event [reason: 'LIMIT']";
         return bmqt::GenericResult::e_TIMEOUT;  // RETURN
@@ -7353,9 +7265,7 @@ int BrokerSession::confirmMessages(
         return bmqt::GenericResult::e_INVALID_ARGUMENT;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_acceptRequests)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!d_acceptRequests) [[unlikely]] {
         BALL_LOG_ERROR << id() << "Unable to confirm message "
                        << "[reason: 'SESSION_STOPPED']";
 
@@ -7363,8 +7273,7 @@ int BrokerSession::confirmMessages(
     }
 
     bmqp::Event event(blob_sp, d_allocator_p);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!event.isConfirmEvent())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!event.isConfirmEvent()) [[unlikely]] {
         BALL_LOG_ERROR << id()
                        << "Unable to confirm event [reason: 'Not a CONFIRM "
                        << "event ']";
@@ -7373,17 +7282,14 @@ int BrokerSession::confirmMessages(
 
     bmqp::ConfirmMessageIterator confirmIter;
     event.loadConfirmMessageIterator(&confirmIter);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!confirmIter.isValid())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!confirmIter.isValid()) [[unlikely]] {
         BALL_LOG_ERROR << id() << "Unable to confirm event [reason: 'Invalid"
                        << "ConfirmIterator']";
         return bmqt::GenericResult::e_INVALID_ARGUMENT;  // RETURN
     }
 
     bool isAccepted = acceptUserEvent(blob_sp);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isAccepted)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!isAccepted) [[unlikely]] {
         BALL_LOG_ERROR << id()
                        << "Unable to send confirm event [reason: 'LIMIT']";
         return bmqt::GenericResult::e_TIMEOUT;  // RETURN
@@ -7411,8 +7317,7 @@ void BrokerSession::postToFsm(const bsl::function<void()>& f)
     });
     int rc = d_fsmEventQueue.pushBack(bsl::move(event));
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         BALL_LOG_ERROR << id() << "Failed to enqueue FSM event: " << *event;
     }
 }

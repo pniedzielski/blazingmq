@@ -27,7 +27,6 @@
 #include <bsl_memory.h>
 #include <bslma_allocator.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqp {
@@ -51,18 +50,14 @@ bmqt::EventBuilderResult::Enum StorageEventBuilder::packMessageImp(
     // No padding needed for storage messages
 
     // Validate payload is not too big
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            totalLength > StorageHeader::k_MAX_PAYLOAD_SIZE_SOFT)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (totalLength > StorageHeader::k_MAX_PAYLOAD_SIZE_SOFT) [[unlikely]] {
         return bmqt::EventBuilderResult::e_PAYLOAD_TOO_BIG;  // RETURN
     }
 
     // Ensure event has enough space left for this message
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            EventHeader::k_MAX_SIZE_SOFT <
-            static_cast<int>(eventSize() + sizeof(StorageHeader) +
-                             totalLength))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (EventHeader::k_MAX_SIZE_SOFT <
+        static_cast<int>(eventSize() + sizeof(StorageHeader) + totalLength))
+        [[unlikely]] {
         return bmqt::EventBuilderResult::e_EVENT_TOO_BIG;  // RETURN
     }
 
@@ -162,9 +157,7 @@ StorageEventBuilder::packMessageRaw(const bdlbb::Blob&        blob,
         return bmqt::EventBuilderResult::e_SUCCESS;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !bmqu::BlobUtil::isValidPos(blob, startPos))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!bmqu::BlobUtil::isValidPos(blob, startPos)) [[unlikely]] {
         return bmqt::EventBuilderResult::e_UNKNOWN;  // RETURN
     }
 
@@ -172,19 +165,14 @@ StorageEventBuilder::packMessageRaw(const bdlbb::Blob&        blob,
     // include the length of 'StorageHeader' because this is a raw message, and
     // it is assumed that it already contains it.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            EventHeader::k_MAX_SIZE_SOFT <
-            static_cast<int>(eventSize() + blob.length()))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (EventHeader::k_MAX_SIZE_SOFT <
+        static_cast<int>(eventSize() + blob.length())) [[unlikely]] {
         return bmqt::EventBuilderResult::e_EVENT_TOO_BIG;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            0 != bmqu::BlobUtil::appendToBlob(d_blob_sp.get(),
-                                              blob,
-                                              startPos,
-                                              length))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (0 !=
+        bmqu::BlobUtil::appendToBlob(d_blob_sp.get(), blob, startPos, length))
+        [[unlikely]] {
         return bmqt::EventBuilderResult::e_UNKNOWN;  // RETURN
     }
 
@@ -197,8 +185,7 @@ const bsl::shared_ptr<bdlbb::Blob>& StorageEventBuilder::blob() const
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_blob_sp->length() <= EventHeader::k_MAX_SIZE_SOFT);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(messageCount() == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (messageCount() == 0) [[unlikely]] {
         return d_emptyBlob_sp;  // RETURN
     }
 

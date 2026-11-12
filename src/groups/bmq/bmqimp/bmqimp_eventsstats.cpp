@@ -24,7 +24,6 @@
 #include <bdlma_localsequentialallocator.h>
 #include <bslma_allocator.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqimp {
@@ -199,8 +198,7 @@ void EventsStats::onEvent(EventsStatsEventType::Enum type,
                           int                        eventSize,
                           int                        messageCount)
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_statContexts_mp[type])) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_statContexts_mp[type]) [[unlikely]] {
         // Stats are disabled (i.e. 'initializeStats' was not called).
         return;  // RETURN
     }

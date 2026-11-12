@@ -32,7 +32,6 @@
 #include <bslma_allocator.h>
 #include <bslmt_lockguard.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace mqbnet {
@@ -84,8 +83,7 @@ MockClusterNode::setChannel(const bsl::weak_ptr<bmqio::Channel>& value,
 bool MockClusterNode::enableRead()
 {
     const bsl::shared_ptr<bmqio::Channel> channelSp = d_channel.channel();
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!channelSp)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!channelSp) [[unlikely]] {
         return false;  // RETURN
     }
 

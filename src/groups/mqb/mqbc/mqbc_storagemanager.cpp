@@ -49,7 +49,6 @@
 #include <bsl_utility.h>
 #include <bsla_annotations.h>
 #include <bslmt_once.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace mqbc {
@@ -4745,8 +4744,7 @@ void StorageManager::processStorageEvent(const mqbevt::StorageEvent& event)
     BSLS_ASSERT_SAFE(d_cluster_p->inDispatcherThread());
     BSLS_ASSERT_SAFE(!d_clusterData_p->cluster().isLocal());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_isStarted)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_isStarted) [[unlikely]] {
         BMQ_LOGTHROTTLE_WARN
             << d_clusterData_p->identity().description()
             << " Dropping storage event as storage has been closed.";

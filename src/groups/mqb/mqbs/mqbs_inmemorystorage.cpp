@@ -199,10 +199,7 @@ InMemoryStorage::put(mqbi::StorageMessageAttributes*     attributes,
         mqbu::CapacityMeter::CommitResult capacity =
             d_capacityMeter.commitUnreserved(1, msgSize);
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                capacity != mqbu::CapacityMeter::e_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (capacity != mqbu::CapacityMeter::e_SUCCESS) [[unlikely]] {
             return (capacity == mqbu::CapacityMeter::e_LIMIT_MESSAGES
                         ? mqbi::StorageResult::e_LIMIT_MESSAGES
                         : mqbi::StorageResult::e_LIMIT_BYTES);  // RETURN

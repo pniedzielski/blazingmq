@@ -3784,8 +3784,7 @@ int FileStore::writeQueueOpRecord(DataStoreRecordHandle*  handle,
     FileSet* activeFileSet = d_fileSets[0].get();
     BSLS_ASSERT_SAFE(activeFileSet);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_isPrimary)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_isPrimary) [[unlikely]] {
         BMQTSK_ALARMLOG_ALARM("REPLICATION")
             << partitionDesc()
             << "Not the primary. Not writing & replicating queueOp record with"
@@ -4003,9 +4002,7 @@ void FileStore::writeRolledOverRecord(DataStoreRecord*    record,
         QueueKeyCounterMapIter qit = queueKeyCounterMap->find(
             toRec->queueKey());
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(queueKeyCounterMap->end() ==
-                                                  qit)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (queueKeyCounterMap->end() == qit) [[unlikely]] {
             BALL_LOG_ERROR << "Message with unexpected queueKey: " << *toRec;
             BSLS_ASSERT_OPT(false && "Message with unexpected queueKey");
         }
@@ -4074,10 +4071,8 @@ void FileStore::writeRolledOverRecord(DataStoreRecord*    record,
             BSLS_ASSERT_SAFE(QueueOpType::e_PURGE == fromRec->type() ||
                              QueueOpType::e_DELETION == fromRec->type());
 
-            if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                    queueKeyCounterMap->end() ==
-                    queueKeyCounterMap->find(fromRec->queueKey()))) {
-                BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+            if (queueKeyCounterMap->end() ==
+                queueKeyCounterMap->find(fromRec->queueKey())) [[unlikely]] {
                 BALL_LOG_ERROR << "Message with unexpected queueKey: "
                                << *fromRec;
                 BSLS_ASSERT_OPT(false && "Message with unexpected queueKey");
@@ -4458,9 +4453,7 @@ int FileStore::writeMessageRecord(const bmqp::StorageHeader& header,
     FileSet* activeFileSet = d_fileSets[0].get();
     BSLS_ASSERT_SAFE(activeFileSet);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !activeFileSet->d_journalFileAvailable)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!activeFileSet->d_journalFileAvailable) [[unlikely]] {
         return rc_UNAVAILABLE;  // RETURN
     }
 
@@ -4593,9 +4586,7 @@ int FileStore::writeQueueCreationRecord(
     FileSet* activeFileSet = d_fileSets[0].get();
     BSLS_ASSERT_SAFE(activeFileSet);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !activeFileSet->d_journalFileAvailable)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!activeFileSet->d_journalFileAvailable) [[unlikely]] {
         return rc_UNAVAILABLE;  // RETURN
     }
 
@@ -4981,9 +4972,7 @@ int FileStore::writeJournalRecord(const bmqp::StorageHeader& header,
     FileSet* activeFileSet = d_fileSets[0].get();
     BSLS_ASSERT_SAFE(activeFileSet);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !activeFileSet->d_journalFileAvailable)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!activeFileSet->d_journalFileAvailable) [[unlikely]] {
         return rc_UNAVAILABLE;  // RETURN
     }
 
@@ -5392,19 +5381,15 @@ int FileStore::validateWritingRecord(const bmqt::MessageGUID& guid,
     FileSet* activeFileSet = d_fileSets[0].get();
     BSLS_ASSERT_SAFE(activeFileSet);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_isStopping)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_isStopping) [[unlikely]] {
         return rc_STOPPING;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !activeFileSet->d_journalFileAvailable)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!activeFileSet->d_journalFileAvailable) [[unlikely]] {
         return rc_UNAVAILABLE;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_isPrimary)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_isPrimary) [[unlikely]] {
         BMQTSK_ALARMLOG_ALARM("REPLICATION")
             << partitionDesc()
             << "Not the primary. Not writing & replicating record with guid "
@@ -5839,19 +5824,15 @@ int FileStore::writeMessageRecord(mqbi::StorageMessageAttributes* attributes,
     FileSet* activeFileSet = d_fileSets[0].get();
     BSLS_ASSERT_SAFE(activeFileSet);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_isStopping)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_isStopping) [[unlikely]] {
         return rc_STOPPING;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !activeFileSet->d_journalFileAvailable)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!activeFileSet->d_journalFileAvailable) [[unlikely]] {
         return rc_UNAVAILABLE;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_isPrimary)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_isPrimary) [[unlikely]] {
         BMQTSK_ALARMLOG_ALARM("REPLICATION")
             << partitionDesc()
             << "Not the primary. Not writing & replicating message with guid "
@@ -6045,19 +6026,15 @@ int FileStore::writeQueueCreationRecord(DataStoreRecordHandle*  handle,
     FileSet* activeFileSet = d_fileSets[0].get();
     BSLS_ASSERT_SAFE(activeFileSet);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_isStopping)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_isStopping) [[unlikely]] {
         return rc_STOPPING;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !activeFileSet->d_journalFileAvailable)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!activeFileSet->d_journalFileAvailable) [[unlikely]] {
         return rc_UNAVAILABLE;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_isPrimary)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_isPrimary) [[unlikely]] {
         BMQTSK_ALARMLOG_ALARM("REPLICATION")
             << partitionDesc()
             << "Not the primary. Not writing & replicating QueueUriRecord for "
@@ -6345,8 +6322,7 @@ int FileStore::writeConfirmRecord(DataStoreRecordHandle*   handle,
     };
 
     int rc = validateWritingRecord(guid, queueKey);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return 10 * rc + rc_VALIDATION_FAILURE;  // RETURN
     }
 
@@ -6357,8 +6333,7 @@ int FileStore::writeConfirmRecord(DataStoreRecordHandle*   handle,
     rc = rolloverIfNeeded(FileType::e_JOURNAL,
                           activeFileSet->d_journal,
                           k_REQUESTED_JOURNAL_SPACE);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return 10 * rc + rc_ROLLOVER_FAILURE;  // RETURN
     }
 
@@ -6414,8 +6389,7 @@ int FileStore::writeDeletionRecord(const bmqt::MessageGUID& guid,
     };
 
     int rc = validateWritingRecord(guid, queueKey);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != 0) [[unlikely]] {
         return 10 * rc + rc_VALIDATION_FAILURE;  // RETURN
     }
 
@@ -6468,9 +6442,7 @@ int FileStore::writeSyncPointRecord(const bmqp_ctrlmsg::SyncPoint& syncPoint,
     FileSet* activeFileSet = d_fileSets[0].get();
     BSLS_ASSERT_SAFE(activeFileSet);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !activeFileSet->d_journalFileAvailable)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!activeFileSet->d_journalFileAvailable) [[unlikely]] {
         return rc_UNAVAILABLE;  // RETURN
     }
 
@@ -6574,10 +6546,7 @@ int FileStore::processStorageEvent(const bsl::shared_ptr<bdlbb::Blob>& blob,
 
     enum { rc_SUCCESS = 0, rc_MALFORMED_QUEUE_RECORD = -1 };
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_isStopping &&
-                                              d_lastSyncPtReceived)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (d_isStopping && d_lastSyncPtReceived) [[unlikely]] {
         // Self node is stopping and has received the "last" SyncPt.  No need
         // to process any more storage events.
 
@@ -6670,7 +6639,7 @@ int FileStore::processStorageEvent(const bsl::shared_ptr<bdlbb::Blob>& blob,
         if (bmqp::StorageMessageType::e_DATA == header.messageType()) {
             rc = writeMessageRecord(header, *recHeader, blob, recordPosition);
 
-            if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(0 == rc)) {
+            if (0 == rc) [[likely]] {
                 if (header.flags() &
                     bmqp::StorageHeaderFlags::e_RECEIPT_REQUESTED) {
                     nodeContext = generateReceipt(nodeContext,
@@ -6694,9 +6663,7 @@ int FileStore::processStorageEvent(const bsl::shared_ptr<bdlbb::Blob>& blob,
                                     header.messageType());
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                FileStoreUtil::k_MALFORMED_QUEUE_RECORD == rc)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (FileStoreUtil::k_MALFORMED_QUEUE_RECORD == rc) [[unlikely]] {
             BMQTSK_ALARMLOG_ALARM("REPLICATION")
                 << partitionDesc() << "Received a malformed storage msg "
                 << header.messageType() << " from "
@@ -6711,7 +6678,7 @@ int FileStore::processStorageEvent(const bsl::shared_ptr<bdlbb::Blob>& blob,
         // Bump up the current PSN if record was written
         // successfully, raise alarm otherwise.
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(0 == rc)) {
+        if (0 == rc) [[likely]] {
             // Advance the write cursor to the record just applied.
 
             const bool bumpedLeaseId = d_writeHeadLeaseId <
@@ -6742,8 +6709,7 @@ int FileStore::processStorageEvent(const bsl::shared_ptr<bdlbb::Blob>& blob,
                 }
             }
         }
-        else {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        else [[unlikely]] {
             BMQTSK_ALARMLOG_ALARM("REPLICATION")
                 << partitionDesc() << "Failed to write storage msg "
                 << header.messageType() << " with PSN ("
@@ -6921,9 +6887,7 @@ int FileStore::processRecoveryEvent(const bsl::shared_ptr<bdlbb::Blob>& blob)
                                     header.messageType());
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                FileStoreUtil::k_MALFORMED_QUEUE_RECORD == rc)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (FileStoreUtil::k_MALFORMED_QUEUE_RECORD == rc) [[unlikely]] {
             BMQTSK_ALARMLOG_ALARM("RECOVERY")
                 << partitionDesc() << "Buffered storage message "
                 << header.messageType() << " with PSN "
@@ -7018,8 +6982,7 @@ void FileStore::sendReceipt(mqbnet::ClusterNode* node,
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!node)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!node) [[unlikely]] {
         BALL_LOG_ERROR << partitionDesc()
                        << "Cannot send Receipt: primary node is null.";
         return;  // RETURN
@@ -7029,8 +6992,7 @@ void FileStore::sendReceipt(mqbnet::ClusterNode* node,
                                        bmqp::EventType::e_REPLICATION_RECEIPT,
                                        nodeContext->d_state);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqt::GenericResult::e_SUCCESS)) {
+    if (rc != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
         BALL_LOG_INFO << partitionDesc() << "Failed to send Receipt for PSN: "
                       << printPSN(nodeContext->d_key.d_primaryLeaseId,
                                   nodeContext->d_key.d_sequenceNum)
@@ -7298,8 +7260,7 @@ void FileStore::flushStorage()
 
 void FileStore::notifyQueuesOnReplicatedBatch()
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-            d_storageEventBuilder.messageCount() == 0)) {
+    if (d_storageEventBuilder.messageCount() == 0) [[likely]] {
         // Empty 'd_storageEventBuilder' means it has been flushed and it is a
         // good time to flush weak consistency queues.
 
@@ -7333,8 +7294,7 @@ void FileStore::gcExpiredMessages()
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_isStopping)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_isStopping) [[unlikely]] {
         return;  // RETURN
     }
 
@@ -7523,8 +7483,7 @@ void FileStore::scheduledCleanupStorages()
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(inDispatcherThread());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_isStopping)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_isStopping) [[unlikely]] {
         return;  // RETURN
     }
 

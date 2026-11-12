@@ -279,12 +279,11 @@ inline AtomicValidatorGuard::AtomicValidatorGuard(AtomicValidator* validator,
 
 inline AtomicValidatorGuard::~AtomicValidatorGuard()
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_isAcquired)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_isAcquired) [[unlikely]] {
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(d_validator_p)) {
+    if (d_validator_p) [[likely]] {
         d_validator_p->release();
     }
 }
@@ -292,7 +291,7 @@ inline AtomicValidatorGuard::~AtomicValidatorGuard()
 // ACCESSORS
 inline bool AtomicValidatorGuard::isValid() const
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!d_validator_p)) {
+    if (!d_validator_p) [[unlikely]] {
         // A guard on a NULL validator is valid...
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
         return true;  // RETURN

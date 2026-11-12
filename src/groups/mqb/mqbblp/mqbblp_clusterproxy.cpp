@@ -60,7 +60,6 @@
 #include <bsla_annotations.h>
 #include <bslmt_lockguard.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 #include <bsls_systemclocktype.h>
 
 namespace BloombergLP {
@@ -513,8 +512,7 @@ void ClusterProxy::onRelayRejectEvent(const mqbevt::RejectEvent& event)
         rc = bmqt::GenericResult::e_NOT_CONNECTED;
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqt::GenericResult::e_SUCCESS)) {
+    if (rc != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
         BALL_LOG_ERROR << "Failed to relay Reject message [rc: " << rc
                        << ", GUID: " << rejectMsg.messageGUID()
                        << ", queue Id: " << rejectMsg.queueId() << ""
@@ -1184,9 +1182,7 @@ ClusterProxy::sendConfirmInline([[maybe_unused]] int        partitionId,
         message.subQueueId(),
         message.messageGUID());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqt::GenericResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
         return mqbi::InlineResult::e_CHANNEL_ERROR;  // RETURN
     }
 
@@ -1223,16 +1219,14 @@ mqbi::InlineResult::Enum ClusterProxy::sendPutInline(
     // d_clusterData.electorInfo().electorTerm() if the gate is open
 
     bsls::Types::Uint64 term = d_clusterData.electorInfo().electorTerm();
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(genCount != term)) {
+    if (genCount != term) [[unlikely]] {
         return mqbi::InlineResult::e_INVALID_PRIMARY;  // RETURN
     }
 
     bmqt::GenericResult::Enum rc =
         d_activeNode_p->channel().writePut(putHeader, appData, state);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            rc != bmqt::GenericResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (rc != bmqt::GenericResult::e_SUCCESS) [[unlikely]] {
         return mqbi::InlineResult::e_CHANNEL_ERROR;  // RETURN
     }
 

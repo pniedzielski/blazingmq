@@ -492,8 +492,7 @@ inline bool BlobObjectProxy<TYPE>::resetImp(const bdlbb::Blob*        blob,
     d_position  = position;
     d_object_p  = 0;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(length >=
-                                            static_cast<int>(sizeof(TYPE)))) {
+    if (length >= static_cast<int>(sizeof(TYPE))) [[likely]] {
         d_object_p = (raw)
                          ? bmqu::BlobUtil::getAlignedObject(&d_buffer.object(),
                                                             *blob,

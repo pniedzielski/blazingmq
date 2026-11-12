@@ -29,7 +29,6 @@
 #include <bsl_utility.h>
 #include <bslim_printer.h>
 #include <bslma_allocator.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqimp {
@@ -100,9 +99,7 @@ Event::Event(const Event& other, bslma::Allocator* allocator)
     // underlying blob.  This is also the reason why PutEventBuilder is not
     // constructed in d_putEventBuilderBuffer.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_type ==
-                                              EventType::e_SESSION)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_type == EventType::e_SESSION) [[unlikely]] {
         return;  // RETURN
     }
 
@@ -153,9 +150,7 @@ Event& Event::operator=(const Event& rhs)
     d_msgEventMode                    = rhs.d_msgEventMode;
     d_contexts                        = rhs.d_contexts;
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_type ==
-                                              EventType::e_SESSION)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (d_type == EventType::e_SESSION) [[unlikely]] {
         return *this;  // RETURN
     }
 

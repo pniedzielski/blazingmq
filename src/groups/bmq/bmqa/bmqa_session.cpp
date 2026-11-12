@@ -54,7 +54,6 @@
 #include <bslmf_ispolymorphic.h>
 #include <bsls_assert.h>
 #include <bsls_atomic.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqa {
@@ -1565,10 +1564,8 @@ Event Session::nextEvent(const bsls::TimeInterval& timeout)
 
 int Session::post(const MessageEvent& event)
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !d_impl.d_application_mp ||
-            !d_impl.d_application_mp->isStarted())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_impl.d_application_mp || !d_impl.d_application_mp->isStarted())
+        [[unlikely]] {
         return bmqt::GenericResult::e_NOT_CONNECTED;  // RETURN
     }
 
@@ -1586,11 +1583,9 @@ int Session::confirmMessage(const MessageConfirmationCookie& cookie)
     // Check there is a connection with broker. Return error if there is no
     // connection (e.g. the session is not started or reconnecting) because
     // CONFIRM messages are not buffered and retransmitted.
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !d_impl.d_application_mp ||
-            d_impl.d_application_mp->brokerSession().state() !=
-                bmqimp::BrokerSession::State::e_STARTED)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_impl.d_application_mp ||
+        d_impl.d_application_mp->brokerSession().state() !=
+            bmqimp::BrokerSession::State::e_STARTED) [[unlikely]] {
         return bmqt::GenericResult::e_NOT_CONNECTED;  // RETURN
     }
 
@@ -1608,11 +1603,9 @@ int Session::confirmMessages(ConfirmEventBuilder* builder)
     // Check there is a connection with broker. Return error if there is no
     // connection (e.g. the session is not started or reconnecting) because
     // CONFIRM messages are not buffered and retransmitted.
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !d_impl.d_application_mp ||
-            d_impl.d_application_mp->brokerSession().state() !=
-                bmqimp::BrokerSession::State::e_STARTED)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_impl.d_application_mp ||
+        d_impl.d_application_mp->brokerSession().state() !=
+            bmqimp::BrokerSession::State::e_STARTED) [[unlikely]] {
         return bmqt::GenericResult::e_NOT_CONNECTED;  // RETURN
     }
 

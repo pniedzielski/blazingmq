@@ -62,7 +62,6 @@
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bsls_assert.h>
-#include <bsls_performancehint.h>
 #include <bsls_types.h>
 
 namespace BloombergLP {
@@ -393,11 +392,8 @@ void RemoteQueue::pushMessage(
         }
 
         // 'msgGUID' must be present in the storage.
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                storage->getMessageSize(&msgSize, msgGUID) !=
-                mqbi::StorageResult::e_SUCCESS)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (storage->getMessageSize(&msgSize, msgGUID) !=
+            mqbi::StorageResult::e_SUCCESS) [[unlikely]] {
             // This can occur under 2 situations:
             // 1) The message was deleted by the primary because of TTL
             //    expiration, *after* that message guid was enqueued in
@@ -914,11 +910,8 @@ void RemoteQueue::postMessage(const bmqp::PutHeader&              putHeaderIn,
                           << "]. Upstream is already closed.";
         }
     }
-    else if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                 !bmqt::QueueFlagsUtil::isWriter(
-                     source->handleParameters().flags()))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    else if (!bmqt::QueueFlagsUtil::isWriter(
+                 source->handleParameters().flags())) [[unlikely]] {
         // Either queue was not opened in the WRITE mode (which should have
         // been caught in the SDK) or client is posting a message after closing
         // or reconfiguring the queue (which may not be caught in the SDK).
@@ -933,11 +926,8 @@ void RemoteQueue::postMessage(const bmqp::PutHeader&              putHeaderIn,
                 << "]. Queue not opened in WRITE mode by the client.";
         }
     }
-    else if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                 d_pendingMessages.find(putHeader.messageGUID()) !=
-                 d_pendingMessages.end())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    else if (d_pendingMessages.find(putHeader.messageGUID()) !=
+             d_pendingMessages.end()) [[unlikely]] {
         isInvalid = true;
 
         if (d_throttledFailedPutMessages.requestPermission()) {
@@ -1036,10 +1026,7 @@ void RemoteQueue::postMessage(const bmqp::PutHeader&              putHeaderIn,
                                     state,
                                     ctx.d_genCount);
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                mqbi::InlineResult::isPermanentError(rc))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (mqbi::InlineResult::isPermanentError(rc)) [[unlikely]] {
             // Cannot make progress with this PUT.  NACK and drop it
 
             // Use the same throttle as for incoming PUTs
@@ -1222,10 +1209,7 @@ void RemoteQueue::sendConfirmMessage(const bmqt::MessageGUID& msgGUID,
     mqbi::InlineResult::Enum rc =
         cluster->sendConfirmInline(d_state_p->partitionId(), confirmMessage);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc !=
-                                              mqbi::InlineResult::e_SUCCESS)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (rc != mqbi::InlineResult::e_SUCCESS) [[unlikely]] {
         if (d_throttledFailedConfirmMessages.requestPermission()) {
             BALL_LOG_WARN << "Failed to relay CONFIRM message "
                           << "[queueId: " << d_state_p->id()
@@ -1253,12 +1237,11 @@ void RemoteQueue::processAckEvent(const mqbevt::AckEvent& event)
         ackMessage.status());
     auto it = d_pendingMessages.find(ackMessage.messageGUID());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(it != d_pendingMessages.end())) {
+    if (it != d_pendingMessages.end()) [[likely]] {
         source = it->second.d_handle;
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(source == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (source == 0) [[unlikely]] {
         // Didn't find the GUID.  This means that we got an ack from upstream
         // for a guid which we are not aware of.  Log it.
         //
@@ -1502,10 +1485,7 @@ void RemoteQueue::retransmitPendingMessages(bsls::Types::Uint64 genCount)
                     it->second.d_state_sp,
                     genCount);
 
-                if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                        mqbi::InlineResult::isPermanentError(rc))) {
-                    BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+                if (mqbi::InlineResult::isPermanentError(rc)) [[unlikely]] {
                     bmqp::AckMessage      ackMessage;
                     bmqt::AckResult::Enum ackResult =
                         mqbi::InlineResult::toAckResult(rc);

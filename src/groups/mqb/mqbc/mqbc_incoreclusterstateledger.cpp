@@ -353,12 +353,10 @@ void IncoreClusterStateLedger::onQuorumChangeCb(unsigned int ackQuorum)
     // *CLUSTER DISPATCHER* thread. However there is no such obligation for
     // `ClusterQuorumManager`, so we support calls from *ANY* thread.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-            d_clusterData_p->cluster().inDispatcherThread())) {
+    if (d_clusterData_p->cluster().inDispatcherThread()) [[likely]] {
         reviewUncommittedAdvisories(ackQuorum);
     }
-    else {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    else [[unlikely]] {
         d_clusterData_p->cluster().dispatcher()->execute(
             [this, ackQuorum]() {
                 reviewUncommittedAdvisories(ackQuorum);

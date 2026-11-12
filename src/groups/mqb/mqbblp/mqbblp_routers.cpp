@@ -35,7 +35,6 @@
 #include <bsl_iostream.h>
 #include <bsl_memory.h>
 #include <bsl_string.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace mqbblp {
@@ -727,8 +726,8 @@ bool Routers::RoundRobin::iterateSubscriptions(Visitor&       visitor,
         mqbi::QueueHandle*  handle       = subscription->handle();
         BSLS_ASSERT_SAFE(handle);
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(handle->canDeliver(
-                subscription->d_downstreamSubscriptionId))) {
+        if (handle->canDeliver(subscription->d_downstreamSubscriptionId))
+            [[likely]] {
             if (visitor.visit(handle,
                               subscription->consumer(),
                               subscription->d_downstreamSubscriptionId)) {
@@ -803,8 +802,8 @@ const Routers::Subscription* Routers::AppContext::selectSubscription(
     const SubscriptionList&  subscriptions = consumer.d_highestSubscriptions;
 
     for (const Subscription* subscription : subscriptions) {
-        if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(handle->canDeliver(
-                subscription->d_downstreamSubscriptionId))) {
+        if (handle->canDeliver(subscription->d_downstreamSubscriptionId))
+            [[likely]] {
             PriorityGroup& group = subscription->d_itGroup->value();
             if (group.evaluate()) {
                 return subscription;  // RETURN

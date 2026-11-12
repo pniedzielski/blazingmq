@@ -27,7 +27,6 @@
 #include <bdlt_currenttime.h>
 #include <bdlt_epochutil.h>
 #include <bdlt_timeunitratio.h>
-#include <bsls_performancehint.h>
 #include <bsls_timeinterval.h>
 #include <bsls_types.h>
 
@@ -137,8 +136,7 @@ void StorageUtil::loadArrivalTime(
     // changed or restarted since this message's arrival, arrival timepoint
     // will be non-zero.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(0 !=
-                                            attributes.arrivalTimepoint())) {
+    if (0 != attributes.arrivalTimepoint()) [[likely]] {
         const bsls::Types::Int64 timeDeltaNs =
             bmqu::Time::highResolutionTimer() - attributes.arrivalTimepoint();
 
@@ -148,8 +146,7 @@ void StorageUtil::loadArrivalTime(
 
         *out = currentTimeNs - timeDeltaNs;
     }
-    else {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    else [[unlikely]] {
         *out = attributes.arrivalTimestamp();
 
         // Here, time will be in seconds.  Change it to nano seconds.
@@ -183,13 +180,11 @@ void StorageUtil::loadArrivalTimeDelta(
     // has not changed or restarted since this message's arrival, arrival
     // timepoint will be non-zero.
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(0 !=
-                                            attributes.arrivalTimepoint())) {
+    if (0 != attributes.arrivalTimepoint()) [[likely]] {
         *out = bmqu::Time::highResolutionTimer() -
                attributes.arrivalTimepoint();
     }
-    else {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    else [[unlikely]] {
         *out = bdlt::EpochUtil::convertToTimeT64(bdlt::CurrentTime::utc()) -
                attributes.arrivalTimestamp();
 
@@ -220,10 +215,8 @@ int StorageUtil::loadRecordHeaderAndPos(
 
     const bmqp::StorageHeader& header = storageIter.header();
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            header.storageProtocolVersion() != FileStoreProtocol::k_VERSION)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (header.storageProtocolVersion() != FileStoreProtocol::k_VERSION)
+        [[unlikely]] {
         BMQTSK_ALARMLOG_ALARM("REPLICATION")
             << partitionDesc << "Storage protocol version mismatch. Self: "
             << FileStoreProtocol::k_VERSION
@@ -235,10 +228,8 @@ int StorageUtil::loadRecordHeaderAndPos(
         return rc_PROTO_VER_MISMATCH;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            bmqp::StorageMessageType::e_UNDEFINED == header.messageType())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (bmqp::StorageMessageType::e_UNDEFINED == header.messageType())
+        [[unlikely]] {
         BMQTSK_ALARMLOG_ALARM("REPLICATION")
             << partitionDesc << "Received an unexpected storage message type: "
             << header.messageType() << " with journal offset (in words): "
@@ -248,9 +239,7 @@ int StorageUtil::loadRecordHeaderAndPos(
     }
 
     const int rc = storageIter.loadDataPosition(recordPosition);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(0 != rc)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (0 != rc) [[unlikely]] {
         BMQTSK_ALARMLOG_ALARM("REPLICATION")
             << partitionDesc
             << "Failed to load record position for storage msg "
@@ -264,9 +253,7 @@ int StorageUtil::loadRecordHeaderAndPos(
                         *recordPosition,
                         true,    // read
                         false);  // write
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!recordHeader->isSet())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+    if (!recordHeader->isSet()) [[unlikely]] {
         BMQTSK_ALARMLOG_ALARM("REPLICATION")
             << partitionDesc << "Failed to read RecordHeader for storage msg "
             << header.messageType() << ", with journal offset (in words): "

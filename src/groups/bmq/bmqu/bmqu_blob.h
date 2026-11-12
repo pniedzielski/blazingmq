@@ -578,8 +578,7 @@ inline int BlobUtil::findOffsetSafe(BlobPosition*       pos,
                                     int                 offset)
 {
     // Check if 'start' is a valid position in the blob.
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isValidPos(blob, start))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValidPos(blob, start)) [[unlikely]] {
         return -1;  // RETURN
     }
 
@@ -596,8 +595,7 @@ inline int BlobUtil::positionToOffsetSafe(int*                offset,
                                           const bdlbb::Blob&  blob,
                                           const BlobPosition& position)
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isValidPos(blob, position))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValidPos(blob, position)) [[unlikely]] {
         return -1;  // RETURN
     }
 

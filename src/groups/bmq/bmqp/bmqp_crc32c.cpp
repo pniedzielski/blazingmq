@@ -20,7 +20,6 @@
 // BDE
 #include <ball_log.h>
 #include <bdlde_crc32c.h>
-#include <bsls_performancehint.h>
 
 namespace BloombergLP {
 namespace bmqp {
@@ -46,8 +45,7 @@ Crc32c::calculate(const void* data, unsigned int length, unsigned int crc)
 unsigned int Crc32c::calculate(const bdlbb::Blob& blob, unsigned int crc)
 {
     const int numBuffers = blob.numDataBuffers();
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(numBuffers == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (numBuffers == 0) [[unlikely]] {
         return crc;  // RETURN
     }
 

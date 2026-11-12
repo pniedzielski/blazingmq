@@ -49,7 +49,7 @@ const bsl::string_view k_TIER_PREFIX      = ".~";
 
 #define BMQT_VALIDATE_AND_RETURN(LENGTH, ERROR_RC, ERROR_VAR, ERROR_DESC)     \
     do {                                                                      \
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(0 == (LENGTH))) {           \
+        if (0 == (LENGTH)) [[unlikely]] {                                     \
             BSLS_PERFORMANCEHINT_UNLIKELY_HINT;                               \
             BMQT_RETURN_WITH_ERROR(ERROR_RC, ERROR_VAR, ERROR_DESC);          \
         }                                                                     \
@@ -92,10 +92,7 @@ struct UriParsingContext {
     /// @return 0 on success, non-zero on failure.
     inline int validateScheme(bsl::string* errorDescription) const
     {
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-                !d_uri.starts_with(k_SCHEME_SEPARATED))) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (!d_uri.starts_with(k_SCHEME_SEPARATED)) [[unlikely]] {
             BMQT_RETURN_WITH_ERROR(UriParser::UriParseResult::e_INVALID_SCHEME,
                                    errorDescription,
                                    "Invalid scheme: uri must start with \""
@@ -168,8 +165,7 @@ struct UriParsingContext {
             }
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_uri.length() <= start)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (d_uri.length() <= start) [[unlikely]] {
             // We tried to parse the domain from the position beyond `d_uri`
             // length.  Nothing to parse: empty domain.
             BMQT_RETURN_WITH_ERROR(UriParser::UriParseResult::e_MISSING_DOMAIN,
@@ -225,8 +221,7 @@ struct UriParsingContext {
             }
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_uri.length() <= start)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (d_uri.length() <= start) [[unlikely]] {
             // We tried to parse the tier from the position beyond `d_uri`
             // length.  Nothing to parse: empty tier.
             BMQT_RETURN_WITH_ERROR(UriParser::UriParseResult::e_EMPTY_TIER,
@@ -287,8 +282,7 @@ struct UriParsingContext {
             }
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_uri.length() <= start)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (d_uri.length() <= start) [[unlikely]] {
             // We tried to parse the path from the position beyond `d_uri`
             // length.  Nothing to parse: empty path.
             BMQT_RETURN_WITH_ERROR(UriParser::UriParseResult::e_MISSING_QUEUE,
@@ -334,9 +328,7 @@ struct UriParsingContext {
                 break;
         }
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(d_uri.length() <=
-                                                  separatorPos + 1)) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+        if (d_uri.length() <= separatorPos + 1) [[unlikely]] {
             if (d_uri.length() == separatorPos + 1) {
                 BMQT_RETURN_WITH_ERROR(UriParser::UriParseResult::e_BAD_QUERY,
                                        errorDescription,
@@ -537,8 +529,7 @@ int UriParser::parse(Uri*                     result,
     BSLS_ASSERT_SAFE(result);
 
 #define BMQT_RETURN_ON_BAD_RC(RC, RES)                                        \
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(                                \
-            UriParser::UriParseResult::e_SUCCESS != (RC))) {                  \
+    if (UriParser::UriParseResult::e_SUCCESS != (RC)) [[unlikely]] {          \
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;                                   \
         (RES)->reset();                                                       \
         return (RC);                                                          \

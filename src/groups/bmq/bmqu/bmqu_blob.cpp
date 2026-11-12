@@ -72,15 +72,11 @@ BlobSection::print(bsl::ostream& stream, int level, int spacesPerLevel) const
 
 bool BlobUtil::isValidPos(const bdlbb::Blob& blob, const BlobPosition& pos)
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(pos.buffer() >
-                                              blob.numDataBuffers())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (pos.buffer() > blob.numDataBuffers()) [[unlikely]] {
         return false;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(pos.buffer() ==
-                                              blob.numDataBuffers())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (pos.buffer() == blob.numDataBuffers()) [[unlikely]] {
         // Buffer points to one past the last buffer, valid only if pointing at
         // the first byte.
         return pos.byte() == 0;  // RETURN
@@ -129,21 +125,15 @@ int BlobUtil::findOffset(BlobPosition*       pos,
 bool BlobUtil::isValidSection(const bdlbb::Blob& blob,
                               const BlobSection& section)
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(section.end() <
-                                              section.start())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (section.end() < section.start()) [[unlikely]] {
         return false;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !isValidPos(blob, section.start()))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValidPos(blob, section.start())) [[unlikely]] {
         return false;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !isValidPos(blob, section.end()))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValidPos(blob, section.end())) [[unlikely]] {
         return false;  // RETURN
     }
 
@@ -156,9 +146,7 @@ int BlobUtil::sectionSize(int*               size,
 {
     BSLS_ASSERT_SAFE(size);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !isValidSection(blob, section))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValidSection(blob, section)) [[unlikely]] {
         return -1;  // RETURN
     }
 
@@ -277,8 +265,7 @@ int BlobUtil::appendToBlob(bdlbb::Blob*       dest,
 
     BlobSection localSection(section);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isValidSection(src, section))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValidSection(src, section)) [[unlikely]] {
         return -1;  // RETURN
     }
 
@@ -381,22 +368,19 @@ int BlobUtil::appendToBlob(bdlbb::Blob*        dest,
 {
     BSLS_ASSERT_SAFE(dest);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isValidPos(src, start))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValidPos(src, start)) [[unlikely]] {
         return -1;  // RETURN
     }
 
     BlobSection section;
     section.start() = start;
     int ret         = findOffset(&section.end(), src, start, length);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(ret != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (ret != 0) [[unlikely]] {
         return (ret * 10) - 2;  // RETURN
     }
 
     ret = appendToBlob(dest, src, section);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(ret != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (ret != 0) [[unlikely]] {
         return (ret * 10) - 3;  // RETURN
     }
 
@@ -409,13 +393,11 @@ int BlobUtil::appendToBlob(bdlbb::Blob*        dest,
 {
     BSLS_ASSERT_SAFE(dest);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isValidPos(src, start))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValidPos(src, start)) [[unlikely]] {
         return -1;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(src.numDataBuffers() <= 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (src.numDataBuffers() <= 0) [[unlikely]] {
         return 0;  // RETURN
     }
 
@@ -425,8 +407,7 @@ int BlobUtil::appendToBlob(bdlbb::Blob*        dest,
     section.end().setByte(0);
 
     const int ret = appendToBlob(dest, src, section);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(ret != 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (ret != 0) [[unlikely]] {
         return (ret * 10) - 2;  // RETURN
     }
 
@@ -494,13 +475,11 @@ int BlobUtil::readUpToNBytes(char*               buf,
                              const BlobPosition& start,
                              int                 length)
 {
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!isValidPos(blob, start))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!isValidPos(blob, start)) [[unlikely]] {
         return -1;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(length == 0)) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (length == 0) [[unlikely]] {
         return 0;  // RETURN
     }
 
@@ -532,7 +511,7 @@ int BlobUtil::readNBytes(char*               buf,
 {
     const int ret = readUpToNBytes(buf, blob, start, length);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(ret == length)) {
+    if (ret == length) [[likely]] {
         return 0;  // RETURN
     }
     else if (ret < 0) {

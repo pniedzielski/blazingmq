@@ -686,8 +686,7 @@ FileBackedStorage::getMessageSize(int*                     msgSize,
                                   const bmqt::MessageGUID& msgGUID) const
 {
     RecordHandleMap::const_iterator it = d_handles.find(msgGUID);
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(it == d_handles.end())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (it == d_handles.end()) [[unlikely]] {
         *msgSize = 0;
         return mqbi::StorageResult::e_GUID_NOT_FOUND;  // RETURN
     }

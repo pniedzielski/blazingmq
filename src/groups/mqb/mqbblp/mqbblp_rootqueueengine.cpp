@@ -186,8 +186,7 @@ void RootQueueEngine::deliverMessages(AppState* app)
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!app->hasConsumers())) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!app->hasConsumers()) [[unlikely]] {
         return;  // RETURN
     }
 
@@ -197,7 +196,7 @@ void RootQueueEngine::deliverMessages(AppState* app)
     size_t             numMessages = app->processDeliveryLists(&delay,
                                                    d_realStorageIter_mp.get());
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(0 == app->redeliveryListSize())) {
+    if (0 == app->redeliveryListSize()) [[likely]] {
         if (!app->resumePoint().isUnset()) {
             // Position to the resumePoint
             bmqu::UniquePtr<mqbi::StorageIterator> start;
@@ -229,7 +228,7 @@ void RootQueueEngine::deliverMessages(AppState* app)
                               });
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(numMessages > 0)) {
+    if (numMessages > 0) [[likely]] {
         d_consumptionMonitor.onMessageSent(app->appId());
     }
 
@@ -1371,18 +1370,15 @@ void RootQueueEngine::onHandleUsable(mqbi::QueueHandle* handle,
     BSLS_ASSERT_SAFE(d_queueState_p->queue()->inDispatcherThread());
     BSLS_ASSERT_SAFE(handle);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
-            !d_queueState_p->handleCatalog().hasHandle(handle))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!d_queueState_p->handleCatalog().hasHandle(handle)) [[unlikely]] {
         BALL_LOG_ERROR << "#CLIENT_IMPROPER_BEHAVIOR "
                        << "Making unknown handle available.";
         BSLS_ASSERT_SAFE(false && "Making unknown handle available.");
         return;  // RETURN
     }
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!bmqt::QueueFlagsUtil::isReader(
-            handle->handleParameters().flags()))) {
-        BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
+    if (!bmqt::QueueFlagsUtil::isReader(handle->handleParameters().flags()))
+        [[unlikely]] {
         return;  // RETURN
     }
 
@@ -1548,7 +1544,7 @@ int RootQueueEngine::onConfirmMessage(mqbi::QueueHandle*       handle,
     // TODO: handle missing SubQueue?
     QueueEngineUtil_AppState& app = *subQueue(subQueueId);
 
-    if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(!app.isAuthorized())) {
+    if (!app.isAuthorized()) [[unlikely]] {
         // If an appId was dynamically unregistered, it is possible that the
         // client may still attempt at confirming outstanding messages, which
         // we need to guard against.
@@ -1658,10 +1654,7 @@ int RootQueueEngine::onRejectMessage(
         const bool     domainIsUnlimited   = (maxDeliveryAttempts == 0);
         bmqp::RdaInfo& rda = message->appMessageState(app.ordinal()).d_rdaInfo;
 
-        if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(domainIsUnlimited !=
-                                                  rda.isUnlimited())) {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-
+        if (domainIsUnlimited != rda.isUnlimited()) [[unlikely]] {
             BMQ_LOGTHROTTLE_WARN
                 << "Mismatch between the message's RdaInfo " << rda
                 << " and the domain's 'maxDeliveryAttempts' setting ["
