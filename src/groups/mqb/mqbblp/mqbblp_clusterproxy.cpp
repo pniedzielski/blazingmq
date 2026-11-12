@@ -769,17 +769,14 @@ void ClusterProxy::finishStopSequence(
 
 void ClusterProxy::updateDatumStats()
 {
-    typedef NodeStatsMap::iterator NodeStatsMapIter;
-    NodeStatsMapIter               iter    = d_nodeStatsMap.begin();
-    NodeStatsMapIter               endIter = d_nodeStatsMap.end();
-    for (; iter != endIter; ++iter) {
-        mqbnet::ClusterNode* node   = iter->first;
+    for (const auto& nodeStatsEntry : d_nodeStatsMap) {
+        mqbnet::ClusterNode* node   = nodeStatsEntry.first;
         int                  status = node->isAvailable();
         bsl::string          active = node == d_activeNodeManager.activeNode()
                                           ? "Active"
                                           : "";
 
-        bmqst::StatContext* statContext = (iter->second).get();
+        bmqst::StatContext* statContext = (nodeStatsEntry.second).get();
         bslma::Allocator*   alloc       = statContext->datumAllocator();
         ManagedDatumMp      datum       = statContext->datum();
 
@@ -920,16 +917,14 @@ ClusterProxy::ClusterProxy(
 
     // Create and populate stats data for each cluster node
     NodeStatsMap& nodeStatsMap = d_nodeStatsMap;
-    NodeListIter  nodeIter     = netCluster_p->nodes().begin();
-    NodeListIter  endIter      = netCluster_p->nodes().end();
-    for (; nodeIter != endIter; ++nodeIter) {
-        bmqst::StatContextConfiguration config((*nodeIter)->hostName());
+    for (mqbnet::ClusterNode* node : netCluster_p->nodes()) {
+        bmqst::StatContextConfiguration config(node->hostName());
 
         StatContextMp statContextMp =
             d_clusterData.clusterNodesStatContext()->addSubcontext(config);
         StatContextSp statContextSp(statContextMp, d_allocator_p);
 
-        nodeStatsMap.insert(bsl::make_pair(*nodeIter, statContextSp));
+        nodeStatsMap.insert(bsl::make_pair(node, statContextSp));
     }
 
     // Register to the dispatcher
