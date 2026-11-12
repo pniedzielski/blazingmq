@@ -467,7 +467,7 @@ void QueueSessionManager::processHandleReleased(
         bmqp::QueueUtil::createQueueIdFromHandleParameters(
             request.choice().closeQueue().handleParameters());
 
-    QueueStateMap::iterator it = d_queues.find(queueId.id());
+    auto it = d_queues.find(queueId.id());
     if (it == d_queues.end()) {
         BALL_LOG_ERROR << "#CLIENT_UNKNOWN_QUEUE "
                        << d_dispatcherClient_p->description()
@@ -732,7 +732,7 @@ void QueueSessionManager::processCloseQueue(
         bmqp::QueueUtil::createQueueIdFromHandleParameters(
             req.handleParameters());
 
-    QueueStateMap::iterator it = d_queues.find(queueId.id());
+    auto it = d_queues.find(queueId.id());
     if (it == d_queues.end()) {
         // Failure to find queue.
         BALL_LOG_WARN << "#CLIENT_UNKNOWN_QUEUE "
@@ -761,8 +761,8 @@ void QueueSessionManager::processCloseQueue(
         return;  // RETURN
     }
 
-    QueueState::StreamsMap::iterator subQInfoIter =
-        queueState.d_subQueueInfosMap.findBySubIdSafe(queueId.subId());
+    auto subQInfoIter = queueState.d_subQueueInfosMap.findBySubIdSafe(
+        queueId.subId());
     if (subQInfoIter == queueState.d_subQueueInfosMap.end()) {
         // Failure to find subStream of the queue.
         BALL_LOG_WARN << "#CLIENT_UNKNOWN_QUEUE "
