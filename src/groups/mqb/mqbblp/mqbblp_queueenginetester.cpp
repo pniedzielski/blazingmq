@@ -569,18 +569,13 @@ void QueueEngineTester::init(const mqbconfm::Domain& domainConfig,
         const bsl::vector<bsl::string>& cfgAppIds =
             domainConfig.mode().fanout().appIDs();
         bsl::unordered_set<mqbu::StorageKey> appKeys;
-        for (bsl::vector<bsl::string>::size_type i = 0; i < cfgAppIds.size();
-             ++i) {
+        for (const bsl::string& appId : cfgAppIds) {
             mqbu::StorageKey appKey;
-            mqbs::StorageUtil::generateStorageKey(&appKey,
-                                                  &appKeys,
-                                                  cfgAppIds[i]);
+            mqbs::StorageUtil::generateStorageKey(&appKey, &appKeys, appId);
             BSLS_ASSERT_SAFE(!appKey.isNull());
             BSLS_ASSERT_SAFE(appKeys.find(appKey) != appKeys.end());
 
-            rc = storage_p->addVirtualStorage(errorDescription,
-                                              cfgAppIds[i],
-                                              appKey);
+            rc = storage_p->addVirtualStorage(errorDescription, appId, appKey);
             BSLS_ASSERT_SAFE(rc == 0);
         }
     }
@@ -951,7 +946,7 @@ void QueueEngineTester::post(const bslstl::StringRef& messages,
     bsl::vector<bsl::string> msgs(d_allocator_p);
     parseList(&msgs, messages, d_allocator_p);
 
-    for (unsigned int i = 0; i < msgs.size(); ++i) {
+    for (const bsl::string& msg : msgs) {
         // Each message must have its own 'subscriptions'.
         bmqp::Protocol::SubQueueInfosArray subscriptions(d_allocator_p);
 
@@ -964,10 +959,8 @@ void QueueEngineTester::post(const bslstl::StringRef& messages,
             // subscriptionIds.
             // This needs to be in accord with the 'configureHandle' logic.
 
-            for (SubIdsMap::const_iterator cit = d_subIds.cbegin();
-                 cit != d_subIds.cend();
-                 ++cit) {
-                subscriptions.push_back(bmqp::SubQueueInfo(cit->second));
+            for (const auto& subIdEntry : d_subIds) {
+                subscriptions.push_back(bmqp::SubQueueInfo(subIdEntry.second));
             }
         }
 
@@ -985,9 +978,7 @@ void QueueEngineTester::post(const bslstl::StringRef& messages,
         appData.createInplace(d_allocator_p,
                               d_mockCluster_mp->bufferFactory(),
                               d_allocator_p);
-        bdlbb::BlobUtil::append(appData.get(),
-                                msgs[i].data(),
-                                msgs[i].length());
+        bdlbb::BlobUtil::append(appData.get(), msg.data(), msg.length());
 
         msgAttributes.setRefCount(d_queueEngine_mp->messageReferenceCount());
         msgAttributes.setArrivalTimestamp(d_messageCount);
@@ -1014,11 +1005,11 @@ void QueueEngineTester::post(const bslstl::StringRef& messages,
         // Insert into messages maps
         bsl::pair<MessagesMap::iterator, bool> insertRC =
             d_postedMessages.insert(
-                bsl::make_pair(bsl::string(msgs[i], d_allocator_p), msgGUID));
+                bsl::make_pair(bsl::string(msg, d_allocator_p), msgGUID));
         BSLS_ASSERT_OPT(insertRC.second && "Message previously posted");
 
         insertRC = d_newMessages.insert(
-            bsl::make_pair(bsl::string(msgs[i], d_allocator_p), msgGUID));
+            bsl::make_pair(bsl::string(msg, d_allocator_p), msgGUID));
         BSLS_ASSERT_OPT(insertRC.second);
     }
 }
@@ -1086,8 +1077,8 @@ void QueueEngineTester::confirm(const bsl::string&       clientText,
     mqbmock::QueueHandle*    mockHandle = client(clientKey);
     bsl::vector<bsl::string> msgs(d_allocator_p);
     parseList(&msgs, messages, d_allocator_p);
-    for (bsl::vector<bsl::string>::size_type i = 0; i < msgs.size(); ++i) {
-        MessagesMap::iterator it = d_postedMessages.find(msgs[i]);
+    for (const bsl::string& msg : msgs) {
+        MessagesMap::iterator it = d_postedMessages.find(msg);
 
         if (it != d_postedMessages.end()) {
             // msgGUID was found
@@ -1148,8 +1139,8 @@ void QueueEngineTester::reject(const bsl::string&       clientText,
     mqbmock::QueueHandle*    mockHandle = client(clientKey);
     bsl::vector<bsl::string> msgs(d_allocator_p);
     parseList(&msgs, messages, d_allocator_p);
-    for (bsl::vector<bsl::string>::size_type i = 0; i < msgs.size(); ++i) {
-        MessagesMap::iterator it = d_postedMessages.find(msgs[i]);
+    for (const bsl::string& msg : msgs) {
+        MessagesMap::iterator it = d_postedMessages.find(msg);
 
         if (it != d_postedMessages.end()) {
             // msgGUID was found
@@ -1493,8 +1484,8 @@ void QueueEngineTester::push(RelayQueueEngine*        downstream,
 
     bmqp::Protocol::SubQueueInfosArray subscriptions(d_allocator_p);
 
-    for (bsl::vector<bsl::string>::size_type i = 0; i < apps.size(); ++i) {
-        SubIdsMap::iterator it = d_subIds.find(apps[i]);
+    for (const bsl::string& appId : apps) {
+        SubIdsMap::iterator it = d_subIds.find(appId);
 
         BSLS_ASSERT_OPT(it != d_subIds.end() && "Unknown app");
         // msgGUID was found
@@ -1502,8 +1493,8 @@ void QueueEngineTester::push(RelayQueueEngine*        downstream,
         subscriptions.push_back(bmqp::SubQueueInfo(id));
     }
 
-    for (bsl::vector<bsl::string>::size_type i = 0; i < msgs.size(); ++i) {
-        MessagesMap::iterator it = d_postedMessages.find(msgs[i]);
+    for (const bsl::string& msg : msgs) {
+        MessagesMap::iterator it = d_postedMessages.find(msg);
 
         BSLS_ASSERT_OPT(it != d_postedMessages.end() && "Unknown message");
         // msgGUID was found
