@@ -441,11 +441,10 @@ int ClusterCatalog::loadBrokerClusterConfig(bsl::ostream&)
                    local::clusterName);
 
     // Populate the virtual clusters map
-    for (bsl::vector<mqbcfg::VirtualClusterInformation>::const_iterator it =
-             d_clustersDefinition.myVirtualClusters().begin();
-         it != d_clustersDefinition.myVirtualClusters().end();
-         ++it) {
-        d_myVirtualClusters[it->name()] = it->selfNodeId();
+    for (const mqbcfg::VirtualClusterInformation& virtualCluster :
+         d_clustersDefinition.myVirtualClusters()) {
+        d_myVirtualClusters[virtualCluster.name()] =
+            virtualCluster.selfNodeId();
     }
 
     BALL_LOG_INFO_BLOCK
@@ -494,14 +493,13 @@ int ClusterCatalog::start(bsl::ostream& errorDescription)
     bsl::unordered_set<bsl::string> allClusters(d_myClusters);
 
     // Create any cluster this broker is member of
-    bsl::unordered_set<bsl::string>::const_iterator it;
-    for (it = allClusters.begin(); it != allClusters.end(); ++it) {
+    for (const bsl::string& clusterName : allClusters) {
         bsl::shared_ptr<mqbi::Cluster> cluster;
         // CreateCluster expects unique cluster names, but that's fine, we are
         // iterating over a set, so names are guaranteed to be unique.
         {
             bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);
-            rc = createCluster(errorDescription, &cluster, *it);
+            rc = createCluster(errorDescription, &cluster, clusterName);
             if (rc != 0) {
                 return (rc * 10) + rc_CLUSTER_CREATION_FAILED;  // RETURN
             }
@@ -527,9 +525,8 @@ void ClusterCatalog::stop()
     d_isStarted = false;
 
     // Iterate over all clusters and stop them
-    for (ClustersMapIter it = d_clusters.begin(); it != d_clusters.end();
-         ++it) {
-        it->second.d_cluster_sp->stop();
+    for (const auto& clusterEntry : d_clusters) {
+        clusterEntry.second.d_cluster_sp->stop();
     }
 }
 
@@ -670,36 +667,31 @@ int ClusterCatalog::processCommand(mqbcmd::ClustersResult*        result,
 
         mqbcmd::ClusterList& clusterList = result->makeClusterList();
         clusterList.clusters().reserve(d_clusters.size());
-        for (ClustersMapConstIter it = d_clusters.begin();
-             it != d_clusters.end();
-             ++it) {
+        for (const auto& clusterEntry : d_clusters) {
             clusterList.clusters().resize(clusterList.clusters().size() + 1);
             mqbcmd::ClusterInfo& clusterInfo = clusterList.clusters().back();
 
-            if (it->second.d_cluster_sp->isLocal()) {
+            if (clusterEntry.second.d_cluster_sp->isLocal()) {
                 clusterInfo.locality() = mqbcmd::Locality::LOCAL;
             }
-            else if (it->second.d_cluster_sp->isRemote()) {
+            else if (clusterEntry.second.d_cluster_sp->isRemote()) {
                 clusterInfo.locality() = mqbcmd::Locality::REMOTE;
             }
-            else if (it->second.d_cluster_sp->isClusterMember()) {
+            else if (clusterEntry.second.d_cluster_sp->isClusterMember()) {
                 clusterInfo.locality() = mqbcmd::Locality::MEMBER;
             }
-            clusterInfo.name() = it->first;
+            clusterInfo.name() = clusterEntry.first;
             const mqbnet::Cluster::NodesList& nodes =
-                it->second.d_cluster_sp->netCluster().nodes();
+                clusterEntry.second.d_cluster_sp->netCluster().nodes();
 
             clusterInfo.nodes().reserve(nodes.size());
-            for (mqbnet::Cluster::NodesList::const_iterator itNode =
-                     nodes.cbegin();
-                 itNode != nodes.cend();
-                 ++itNode) {
+            for (const mqbnet::ClusterNode* node : nodes) {
                 clusterInfo.nodes().resize(clusterInfo.nodes().size() + 1);
                 mqbcmd::ClusterNode& clusterNode = clusterInfo.nodes().back();
 
-                clusterNode.hostName()   = (*itNode)->hostName();
-                clusterNode.nodeId()     = (*itNode)->nodeId();
-                clusterNode.dataCenter() = (*itNode)->dataCenter();
+                clusterNode.hostName()   = node->hostName();
+                clusterNode.nodeId()     = node->nodeId();
+                clusterNode.dataCenter() = node->dataCenter();
             }
         }
 
@@ -785,9 +777,8 @@ void ClusterCatalog::getClusters(
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // d_mutex LOCK
 
     out->reserve(d_clusters.size());
-    for (ClustersMapConstIter it = d_clusters.begin(); it != d_clusters.end();
-         ++it) {
-        out->push_back(it->second.d_cluster_sp);
+    for (const auto& clusterEntry : d_clusters) {
+        out->push_back(clusterEntry.second.d_cluster_sp);
     }
 }
 
