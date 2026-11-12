@@ -89,10 +89,8 @@ bool ClusterStateMonitor::notifyObserversIfNeededHelper(
     if (state->d_state == e_THRESHOLD || state->d_state == e_ALARMING) {
         // Emit threshold notification?
         if ((now - state->d_lastThreshold) >= thresholdTime) {
-            for (ObserversSet::iterator iter = d_observers.begin();
-                 iter != d_observers.end();
-                 ++iter) {
-                notificationCb(*iter);
+            for (mqbc::ClusterStateObserver* observer : d_observers) {
+                notificationCb(observer);
             }
             state->d_lastThreshold = now;
         }
@@ -151,12 +149,10 @@ void ClusterStateMonitor::notifyObserversIfNeeded()
     // [1.2] Cluster nodes state
     const ClusterNodeSessionMap& nodeMap =
         d_clusterData_p->membership().clusterNodeSessionMap();
-    for (ClusterNodeSessionMap::const_iterator cit = nodeMap.begin();
-         cit != nodeMap.end();
-         ++cit) {
-        State* state = &d_nodeStates[cit->first->nodeId()];
+    for (const auto& nodeEntry : nodeMap) {
+        State* state = &d_nodeStates[nodeEntry.first->nodeId()];
         bsl::function<void(mqbc::ClusterStateObserver*)> notificationCb =
-            [node = cit->first](mqbc::ClusterStateObserver* observer) {
+            [node = nodeEntry.first](mqbc::ClusterStateObserver* observer) {
                 observer->onNodeUnavailableThreshold(node);
             };
 
@@ -168,7 +164,7 @@ void ClusterStateMonitor::notifyObserversIfNeeded()
             now);
 
         if (shouldAlarm) {
-            alarmOs << "Node [" << cit->first->nodeId()
+            alarmOs << "Node [" << nodeEntry.first->nodeId()
                     << "] is unavailable\n";
         }
     }
@@ -317,17 +313,15 @@ void ClusterStateMonitor::updateAllStates()
     const ClusterNodeSessionMap& nodeMap =
         d_clusterData_p->membership().clusterNodeSessionMap();
     // cluster nodes state
-    for (ClusterNodeSessionMap::const_iterator cit = nodeMap.begin();
-         cit != nodeMap.end();
-         ++cit) {
-        state  = &d_nodeStates[cit->first->nodeId()];
-        status = ((cit->second->nodeStatus() ==
-                   bmqp_ctrlmsg::NodeStatus::E_AVAILABLE)) ||
-                 !cit->first->isAvailable();
+    for (const auto& nodeEntry : nodeMap) {
+        state              = &d_nodeStates[nodeEntry.first->nodeId()];
+        status             = ((nodeEntry.second->nodeStatus() ==
+                               bmqp_ctrlmsg::NodeStatus::E_AVAILABLE)) ||
+                             !nodeEntry.first->isAvailable();
         isCurrentlyHealthy = isCurrentlyHealthy && status;
         stateTransition    = checkAndUpdateState(state, status, now);
         if (stateTransition == e_BAD) {
-            alarmOs << "Node [" << cit->first->nodeId()
+            alarmOs << "Node [" << nodeEntry.first->nodeId()
                     << "] goes to alarming state\n";
         }
     }
@@ -507,14 +501,13 @@ void ClusterStateMonitor::start()
     const ClusterNodeSessionMap& nodeMap =
         d_clusterData_p->membership().clusterNodeSessionMap();
 
-    for (ClusterNodeSessionMap::const_iterator cit = nodeMap.begin();
-         cit != nodeMap.end();
-         ++cit) {
+    for (const auto& nodeEntry : nodeMap) {
         State toInsert(bsls::TimeInterval(config.maxTimeNode(), 0),
                        bsls::TimeInterval(config.thresholdNode(), 0),
                        now,
                        e_INVALID);
-        d_nodeStates.insert(bsl::make_pair(cit->first->nodeId(), toInsert));
+        d_nodeStates.insert(
+            bsl::make_pair(nodeEntry.first->nodeId(), toInsert));
     }
 
     d_failoverState.d_maxInvalid = bsls::TimeInterval(config.maxTimeFailover(),
