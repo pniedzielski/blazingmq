@@ -219,49 +219,50 @@ void ClusterStateManager::onLeaderSyncStateQueryResponse(
 
     BSLS_ASSERT_SAFE(!pairs.empty());
 
-    for (NodeResponsePairsConstIter it = pairs.begin(); it != pairs.end();
-         ++it) {
-        BSLS_ASSERT_SAFE(it->first);
+    for (const auto& responsePair : pairs) {
+        BSLS_ASSERT_SAFE(responsePair.first);
 
-        if (it->second.choice().isStatusValue()) {
+        if (responsePair.second.choice().isStatusValue()) {
             BALL_LOG_WARN << d_clusterData_p->identity().description()
                           << ": received failed leader sync query response "
-                          << it->second.choice().status() << " from "
-                          << it->first->nodeDescription()
+                          << responsePair.second.choice().status() << " from "
+                          << responsePair.first->nodeDescription()
                           << ". Skipping this node's response.";
             continue;  // CONTINUE
         }
 
         mqbc::ClusterNodeSession* ns =
-            d_clusterData_p->membership().getClusterNodeSession(it->first);
+            d_clusterData_p->membership().getClusterNodeSession(
+                responsePair.first);
         BSLS_ASSERT_SAFE(ns);
         if (bmqp_ctrlmsg::NodeStatus::E_AVAILABLE != ns->nodeStatus()) {
             BALL_LOG_WARN << d_clusterData_p->identity().description()
                           << ": ignoring leader sync query response from "
-                          << it->first->nodeDescription() << " because it is "
+                          << responsePair.first->nodeDescription()
+                          << " because it is "
                           << "not AVAILABLE.";
             continue;  // CONTINUE
         }
 
-        BSLS_ASSERT_SAFE(it->second.choice().isClusterMessageValue());
-        BSLS_ASSERT_SAFE(it->second.choice()
+        BSLS_ASSERT_SAFE(responsePair.second.choice().isClusterMessageValue());
+        BSLS_ASSERT_SAFE(responsePair.second.choice()
                              .clusterMessage()
                              .choice()
                              .isLeaderSyncStateQueryResponseValue());
 
         const bmqp_ctrlmsg::LeaderSyncStateQueryResponse& r =
-            it->second.choice()
+            responsePair.second.choice()
                 .clusterMessage()
                 .choice()
                 .leaderSyncStateQueryResponse();
 
         BALL_LOG_INFO << d_clusterData_p->identity().description()
                       << ": received leader sync query response " << r
-                      << " from " << it->first->nodeDescription();
+                      << " from " << responsePair.first->nodeDescription();
 
         if (maxSeq < r.leaderMessageSequence()) {
             maxSeq     = r.leaderMessageSequence();
-            maxSeqNode = it->first;
+            maxSeqNode = responsePair.first;
         }
     }
 
@@ -440,10 +441,8 @@ void ClusterStateManager::onLeaderSyncDataQueryResponse(
     const bsl::vector<bmqp_ctrlmsg::PartitionPrimaryInfo>& partitionsInfo =
         leaderSyncData.partitions();
 
-    for (unsigned int i = 0; i < partitionsInfo.size(); ++i) {
-        const bmqp_ctrlmsg::PartitionPrimaryInfo& peerPinfo =
-            partitionsInfo[i];
-
+    for (const bmqp_ctrlmsg::PartitionPrimaryInfo& peerPinfo :
+         partitionsInfo) {
         if (peerPinfo.partitionId() < 0 ||
             peerPinfo.partitionId() >=
                 static_cast<int>(d_state_p->partitions().size())) {
@@ -581,9 +580,7 @@ void ClusterStateManager::onLeaderSyncDataQueryResponse(
     const bsl::vector<bmqp_ctrlmsg::QueueInfo>& queuesInfo =
         leaderSyncData.queues();
 
-    for (unsigned int i = 0; i < queuesInfo.size(); ++i) {
-        const bmqp_ctrlmsg::QueueInfo& queueInfo = queuesInfo[i];
-
+    for (const bmqp_ctrlmsg::QueueInfo& queueInfo : queuesInfo) {
         // It is assumed that uri present in 'queueInfo' is canonical.
 
         if (queueInfo.partitionId() < 0 ||
@@ -992,14 +989,12 @@ void ClusterStateManager::initiateLeaderSync(bool wait)
     // not update self's LSN yet.
 
     bsl::vector<mqbnet::ClusterNode*> availableFollowers;
-    for (ClusterNodeSessionMapIter nit =
-             d_clusterData_p->membership().clusterNodeSessionMap().begin();
-         nit != d_clusterData_p->membership().clusterNodeSessionMap().end();
-         ++nit) {
-        if (nit->first != d_clusterData_p->membership().selfNode() &&
-            nit->second->nodeStatus() ==
+    for (const auto& sessionEntry :
+         d_clusterData_p->membership().clusterNodeSessionMap()) {
+        if (sessionEntry.first != d_clusterData_p->membership().selfNode() &&
+            sessionEntry.second->nodeStatus() ==
                 bmqp_ctrlmsg::NodeStatus::E_AVAILABLE) {
-            availableFollowers.push_back(nit->first);
+            availableFollowers.push_back(sessionEntry.first);
         }
     }
 
