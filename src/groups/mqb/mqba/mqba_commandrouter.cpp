@@ -288,7 +288,7 @@ void CommandRouter::setCommandRoutingMode()
 {
     bslma::Allocator* allocator = bslma::Default::allocator();
 
-    d_routingModeMp = NULL;
+    d_routingModeMp.reset();
 
     const mqbcmd::CommandChoice& commandChoice = d_command.choice();
 
@@ -297,24 +297,30 @@ void CommandRouter::setCommandRoutingMode()
         if (domains.isDomainValue()) {
             const mqbcmd::DomainCommand& domain = domains.domain().command();
             if (domain.isPurgeValue()) {
-                d_routingModeMp.load(new (*allocator)
-                                         AllPartitionPrimariesRoutingMode());
+                d_routingModeMp = bmqu::UniquePtrUtil::adopt<RoutingMode>(
+                    new (*allocator) AllPartitionPrimariesRoutingMode(),
+                    allocator);
                 // DOMAINS DOMAIN <name> PURGE
             }
             else if (domain.isQueueValue()) {
                 if (domain.queue().command().isPurgeAppIdValue()) {
-                    d_routingModeMp.load(
-                        new (*allocator) AllPartitionPrimariesRoutingMode());
+                    d_routingModeMp = bmqu::UniquePtrUtil::adopt<RoutingMode>(
+                        new (*allocator) AllPartitionPrimariesRoutingMode(),
+                        allocator);
                     // DOMAINS DOMAIN <name> QUEUE <name> PURGE
                 }
             }
         }
         else if (domains.isReconfigureValue()) {
-            d_routingModeMp.load(new (*allocator) ClusterWideRoutingMode());
+            d_routingModeMp = bmqu::UniquePtrUtil::adopt<RoutingMode>(
+                new (*allocator) ClusterWideRoutingMode(),
+                allocator);
             // DOMAINS RECONFIGURE <domain>
         }
         else if (domains.isRemoveValue()) {
-            d_routingModeMp.load(new (*allocator) ClusterWideRoutingMode());
+            d_routingModeMp = bmqu::UniquePtrUtil::adopt<RoutingMode>(
+                new (*allocator) ClusterWideRoutingMode(),
+                allocator);
             // DOMAINS REMOVE <domain> [FINALIZE]
         }
     }
@@ -324,8 +330,9 @@ void CommandRouter::setCommandRoutingMode()
             const mqbcmd::ClusterCommand& cluster =
                 clusters.cluster().command();
             if (cluster.isForceGcQueuesValue()) {
-                d_routingModeMp.load(new (*allocator)
-                                         AllPartitionPrimariesRoutingMode());
+                d_routingModeMp = bmqu::UniquePtrUtil::adopt<RoutingMode>(
+                    new (*allocator) AllPartitionPrimariesRoutingMode(),
+                    allocator);
                 // CLUSTERS CLUSTER <name> FORCE_GC_QUEUES
             }
             else if (cluster.isStorageValue()) {
@@ -334,9 +341,12 @@ void CommandRouter::setCommandRoutingMode()
                     if (storage.partition().command().isEnableValue() ||
                         storage.partition().command().isDisableValue()) {
                         int partitionId = storage.partition().partitionId();
-                        d_routingModeMp.load(
-                            new (*allocator) SinglePartitionPrimaryRoutingMode(
-                                partitionId));
+                        d_routingModeMp =
+                            bmqu::UniquePtrUtil::adopt<RoutingMode>(
+                                new (*allocator)
+                                    SinglePartitionPrimaryRoutingMode(
+                                        partitionId),
+                                allocator);
                         // CLUSTERS CLUSTER <name> STORAGE PARTITION
                         // <partitionId> [ENABLE|DISABLE]
                     }
@@ -349,8 +359,10 @@ void CommandRouter::setCommandRoutingMode()
                         const mqbcmd::SetTunable& tunable =
                             replication.setTunable();
                         if (tunable.choice().isAllValue()) {
-                            d_routingModeMp.load(new (*allocator)
-                                                     ClusterWideRoutingMode());
+                            d_routingModeMp =
+                                bmqu::UniquePtrUtil::adopt<RoutingMode>(
+                                    new (*allocator) ClusterWideRoutingMode(),
+                                    allocator);
                             // CLUSTERS CLUSTER <name> STORAGE REPLICATION
                             // SET_ALL
                         }
@@ -359,8 +371,10 @@ void CommandRouter::setCommandRoutingMode()
                         const mqbcmd::GetTunable& tunable =
                             replication.getTunable();
                         if (tunable.choice().isAllValue()) {
-                            d_routingModeMp.load(new (*allocator)
-                                                     ClusterWideRoutingMode());
+                            d_routingModeMp =
+                                bmqu::UniquePtrUtil::adopt<RoutingMode>(
+                                    new (*allocator) ClusterWideRoutingMode(),
+                                    allocator);
                             // CLUSTERS CLUSTER <name> STORAGE REPLICATION
                             // GET_ALL
                         }
@@ -375,8 +389,10 @@ void CommandRouter::setCommandRoutingMode()
                         const mqbcmd::SetTunable& tunable =
                             elector.setTunable();
                         if (tunable.choice().isAllValue()) {
-                            d_routingModeMp.load(new (*allocator)
-                                                     ClusterWideRoutingMode());
+                            d_routingModeMp =
+                                bmqu::UniquePtrUtil::adopt<RoutingMode>(
+                                    new (*allocator) ClusterWideRoutingMode(),
+                                    allocator);
                             // CLUSTERS CLUSTER <name> STATE ELECTOR SET_ALL
                         }
                     }
@@ -384,8 +400,10 @@ void CommandRouter::setCommandRoutingMode()
                         const mqbcmd::GetTunable& tunable =
                             elector.getTunable();
                         if (tunable.choice().isAllValue()) {
-                            d_routingModeMp.load(new (*allocator)
-                                                     ClusterWideRoutingMode());
+                            d_routingModeMp =
+                                bmqu::UniquePtrUtil::adopt<RoutingMode>(
+                                    new (*allocator) ClusterWideRoutingMode(),
+                                    allocator);
                             // CLUSTERS CLUSTER <name> STATE ELECTOR GET_ALL
                         }
                     }

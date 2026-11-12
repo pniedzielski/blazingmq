@@ -61,6 +61,9 @@
 #include <bsl_memory.h>
 #include <mqbcmd_messages.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 namespace BloombergLP {
 
 // FORWARD DECLARATION
@@ -167,7 +170,7 @@ class CommandRouter {
 
   private:
     // PRIVATE TYPES
-    typedef bslma::ManagedPtr<RoutingMode> RoutingModeMp;
+    typedef bmqu::UniquePtr<RoutingMode> RoutingModeMp;
 
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("MQBA.COMMANDROUTER");
@@ -262,7 +265,7 @@ inline void CommandRouter::releaseLatch()
 
 inline bool CommandRouter::isRoutingNeeded() const
 {
-    return d_routingModeMp;
+    return static_cast<bool>(d_routingModeMp);
 }
 
 }  // close package namespace
