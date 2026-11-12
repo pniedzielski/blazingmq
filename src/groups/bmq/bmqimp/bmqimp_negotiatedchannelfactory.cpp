@@ -24,12 +24,9 @@
 #include <bmqio_channelutil.h>
 #include <bmqu_blob.h>
 #include <bmqu_memoutstream.h>
-#include <bmqu_weakmemfn.h>
 
 // BDE
 #include <ball_log.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_iostream.h>
 #include <bsl_memory.h>
@@ -160,15 +157,16 @@ void NegotiatedChannelFactory::negotiate(
     }
 
     // Initiate a read for the broker's negotiation response message
-    bmqio::Channel::ReadCallback readCb = bdlf::BindUtil::bind(
-        bmqu::WeakMemFnUtil::weakMemFn(
-            &NegotiatedChannelFactory::readPacketsCb,
-            d_self.acquireWeak()),
-        channel,
-        cb,
-        bdlf::PlaceHolders::_1,   // status
-        bdlf::PlaceHolders::_2,   // numNeeded
-        bdlf::PlaceHolders::_3);  // blob
+    bmqio::Channel::ReadCallback readCb = [weakSelf = d_self.acquireWeak(),
+                                           channel,
+                                           cb](const bmqio::Status& readStatus,
+                                               int*                 numNeeded,
+                                               bdlbb::Blob*         blob) {
+        if (bsl::shared_ptr<NegotiatedChannelFactory> factory =
+                weakSelf.lock()) {
+            factory->readPacketsCb(channel, cb, readStatus, numNeeded, blob);
+        }
+    };
 
     channel->read(&status,
                   bmqp::Protocol::k_PACKET_MIN_SIZE,
@@ -388,13 +386,18 @@ void NegotiatedChannelFactory::connect(bmqio::Status*               status,
         status,
         handle,
         options,
-        bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-                                 &NegotiatedChannelFactory::baseResultCallback,
-                                 d_self.acquireWeak()),
-                             cb,
-                             bdlf::PlaceHolders::_1,    // event
-                             bdlf::PlaceHolders::_2,    // status
-                             bdlf::PlaceHolders::_3));  // channel
+        [weakSelf = d_self.acquireWeak(),
+         cb](bmqio::ChannelFactoryEvent::Enum       factoryEvent,
+             const bmqio::Status&                   factoryStatus,
+             const bsl::shared_ptr<bmqio::Channel>& factoryChannel) {
+            if (bsl::shared_ptr<NegotiatedChannelFactory> factory =
+                    weakSelf.lock()) {
+                factory->baseResultCallback(cb,
+                                            factoryEvent,
+                                            factoryStatus,
+                                            factoryChannel);
+            }
+        });
 }
 
 int NegotiatedChannelFactory::start()
