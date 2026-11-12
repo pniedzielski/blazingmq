@@ -507,7 +507,7 @@ int IncoreClusterStateLedger::applyRecordInternalImpl(
         ClusterMessageInfo info;
         info.d_clusterMessage = clusterMessage;
         info.d_ackCount       = 0;
-        const AdvisoriesMap::iterator advIt =
+        const auto advIt =
             d_uncommittedAdvisories.insert(bsl::make_pair(lsn, info)).first;
 
         if (isSelfLeader()) {
@@ -608,10 +608,10 @@ int IncoreClusterStateLedger::applyRecordInternalImpl(
         const bmqp_ctrlmsg::LeaderAdvisoryCommit& commit =
             clusterMessage.choice().leaderAdvisoryCommit();
 
-        AdvisoriesMapIter iter = d_uncommittedAdvisories.find(
+        auto iter = d_uncommittedAdvisories.find(
             commit.sequenceNumberCommitted());
         if (iter == d_uncommittedAdvisories.end()) {
-            GatedUpdateLsnsIter git = d_gatedUpdateLsns.find(
+            auto git = d_gatedUpdateLsns.find(
                 commit.sequenceNumberCommitted());
             if (git != d_gatedUpdateLsns.end()) {
                 BALL_LOG_INFO
@@ -691,8 +691,7 @@ int IncoreClusterStateLedger::applyRecordInternalImpl(
         const bmqp_ctrlmsg::LeaderAdvisoryAck& ack =
             clusterMessage.choice().leaderAdvisoryAck();
 
-        AdvisoriesMapIter iter = d_uncommittedAdvisories.find(
-            ack.sequenceNumberAcked());
+        auto iter = d_uncommittedAdvisories.find(ack.sequenceNumberAcked());
         if (iter == d_uncommittedAdvisories.end()) {
             BALL_LOG_ERROR << description()
                            << ": Failed to apply 'LeaderAdvisoryAck': " << ack
@@ -828,7 +827,7 @@ void IncoreClusterStateLedger::cancelUncommittedAdvisories()
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_clusterData_p->cluster().inDispatcherThread());
 
-    AdvisoriesMapIter iter = d_uncommittedAdvisories.begin();
+    auto iter = d_uncommittedAdvisories.begin();
     if (iter != d_uncommittedAdvisories.end()) {
         const bmqp_ctrlmsg::LeaderMessageSequence& lsn = iter->first;
         BALL_LOG_INFO << description() << "Canceling "
@@ -864,7 +863,7 @@ void IncoreClusterStateLedger::reviewUncommittedAdvisories(
     if (isSelfLeader()) {
         bsl::vector<bmqp_ctrlmsg::LeaderMessageSequence> advisoriesToCommit(
             d_allocator_p);
-        AdvisoriesMapCIter iter = d_uncommittedAdvisories.cbegin();
+        auto iter = d_uncommittedAdvisories.cbegin();
         for (; iter != d_uncommittedAdvisories.cend(); ++iter) {
             const ClusterMessageInfo& info = iter->second;
             if (info.d_ackCount >= ackQuorum) {
