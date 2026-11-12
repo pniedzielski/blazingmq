@@ -39,12 +39,12 @@
 #include <bsl_string.h>
 #include <bsla_annotations.h>
 #include <bslma_allocator.h>
-#include <bslma_managedptr.h>
 #include <bsls_assert.h>
 #include <bsls_types.h>
 
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
+#include <bmqu_uniqueptr.h>
 
 // CONVENIENCE
 using namespace BloombergLP;
@@ -89,7 +89,7 @@ struct Tester {
   private:
     // DATA
     mqbsi::LedgerConfig              d_config;
-    bslma::ManagedPtr<mqbsi::Ledger> d_ledger_mp;
+    bmqu::UniquePtr<mqbsi::Ledger>   d_ledger_mp;
     bmqu::TempDirectory              d_tempDir;
     bdlbb::PooledBlobBufferFactory   d_bufferFactory;
 
@@ -101,7 +101,7 @@ struct Tester {
     // CREATORS
     Tester(bslma::Allocator* allocator = bmqtst::TestHelperUtil::allocator())
     : d_config(allocator)
-    , d_ledger_mp(0)
+    , d_ledger_mp()
     , d_tempDir(allocator)
     , d_bufferFactory(1024, allocator)
     {
@@ -133,8 +133,9 @@ struct Tester {
             .setCleanupCallback(&cleanupCallback);
 
         // Create and open the ledger
-        d_ledger_mp.load(new (*allocator) mqbsl::Ledger(d_config, allocator),
-                         allocator);
+        d_ledger_mp = bmqu::UniquePtrUtil::adopt<mqbsi::Ledger>(
+            new (*allocator) mqbsl::Ledger(d_config, allocator),
+            allocator);
         BSLS_ASSERT_OPT(
             d_ledger_mp->open(mqbsi::Ledger::e_CREATE_IF_MISSING) == 0);
     }

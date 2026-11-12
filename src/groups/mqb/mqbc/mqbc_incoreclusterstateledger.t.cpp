@@ -49,7 +49,6 @@
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bslma_allocator.h>
-#include <bslma_managedptr.h>
 #include <bsls_assert.h>
 #include <bsls_types.h>
 
@@ -59,6 +58,7 @@
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
 #include <bmqu_tempdirectory.h>
+#include <bmqu_uniqueptr.h>
 #include <bsl_deque.h>
 
 // CONVENIENCE
@@ -184,8 +184,8 @@ struct Tester {
     bool                                              d_isLeader;
     bmqu::TempDirectory                               d_tempDir;
     bsl::string                                       d_location;
-    bslma::ManagedPtr<mqbmock::Cluster>               d_cluster_mp;
-    bslma::ManagedPtr<mqbc::IncoreClusterStateLedger> d_clusterStateLedger_mp;
+    bmqu::UniquePtr<mqbmock::Cluster>                 d_cluster_mp;
+    bmqu::UniquePtr<mqbc::IncoreClusterStateLedger>   d_clusterStateLedger_mp;
     bsl::deque<bmqp_ctrlmsg::ControlMessage>          d_committedMessages;
     bsls::Types::Int64                                d_commitCounter;
 
@@ -199,8 +199,8 @@ struct Tester {
           !location.empty()
               ? bsl::string(location, bmqtst::TestHelperUtil::allocator())
               : d_tempDir.path())
-    , d_cluster_mp(0)
-    , d_clusterStateLedger_mp(0)
+    , d_cluster_mp()
+    , d_clusterStateLedger_mp()
     , d_committedMessages(bmqtst::TestHelperUtil::allocator())
     , d_commitCounter(0)
     {
@@ -235,7 +235,7 @@ struct Tester {
             mqbmock::Cluster::k_LEADER_NODE_ID + 3,
             bmqtst::TestHelperUtil::allocator());
 
-        d_cluster_mp.load(
+        d_cluster_mp = bmqu::UniquePtrUtil::adopt<mqbmock::Cluster>(
             new (*bmqtst::TestHelperUtil::allocator())
                 mqbmock::Cluster(bmqtst::TestHelperUtil::allocator(),
                                  true,  // isClusterMember
@@ -280,15 +280,16 @@ struct Tester {
             ++pid;
         }
 
-        d_clusterStateLedger_mp.load(
-            new (*bmqtst::TestHelperUtil::allocator())
-                mqbc::IncoreClusterStateLedger(
-                    d_cluster_mp->_clusterDefinition(),
-                    d_cluster_mp->_clusterData(),
-                    d_cluster_mp->_state(),
-                    d_cluster_mp->_blobSpPool(),
-                    bmqtst::TestHelperUtil::allocator()),
-            bmqtst::TestHelperUtil::allocator());
+        d_clusterStateLedger_mp =
+            bmqu::UniquePtrUtil::adopt<mqbc::IncoreClusterStateLedger>(
+                new (*bmqtst::TestHelperUtil::allocator())
+                    mqbc::IncoreClusterStateLedger(
+                        d_cluster_mp->_clusterDefinition(),
+                        d_cluster_mp->_clusterData(),
+                        d_cluster_mp->_state(),
+                        d_cluster_mp->_blobSpPool(),
+                        bmqtst::TestHelperUtil::allocator()),
+                bmqtst::TestHelperUtil::allocator());
         d_clusterStateLedger_mp->setCommitCb(
             [this](const bmqp_ctrlmsg::ControlMessage&        advisory,
                    mqbc::ClusterStateLedgerCommitStatus::Enum status) {

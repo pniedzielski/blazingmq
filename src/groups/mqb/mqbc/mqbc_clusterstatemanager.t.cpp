@@ -51,6 +51,7 @@
 
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
+#include <bmqu_uniqueptr.h>
 
 // CONVENIENCE
 using namespace BloombergLP;
@@ -103,9 +104,9 @@ struct Tester {
     // PUBLIC DATA
     bool                                         d_isLeader;
     bmqu::TempDirectory                          d_tempDir;
-    bslma::ManagedPtr<mqbmock::Cluster>          d_cluster_mp;
+    bmqu::UniquePtr<mqbmock::Cluster>            d_cluster_mp;
     mqbmock::ClusterStateLedger*                 d_clusterStateLedger_p;
-    bslma::ManagedPtr<mqbc::ClusterStateManager> d_clusterStateManager_mp;
+    bmqu::UniquePtr<mqbc::ClusterStateManager>   d_clusterStateManager_mp;
     mqbmock::StorageManager                      d_storageManager;
 
   public:
@@ -115,9 +116,9 @@ struct Tester {
            bsls::Types::Int64 watchdogTimeout = k_WATCHDOG_TIMEOUT_DURATION)
     : d_isLeader(isLeader)
     , d_tempDir(bmqtst::TestHelperUtil::allocator())
-    , d_cluster_mp(0)
+    , d_cluster_mp()
     , d_clusterStateLedger_p(0)
-    , d_clusterStateManager_mp(0)
+    , d_clusterStateManager_mp()
     , d_storageManager()
     {
         // Create the cluster
@@ -152,7 +153,7 @@ struct Tester {
             mqbmock::Cluster::k_LEADER_NODE_ID + 3,
             bmqtst::TestHelperUtil::allocator());
 
-        d_cluster_mp.load(
+        d_cluster_mp = bmqu::UniquePtrUtil::adopt<mqbmock::Cluster>(
             new (*bmqtst::TestHelperUtil::allocator())
                 mqbmock::Cluster(bmqtst::TestHelperUtil::allocator(),
                                  true,  // isClusterMember
@@ -188,17 +189,19 @@ struct Tester {
             clusterStateLedger_mp.get());
 
         // Create the cluster state manager
-        d_clusterStateManager_mp.load(
-            new (*bmqtst::TestHelperUtil::allocator())
-                mqbc::ClusterStateManager(d_cluster_mp->_clusterDefinition(),
-                                          d_cluster_mp.get(),
-                                          d_cluster_mp->_clusterData(),
-                                          d_cluster_mp->_state(),
-                                          clusterStateLedger_mp,
-                                          watchdogTimeout,
-                                          numRetries,
-                                          bmqtst::TestHelperUtil::allocator()),
-            bmqtst::TestHelperUtil::allocator());
+        d_clusterStateManager_mp =
+            bmqu::UniquePtrUtil::adopt<mqbc::ClusterStateManager>(
+                new (*bmqtst::TestHelperUtil::allocator())
+                    mqbc::ClusterStateManager(
+                        d_cluster_mp->_clusterDefinition(),
+                        d_cluster_mp.get(),
+                        d_cluster_mp->_clusterData(),
+                        d_cluster_mp->_state(),
+                        clusterStateLedger_mp,
+                        watchdogTimeout,
+                        numRetries,
+                        bmqtst::TestHelperUtil::allocator()),
+                bmqtst::TestHelperUtil::allocator());
         d_clusterStateManager_mp->setStorageManager(&d_storageManager);
 
         // In some UTs, operations with cluster might be executed either

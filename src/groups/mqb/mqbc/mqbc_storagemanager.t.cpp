@@ -63,7 +63,6 @@
 #include <bsl_unordered_map.h>
 #include <bsl_utility.h>
 #include <bsl_vector.h>
-#include <bslma_managedptr.h>
 #include <bsls_systemtime.h>
 #include <bsls_types.h>
 
@@ -73,6 +72,7 @@
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
 #include <bmqu_tempdirectory.h>
+#include <bmqu_uniqueptr.h>
 #include <bsl_cstring.h>
 
 // CONVENIENCE
@@ -146,7 +146,7 @@ struct TestHelper {
 
   public:
     // PUBLIC DATA
-    bslma::ManagedPtr<mqbmock::Cluster> d_cluster_mp;
+    bmqu::UniquePtr<mqbmock::Cluster> d_cluster_mp;
 
     bmqu::TempDirectory d_tempDir;
 
@@ -154,7 +154,7 @@ struct TestHelper {
 
     // CREATORS
     TestHelper()
-    : d_cluster_mp(0)
+    : d_cluster_mp()
     , d_tempDir(bmqtst::TestHelperUtil::allocator())
     , d_tempArchiveDir(bmqtst::TestHelperUtil::allocator())
     {
@@ -190,7 +190,7 @@ struct TestHelper {
             mqbmock::Cluster::k_LEADER_NODE_ID + 3,
             bmqtst::TestHelperUtil::allocator());
 
-        d_cluster_mp.load(
+        d_cluster_mp = bmqu::UniquePtrUtil::adopt<mqbmock::Cluster>(
             new (*bmqtst::TestHelperUtil::allocator())
                 mqbmock::Cluster(bmqtst::TestHelperUtil::allocator(),
                                  true,   // isClusterMember
