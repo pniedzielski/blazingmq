@@ -67,17 +67,11 @@ struct ExecutorTraits_Imp {
     template <class EXECUTOR, class FUNCTION>
     static void post(const EXECUTOR& executor, FUNCTION&& f);
 
-    /// Perform `executor.dispatch(bsl::forward<FUNCTION>(f))`.
+    /// Perform `executor.dispatch(bsl::forward<FUNCTION>(f))` if that is a
+    /// well-formed expression, and `executor.post(bsl::forward<FUNCTION>(f))`
+    /// otherwise.
     template <class EXECUTOR, class FUNCTION>
-    static typename bsl::enable_if<
-        ExecutorTraits_CanDispatch<EXECUTOR, FUNCTION>::value>::type
-    dispatch(const EXECUTOR& executor, FUNCTION&& f);
-
-    /// Perform `executor.post(bsl::forward<FUNCTION>(f))`.
-    template <class EXECUTOR, class FUNCTION>
-    static typename bsl::enable_if<
-        !ExecutorTraits_CanDispatch<EXECUTOR, FUNCTION>::value>::type
-    dispatch(const EXECUTOR& executor, FUNCTION&& f);
+    static void dispatch(const EXECUTOR& executor, FUNCTION&& f);
 };
 
 // =====================
@@ -129,19 +123,15 @@ inline void ExecutorTraits_Imp::post(const EXECUTOR& executor, FUNCTION&& f)
 }
 
 template <class EXECUTOR, class FUNCTION>
-inline typename bsl::enable_if<
-    ExecutorTraits_CanDispatch<EXECUTOR, FUNCTION>::value>::type
-ExecutorTraits_Imp::dispatch(const EXECUTOR& executor, FUNCTION&& f)
+inline void ExecutorTraits_Imp::dispatch(const EXECUTOR& executor,
+                                         FUNCTION&&      f)
 {
-    executor.dispatch(bsl::forward<FUNCTION>(f));
-}
-
-template <class EXECUTOR, class FUNCTION>
-inline typename bsl::enable_if<
-    !ExecutorTraits_CanDispatch<EXECUTOR, FUNCTION>::value>::type
-ExecutorTraits_Imp::dispatch(const EXECUTOR& executor, FUNCTION&& f)
-{
-    executor.post(bsl::forward<FUNCTION>(f));
+    if constexpr (ExecutorTraits_CanDispatch<EXECUTOR, FUNCTION>::value) {
+        executor.dispatch(bsl::forward<FUNCTION>(f));
+    }
+    else {
+        executor.post(bsl::forward<FUNCTION>(f));
+    }
 }
 
 // ---------------------
