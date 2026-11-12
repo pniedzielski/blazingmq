@@ -1217,11 +1217,8 @@ int QueueHandle::transferUnconfirmedMessageGUID(
     int result = data->size();
 
     if (out) {
-        for (mqbi::QueueHandle::UnconfirmedMessageInfoMap::const_iterator it =
-                 data->begin();
-             it != data->end();
-             ++it) {
-            out(it->first);
+        for (const auto& [msgGUID, messageInfo] : *data) {
+            out(msgGUID);
         }
     }
 
@@ -1231,10 +1228,7 @@ int QueueHandle::transferUnconfirmedMessageGUID(
 
     // Reset unconfirmed messages and associated state
 
-    for (Subscriptions::iterator itSubscription = d_subscriptions.begin();
-         itSubscription != d_subscriptions.end();
-         ++itSubscription) {
-        const SubscriptionSp& subscription = itSubscription->second;
+    for (const auto& [subscriptionId, subscription] : d_subscriptions) {
         if (subscription->d_downstreamSubQueueId == subQueueId) {
             subscription->d_unconfirmedMonitor.reset();
         }
@@ -1404,11 +1398,9 @@ QueueHandle::unconfirmedMonitors(const bsl::string& appId) const
     SubStreams::const_iterator infoCiter = d_subStreamInfos.find(appId);
 
     if (infoCiter != d_subStreamInfos.end()) {
-        for (Subscriptions::const_iterator cit = d_subscriptions.begin();
-             cit != d_subscriptions.end();
-             ++cit) {
-            if (cit->second->appId() == appId) {
-                out.push_back(&cit->second->d_unconfirmedMonitor);
+        for (const auto& [subscriptionId, subscription] : d_subscriptions) {
+            if (subscription->appId() == appId) {
+                out.push_back(&subscription->d_unconfirmedMonitor);
             }
         }
     }
@@ -1425,10 +1417,7 @@ bsls::Types::Int64 QueueHandle::countUnconfirmed() const
 
     bsls::Types::Int64 result = 0;
 
-    for (Downstreams::const_iterator itStream = d_downstreams.begin();
-         itStream != d_downstreams.end();
-         ++itStream) {
-        const bsl::shared_ptr<Downstream>& downstream = (*itStream);
+    for (const bsl::shared_ptr<Downstream>& downstream : d_downstreams) {
         if (downstream) {
             if (downstream->d_data) {
                 result += downstream->d_data->size();
@@ -1452,13 +1441,10 @@ void QueueHandle::loadInternals(mqbcmd::QueueHandle* out) const
 
     bsl::vector<mqbcmd::QueueHandleSubStream>& subStreams = out->subStreams();
     subStreams.reserve(d_subStreamInfos.size());
-    for (SubStreams::const_iterator infoCiter = d_subStreamInfos.begin();
-         infoCiter != d_subStreamInfos.end();
-         ++infoCiter) {
+    for (const auto& [appId, streamInfo] : d_subStreamInfos) {
         subStreams.resize(subStreams.size() + 1);
         mqbcmd::QueueHandleSubStream& subStream = subStreams.back();
-        unsigned int       subId = infoCiter->second.d_downstreamSubQueueId;
-        const bsl::string& appId = infoCiter->first;
+        unsigned int                 subId = streamInfo.d_downstreamSubQueueId;
         bmqp_ctrlmsg::SubQueueIdInfo subStreamInfo;
 
         subStreamInfo.appId() = appId;
@@ -1468,7 +1454,7 @@ void QueueHandle::loadInternals(mqbcmd::QueueHandle* out) const
         subStream.appId().makeValue(appId);
 
         os.reset();
-        os << infoCiter->second.d_streamParameters;
+        os << streamInfo.d_streamParameters;
         subStream.parametersJson() = os.str();
 
         if (!bmqt::QueueFlagsUtil::isReader(handleParameters().flags())) {
@@ -1483,18 +1469,15 @@ void QueueHandle::loadInternals(mqbcmd::QueueHandle* out) const
         bsl::vector<mqbcmd::ResourceUsageMonitor>& monitors =
             subStream.unconfirmedMonitors();
 
-        for (Subscriptions::const_iterator citSubscription =
-                 d_subscriptions.begin();
-             citSubscription != d_subscriptions.end();
-             ++citSubscription) {
-            if (citSubscription->second->d_downstreamSubQueueId != subId) {
+        for (const auto& [subscriptionId, subscription] : d_subscriptions) {
+            if (subscription->d_downstreamSubQueueId != subId) {
                 continue;  // CONTINUE
             }
             monitors.resize(monitors.size() + 1);
             mqbcmd::ResourceUsageMonitor& unconfirmedMonitorResult =
                 monitors.back();
             mqbu::ResourceUsageMonitor& unconfirmedMonitor =
-                citSubscription->second->d_unconfirmedMonitor;
+                subscription->d_unconfirmedMonitor;
 
             // TODO: Add assert here to make sure state exists
             mqbcmd::ResourceUsageMonitorState::fromInt(
