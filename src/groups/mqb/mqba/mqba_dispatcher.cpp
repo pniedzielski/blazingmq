@@ -103,11 +103,8 @@ void Dispatcher_Executor::post(const bsl::function<void()>& f) const
     event_sp->setEnqueueTime(bmqu::Time::highResolutionTimer());
     (*event_sp).callback().set(f);
 
-    // C++03 compatibility:
-    bsl::shared_ptr<mqbi::DispatcherEvent> base_sp(bsl::move(event_sp));
-
     // submit the event
-    int rc = d_processorPool_p->enqueueEvent(bsl::move(base_sp),
+    int rc = d_processorPool_p->enqueueEvent(bsl::move(event_sp),
                                              d_processorHandle);
     BSLS_ASSERT_OPT(rc == 0);
 
@@ -571,10 +568,7 @@ void Dispatcher::executeOnAllQueues(
     event_sp->callback().set(functor);
     event_sp->finalizeCallback().set(doneCallback);
 
-    // C++03 compatibility:
-    bsl::shared_ptr<mqbi::DispatcherEvent> base_sp(bsl::move(event_sp));
-
-    processorPool->enqueueEventOnAllQueues(bsl::move(base_sp));
+    processorPool->enqueueEventOnAllQueues(bsl::move(event_sp));
 
     // Update stats for all queues
     for (const auto& statContext : context_p->d_statContexts) {
