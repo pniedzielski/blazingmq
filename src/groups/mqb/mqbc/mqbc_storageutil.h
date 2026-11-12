@@ -680,15 +680,14 @@ struct StorageUtil {
                                    const mqbu::StorageKey& queueKey,
                                    const mqbu::StorageKey& appKey);
 
-    static void
-    updateQueueStorageDispatched(StorageSpMap*           storageMap,
-                                 bslmt::Mutex*           storagesLock,
-                                 mqbi::DomainFactory*    domainFactory,
-                                 bsl::string_view        description,
-                                 const bmqt::Uri&        uri,
-                                 const mqbu::StorageKey& queueKey,
-                                 const AppInfos&         addedIdKeyPairs,
-                                 mqbi::Domain*           domain = 0);
+    static void updateQueueStorage(StorageSpMap*           storageMap,
+                                   bslmt::Mutex*           storagesLock,
+                                   mqbi::DomainFactory*    domainFactory,
+                                   bsl::string_view        description,
+                                   const bmqt::Uri&        uri,
+                                   const mqbu::StorageKey& queueKey,
+                                   const AppInfos&         addedIdKeyPairs,
+                                   mqbi::Domain*           domain = 0);
 
     static int configureStorage(bsl::ostream& errorDescription,
                                 bsl::shared_ptr<mqbi::Storage>* out,

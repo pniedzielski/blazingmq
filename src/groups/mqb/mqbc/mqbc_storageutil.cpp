@@ -3025,15 +3025,14 @@ void StorageUtil::removeQueueStorage(StorageSpMap*           storageMap,
                   << "] as replica.";
 }
 
-void StorageUtil::updateQueueStorageDispatched(
-    StorageSpMap*           storageMap,
-    bslmt::Mutex*           storagesLock,
-    mqbi::DomainFactory*    domainFactory,
-    bsl::string_view        description,
-    const bmqt::Uri&        uri,
-    const mqbu::StorageKey& queueKey,
-    const AppInfos&         appIdKeyPairs,
-    mqbi::Domain*           domain)
+void StorageUtil::updateQueueStorage(StorageSpMap*           storageMap,
+                                     bslmt::Mutex*           storagesLock,
+                                     mqbi::DomainFactory*    domainFactory,
+                                     bsl::string_view        description,
+                                     const bmqt::Uri&        uri,
+                                     const mqbu::StorageKey& queueKey,
+                                     const AppInfos&         appIdKeyPairs,
+                                     mqbi::Domain*           domain)
 {
     // executed by *QUEUE_DISPATCHER* thread with the specified 'partitionId'
 

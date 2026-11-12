@@ -173,7 +173,7 @@ void StorageManager::queueCreationCb(int                     partitionId,
             0);
     }
     else {
-        mqbc::StorageUtil::updateQueueStorageDispatched(
+        mqbc::StorageUtil::updateQueueStorage(
             &d_storages[partitionId],
             d_storageLockVec[partitionId].get(),
             d_domainFactory_p,
