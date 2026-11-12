@@ -263,18 +263,19 @@ bool FileManagerImpl::CslFileHandler::resetIterator(
         .setValidateLogCallback(mqbc::ClusterStateLedgerUtil::validateLog);
 
     // Create and open the ledger
-    d_ledger_p.load(new (*d_allocator)
-                        mqbsl::Ledger(ledgerConfig, d_allocator),
-                    d_allocator);
+    d_ledger_p = bmqu::UniquePtrUtil::adopt(
+        new (*d_allocator) mqbsl::Ledger(ledgerConfig, d_allocator),
+        d_allocator);
     rc = d_ledger_p->open(mqbsi::Ledger::e_READ_ONLY);
     if (rc != 0) {
         errorDescription << "Open ledger failed with error: " << rc << '\n';
         return false;  // RETURN
     }
 
-    d_iter_p.load(new (*d_allocator)
-                      mqbc::IncoreClusterStateLedgerIterator(d_ledger_p.get()),
-                  d_allocator);
+    d_iter_p = bmqu::UniquePtrUtil::adopt(
+        new (*d_allocator)
+            mqbc::IncoreClusterStateLedgerIterator(d_ledger_p.get()),
+        d_allocator);
 
     if (d_cslFromBegin) {
         // Move iterator to the first record.

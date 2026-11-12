@@ -52,6 +52,9 @@
 #include <mqbsl_ledger.h>
 #include <mqbsl_memorymappedondisklog.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 namespace BloombergLP {
 namespace m_bmqstoragetool {
 
@@ -113,8 +116,8 @@ class FileManagerImpl : public FileManager {
         // PRIVATE DATA
 
         const bsl::string                                         d_path;
-        bslma::ManagedPtr<mqbsl::Ledger>                          d_ledger_p;
-        bslma::ManagedPtr<mqbc::IncoreClusterStateLedgerIterator> d_iter_p;
+        bmqu::UniquePtr<mqbsl::Ledger>                            d_ledger_p;
+        bmqu::UniquePtr<mqbc::IncoreClusterStateLedgerIterator>   d_iter_p;
         bool              d_cslFromBegin;
         bslma::Allocator* d_allocator;
 
