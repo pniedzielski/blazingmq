@@ -151,7 +151,7 @@ class StorageManager final : public mqbi::StorageManager {
 
     typedef mqbc::StorageUtil::FileStores FileStores;
 
-    typedef bslma::ManagedPtr<RecoveryManager> RecoveryManagerMp;
+    typedef bmqu::UniquePtr<RecoveryManager> RecoveryManagerMp;
 
     typedef bsl::vector<unsigned int> PrimaryLeaseIds;
 

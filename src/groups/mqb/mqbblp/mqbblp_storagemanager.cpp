@@ -1307,14 +1307,15 @@ int StorageManager::start(bsl::ostream& errorDescription)
     bslma::Allocator* recoveryManagerAllocator = d_allocators.get(
         "RecoveryManager");
 
-    d_recoveryManager_mp.load(new (*recoveryManagerAllocator)
-                                  RecoveryManager(d_clusterConfig,
-                                                  d_cluster_p,
-                                                  d_clusterData_p,
-                                                  dsCfg,
-                                                  d_dispatcher_p,
-                                                  recoveryManagerAllocator),
-                              recoveryManagerAllocator);
+    d_recoveryManager_mp = bmqu::UniquePtrUtil::adopt<RecoveryManager>(
+        new (*recoveryManagerAllocator)
+            RecoveryManager(d_clusterConfig,
+                            d_cluster_p,
+                            d_clusterData_p,
+                            dsCfg,
+                            d_dispatcher_p,
+                            recoveryManagerAllocator),
+        recoveryManagerAllocator);
 
     rc = d_recoveryManager_mp->start(errorDescription);
     if (rc != 0) {
