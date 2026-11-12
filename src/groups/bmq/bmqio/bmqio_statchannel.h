@@ -111,8 +111,8 @@ class StatChannel : public DecoratingChannelPartialImp {
                        bdlbb::Blob*                 blob);
 
     // NOT IMPLEMENTED
-    StatChannel(const StatChannel&);
-    StatChannel& operator=(const StatChannel&);
+    StatChannel(const StatChannel&)            = delete;
+    StatChannel& operator=(const StatChannel&) = delete;
 
   public:
     // TRAITS

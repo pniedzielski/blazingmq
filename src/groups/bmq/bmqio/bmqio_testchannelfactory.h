@@ -54,8 +54,9 @@ class TestChannelFactoryOpHandle : public ChannelFactoryOperationHandle {
     bmqvt::PropertyBag           d_properties;
 
     // NOT IMPLEMENTED
-    TestChannelFactoryOpHandle(const TestChannelFactoryOpHandle&);
-    TestChannelFactoryOpHandle& operator=(const TestChannelFactoryOpHandle&);
+    TestChannelFactoryOpHandle(const TestChannelFactoryOpHandle&) = delete;
+    TestChannelFactoryOpHandle&
+    operator=(const TestChannelFactoryOpHandle&) = delete;
 
   public:
     // TRAITS
@@ -163,8 +164,8 @@ class TestChannelFactory : public ChannelFactory {
     friend class TestChannelFactoryOpHandle;
 
     // NOT IMPLEMENTED
-    TestChannelFactory(const TestChannelFactory&);
-    TestChannelFactory& operator=(const TestChannelFactory&);
+    TestChannelFactory(const TestChannelFactory&)            = delete;
+    TestChannelFactory& operator=(const TestChannelFactory&) = delete;
 
   public:
     // TRAITS

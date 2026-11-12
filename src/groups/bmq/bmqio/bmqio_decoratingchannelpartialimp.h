@@ -54,8 +54,9 @@ class DecoratingChannelPartialImp : public Channel {
     bsl::shared_ptr<Channel> d_base;
 
     // NOT IMPLEMENTED
-    DecoratingChannelPartialImp(const DecoratingChannelPartialImp&);
-    DecoratingChannelPartialImp& operator=(const DecoratingChannelPartialImp&);
+    DecoratingChannelPartialImp(const DecoratingChannelPartialImp&) = delete;
+    DecoratingChannelPartialImp&
+    operator=(const DecoratingChannelPartialImp&) = delete;
 
   public:
     // TRAITS

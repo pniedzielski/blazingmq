@@ -71,8 +71,8 @@ class NtcRead {
 
   private:
     // NOT IMPLEMENTED
-    NtcRead(const NtcRead&);
-    NtcRead& operator=(const NtcRead&);
+    NtcRead(const NtcRead&)            = delete;
+    NtcRead& operator=(const NtcRead&) = delete;
 
   public:
     // TRAITS
@@ -135,8 +135,8 @@ class NtcReadQueue {
 
   private:
     // NOT IMPLEMENTED
-    NtcReadQueue(const NtcReadQueue&);
-    NtcReadQueue& operator=(const NtcReadQueue&);
+    NtcReadQueue(const NtcReadQueue&)            = delete;
+    NtcReadQueue& operator=(const NtcReadQueue&) = delete;
 
   public:
     // TRAITS

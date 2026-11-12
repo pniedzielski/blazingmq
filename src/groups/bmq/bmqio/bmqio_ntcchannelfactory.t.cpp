@@ -269,8 +269,8 @@ class Tester {
     void destroy();
 
     // NOT IMPLEMENTED
-    Tester(const Tester&);
-    Tester& operator=(const Tester&);
+    Tester(const Tester&)            = delete;
+    Tester& operator=(const Tester&) = delete;
 
   public:
     // TRAITS

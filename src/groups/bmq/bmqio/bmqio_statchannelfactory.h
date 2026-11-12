@@ -91,7 +91,8 @@ class StatChannelFactoryConfig {
     friend class StatChannelFactory;
 
     // NOT IMPLEMENTED
-    StatChannelFactoryConfig& operator=(const StatChannelFactoryConfig&);
+    StatChannelFactoryConfig&
+    operator=(const StatChannelFactoryConfig&) = delete;
 
   public:
     // TRAITS
@@ -191,8 +192,8 @@ class StatChannelFactory : public ChannelFactory {
                             const bsl::shared_ptr<Channel>& channel);
 
     // NOT IMPLEMENTED
-    StatChannelFactory(const StatChannelFactory&);
-    StatChannelFactory& operator=(const StatChannelFactory&);
+    StatChannelFactory(const StatChannelFactory&)            = delete;
+    StatChannelFactory& operator=(const StatChannelFactory&) = delete;
 
   public:
     // TRAITS

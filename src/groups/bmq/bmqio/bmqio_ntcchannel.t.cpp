@@ -148,8 +148,8 @@ class Tester {
     bslmt::Mutex                                    d_mutex;
 
     // NOT IMPLEMENTED
-    Tester(const Tester&);
-    Tester& operator=(const Tester&);
+    Tester(const Tester&)            = delete;
+    Tester& operator=(const Tester&) = delete;
 
     // PRIVATE MANIPULATORS
     void destroy();

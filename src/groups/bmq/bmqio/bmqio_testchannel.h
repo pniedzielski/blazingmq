@@ -196,8 +196,8 @@ class TestChannel : public Channel {
     bslma::Allocator*           d_allocator_p;
 
     // NOT IMPLEMENTED
-    TestChannel(const TestChannel&);
-    TestChannel& operator=(const TestChannel&);
+    TestChannel(const TestChannel&)            = delete;
+    TestChannel& operator=(const TestChannel&) = delete;
 
   public:
     // TRAITS

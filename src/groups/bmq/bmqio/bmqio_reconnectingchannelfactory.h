@@ -297,8 +297,9 @@ class ReconnectingChannelFactory : public ChannelFactory {
     friend struct ReconnectingChannelFactory_ConnectHandle;
 
     // NOT IMPLEMENTED
-    ReconnectingChannelFactory(const ReconnectingChannelFactory&);
-    ReconnectingChannelFactory& operator=(const ReconnectingChannelFactory&);
+    ReconnectingChannelFactory(const ReconnectingChannelFactory&) = delete;
+    ReconnectingChannelFactory&
+    operator=(const ReconnectingChannelFactory&) = delete;
 
   public:
     // TRAITS
