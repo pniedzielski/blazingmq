@@ -189,13 +189,18 @@ void ResolvingChannelFactory::listen(Status*                      status,
         status,
         handle,
         options,
-        bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-                                 &ResolvingChannelFactory::baseResultCallback,
-                                 d_self.acquireWeak()),
-                             cb,
-                             bdlf::PlaceHolders::_1,    // event
-                             bdlf::PlaceHolders::_2,    // status
-                             bdlf::PlaceHolders::_3));  // channel
+        [weakSelf = d_self.acquireWeak(),
+         cb](ChannelFactoryEvent::Enum       event,
+             const Status&                   eventStatus,
+             const bsl::shared_ptr<Channel>& channel) {
+            if (bsl::shared_ptr<ResolvingChannelFactory> strongSelf =
+                    weakSelf.lock()) {
+                strongSelf->baseResultCallback(cb,
+                                               event,
+                                               eventStatus,
+                                               channel);
+            }
+        });
 }
 
 void ResolvingChannelFactory::connect(Status*                      status,
@@ -207,13 +212,18 @@ void ResolvingChannelFactory::connect(Status*                      status,
         status,
         handle,
         options,
-        bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-                                 &ResolvingChannelFactory::baseResultCallback,
-                                 d_self.acquireWeak()),
-                             cb,
-                             bdlf::PlaceHolders::_1,    // event
-                             bdlf::PlaceHolders::_2,    // status
-                             bdlf::PlaceHolders::_3));  // channel
+        [weakSelf = d_self.acquireWeak(),
+         cb](ChannelFactoryEvent::Enum       event,
+             const Status&                   eventStatus,
+             const bsl::shared_ptr<Channel>& channel) {
+            if (bsl::shared_ptr<ResolvingChannelFactory> strongSelf =
+                    weakSelf.lock()) {
+                strongSelf->baseResultCallback(cb,
+                                               event,
+                                               eventStatus,
+                                               channel);
+            }
+        });
 }
 
 int ResolvingChannelFactory::start()
