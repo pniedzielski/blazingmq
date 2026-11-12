@@ -342,7 +342,7 @@ QueueInfo<VALUE>::insert(const bsl::string& appId,
     // Extract previous Subscriptions pointing to the 'appId'
     bsl::vector<bsls::Types::Uint64> subscriptions(d_allocator_p);
 
-    typename SubscriptionsMap::iterator it = d_subscriptions.begin();
+    auto it = d_subscriptions.begin();
     while (it != d_subscriptions.end()) {
         iterator subQueue(it->second);
         if (subQueue->appId() == appId) {
@@ -486,8 +486,7 @@ template <class VALUE>
 inline typename QueueInfo<VALUE>::const_iterator
 QueueInfo<VALUE>::findBySubscriptionIdSafe(unsigned int subscriptionId) const
 {
-    typename SubscriptionsMap::const_iterator cit = d_subscriptions.find(
-        subscriptionId);
+    auto cit = d_subscriptions.find(subscriptionId);
     return cit == d_subscriptions.end() ? end() : const_iterator(cit->second);
 }
 
@@ -495,8 +494,7 @@ template <class VALUE>
 inline typename QueueInfo<VALUE>::const_iterator
 QueueInfo<VALUE>::findBySubscriptionId(unsigned int subscriptionId) const
 {
-    typename SubscriptionsMap::const_iterator cit = d_subscriptions.find(
-        subscriptionId);
+    auto cit = d_subscriptions.find(subscriptionId);
 
     BSLS_ASSERT_SAFE(cit != d_subscriptions.end());
 
@@ -538,7 +536,7 @@ inline void QueueInfo<VALUE>::erase(const_iterator it)
 template <class VALUE>
 inline void QueueInfo<VALUE>::removeSubscriptions(const bsl::string& appId)
 {
-    typename SubscriptionsMap::iterator it = d_subscriptions.begin();
+    auto it = d_subscriptions.begin();
     while (it != d_subscriptions.end()) {
         iterator subQueue(it->second);
         if (subQueue->appId() == appId) {
