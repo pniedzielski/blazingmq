@@ -34,6 +34,8 @@
 // 'bsl::function' that invokes the target functor 'f' as if by 'f()',
 // 'bmqex::Job' does it as as if by 'bsl::move(f)()'.
 
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bsl_type_traits.h>
 #include <bsl_utility.h>
@@ -120,7 +122,7 @@ class Job {
     // PRIVATE DATA
 
     /// Type-erased target function object.
-    bslma::ManagedPtr<Job_TargetBase> d_target_mp;
+    bmqu::UniquePtr<Job_TargetBase> d_target_mp;
 
   private:
     // NOT IMPLEMENTED
@@ -172,7 +174,7 @@ inline Job::Job(FUNCTION&& function, bslma::Allocator* basicAllocator)
     typedef Job_Target<typename bsl::decay<FUNCTION>::type> Target;
 
     bslma::Allocator* alloc = bslma::Default::allocator(basicAllocator);
-    d_target_mp             = bslma::ManagedPtrUtil::allocateManaged<Target>(
+    d_target_mp             = bmqu::UniquePtrUtil::allocateUnique<Target>(
         alloc,
         bsl::forward<FUNCTION>(function),
         alloc);
