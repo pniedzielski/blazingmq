@@ -268,9 +268,9 @@
 ///     // We use the macro to expect a call to 'openQueueAsync', binding the
 ///     // 'uri' and 'queueId' objects as well as the 'flags' that we created.
 ///     bmqa::MockSession::OpenQueueCallback openQueueCallback =
-///         bdlf::BindUtil::bind(&EventHandler::onOpenQueueStatus,
-///                              &eventHandler,
-///                              bdlf::PlaceHolders::_1); // result
+///         [&eventHandler](const bmqa::OpenQueueStatus& result) {
+///             eventHandler.onOpenQueueStatus(result);
+///         };
 ///
 ///     BMQA_EXPECT_CALL(mockSession,
 ///                      openQueueAsync(uri1,
