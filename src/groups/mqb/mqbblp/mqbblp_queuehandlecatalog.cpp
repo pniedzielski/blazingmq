@@ -33,6 +33,7 @@
 #include <bdlb_print.h>
 #include <bsl_iostream.h>
 #include <bsl_string.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bslma_allocator.h>
@@ -120,7 +121,9 @@ void QueueHandleCatalog::queueHandleDeleter(mqbi::QueueHandle* handle)
 QueueHandleCatalog::QueueHandleCatalog(mqbi::Queue*      queue,
                                        bslma::Allocator* allocator)
 : d_queue_p(queue)
-, d_handleFactory_mp(new(*allocator) DefaultHandleFactory(), allocator)
+, d_handleFactory_mp(bmqu::UniquePtrUtil::adopt<mqbi::QueueHandleFactory>(
+      new (*allocator) DefaultHandleFactory(),
+      allocator))
 , d_handles(allocator)
 , d_allocator_p(allocator)
 {
@@ -134,9 +137,9 @@ QueueHandleCatalog::~QueueHandleCatalog()
 }
 
 QueueHandleCatalog& QueueHandleCatalog::setHandleFactory(
-    bslma::ManagedPtr<mqbi::QueueHandleFactory>& factory)
+    bmqu::UniquePtr<mqbi::QueueHandleFactory>& factory)
 {
-    d_handleFactory_mp = factory;
+    d_handleFactory_mp = bsl::move(factory);
 
     return *this;
 }

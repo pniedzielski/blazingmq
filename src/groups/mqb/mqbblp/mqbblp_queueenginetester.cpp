@@ -36,6 +36,7 @@
 #include <bmqt_uri.h>
 
 #include <bmqu_memoutstream.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bdlb_string.h>
@@ -599,9 +600,10 @@ void QueueEngineTester::init(const mqbconfm::Domain& domainConfig,
     BSLS_ASSERT_OPT(d_queueState_mp->storage() == storage_p);
 
     // Create and set the Mock Handle Factory on the Queue Handle Catalog
-    bslma::ManagedPtr<mqbi::QueueHandleFactory> handleFactory_mp;
-    handleFactory_mp.load(new (*d_allocator_p) mqbmock::HandleFactory(),
-                          d_allocator_p);
+    bmqu::UniquePtr<mqbi::QueueHandleFactory> handleFactory_mp =
+        bmqu::UniquePtrUtil::adopt<mqbi::QueueHandleFactory>(
+            new (*d_allocator_p) mqbmock::HandleFactory(),
+            d_allocator_p);
 
     const_cast<QueueHandleCatalog&>(d_queueState_mp->handleCatalog())
         .setHandleFactory(handleFactory_mp);

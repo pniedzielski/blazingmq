@@ -36,6 +36,7 @@
 #include <bmqc_twokeyhashmap.h>
 #include <bmqp_ctrlmsg_messages.h>
 #include <bmqp_queueid.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bsl_functional.h>
@@ -136,7 +137,7 @@ class QueueHandleCatalog {
     mqbi::Queue* d_queue_p;
 
     /// Factory to use for creating `QueueHandle` objects.
-    bslma::ManagedPtr<mqbi::QueueHandleFactory> d_handleFactory_mp;
+    bmqu::UniquePtr<mqbi::QueueHandleFactory> d_handleFactory_mp;
 
     /// Map of all created handles.  `mutable` because `TwoKeyHashMap` doesn't
     /// expose `const` operators.
@@ -180,7 +181,7 @@ class QueueHandleCatalog {
     /// access to this object.  This is mostly needed only for test driver,
     /// so that a `MockQueueHandle` factory can be injected.
     QueueHandleCatalog&
-    setHandleFactory(bslma::ManagedPtr<mqbi::QueueHandleFactory>& factory);
+    setHandleFactory(bmqu::UniquePtr<mqbi::QueueHandleFactory>& factory);
 
     /// Create and return a new handle for the specified `clientContext`,
     /// with the specified `parameters`, and update the specified `stats`.
