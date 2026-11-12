@@ -817,16 +817,14 @@ QueueEngineTester::getHandle(const bsl::string& clientText)
                                   upstreamSubQueueId,
                                   callback);
 
-        mqbmock::QueueHandle* mHandle = dynamic_cast<mqbmock::QueueHandle*>(
-            handle);
+        auto* mHandle = dynamic_cast<mqbmock::QueueHandle*>(handle);
         // Update internal state
         ++d_clientCounter;
         d_handles.insert(bsl::make_pair(clientKey, mHandle));
         d_clientContexts.insert(bsl::make_pair(clientKey, clientContext));
     }
 
-    mqbmock::QueueHandle* mockHandle = dynamic_cast<mqbmock::QueueHandle*>(
-        handle);
+    auto* mockHandle = dynamic_cast<mqbmock::QueueHandle*>(handle);
 
     return mockHandle;
 }

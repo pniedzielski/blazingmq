@@ -647,7 +647,7 @@ inline T* QueueEngineTester::createQueueEngine()
         d_queueState_mp.get(),
         *d_queueState_mp->queue()->domain()->config());
 
-    T* result = static_cast<T*>(d_queueEngine_mp.get());
+    auto* result = static_cast<T*>(d_queueEngine_mp.get());
 
     createQueueEngineHelper(d_queueEngine_mp.get());
 
