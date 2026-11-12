@@ -742,9 +742,9 @@ QueueEngineTester::getHandle(const bsl::string& clientText)
     handleParams.uri() = uri.asString();
 
     // 2. Get the handle
-    bmqu::MemOutStream  errorDescription(d_allocator_p);
-    mqbi::QueueHandle*  handle     = 0;
-    HandleMap::iterator handleIter = d_handles.find(clientKey);
+    bmqu::MemOutStream errorDescription(d_allocator_p);
+    mqbi::QueueHandle* handle     = 0;
+    auto               handleIter = d_handles.find(clientKey);
     if (handleIter != d_handles.end()) {
         // Already aware of this client
         ClientContextMap::const_iterator clientContextCiter =
@@ -1078,7 +1078,7 @@ void QueueEngineTester::confirm(const bsl::string&       clientText,
     bsl::vector<bsl::string> msgs(d_allocator_p);
     parseList(&msgs, messages, d_allocator_p);
     for (const bsl::string& msg : msgs) {
-        MessagesMap::iterator it = d_postedMessages.find(msg);
+        auto it = d_postedMessages.find(msg);
 
         if (it != d_postedMessages.end()) {
             // msgGUID was found
@@ -1140,7 +1140,7 @@ void QueueEngineTester::reject(const bsl::string&       clientText,
     bsl::vector<bsl::string> msgs(d_allocator_p);
     parseList(&msgs, messages, d_allocator_p);
     for (const bsl::string& msg : msgs) {
-        MessagesMap::iterator it = d_postedMessages.find(msg);
+        auto it = d_postedMessages.find(msg);
 
         if (it != d_postedMessages.end()) {
             // msgGUID was found
@@ -1450,7 +1450,7 @@ void QueueEngineTester::dropHandles()
     BSLS_ASSERT_OPT(d_queueEngine_mp &&
                     "'createQueueEngine()' was not called");
 
-    HandleMap::iterator iter = d_handles.begin();
+    auto iter = d_handles.begin();
     while (iter != d_handles.end()) {
         BSLS_ASSERT_OPT(d_clientContexts.find(iter->first) !=
                             d_clientContexts.end() &&
@@ -1485,7 +1485,7 @@ void QueueEngineTester::push(RelayQueueEngine*        downstream,
     bmqp::Protocol::SubQueueInfosArray subscriptions(d_allocator_p);
 
     for (const bsl::string& appId : apps) {
-        SubIdsMap::iterator it = d_subIds.find(appId);
+        auto it = d_subIds.find(appId);
 
         BSLS_ASSERT_OPT(it != d_subIds.end() && "Unknown app");
         // msgGUID was found
@@ -1494,7 +1494,7 @@ void QueueEngineTester::push(RelayQueueEngine*        downstream,
     }
 
     for (const bsl::string& msg : msgs) {
-        MessagesMap::iterator it = d_postedMessages.find(msg);
+        auto it = d_postedMessages.find(msg);
 
         BSLS_ASSERT_OPT(it != d_postedMessages.end() && "Unknown message");
         // msgGUID was found
