@@ -324,7 +324,7 @@ bool populateQueueUpdate(bmqp_ctrlmsg::QueueUpdateAdvisory* queueAdvisory,
     }
 
     for (const bsl::string& appId : added) {
-        AppInfos::const_iterator existing = from.appInfos().find(appId);
+        auto existing = from.appInfos().find(appId);
 
         if (existing == from.appInfos().end()) {
             // Populate AppIdInfo
@@ -339,7 +339,7 @@ bool populateQueueUpdate(bmqp_ctrlmsg::QueueUpdateAdvisory* queueAdvisory,
     }
 
     for (const bsl::string& appId : removed) {
-        AppInfos::const_iterator existing = from.appInfos().find(appId);
+        auto existing = from.appInfos().find(appId);
 
         if (existing != from.appInfos().end()) {
             // Populate AppIdInfo
@@ -375,10 +375,9 @@ void ClusterUtil::setPendingUnassignment(const ClusterState* clusterState,
     BSLS_ASSERT_SAFE(clusterState);
     BSLS_ASSERT_SAFE(uri.isCanonical());
 
-    mqbc::ClusterUtil::DomainStatesCIter citer =
-        clusterState->domainStates().find(uri.qualifiedDomain());
+    auto citer = clusterState->domainStates().find(uri.qualifiedDomain());
     if (citer != clusterState->domainStates().cend()) {
-        UriToQueueInfoMapIter qiter = citer->second->queuesInfo().find(uri);
+        auto qiter = citer->second->queuesInfo().find(uri);
         if (qiter != citer->second->queuesInfo().cend()) {
             qiter->second->setState(
                 ClusterStateQueueInfo::State::k_UNASSIGNING);
@@ -477,8 +476,7 @@ void ClusterUtil::assignPartitions(
                     assignmentAlgo,
                     clusterData);
 
-    bsl::vector<mqbc::ClusterStatePartitionInfo>::const_iterator cit2 =
-        partitionsToChange.cbegin();
+    auto cit2 = partitionsToChange.cbegin();
     for (const auto& [nodeSession, numPartitions] : numNewPartitions) {
         mqbc::ClusterNodeSession* primaryNs = nodeSession;
         mqbnet::ClusterNode*      primary   = primaryNs->clusterNode();
@@ -870,7 +868,7 @@ bool ClusterUtil::assignQueue(ClusterState*         clusterState,
     }
 
     ClusterState::DomainStates& domainStates = clusterState->domainStates();
-    DomainStatesIter domIt = domainStates.find(uri.qualifiedDomain());
+    auto domIt = domainStates.find(uri.qualifiedDomain());
 
     UriToQueueInfoMapIter queueIt;
     if (domIt == domainStates.end()) {
@@ -1102,8 +1100,7 @@ void ClusterUtil::registerQueueInfo(ClusterState*        clusterState,
     const mqbu::StorageKey queueKey(mqbu::StorageKey::BinaryRepresentation(),
                                     advisory.key().data());
 
-    DomainStatesIter domIt = clusterState->domainStates().find(
-        uri.qualifiedDomain());
+    auto domIt = clusterState->domainStates().find(uri.qualifiedDomain());
     if (domIt != clusterState->domainStates().end()) {
         UriToQueueInfoMapCIter cit = domIt->second->queuesInfo().find(uri);
         if (cit != domIt->second->queuesInfo().cend()) {
@@ -1713,8 +1710,7 @@ int ClusterUtil::validateState(bsl::ostream&       errorDescription,
     for (const auto& domainEntry : state.domainStates()) {
         const bsl::string& domainName = domainEntry.first;
 
-        ClusterState::DomainStatesCIter refDomCit =
-            reference.domainStates().find(domainName);
+        auto refDomCit = reference.domainStates().find(domainName);
         if (refDomCit == reference.domainStates().cend()) {
             // Entire domain is extra
             for (const auto& queueEntry : domainEntry.second->queuesInfo()) {
@@ -1779,8 +1775,7 @@ int ClusterUtil::validateState(bsl::ostream&       errorDescription,
     for (const auto& refDomainEntry : reference.domainStates()) {
         const bsl::string& domainName = refDomainEntry.first;
 
-        ClusterState::DomainStatesCIter domCit = state.domainStates().find(
-            domainName);
+        auto domCit = state.domainStates().find(domainName);
         if (domCit == state.domainStates().cend()) {
             // Entire domain is missing
             for (const auto& refQueueEntry :
