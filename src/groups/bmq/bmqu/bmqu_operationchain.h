@@ -159,6 +159,8 @@
 //  chain.join();
 //..
 
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bdlf_noop.h>
 #include <bsl_list.h>
@@ -355,7 +357,7 @@ class OperationChain_Job {
     unsigned d_id;
 
     /// Type-erased target holding the operation and completion callbacks.
-    bslma::ManagedPtr<TargetBase> d_target_mp;
+    bmqu::UniquePtr<TargetBase> d_target_mp;
 
   private:
     // NOT IMPLEMENTED
@@ -780,7 +782,7 @@ inline OperationChain_Job::OperationChain_Job(unsigned          id,
                    typename bsl::decay<CO_CALLBACK>::type>
         Target;
 
-    d_target_mp = bslma::ManagedPtrUtil::allocateManaged<Target>(
+    d_target_mp = bmqu::UniquePtrUtil::allocateUnique<Target>(
         allocator,
         bsl::forward<OP_CALLBACK>(opCallback),
         bsl::forward<CO_CALLBACK>(coCallback),
