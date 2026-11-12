@@ -26,11 +26,13 @@
 #include <mqbblp_queuestate.h>
 #include <mqbi_dispatcher.h>
 #include <mqbi_queue.h>
+#include <mqbi_queueengine.h>
 
 // BMQ
 #include <bmqp_protocol.h>
 #include <bmqt_messageguid.h>
 #include <bmqu_throttledaction.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -80,7 +82,7 @@ class LocalQueue final {
     // DATA
     bslma::Allocator*                    d_allocator_p;
     QueueState*                          d_state_p;
-    bslma::ManagedPtr<mqbi::QueueEngine> d_queueEngine_mp;
+    bmqu::UniquePtr<mqbi::QueueEngine>   d_queueEngine_mp;
     bmqu::ThrottledActionParams          d_throttledFailedPutMessages;
     bdlmt::Throttle                      d_throttledDuplicateMessages;
     /// Throttler for duplicates.

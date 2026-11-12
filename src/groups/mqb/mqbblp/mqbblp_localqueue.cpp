@@ -74,7 +74,7 @@ const int k_EXPIRE_MESSAGES_BATCH_SIZE = 1000;
 LocalQueue::LocalQueue(QueueState* state, bslma::Allocator* allocator)
 : d_allocator_p(allocator)
 , d_state_p(state)
-, d_queueEngine_mp(0)
+, d_queueEngine_mp()
 , d_throttledFailedPutMessages(5000, 1)  // 1 log per 5s interval
 , d_throttledDuplicateMessages()
 , d_haveStrongConsistency(false)
@@ -159,10 +159,9 @@ int LocalQueue::configure(bsl::ostream& errorDescription, bool isReconfigure)
     // and should not be re-created.
     if (!d_queueEngine_mp) {
         d_queueEngine_mp =
-            bslma::ManagedPtrUtil::allocateManaged<RootQueueEngine>(
-                d_allocator_p,
-                d_state_p,
-                *domainCfg);
+            bmqu::UniquePtrUtil::allocateUnique<RootQueueEngine>(d_allocator_p,
+                                                                 d_state_p,
+                                                                 *domainCfg);
     }
 
     // Inform the storage about the queue.
