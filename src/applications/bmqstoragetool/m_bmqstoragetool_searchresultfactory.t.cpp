@@ -59,9 +59,9 @@ static void test1_breathingTest()
         bmqtst::TestHelperUtil::allocator());
 
     // Create payload dumper
-    bslma::ManagedPtr<PayloadDumper> payloadDumper;
+    bmqu::UniquePtr<PayloadDumper> payloadDumper;
     if (params.d_dumpPayload) {
-        payloadDumper.load(
+        payloadDumper = bmqu::UniquePtrUtil::adopt(
             new (*bmqtst::TestHelperUtil::allocator())
                 PayloadDumper(bsl::cout,
                               fileManager->dataFileIterator(),

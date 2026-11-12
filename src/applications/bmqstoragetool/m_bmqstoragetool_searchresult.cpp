@@ -317,14 +317,14 @@ bool SearchResultSequenceNumberDecorator::processDeletionRecord(
 SearchShortResult::SearchShortResult(
     const bsl::shared_ptr<Printer>&       printer,
     const Parameters::ProcessRecordTypes& processRecordTypes,
-    bslma::ManagedPtr<PayloadDumper>&     payloadDumper,
+    bmqu::UniquePtr<PayloadDumper>&       payloadDumper,
     bool                                  printImmediately,
     bool                                  eraseDeleted,
     bool                                  printOnDelete,
     bslma::Allocator*                     allocator)
 : d_printer(printer)
 , d_processRecordTypes(processRecordTypes)
-, d_payloadDumper(payloadDumper)
+, d_payloadDumper(bsl::move(payloadDumper))
 , d_printImmediately(printImmediately)
 , d_eraseDeleted(eraseDeleted)
 , d_printOnDelete(printOnDelete)
@@ -481,7 +481,7 @@ SearchDetailResult::SearchDetailResult(
     const bsl::shared_ptr<Printer>&       printer,
     const Parameters::ProcessRecordTypes& processRecordTypes,
     const QueueMap&                       queueMap,
-    bslma::ManagedPtr<PayloadDumper>&     payloadDumper,
+    bmqu::UniquePtr<PayloadDumper>&       payloadDumper,
     bool                                  printImmediately,
     bool                                  eraseDeleted,
     bool                                  cleanUnprinted,
@@ -489,7 +489,7 @@ SearchDetailResult::SearchDetailResult(
 : d_processRecordTypes(processRecordTypes)
 , d_queueMap(queueMap)
 , d_printer(printer)
-, d_payloadDumper(payloadDumper)
+, d_payloadDumper(bsl::move(payloadDumper))
 , d_printImmediately(printImmediately)
 , d_eraseDeleted(eraseDeleted)
 , d_cleanUnprinted(cleanUnprinted)
@@ -692,12 +692,12 @@ SearchExactMatchResult::SearchExactMatchResult(
     const bsl::shared_ptr<Printer>&       printer,
     const Parameters::ProcessRecordTypes& processRecordTypes,
     const QueueMap&                       queueMap,
-    bslma::ManagedPtr<PayloadDumper>&     payloadDumper,
+    bmqu::UniquePtr<PayloadDumper>&       payloadDumper,
     bslma::Allocator*                     allocator)
 : d_printer(printer)
 , d_processRecordTypes(processRecordTypes)
 , d_queueMap(queueMap)
-, d_payloadDumper(payloadDumper)
+, d_payloadDumper(bsl::move(payloadDumper))
 , d_printedMessagesCount(0)
 , d_printedConfirmCount(0)
 , d_printedDeletionCount(0)

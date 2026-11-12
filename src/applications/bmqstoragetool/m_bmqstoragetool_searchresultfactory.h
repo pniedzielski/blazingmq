@@ -30,6 +30,9 @@
 #include <m_bmqstoragetool_payloaddumper.h>
 #include <m_bmqstoragetool_searchresult.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bsl_memory.h>
 #include <bslma_managedptr.h>
@@ -51,7 +54,7 @@ class SearchResultFactory {
     createSearchResult(const Parameters*                     params,
                        const bslma::ManagedPtr<FileManager>& fileManager,
                        const bsl::shared_ptr<Printer>&       printer,
-                       bslma::ManagedPtr<PayloadDumper>&     payloadDumper,
+                       bmqu::UniquePtr<PayloadDumper>&       payloadDumper,
                        bslma::Allocator*                     allocator);
 
     /// Create CslSearchResult object for the specified 'params' using

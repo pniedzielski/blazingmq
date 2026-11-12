@@ -62,6 +62,9 @@
 
 #include <mqbs_filestoreprotocolprinter.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bsl_iostream.h>
 #include <bsl_list.h>
@@ -175,7 +178,7 @@ class SearchShortResult : public SearchResult {
     // Pointer to 'Printer' instance.
     Parameters::ProcessRecordTypes d_processRecordTypes;
     // Record types to process
-    const bslma::ManagedPtr<PayloadDumper> d_payloadDumper;
+    const bmqu::UniquePtr<PayloadDumper> d_payloadDumper;
     // Pointer to 'PayloadDumper' instance.
     const bool d_printImmediately;
     // If 'true', print message guid as soon as it is received (usually when
@@ -216,7 +219,7 @@ class SearchShortResult : public SearchResult {
     explicit SearchShortResult(
         const bsl::shared_ptr<Printer>&       printer,
         const Parameters::ProcessRecordTypes& processRecordTypes,
-        bslma::ManagedPtr<PayloadDumper>&     payloadDumper,
+        bmqu::UniquePtr<PayloadDumper>&       payloadDumper,
         bool                                  printImmediately = true,
         bool                                  eraseDeleted     = false,
         bool                                  printOnDelete    = false,
@@ -292,7 +295,7 @@ class SearchDetailResult : public SearchResult {
     // Reference to 'QueueMap' instance.
     const bsl::shared_ptr<Printer> d_printer;
     // Pointer to 'Printer' instance.
-    const bslma::ManagedPtr<PayloadDumper> d_payloadDumper;
+    const bmqu::UniquePtr<PayloadDumper> d_payloadDumper;
     // Pointer to 'PayloadDumper' instance.
     const bool d_printImmediately;
     // If true, print message details as soon as it is complete (usually when
@@ -346,7 +349,7 @@ class SearchDetailResult : public SearchResult {
         const bsl::shared_ptr<Printer>&       printer,
         const Parameters::ProcessRecordTypes& processRecordTypes,
         const QueueMap&                       queueMap,
-        bslma::ManagedPtr<PayloadDumper>&     payloadDumper,
+        bmqu::UniquePtr<PayloadDumper>&       payloadDumper,
         bool                                  printImmediately = true,
         bool                                  eraseDeleted     = true,
         bool                                  cleanUnprinted   = false,
@@ -411,7 +414,7 @@ class SearchExactMatchResult : public SearchResult {
     // Record types to process
     const QueueMap& d_queueMap;
     // Reference to 'QueueMap' instance.
-    const bslma::ManagedPtr<PayloadDumper> d_payloadDumper;
+    const bmqu::UniquePtr<PayloadDumper> d_payloadDumper;
     // Pointer to 'PayloadDumper' instance.
     bsls::Types::Uint64 d_printedMessagesCount;
     // Counter of already output (printed) messages.
@@ -448,7 +451,7 @@ class SearchExactMatchResult : public SearchResult {
         const bsl::shared_ptr<Printer>&       printer,
         const Parameters::ProcessRecordTypes& processRecordTypes,
         const QueueMap&                       queueMap,
-        bslma::ManagedPtr<PayloadDumper>&     payloadDumper,
+        bmqu::UniquePtr<PayloadDumper>&       payloadDumper,
         bslma::Allocator*                     allocator);
 
     // MANIPULATORS

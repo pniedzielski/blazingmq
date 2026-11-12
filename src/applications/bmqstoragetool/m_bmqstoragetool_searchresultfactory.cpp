@@ -30,7 +30,7 @@ bsl::shared_ptr<SearchResult> SearchResultFactory::createSearchResult(
     const Parameters*                     params,
     const bslma::ManagedPtr<FileManager>& fileManager,
     const bsl::shared_ptr<Printer>&       printer,
-    bslma::ManagedPtr<PayloadDumper>&     payloadDumper,
+    bmqu::UniquePtr<PayloadDumper>&       payloadDumper,
     bslma::Allocator*                     allocator)
 {
     // PRECONDITIONS

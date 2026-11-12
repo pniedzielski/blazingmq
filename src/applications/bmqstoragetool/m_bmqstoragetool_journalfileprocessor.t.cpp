@@ -86,14 +86,14 @@ createCommandProcessor(const Parameters*               params,
     bslma::Allocator* alloc = bslma::Default::allocator(allocator);
 
     // Create payload dumper
-    bslma::ManagedPtr<PayloadDumper> payloadDumper;
+    bmqu::UniquePtr<PayloadDumper> payloadDumper;
     if (params->d_dumpPayload) {
-        payloadDumper.load(new (*alloc)
-                               PayloadDumper(ostream,
-                                             fileManager->dataFileIterator(),
-                                             params->d_dumpLimit,
-                                             alloc),
-                           alloc);
+        payloadDumper = bmqu::UniquePtrUtil::adopt(
+            new (*alloc) PayloadDumper(ostream,
+                                       fileManager->dataFileIterator(),
+                                       params->d_dumpLimit,
+                                       alloc),
+            alloc);
     }
 
     // Create searchResult for given 'params'.

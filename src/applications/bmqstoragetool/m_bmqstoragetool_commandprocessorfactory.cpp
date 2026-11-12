@@ -66,9 +66,9 @@ CommandProcessorFactory::createCommandProcessor(
                                                          allocator);
 
         // Create payload dumper
-        bslma::ManagedPtr<PayloadDumper> payloadDumper;
+        bmqu::UniquePtr<PayloadDumper> payloadDumper;
         if (params->d_dumpPayload) {
-            payloadDumper.load(
+            payloadDumper = bmqu::UniquePtrUtil::adopt(
                 new (*alloc) PayloadDumper(ostream,
                                            fileManager->dataFileIterator(),
                                            params->d_dumpLimit,
