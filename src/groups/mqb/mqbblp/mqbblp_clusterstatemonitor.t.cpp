@@ -195,11 +195,8 @@ struct TestHelper {
                 return cluster->getTimeInt64();
             });
 
-        for (mqbnet::Cluster::NodesList::iterator iter =
-                 d_cluster_mp->netCluster().nodes().begin();
-             iter != d_cluster_mp->netCluster().nodes().end();
-             ++iter) {
-            d_nodes.push_back(dynamic_cast<mqbnet::MockClusterNode*>(*iter));
+        for (mqbnet::ClusterNode* node : d_cluster_mp->netCluster().nodes()) {
+            d_nodes.push_back(dynamic_cast<mqbnet::MockClusterNode*>(node));
         }
     }
 
