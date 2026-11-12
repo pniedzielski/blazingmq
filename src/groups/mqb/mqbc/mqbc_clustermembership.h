@@ -214,8 +214,7 @@ ClusterMembership::clusterNodeSessionMap() const
 inline mqbc::ClusterNodeSession*
 ClusterMembership::getClusterNodeSession(mqbnet::ClusterNode* key) const
 {
-    ClusterNodeSessionMap::const_iterator cit = clusterNodeSessionMap().find(
-        key);
+    auto cit = clusterNodeSessionMap().find(key);
     if (cit == clusterNodeSessionMap().end()) {
         return 0;  // RETURN
     }
