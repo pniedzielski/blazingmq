@@ -415,7 +415,7 @@ int RootQueueEngine::configure(bsl::ostream& errorDescription,
             }
         }
         for (const mqbconfm::Subscription& subscription : subscriptions) {
-            Apps::iterator itApp = d_apps.find(subscription.appId());
+            auto itApp = d_apps.find(subscription.appId());
             if (itApp != d_apps.end()) {
                 int rc = itApp->second->setSubscription(
                     subscription.expression());
@@ -461,7 +461,7 @@ int RootQueueEngine::configure(bsl::ostream& errorDescription,
             return rc_APP_SUBSCRIPTIONS_ERROR;  // RETURN
         }
 
-        Apps::iterator itApp = d_apps.begin();
+        auto itApp = d_apps.begin();
         BSLS_ASSERT_SAFE(itApp != d_apps.end());
 
         int rc = 0;
@@ -499,7 +499,7 @@ int RootQueueEngine::initializeAppId(const bsl::string& appId,
                                      unsigned int       upstreamSubQueueId,
                                      bool               isReconfigure)
 {
-    Apps::iterator iter = d_apps.find(appId);
+    auto iter = d_apps.find(appId);
 
     if (iter != d_apps.end()) {
         mqbconfm::Expression empty(d_allocator_p);
@@ -657,8 +657,8 @@ int RootQueueEngine::rebuildInternalState(bsl::ostream& errorDescription)
         if (!previous) {
             continue;  // CONTINUE
         }
-        Apps::iterator itApp              = d_apps.find(previous->appId());
-        unsigned int   upstreamSubQueueId = previous->upstreamSubQueueId();
+        auto         itApp              = d_apps.find(previous->appId());
+        unsigned int upstreamSubQueueId = previous->upstreamSubQueueId();
 
         if (itApp == d_apps.end()) {
             // This means that this is an unregistered appId.
@@ -882,7 +882,7 @@ mqbi::QueueHandle* RootQueueEngine::getHandle(
     if (handleParameters.readCount()) {
         // Ensure appId is authorized
         const bsl::string& appId = subStreamInfo.appId();
-        Apps::iterator     iter  = d_apps.find(appId);
+        auto               iter  = d_apps.find(appId);
 
         if (iter == d_apps.end()) {
             BMQTSK_ALARMLOG_ALARM("FANOUT_UNREGISTERED_APPID")
@@ -1034,7 +1034,7 @@ void RootQueueEngine::configureHandle(
         return;  // RETURN
     }
 
-    Apps::iterator iter = d_apps.find(appId);
+    auto iter = d_apps.find(appId);
     BSLS_ASSERT_SAFE(iter != d_apps.end());
 
     const AppStateSp& affectedApp = iter->second;
@@ -1228,7 +1228,7 @@ void RootQueueEngine::releaseHandle(
         mqbi::QueueHandleReleaseResult result = proctor.releaseStream(copy);
 
         if (copy.readCount()) {
-            Apps::iterator itApp = d_apps.find(subStreamEntry.first);
+            auto itApp = d_apps.find(subStreamEntry.first);
 
             BSLS_ASSERT_SAFE(itApp != d_apps.end());
 
@@ -1783,7 +1783,7 @@ void RootQueueEngine::afterQueuePurged(const bsl::string&      appId,
         return;  // RETURN
     }
 
-    Apps::iterator iter = d_apps.find(appId);
+    auto iter = d_apps.find(appId);
     BSLS_ASSERT_SAFE(iter != d_apps.end());
     BSLS_ASSERT_SAFE(iter->first == appId);
     iter->second->clear();
@@ -2172,7 +2172,7 @@ void RootQueueEngine::afterAppIdUnregistered(
     for (const auto& appInfo : removedAppIds) {
         const bsl::string& appId = appInfo.first;
 
-        Apps::iterator iter = d_apps.find(appId);
+        auto iter = d_apps.find(appId);
         BSLS_ASSERT_SAFE(iter != d_apps.end());
 
         BSLS_ASSERT_SAFE(iter->second->isAuthorized());
@@ -2204,7 +2204,7 @@ void RootQueueEngine::registerStorage(const bsl::string&      appId,
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queueState_p->queue()->inDispatcherThread());
 
-    Apps::iterator iter = d_apps.find(appId);
+    auto iter = d_apps.find(appId);
     BSLS_ASSERT_SAFE(iter != d_apps.end());
 
     AppState& app = *iter->second;
@@ -2242,7 +2242,7 @@ void RootQueueEngine::unregisterStorage(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queueState_p->queue()->inDispatcherThread());
 
-    Apps::iterator iter = d_apps.find(appId);
+    auto iter = d_apps.find(appId);
     BSLS_ASSERT_SAFE(iter != d_apps.end());
 
     // we still keep the app but invalidate the authorization
@@ -2358,8 +2358,7 @@ void RootQueueEngine::loadInternals(mqbcmd::QueueEngine* out) const
 bool RootQueueEngine::hasHandle(const bsl::string& appId,
                                 mqbi::QueueHandle* handle) const
 {
-    Apps::iterator iter = const_cast<RootQueueEngine*>(this)->d_apps.find(
-        appId);
+    auto iter = const_cast<RootQueueEngine*>(this)->d_apps.find(appId);
 
     return (iter != d_apps.end() && iter->second->find(handle));
 }
