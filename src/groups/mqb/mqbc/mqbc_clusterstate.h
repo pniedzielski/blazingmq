@@ -1197,8 +1197,7 @@ ClusterState::partition(int partitionId) const
 inline ClusterStateQueueInfo*
 ClusterState::getQueueInfo(const bmqt::Uri& uri) const
 {
-    const DomainStatesCIter domCit = domainStates().find(
-        uri.qualifiedDomain());
+    const auto domCit = domainStates().find(uri.qualifiedDomain());
     if (domCit == domainStates().cend()) {
         return 0;
     }

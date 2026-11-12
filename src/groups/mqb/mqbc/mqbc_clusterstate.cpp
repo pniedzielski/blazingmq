@@ -491,7 +491,7 @@ ClusterState::getDomainState(const bsl::string& domain)
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(cluster()->inDispatcherThread());
 
-    DomainStatesIter domIt = d_domainStates.find(domain);
+    auto domIt = d_domainStates.find(domain);
     if (domIt == d_domainStates.end()) {
         DomainStateSp domainState;
         domainState.createInplace(d_allocator_p, d_allocator_p);
@@ -507,7 +507,7 @@ void ClusterState::onDomainsCreated(const DomainMap& domains)
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(cluster()->inDispatcherThread());
 
-    DomainMap::const_iterator it = domains.cbegin();
+    auto it = domains.cbegin();
     for (; it != domains.cend(); ++it) {
         if (it->second != 0) {
             DomainState& domState = getDomainState(it->first);
@@ -527,7 +527,7 @@ void ClusterState::assignQueue(const bmqp_ctrlmsg::QueueInfo& advisory)
     const bmqt::Uri&      uri         = advisory.uri();
     const int             partitionId = advisory.partitionId();
     DomainState&          domState    = getDomainState(uri.qualifiedDomain());
-    UriToQueueInfoMapIter queueIt     = domState.queuesInfo().find(uri);
+    auto                  queueIt     = domState.queuesInfo().find(uri);
     QueueInfoSp           newQueueInfo;
     QueueInfoSp&          queue = newQueueInfo;
 
@@ -588,7 +588,7 @@ bool ClusterState::unassignQueue(const bmqt::Uri& uri)
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(cluster()->inDispatcherThread());
 
-    const DomainStatesIter domIt = d_domainStates.find(uri.qualifiedDomain());
+    const auto domIt = d_domainStates.find(uri.qualifiedDomain());
     if (domIt == d_domainStates.end()) {
         return false;  // RETURN
     }
@@ -673,14 +673,12 @@ int ClusterState::updateQueue(const bmqp_ctrlmsg::QueueInfoUpdate& update)
     if (uri.isValid()) {
         BSLS_ASSERT_SAFE(uri.qualifiedDomain() == domain);
 
-        const DomainStatesIter domIt = d_domainStates.find(
-            uri.qualifiedDomain());
+        const auto domIt = d_domainStates.find(uri.qualifiedDomain());
         if (domIt == d_domainStates.end()) {
             return rc_QUEUE_NOT_FOUND;  // RETURN
         }
 
-        const UriToQueueInfoMapIter iter = domIt->second->queuesInfo().find(
-            uri);
+        const auto iter = domIt->second->queuesInfo().find(uri);
         if (iter == domIt->second->queuesInfo().end()) {
             return rc_QUEUE_NOT_FOUND;  // RETURN
         }
