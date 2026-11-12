@@ -454,8 +454,7 @@ AuthenticationController::AuthenticationController(
     mqbplug::PluginManager* pluginManager,
     bslma::Allocator*       allocator)
 : d_builtInPluginLibrary(
-      bslma::ManagedPtrUtil::allocateManaged<mqbauthn::PluginLibrary>(
-          allocator))
+      bmqu::UniquePtrUtil::allocateUnique<mqbauthn::PluginLibrary>(allocator))
 , d_pluginManager_p(pluginManager)
 , d_credentialProvider_mp()
 , d_credentialCb()

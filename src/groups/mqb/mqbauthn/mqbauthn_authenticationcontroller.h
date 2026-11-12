@@ -33,6 +33,9 @@
 #include <mqbplug_credentialprovider.h>
 #include <mqbplug_pluginmanager.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <ball_log.h>
 #include <bsl_memory.h>
@@ -79,7 +82,7 @@ class AuthenticationController {
     bsl::optional<mqbcfg::Credential> d_anonymousCredential;
 
     /// Hold the PluginLibrary for all the built-in authentication plugins.
-    bslma::ManagedPtr<mqbplug::PluginLibrary> d_builtInPluginLibrary;
+    bmqu::UniquePtr<mqbplug::PluginLibrary> d_builtInPluginLibrary;
 
     /// Used to instantiate external authenticator plugins at start-time.
     /// Held, not owned.
