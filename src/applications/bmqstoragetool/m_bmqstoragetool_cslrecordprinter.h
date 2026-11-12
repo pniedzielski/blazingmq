@@ -29,6 +29,7 @@
 #include <m_bmqstoragetool_parameters.h>
 
 // BMQ
+#include <bmqu_uniqueptr.h>
 #include <mqbc_clusterstateledgerprotocol.h>
 #include <mqbsi_ledger.h>
 
@@ -95,7 +96,7 @@ class CslRecordPrinter {
   private:
     bsl::ostream&                   d_ostream;
     bsl::vector<bsl::string>        d_fields;
-    bslma::ManagedPtr<PRINTER_TYPE> d_printer_mp;
+    bmqu::UniquePtr<PRINTER_TYPE>   d_printer_mp;
     bslma::Allocator*               d_allocator_p;
 
   public:
@@ -153,8 +154,9 @@ void CslRecordPrinter<PRINTER_TYPE>::printRecordDetails(
     d_fields.push_back("Epoch");
     // The printer holds a reference to this vector, so appending fields
     // afterwards is safe; the reference stays valid even across reallocation.
-    d_printer_mp.load(new (*d_allocator_p) PRINTER_TYPE(d_ostream, d_fields),
-                      d_allocator_p);
+    d_printer_mp = bmqu::UniquePtrUtil::adopt(
+        new (*d_allocator_p) PRINTER_TYPE(d_ostream, d_fields),
+        d_allocator_p);
 
     *d_printer_mp << header.recordType() << recId.offset() << recId.logId()
                   << header.electorTerm() << header.sequenceNumber()
@@ -197,8 +199,9 @@ void CslRecordPrinter<PRINTER_TYPE>::printRecordsSummary(
 
     // The printer holds a reference to this vector, so appending fields
     // afterwards is safe; the reference stays valid even across reallocation.
-    d_printer_mp.load(new (*d_allocator_p) PRINTER_TYPE(d_ostream, d_fields),
-                      d_allocator_p);
+    d_printer_mp = bmqu::UniquePtrUtil::adopt(
+        new (*d_allocator_p) PRINTER_TYPE(d_ostream, d_fields),
+        d_allocator_p);
 
     *d_printer_mp << recordCount.d_snapshotCount << recordCount.d_updateCount;
     if (recordCount.d_updateCount > 0) {
