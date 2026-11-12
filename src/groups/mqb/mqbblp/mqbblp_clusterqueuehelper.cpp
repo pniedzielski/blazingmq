@@ -228,11 +228,8 @@ void ClusterQueueHelper::finishAllOpening(const QueueContextSp& queueContext,
     bsl::vector<OpenQueueContextSp> contexts(d_allocator_p);
     contexts.swap(queueContext->d_liveQInfo.d_pending);
 
-    for (bsl::vector<OpenQueueContextSp>::const_iterator cIt =
-             contexts.begin();
-         cIt != contexts.end();
-         ++cIt) {
-        finishOpening(*cIt,
+    for (const OpenQueueContextSp& context : contexts) {
+        finishOpening(context,
                       status,
                       0,
                       bmqp_ctrlmsg::OpenQueueResponse(),
@@ -846,27 +843,27 @@ void ClusterQueueHelper::finishReopening(
 
     bsl::vector<SubQueueContext::PendingClose> pendingClose(d_allocator_p);
     pendingClose.swap(subQueueContext.d_pendingCloseRequests);
-    for (size_t i = 0; i < pendingClose.size(); ++i) {
+    for (const SubQueueContext::PendingClose& pendingRequest : pendingClose) {
         if (state == SubQueueContext::k_OPEN && isValid) {
             BMQ_LOGTHROTTLE_INFO
                 << d_cluster_p->description()
                 << ": sending pending Close request with parameters ["
-                << pendingClose[i].d_handleParameters << "].";
+                << pendingRequest.d_handleParameters << "].";
 
-            sendCloseQueueRequest(pendingClose[i].d_handleParameters,
+            sendCloseQueueRequest(pendingRequest.d_handleParameters,
                                   sqit,
                                   queueContext->partitionId(),
-                                  pendingClose[i].d_callback);
+                                  pendingRequest.d_callback);
         }
         else {
             // 'sqit' is invalidated or the state is not OPEN.
             BMQ_LOGTHROTTLE_WARN
                 << d_cluster_p->description()
                 << ": not sending excessive pending Close request"
-                << " with parameters [" << pendingClose[i].d_handleParameters
+                << " with parameters [" << pendingRequest.d_handleParameters
                 << "].";
 
-            if (pendingClose[i].d_callback) {
+            if (pendingRequest.d_callback) {
                 bmqp_ctrlmsg::Status status;
 
                 status.category() =
@@ -875,12 +872,12 @@ void ClusterQueueHelper::finishReopening(
                 status.message() =
                     "Attempting to release queue handle for invalid stream.";
 
-                pendingClose[i].d_callback(status);
+                pendingRequest.d_callback(status);
             }
         }
         if (isValid) {
             isValid = subtractCounters(&queueContext->d_liveQInfo,
-                                       pendingClose[i].d_handleParameters,
+                                       pendingRequest.d_handleParameters,
                                        sqit);
             // 'false' means 'sqit' is deleted (all counters are zeroes)
         }
@@ -999,10 +996,8 @@ void ClusterQueueHelper::processPendingContexts(QueueContext* queueContext)
                   << contexts.size() << " associated pending contexts for '"
                   << queueContext->uri() << "'";
 
-    for (bsl::vector<OpenQueueContextSp>::iterator it = contexts.begin();
-         it != contexts.end();
-         ++it) {
-        processOpenQueueRequest(*it);
+    for (const OpenQueueContextSp& context : contexts) {
+        processOpenQueueRequest(context);
     }
 }
 
@@ -4535,10 +4530,8 @@ void ClusterQueueHelper::onQueueUpdated(
         BMQ_LOGTHROTTLE_INFO << d_cluster_p->description() << ": processing "
                              << pending.size() << " pending Apps Updates.";
 
-        for (bsl::vector<VoidFunctor>::iterator it = pending.begin();
-             it != pending.end();
-             ++it) {
-            (*it)();
+        for (const VoidFunctor& update : pending) {
+            update();
         }
     }
 
@@ -4555,10 +4548,8 @@ void ClusterQueueHelper::onUpstreamNodeChange(mqbnet::ClusterNode* node,
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_cluster_p->inDispatcherThread());
 
-    for (QueueContextMapConstIter cit = d_queues.begin();
-         cit != d_queues.end();
-         ++cit) {
-        const QueueContextSp& queueContextSp = cit->second;
+    for (const auto& queueEntry : d_queues) {
+        const QueueContextSp& queueContextSp = queueEntry.second;
         mqbi::Queue* queue = queueContextSp->d_liveQInfo.d_queue_sp.get();
 
         if (!queue) {
@@ -5314,9 +5305,8 @@ void ClusterQueueHelper::requestToStopQueues()
     d_isShutdownLogicOn = true;
 
     // Prevent future queue operations from sending PUSHes and GC.
-    for (QueueContextMapIter it = d_queues.begin(); it != d_queues.end();
-         ++it) {
-        QueueContextSp& queueContextSp = it->second;
+    for (auto& queueEntry : d_queues) {
+        QueueContextSp& queueContextSp = queueEntry.second;
         QueueLiveState& qinfo          = queueContextSp->d_liveQInfo;
         mqbi::Queue*    queue          = qinfo.d_queue_sp.get();
 
@@ -5459,13 +5449,11 @@ ClusterQueueHelper::processNodeStoppingNotification(
             const mqbc::ClusterNodeSession::QueueHandleMap& handles =
                 ns->queueHandles();
 
-            for (mqbc::ClusterNodeSession::QueueHandleMap::const_iterator cit =
-                     handles.begin();
-                 cit != handles.end();
-                 ++cit) {
-                cit->second.d_handle_p->deconfigureAll([this, contextSp]() {
-                    contextHolder(contextSp, VoidFunctor());
-                });
+            for (const auto& handleEntry : handles) {
+                handleEntry.second.d_handle_p->deconfigureAll(
+                    [this, contextSp]() {
+                        contextHolder(contextSp, VoidFunctor());
+                    });
             }
             BALL_LOG_INFO << d_clusterData_p->identity().description()
                           << ": deconfiguring " << handles.size()
@@ -5479,10 +5467,8 @@ ClusterQueueHelper::processNodeStoppingNotification(
 
         // As a Downstream, notify relevant queues about their shutting
         // down upstream
-        for (QueueContextMapConstIter cit = d_queues.begin();
-             cit != d_queues.end();
-             ++cit) {
-            const QueueContextSp& queueContextSp = cit->second;
+        for (const auto& queueEntry : d_queues) {
+            const QueueContextSp& queueContextSp = queueEntry.second;
             const QueueLiveState& queueLiveState = queueContextSp->d_liveQInfo;
             mqbi::Queue*          queue = queueLiveState.d_queue_sp.get();
 
@@ -5646,9 +5632,8 @@ void ClusterQueueHelper::checkUnconfirmedV2Impl(
     BSLS_ASSERT_SAFE(d_cluster_p->inDispatcherThread());
 
     bsls::Types::Int64 result = 0;
-    for (QueueContextMapIter it = d_queues.begin(); it != d_queues.end();
-         ++it) {
-        QueueContextSp& queueContextSp = it->second;
+    for (auto& queueEntry : d_queues) {
+        QueueContextSp& queueContextSp = queueEntry.second;
         QueueLiveState& qinfo          = queueContextSp->d_liveQInfo;
         mqbi::Queue*    queue          = qinfo.d_queue_sp.get();
 
@@ -5909,8 +5894,7 @@ int ClusterQueueHelper::gcExpiredQueues(bool               immediate,
         return rc_SELF_IS_NOT_LEADER;  // RETURN
     }
 
-    for (size_t i = 0; i < queuesToGc.size(); ++i) {
-        QueueContextMapIter&   qit            = queuesToGc[i];
+    for (QueueContextMapIter& qit : queuesToGc) {
         const QueueContextSp&  queueContextSp = qit->second;
         const int              pid            = queueContextSp->partitionId();
         const bmqt::Uri        uriCopy        = qit->first;
@@ -5974,11 +5958,9 @@ bool ClusterQueueHelper::hasActiveQueue(const bsl::string& domainName)
     const UriToQueueInfoMap& queuesInfoPerDomain =
         domCit->second->queuesInfo();
 
-    for (UriToQueueInfoMapCIter qCit = queuesInfoPerDomain.cbegin();
-         qCit != queuesInfoPerDomain.cend();
-         ++qCit) {
+    for (const auto& queueInfoEntry : queuesInfoPerDomain) {
         QueueContextMapConstIter queueContextCIt = d_queues.find(
-            qCit->second->uri());
+            queueInfoEntry.second->uri());
 
         if (queueContextCIt == d_queues.end()) {
             continue;
@@ -5995,10 +5977,8 @@ bool ClusterQueueHelper::hasActiveQueue(const bsl::string& domainName)
 int ClusterQueueHelper::numPendingReopenQueueRequests() const
 {
     int sum = 0;
-    for (ReopenCycles::const_iterator cit = d_reopenCycles.begin();
-         cit != d_reopenCycles.end();
-         ++cit) {
-        sum += cit->second.use_count();
+    for (const auto& cycleEntry : d_reopenCycles) {
+        sum += cycleEntry.second.use_count();
     }
     return sum;
 }
@@ -6012,16 +5992,15 @@ void ClusterQueueHelper::loadQueuesInfo(mqbcmd::StorageContent* out) const
 
     bsl::vector<mqbcmd::StorageQueueInfo>& queuesInfo = out->storages();
     queuesInfo.reserve(d_queues.size());
-    for (QueueContextMapConstIter it = d_queues.begin(); it != d_queues.end();
-         ++it) {
+    for (const auto& queueEntry : d_queues) {
         queuesInfo.resize(queuesInfo.size() + 1);
         mqbcmd::StorageQueueInfo& queueInfo = queuesInfo.back();
         bmqu::MemOutStream        os;
-        os << it->second->key();
+        os << queueEntry.second->key();
         queueInfo.queueKey()        = os.str();
-        queueInfo.partitionId()     = it->second->partitionId();
-        queueInfo.internalQueueId() = it->second->d_liveQInfo.d_id;
-        queueInfo.queueUri()        = it->second->uri().asString();
+        queueInfo.partitionId()     = queueEntry.second->partitionId();
+        queueInfo.internalQueueId() = queueEntry.second->d_liveQInfo.d_id;
+        queueInfo.queueUri()        = queueEntry.second->uri().asString();
     }
 }
 
@@ -6158,10 +6137,8 @@ void ClusterQueueHelper::match(bsl::vector<bsl::string>*          added,
         domainConfig.fanout().appIDs().cend(),
         d_allocator_p);
 
-    for (AppInfos::const_iterator citInTheState = state.appInfos().begin();
-         citInTheState != state.appInfos().end();
-         ++citInTheState) {
-        const bsl::string& appId = citInTheState->first;
+    for (const auto& appInfo : state.appInfos()) {
+        const bsl::string&                              appId = appInfo.first;
         bsl::unordered_set<bsl::string>::const_iterator citInTheConfig =
             inTheConfig.find(appId);
 
@@ -6177,11 +6154,7 @@ void ClusterQueueHelper::match(bsl::vector<bsl::string>*          added,
             inTheConfig.erase(citInTheConfig);
         }
     }
-    for (bsl::unordered_set<bsl::string>::const_iterator citInTheConfig =
-             inTheConfig.begin();
-         citInTheConfig != inTheConfig.end();
-         ++citInTheConfig) {
-        const bsl::string& appId = *citInTheConfig;
+    for (const bsl::string& appId : inTheConfig) {
         // TODO: handle dynamic App
         BALL_LOG_ERROR << d_cluster_p->description() << " adding missing App '"
                        << appId << "' in the Cluster State of '" << state.uri()
