@@ -49,13 +49,13 @@
 #include <bsl_string.h>
 #include <bsl_utility.h>
 #include <bslma_allocator.h>
-#include <bslma_managedptr.h>
 #include <bsls_assert.h>
 #include <bsls_objectbuffer.h>
 #include <bsls_types.h>
 
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
+#include <bmqu_uniqueptr.h>
 #include <bsl_limits.h>
 #include <bsl_vector.h>
 
@@ -177,7 +177,7 @@ struct Tester {
     mqbmock::Domain                            d_mockDomain;
     mqbmock::Queue                             d_mockQueue;
     mqbmock::QueueEngine                       d_mockQueueEngine;
-    bslma::ManagedPtr<mqbs::ReplicatedStorage> d_replicatedStorage_mp;
+    bmqu::UniquePtr<mqbs::ReplicatedStorage>   d_replicatedStorage_mp;
     Records                                    d_records;
 
   public:
@@ -198,16 +198,18 @@ struct Tester {
         domainCfg.deduplicationTimeMs() = 0;  // No history
         domainCfg.messageTtl()          = k_INT64_MAX;
 
-        d_replicatedStorage_mp.load(new (*d_allocator_p) mqbs::InMemoryStorage(
-                                        0,  // No FileStore
-                                        bmqt::Uri(k_URI_STR, d_allocator_p),
-                                        k_QUEUE_KEY,
-                                        &d_mockDomain,
-                                        partitionId,
-                                        domainCfg,
-                                        d_mockDomain.capacityMeter(),
-                                        d_allocator_p),
-                                    d_allocator_p);
+        d_replicatedStorage_mp =
+            bmqu::UniquePtrUtil::adopt<mqbs::ReplicatedStorage>(
+                new (*d_allocator_p)
+                    mqbs::InMemoryStorage(0,  // No FileStore
+                                          bmqt::Uri(k_URI_STR, d_allocator_p),
+                                          k_QUEUE_KEY,
+                                          &d_mockDomain,
+                                          partitionId,
+                                          domainCfg,
+                                          d_mockDomain.capacityMeter(),
+                                          d_allocator_p),
+                d_allocator_p);
     }
 
     ~Tester()
@@ -244,7 +246,7 @@ struct Tester {
 
     mqbs::ReplicatedStorage& storage()
     {
-        return *d_replicatedStorage_mp.ptr();
+        return *d_replicatedStorage_mp.get();
     }
 
     /// NOTE: Here the `addMessages` function adds the timestamp

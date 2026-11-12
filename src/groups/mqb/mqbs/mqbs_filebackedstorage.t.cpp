@@ -50,13 +50,13 @@
 #include <bsl_utility.h>
 #include <bsla_annotations.h>
 #include <bslma_allocator.h>
-#include <bslma_managedptr.h>
 #include <bsls_assert.h>
 #include <bsls_objectbuffer.h>
 #include <bsls_types.h>
 
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
+#include <bmqu_uniqueptr.h>
 #include <bsl_limits.h>
 #include <bsl_vector.h>
 
@@ -536,7 +536,7 @@ struct Tester {
     mqbmock::Domain                            d_mockDomain;
     mqbmock::Queue                             d_mockQueue;
     mqbmock::QueueEngine                       d_mockQueueEngine;
-    bslma::ManagedPtr<mqbs::ReplicatedStorage> d_replicatedStorage_mp;
+    bmqu::UniquePtr<mqbs::ReplicatedStorage>   d_replicatedStorage_mp;
     Records                                    d_records;
     MockDataStore                              d_dataStore;
 
@@ -562,15 +562,16 @@ struct Tester {
         bmqu::MemOutStream errDescription(d_allocator_p);
         d_mockDomain.configure(errDescription, domainCfg);
 
-        d_replicatedStorage_mp.load(
-            new (*d_allocator_p)
-                mqbs::FileBackedStorage(&d_dataStore,
-                                        bmqt::Uri(k_URI_STR, d_allocator_p),
-                                        k_QUEUE_KEY,
-                                        &d_mockDomain,
-                                        domainCfg,
-                                        d_allocator_p),
-            d_allocator_p);
+        d_replicatedStorage_mp =
+            bmqu::UniquePtrUtil::adopt<mqbs::ReplicatedStorage>(
+                new (*d_allocator_p) mqbs::FileBackedStorage(
+                    &d_dataStore,
+                    bmqt::Uri(k_URI_STR, d_allocator_p),
+                    k_QUEUE_KEY,
+                    &d_mockDomain,
+                    domainCfg,
+                    d_allocator_p),
+                d_allocator_p);
 
         d_replicatedStorage_mp->setQueue(&d_mockQueue);
         BSLS_ASSERT_OPT(d_replicatedStorage_mp->queue() == &d_mockQueue);
@@ -610,7 +611,7 @@ struct Tester {
 
     mqbs::ReplicatedStorage& storage()
     {
-        return *d_replicatedStorage_mp.ptr();
+        return *d_replicatedStorage_mp.get();
     }
 
     /// NOTE: Here the `addMessages` function adds the timestamp

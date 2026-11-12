@@ -33,12 +33,12 @@
 #include <bdlt_epochutil.h>
 #include <bsl_limits.h>
 #include <bsl_string.h>
-#include <bslma_managedptr.h>
 #include <bsls_assert.h>
 #include <bsls_types.h>
 
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
+#include <bmqu_uniqueptr.h>
 
 // CONVENIENCE
 using namespace BloombergLP;
@@ -126,7 +126,7 @@ struct Tester {
     mqbu::CapacityMeter                      d_capacityMeter;
     mqbmock::Cluster                         d_cluster;
     mqbmock::Domain                          d_domain;
-    bslma::ManagedPtr<mqbs::InMemoryStorage> d_storage_mp;
+    bmqu::UniquePtr<mqbs::InMemoryStorage>   d_storage_mp;
 
   public:
     // CREATORS
@@ -145,16 +145,17 @@ struct Tester {
         domainCfg.messageTtl()          = k_INT64_MAX;
 
         const bsl::string uri("my.domain/myqueue", d_allocator_p);
-        d_storage_mp.load(new (*d_allocator_p) mqbs::InMemoryStorage(
-                              0,  // No FileStore
-                              bmqt::Uri(uri, d_allocator_p),
-                              k_QUEUE_KEY,
-                              &d_domain,
-                              0,
-                              domainCfg,
-                              &d_capacityMeter,
-                              d_allocator_p),
-                          d_allocator_p);
+        d_storage_mp = bmqu::UniquePtrUtil::adopt<mqbs::InMemoryStorage>(
+            new (*d_allocator_p)
+                mqbs::InMemoryStorage(0,  // No FileStore
+                                      bmqt::Uri(uri, d_allocator_p),
+                                      k_QUEUE_KEY,
+                                      &d_domain,
+                                      0,
+                                      domainCfg,
+                                      &d_capacityMeter,
+                                      d_allocator_p),
+            d_allocator_p);
 
         bmqu::MemOutStream errorDescription(d_allocator_p);
         d_storage_mp->addVirtualStorage(errorDescription,

@@ -51,6 +51,7 @@
 
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bdlb_random.h>
@@ -70,7 +71,6 @@
 #include <bsl_string_view.h>
 #include <bsl_vector.h>
 #include <bslma_default.h>
-#include <bslma_managedptr.h>
 #include <bslma_usesbslmaallocator.h>
 #include <bslmf_nestedtraitdeclaration.h>
 #include <bsls_platform.h>
@@ -314,7 +314,7 @@ class Tester {
     mqbcfg::ClusterDefinition              d_clusterCfg;
     bsl::vector<mqbcfg::ClusterNode>       d_clusterNodesCfg;
     mqbcfg::ClusterNode                    d_clusterNodeCfg;
-    bslma::ManagedPtr<mqbnet::MockCluster> d_cluster_mp;
+    bmqu::UniquePtr<mqbnet::MockCluster>   d_cluster_mp;
     bsl::shared_ptr<bmqst::StatContext>    d_clusterStatsRootContext_sp;
     mqbstat::ClusterStats                  d_clusterStats;
     mqbnet::ClusterNode*                   d_node_p;
@@ -322,7 +322,7 @@ class Tester {
     bdlmt::FixedThreadPool                 d_miscWorkThreadPool;
     mqbmock::Dispatcher                    d_dispatcher;
     // must outlive FileStore
-    bslma::ManagedPtr<mqbs::FileStore> d_fs_mp;
+    bmqu::UniquePtr<mqbs::FileStore>   d_fs_mp;
     mqbs::FileStore::StateSpPool       d_statePool;
 
   public:
@@ -391,7 +391,7 @@ class Tester {
         d_clusterCfg.nodes() = d_clusterNodesCfg;
 
         d_cluster_mp =
-            bslma::ManagedPtrUtil::allocateManaged<mqbnet::MockCluster>(
+            bmqu::UniquePtrUtil::allocateUnique<mqbnet::MockCluster>(
                 d_allocator_p,
                 d_clusterCfg,
                 &d_bufferFactory);
@@ -416,7 +416,7 @@ class Tester {
                                   1,  // numPartitions
                                   d_clusterStatsRootContext_sp.get(),
                                   d_allocator_p);
-        d_fs_mp = bslma::ManagedPtrUtil::allocateManaged<mqbs::FileStore>(
+        d_fs_mp = bmqu::UniquePtrUtil::allocateUnique<mqbs::FileStore>(
             d_allocator_p,
             d_dsCfg,
             0,  // processorId
