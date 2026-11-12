@@ -3514,9 +3514,9 @@ static void test22_rstUnknownCancelsInFlightRequests()
     // Verify that the old requests were cancelled: processResponse should
     // return non-zero for each request ID (meaning the request is no longer
     // in the RequestManager's map).
-    for (size_t i = 0; i < requestIds.size(); ++i) {
+    for (int requestId : requestIds) {
         bmqp_ctrlmsg::ControlMessage fakeResponse;
-        fakeResponse.rId() = requestIds[i];
+        fakeResponse.rId() = requestId;
         fakeResponse.choice()
             .makeClusterMessage()
             .choice()
@@ -3526,7 +3526,7 @@ static void test22_rstUnknownCancelsInFlightRequests()
 
         const int rc = helper.d_cluster_mp->requestManager().processResponse(
             fakeResponse);
-        BMQTST_ASSERT_NE_D("requestId " << requestIds[i], rc, 0);
+        BMQTST_ASSERT_NE_D("requestId " << requestId, rc, 0);
     }
 
     // Cleanup
