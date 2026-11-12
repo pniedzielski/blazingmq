@@ -132,7 +132,7 @@ class StorageManager final : public mqbi::StorageManager,
     typedef PartitionFSMEventData::PartitionSeqNumDataRange
         PartitionSeqNumDataRange;
 
-    typedef bslma::ManagedPtr<RecoveryManager> RecoveryManagerMp;
+    typedef bmqu::UniquePtr<RecoveryManager> RecoveryManagerMp;
 
     typedef bsl::vector<mqbnet::ClusterNode*> ClusterNodeVec;
     typedef ClusterNodeVec::const_iterator    ClusterNodeVecCIter;
