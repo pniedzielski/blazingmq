@@ -637,7 +637,7 @@ void StorageManager::determineDataDestinations(
         BSLS_ASSERT_SAFE(source);
         BSLS_ASSERT_SAFE(source->nodeId() != selfNode->nodeId());
 
-        NodeToPSNCtxMapCIter cit = nodeToPSNCtxMap.find(source);
+        auto cit = nodeToPSNCtxMap.find(source);
         if (cit != nodeToPSNCtxMap.end()) {
             nodesToCheck.push_back(cit);
         }
@@ -690,8 +690,7 @@ void StorageManager::determineDataDestinations(
 
         const mqbs::FileStore::LeaseIdToSeqNumMap& highestPSNs =
             fileStore(partitionId).highestSeqNums();
-        mqbs::FileStore::LeaseIdToSeqNumMapCIter PSNCit = highestPSNs.find(
-            nodePSN.primaryLeaseId());
+        auto PSNCit = highestPSNs.find(nodePSN.primaryLeaseId());
         if (PSNCit != highestPSNs.end() &&
             nodePSN.sequenceNumber() > PSNCit->second) {
             BALL_LOG_WARN
@@ -2001,9 +2000,8 @@ void StorageManager::do_storePrimarySeq(
 
     // Information from 'ReplicaStateRequest' or 'PrimaryStateResponse' could
     // be stale; ignore if so.
-    bool                hasNew = false;
-    NodeToPSNCtxMapIter it     = d_nodeToPSNCtxMapVec[partitionId].find(
-        eventData.source());
+    bool hasNew = false;
+    auto it     = d_nodeToPSNCtxMapVec[partitionId].find(eventData.source());
     if (it == d_nodeToPSNCtxMapVec[partitionId].end()) {
         NodePSNContext nodePSNContext(
             PSN,
@@ -2051,9 +2049,8 @@ void StorageManager::do_storeReplicaSeq(
 
     // Information from 'PrimaryStateRequest' or 'ReplicaStateResponse'
     // could be stale; ignore if so.
-    bool                hasNew = false;
-    NodeToPSNCtxMapIter it     = d_nodeToPSNCtxMapVec[partitionId].find(
-        eventData.source());
+    bool hasNew = false;
+    auto it     = d_nodeToPSNCtxMapVec[partitionId].find(eventData.source());
     if (it == d_nodeToPSNCtxMapVec[partitionId].end()) {
         NodePSNContext nodePSNContext(
             PSN,
@@ -2786,7 +2783,7 @@ void StorageManager::do_sendDataToPrimary(
         eventData.partitionSeqNumDataRange());
 
     const NodeToPSNCtxMap& nodeToPSNCtxMap = d_nodeToPSNCtxMapVec[partitionId];
-    const NodeToPSNCtxMapCIter selfCit     = nodeToPSNCtxMap.find(selfNode);
+    const auto             selfCit         = nodeToPSNCtxMap.find(selfNode);
     if (selfCit == nodeToPSNCtxMap.cend()) {
         BMQTSK_ALARMLOG_ALARM(PartitionFSM::k_PFSM_DEFECT_LOG_TAG)
             << d_clusterData_p->identity().description() << " Partition ["
@@ -3376,7 +3373,7 @@ void StorageManager::do_updateStorage(
                      static_cast<unsigned int>(partitionId));
 
     // Get first sync point after rollover PSN from source node.
-    NodeToPSNCtxMapIter it = d_nodeToPSNCtxMapVec[partitionId].find(source);
+    auto it = d_nodeToPSNCtxMapVec[partitionId].find(source);
     BSLS_ASSERT_SAFE(it != d_nodeToPSNCtxMapVec[partitionId].end());
     bmqp_ctrlmsg::PartitionSequenceNumber firstSyncPointAfterRolloverSeqNum =
         it->second.d_firstSyncPointAfterRolloverPSN;
