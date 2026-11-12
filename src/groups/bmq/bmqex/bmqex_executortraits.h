@@ -92,13 +92,6 @@ struct ExecutorTraits {
     /// If `executor.dispatch(bsl::forward<FUNCTION>(f))` is a well-formed
     /// expression, perform `executor.dispatch(bsl::forward<FUNCTION>(f))`.
     /// Otherwise, perform `executor.post(bsl::forward<FUNCTION>(f))`.
-    ///
-    /// Note that in C++03, due to the lack of expression SFINAE, this
-    /// function tries to detect the presence of a `dispatch` member
-    /// function on the `EXECUTOR` class having `void(EXECUTOR::*)(F) const`
-    /// signature, and falls back to `post` if no such function is detected,
-    /// `F` being any of `F1`, `const F1&`, `F1&&`, and
-    /// `F1` being `bsl::function<void()>`.
     template <class FUNCTION>
     static void dispatch(const EXECUTOR& executor, FUNCTION&& f);
 };
