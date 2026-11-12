@@ -114,7 +114,7 @@ SchemaGenerator::getSchemaId(const MessageProperties* mps)
             BSLS_ASSERT_OPT(!d_lru.empty());
 
             // Recycle id associated with the front of 'd_listIterator'.
-            ContextMap::iterator recycled = d_contextMap.find(d_lru.front());
+            auto recycled = d_contextMap.find(d_lru.front());
             BSLS_ASSERT_OPT(recycled != d_contextMap.end());
 
             result = recycled->second.d_id;
