@@ -42,6 +42,8 @@
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
 #include <bsl_iostream.h>
+#include <bsl_memory.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 
 // CONVENIENCE
@@ -84,6 +86,34 @@ struct ResultRegistry<bmqa::ConfigureQueueStatus> {
 template <>
 struct ResultRegistry<bmqa::CloseQueueStatus> {
     static const int TypeIndex = 3;
+};
+
+/// An event handler ignoring all events and recording its destruction, used
+/// to check ownership of event handlers passed by `bsl::unique_ptr`.
+class DestructionRecordingEventHandler : public bmqa::SessionEventHandler {
+  private:
+    // DATA
+
+    /// Set to `true` when this object is destroyed.
+    bool* d_destroyed_p;
+
+  public:
+    // CREATORS
+
+    /// Create an event handler setting the specified `*destroyed` to
+    /// `true` when it is destroyed.
+    explicit DestructionRecordingEventHandler(bool* destroyed)
+    : d_destroyed_p(destroyed)
+    {
+        // NOTHING
+    }
+
+    ~DestructionRecordingEventHandler() override { *d_destroyed_p = true; }
+
+    // MANIPULATORS
+    void onSessionEvent(const bmqa::SessionEvent&) override {}
+
+    void onMessageEvent(const bmqa::MessageEvent&) override {}
 };
 
 // ============================================================================
@@ -1502,6 +1532,39 @@ static void test8_postBlockedToSuspendedQueue()
     builder.reset();
 }
 
+static void test9_uniquePtrEventHandler()
+// ------------------------------------------------------------------------
+// UNIQUE_PTR EVENT HANDLER
+//
+// Concerns:
+//   1. A 'MockSession' can be created in asynchronous mode from a
+//      'bsl::unique_ptr' to an event handler of a type derived from
+//      'bmqa::SessionEventHandler'.
+//   2. The 'MockSession' takes ownership of the event handler, and destroys
+//      it when the 'MockSession' is destroyed.
+//
+// Testing:
+//   MockSession(bsl::unique_ptr<HANDLER>, const SessionOptions&, Allocator*)
+// ------------------------------------------------------------------------
+{
+    bmqtst::TestHelper::printTestName("UNIQUE_PTR EVENT HANDLER");
+
+    bool destroyed = false;
+    {
+        bsl::unique_ptr<DestructionRecordingEventHandler> handler(
+            new DestructionRecordingEventHandler(&destroyed));
+
+        bmqa::MockSession mockSession(
+            bsl::move(handler),
+            bmqt::SessionOptions(bmqtst::TestHelperUtil::allocator()),
+            bmqtst::TestHelperUtil::allocator());
+
+        BMQTST_ASSERT(!handler);
+        BMQTST_ASSERT(!destroyed);
+    }
+    BMQTST_ASSERT(destroyed);
+}
+
 // ============================================================================
 //                                 MAIN PROGRAM
 // ----------------------------------------------------------------------------
@@ -1512,6 +1575,7 @@ int main(int argc, char* argv[])
 
     switch (_testCase) {
     case 0:
+    case 9: test9_uniquePtrEventHandler(); break;
     case 8: test8_postBlockedToSuspendedQueue(); break;
     case 7: test7_postAndAccess(); break;
     case 6: test6_runThrough(); break;

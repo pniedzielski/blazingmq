@@ -570,8 +570,10 @@
 #include <bsl_functional.h>
 #include <bsl_memory.h>
 #include <bsl_string.h>
+#include <bsl_type_traits.h>
 #include <bsl_unordered_map.h>
 #include <bsl_unordered_set.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bslma_allocator.h>
 #include <bslma_managedptr.h>
@@ -806,6 +808,34 @@ struct MockSessionUtil {
                            bmqt::CloseQueueResult::Enum statusCode,
                            const bsl::string&           errorDescription,
                            bslma::Allocator*            allocator = 0);
+};
+
+// ===================================
+// struct MockSession_EventHandlerUtil
+// ===================================
+
+/// @private
+/// Component-private utility converting a `bsl::unique_ptr` to a session
+/// event handler into the `bslma::ManagedPtr` stored by `MockSession`.
+struct MockSession_EventHandlerUtil {
+  private:
+    // PRIVATE CLASS METHODS
+
+    /// Destroy the object of the (template parameter) `HANDLER` type at the
+    /// specified `handler` address using `delete`, as the default deleter
+    /// of `bsl::unique_ptr<HANDLER>` does.  The specified cookie is unused.
+    template <class HANDLER>
+    static void deleteHandler(void* handler, void* cookie);
+
+  public:
+    // CLASS METHODS
+
+    /// Return a managed pointer taking ownership of the event handler owned
+    /// by the specified `handler`, and destroying it the way `handler`
+    /// would have.
+    template <class HANDLER>
+    static bslma::ManagedPtr<SessionEventHandler>
+    toManagedPtr(bsl::unique_ptr<HANDLER> handler);
 };
 
 // =================
@@ -1220,6 +1250,23 @@ class MockSession : public AbstractSession {
         const bmqt::SessionOptions& options   = bmqt::SessionOptions(),
         bslma::Allocator*           allocator = 0);
 
+    /// Create a `MockSession` in *asynchronous* mode using the specified
+    /// `eventHandler` as callback for event processing and the optionally
+    /// specified `options`.  Optionally specify an `allocator` used to
+    /// supply memory.  If the optionally specified `allocator` is 0, the
+    /// currently installed default allocator is used.  The event handler
+    /// is destroyed with `delete`, as `bsl::unique_ptr` would have done.
+    /// This constructor participates in overload resolution only if
+    /// `HANDLER *` is convertible to `SessionEventHandler *`.
+    template <
+        class HANDLER,
+        class = typename bsl::enable_if<
+            bsl::is_convertible<HANDLER*, SessionEventHandler*>::value>::type>
+    explicit MockSession(
+        bsl::unique_ptr<HANDLER>    eventHandler,
+        const bmqt::SessionOptions& options   = bmqt::SessionOptions(),
+        bslma::Allocator*           allocator = 0);
+
     /// Stop the `MockSession` and destroy this object.
     ~MockSession() override;
 
@@ -1547,10 +1594,47 @@ class MockSession : public AbstractSession {
 //                             INLINE DEFINITIONS
 // ============================================================================
 
+// -----------------------------------
+// struct MockSession_EventHandlerUtil
+// -----------------------------------
+
+// PRIVATE CLASS METHODS
+template <class HANDLER>
+inline void MockSession_EventHandlerUtil::deleteHandler(void* handler,
+                                                        void* cookie)
+{
+    (void)cookie;
+    delete static_cast<HANDLER*>(handler);
+}
+
+// CLASS METHODS
+template <class HANDLER>
+inline bslma::ManagedPtr<SessionEventHandler>
+MockSession_EventHandlerUtil::toManagedPtr(bsl::unique_ptr<HANDLER> handler)
+{
+    return bslma::ManagedPtr<SessionEventHandler>(handler.release(),
+                                                  0,
+                                                  &deleteHandler<HANDLER>);
+}
+
 // -----------------
 // class MockSession
 // -----------------
 
+// CREATORS
+template <class HANDLER, class>
+inline MockSession::MockSession(bsl::unique_ptr<HANDLER>    eventHandler,
+                                const bmqt::SessionOptions& options,
+                                bslma::Allocator*           allocator)
+: MockSession(
+      MockSession_EventHandlerUtil::toManagedPtr(bsl::move(eventHandler)),
+      options,
+      allocator)
+{
+    // NOTHING
+}
+
+// MANIPULATORS
 inline void MockSession::setFailureCallback(const FailureCb& failureCb)
 {
     d_failureCb = failureCb;
