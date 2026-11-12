@@ -379,8 +379,7 @@ QueueHandle::updateMonitor(const bsl::shared_ptr<Downstream>& subStream,
         return RUMStateTransition::e_NO_CHANGE;  // RETURN
     }
 
-    Subscriptions::iterator sit = d_subscriptions.find(
-        it->second.d_subscriptionId);
+    auto sit = d_subscriptions.find(it->second.d_subscriptionId);
     BSLS_ASSERT_SAFE(sit != d_subscriptions.end());
 
     const RUMStateTransition::Enum resourceUsageStateChange =
@@ -596,8 +595,7 @@ void QueueHandle::deliverMessageImpl(
 
     if (result == mqbi::InlineResult::e_SUCCESS) {
         for (const bmqp::SubQueueInfo& subQueueInfo : subscriptions) {
-            Subscriptions::iterator itSubscription = d_subscriptions.find(
-                subQueueInfo.id());
+            auto itSubscription = d_subscriptions.find(subQueueInfo.id());
 
             // Broadcast PUSH carry 'bmqp::Protocol::k_DEFAULT_SUBSCRIPTION_ID'
             // (0) as SubscriptionId until last hop before SDK.
@@ -696,7 +694,7 @@ QueueHandle::registerSubStream(const bmqp_ctrlmsg::SubQueueIdInfo& stream,
     BSLS_ASSERT_SAFE(d_queue_sp->inDispatcherThread());
     BSLS_ASSERT_SAFE(counts.d_readCount > 0 || counts.d_writeCount > 0);
 
-    SubStreams::iterator infoIter = d_subStreamInfos.find(stream.appId());
+    auto infoIter = d_subStreamInfos.find(stream.appId());
 
     if (infoIter != d_subStreamInfos.end()) {
         // SubStream has already been registered
@@ -760,8 +758,7 @@ void QueueHandle::registerSubscription(unsigned int downstreamSubId,
 
     const bsl::shared_ptr<Downstream>& subStream = downstream(downstreamSubId);
 
-    Subscriptions::iterator itSubscription = d_subscriptions.find(
-        downstreamId);
+    auto           itSubscription = d_subscriptions.find(downstreamId);
     SubscriptionSp subscription;
 
     if (itSubscription == d_subscriptions.end()) {
@@ -834,8 +831,7 @@ bool QueueHandle::unregisterSubStream(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queue_sp->inDispatcherThread());
 
-    SubStreams::iterator infoIter = d_subStreamInfos.find(
-        subStreamInfo.appId());
+    auto infoIter = d_subStreamInfos.find(subStreamInfo.appId());
 
     BSLS_ASSERT_SAFE(infoIter != d_subStreamInfos.end());
 
@@ -1262,8 +1258,8 @@ mqbi::QueueHandle* QueueHandle::setStreamParameters(
 
     // Merge all Subscriptions into 'd_subscriptions'.
     // Ignore all priorities but the highest.
-    const bsl::string&   appId    = streamParameters.appId();
-    SubStreams::iterator infoIter = d_subStreamInfos.find(appId);
+    const bsl::string& appId    = streamParameters.appId();
+    auto               infoIter = d_subStreamInfos.find(appId);
 
     BSLS_ASSERT_SAFE(infoIter != d_subStreamInfos.end());
 
