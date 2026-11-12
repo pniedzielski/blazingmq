@@ -197,7 +197,7 @@ void MessageGUIDGenerator::generateGUID(bmqt::MessageGUID* guid)
     //: o having setters in bmqt::MessageGUID, which is not ideal given that it
     //:   should be completely opaque to clients.
     //: o using friendship
-    char* buffer = reinterpret_cast<char*>(guid);
+    auto* buffer = reinterpret_cast<char*>(guid);
 
     // Populate GUIDVersionAndCounter
     const unsigned int versionAndCounter = (k_GUID_VERSION
@@ -238,7 +238,7 @@ int MessageGUIDGenerator::extractFields(int*                     version,
     BSLS_ASSERT_SAFE(timerTick);
     BSLS_ASSERT_SAFE(clientId);
 
-    const char* buffer = reinterpret_cast<const char*>(&guid);
+    const auto* buffer = reinterpret_cast<const char*>(&guid);
 
     // Version and counter
     bdlb::BigEndianUint32 versionAndCounterBE = bdlb::BigEndianUint32::make(0);
@@ -284,7 +284,7 @@ bmqt::MessageGUID MessageGUIDGenerator::testGUID()
 
     bmqt::MessageGUID  guid;
     const unsigned int counter = ++s_counter;
-    char*              buffer  = reinterpret_cast<char*>(&guid);
+    auto*              buffer  = reinterpret_cast<char*>(&guid);
 
     // Populate GUIDVersion
     const unsigned int version = (k_GUID_VERSION << k_GUID_VERSION_START_IDX);
