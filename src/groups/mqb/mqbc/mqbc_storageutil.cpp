@@ -837,8 +837,7 @@ void StorageUtil::executeForValidPartitions(const PerPartitionFunctor& job,
     BALL_LOG_INFO << "StorageUtil::executeForValidPartitions for "
                   << fileStores.size() << " partitions!";
 
-    for (unsigned int i = 0; i < validPartitionIds.size(); ++i) {
-        int partitionId = validPartitionIds[i];
+    for (int partitionId : validPartitionIds) {
         fileStores[partitionId]->execute([job, partitionId, &latch]() {
             job(partitionId, &latch);
         });
@@ -2716,8 +2715,8 @@ void StorageUtil::unregisterQueueDispatched(mqbs::FileStore*     fs,
     // to remove other QueueOp records.
     const mqbs::ReplicatedStorage::RecordHandles& recHandles =
         storage->queueOpRecordHandles();
-    for (size_t idx = 0; idx < recHandles.size(); ++idx) {
-        fs->removeRecordRaw(recHandles[idx]);
+    for (const auto& recHandle : recHandles) {
+        fs->removeRecordRaw(recHandle);
     }
 
     // Delete the QueueOpRecord.DELETE record written above.
@@ -3576,10 +3575,8 @@ void StorageUtil::processCommand(
                 *fileStores);
 
             mqbcmd::PurgedQueues& purgedQueues = result->makePurgedQueues();
-            for (size_t i = 0; i < purgedQueuesVec.size(); ++i) {
-                const bsl::vector<mqbcmd::PurgeQueueResult>& purgedQs =
-                    purgedQueuesVec[i];
-
+            for (const bsl::vector<mqbcmd::PurgeQueueResult>& purgedQs :
+                 purgedQueuesVec) {
                 purgedQueues.queues().insert(purgedQueues.queues().begin(),
                                              purgedQs.begin(),
                                              purgedQs.end());
@@ -3749,10 +3746,8 @@ void StorageUtil::purgeQueueOnDomain(
         *fileStores);
 
     mqbcmd::PurgedQueues& purgedQueues = result->makePurgedQueues();
-    for (size_t i = 0; i < purgedQueuesVec.size(); ++i) {
-        const bsl::vector<mqbcmd::PurgeQueueResult>& purgedQs =
-            purgedQueuesVec[i];
-
+    for (const bsl::vector<mqbcmd::PurgeQueueResult>& purgedQs :
+         purgedQueuesVec) {
         purgedQueues.queues().insert(purgedQueues.queues().begin(),
                                      purgedQs.begin(),
                                      purgedQs.end());
