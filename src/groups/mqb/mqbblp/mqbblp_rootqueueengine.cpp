@@ -82,10 +82,9 @@ bool verifyConsumerInfo(const bmqp_ctrlmsg::ConsumerInfo& ci)
 
 bool verifyStreamParameters(const bmqp_ctrlmsg::StreamParameters& parameters)
 {
-    for (size_t i = 0; i < parameters.subscriptions().size(); ++i) {
-        const bmqp_ctrlmsg::Subscription& s = parameters.subscriptions()[i];
-        for (size_t n = 0; n < s.consumers().size(); ++n) {
-            if (!verifyConsumerInfo(s.consumers()[n])) {
+    for (const bmqp_ctrlmsg::Subscription& s : parameters.subscriptions()) {
+        for (const bmqp_ctrlmsg::ConsumerInfo& ci : s.consumers()) {
+            if (!verifyConsumerInfo(ci)) {
                 return false;
             }
         }
@@ -415,11 +414,11 @@ int RootQueueEngine::configure(bsl::ostream& errorDescription,
                 return rc_APP_INITIALIZATION_ERROR;  // RETURN
             }
         }
-        for (unsigned int i = 0; i < subscriptions.size(); ++i) {
-            Apps::iterator itApp = d_apps.find(subscriptions[i].appId());
+        for (const mqbconfm::Subscription& subscription : subscriptions) {
+            Apps::iterator itApp = d_apps.find(subscription.appId());
             if (itApp != d_apps.end()) {
                 int rc = itApp->second->setSubscription(
-                    subscriptions[i].expression());
+                    subscription.expression());
 
                 if (rc != 0) {
                     bmqeval::ErrorType::Enum errorType =
@@ -429,9 +428,8 @@ int RootQueueEngine::configure(bsl::ostream& errorDescription,
                         << "#QUEUE_CONFIGURE_FAILURE Queue '"
                         << d_queueState_p->queue()->description()
                         << "' failed to compile application subscription: '"
-                        << subscriptions[i].expression().text()
-                        << "' for the '" << itApp->first << "' app, rc: " << rc
-                        << ", reason: '"
+                        << subscription.expression().text() << "' for the '"
+                        << itApp->first << "' app, rc: " << rc << ", reason: '"
                         << bmqeval::ErrorType::toString(errorType) << "'";
                     return rc_APP_SUBSCRIPTION_ERROR;  // RETURN
                 }
@@ -440,7 +438,7 @@ int RootQueueEngine::configure(bsl::ostream& errorDescription,
                 BALL_LOG_WARN << "Queue \""
                               << d_queueState_p->queue()->description()
                               << "' ignores application subscription: '"
-                              << subscriptions[i].appId() << "'";
+                              << subscription.appId() << "'";
             }
         }
     }
@@ -581,9 +579,9 @@ void RootQueueEngine::resetState(bool isShuttingDown)
 
     close();
 
-    for (Apps::iterator it = d_apps.begin(); it != d_apps.end(); ++it) {
-        it->second->undoRouting();
-        it->second->routing()->reset();
+    for (const auto& appEntry : d_apps) {
+        appEntry.second->undoRouting();
+        appEntry.second->routing()->reset();
     }
 
     if (!isShuttingDown) {
@@ -655,9 +653,7 @@ int RootQueueEngine::rebuildInternalState(bsl::ostream& errorDescription)
     // Subscription ids must stay the same.
 
     QueueState::SubQueues subQueues = d_queueState_p->subQueues();
-    for (size_t i = 0; i < subQueues.size(); ++i) {
-        AppStateSp& previous = subQueues[i];
-
+    for (AppStateSp& previous : subQueues) {
         if (!previous) {
             continue;  // CONTINUE
         }
@@ -1216,25 +1212,23 @@ void RootQueueEngine::releaseHandle(
                               effectiveHandleParam.writeCount());
     }
     // Release state of subStreams selected above
-    for (mqbi::QueueHandle::SubStreams::const_iterator citer =
-             subStreamInfosToRelease.begin();
-         citer != subStreamInfosToRelease.end();
-         ++citer) {
+    for (const auto& subStreamEntry : subStreamInfosToRelease) {
         bmqp_ctrlmsg::SubQueueIdInfo currSubStreamInfo;
 
-        currSubStreamInfo.appId() = citer->first;
-        currSubStreamInfo.subId() = citer->second.d_downstreamSubQueueId;
+        currSubStreamInfo.appId() = subStreamEntry.first;
+        currSubStreamInfo.subId() =
+            subStreamEntry.second.d_downstreamSubQueueId;
 
         bmqp_ctrlmsg::QueueHandleParameters copy(effectiveHandleParam);
         copy.subIdInfo().makeValue(currSubStreamInfo);
 
-        copy.readCount()  = citer->second.d_counts.d_readCount;
-        copy.writeCount() = citer->second.d_counts.d_writeCount;
+        copy.readCount()  = subStreamEntry.second.d_counts.d_readCount;
+        copy.writeCount() = subStreamEntry.second.d_counts.d_writeCount;
 
         mqbi::QueueHandleReleaseResult result = proctor.releaseStream(copy);
 
         if (copy.readCount()) {
-            Apps::iterator itApp = d_apps.find(citer->first);
+            Apps::iterator itApp = d_apps.find(subStreamEntry.first);
 
             BSLS_ASSERT_SAFE(itApp != d_apps.end());
 
@@ -1264,7 +1258,7 @@ void RootQueueEngine::releaseHandle(
                         << "streamParameters. Handle's parameters are "
                         << "[handleParameters: " << handle->handleParameters()
                         << ", streamParameters: "
-                        << citer->second.d_streamParameters
+                        << subStreamEntry.second.d_streamParameters
                         << "], and the parameters specified in this "
                         << "'releaseHandle' request are [handleParameters: "
                         << handleParameters << ", isFinal " << bsl::boolalpha
@@ -1358,8 +1352,8 @@ void RootQueueEngine::releaseHandle(
         // Register/unregister both consumers and producers
         handle->unregisterSubStream(
             currSubStreamInfo,
-            mqbi::QueueCounts(citer->second.d_counts.d_readCount,
-                              citer->second.d_counts.d_writeCount),
+            mqbi::QueueCounts(subStreamEntry.second.d_counts.d_readCount,
+                              subStreamEntry.second.d_counts.d_writeCount),
             proctor.result().hasNoHandleClients());
     }
 
@@ -1453,16 +1447,15 @@ void RootQueueEngine::afterNewMessage()
 
     while (d_appsDeliveryContext.reset(storageIt)) {
         // Assume, all Apps need to deliver (some may be at capacity)
-        for (Apps::iterator iter = d_apps.begin(); iter != d_apps.end();
-             ++iter) {
-            AppStateSp& app = iter->second;
+        for (auto& appEntry : d_apps) {
+            AppStateSp& app = appEntry.second;
 
             if (d_appsDeliveryContext.processApp(*app,
                                                  app->ordinal(),
                                                  false)) {
                 // Consider this message as sent out
 
-                d_consumptionMonitor.onMessageSent(iter->first);
+                d_consumptionMonitor.onMessageSent(appEntry.first);
 
                 // Report queue time metric per App
                 // Report 'queue time' metric for all active appIds
@@ -1989,20 +1982,14 @@ void RootQueueEngine::logAlarmCb(
     int numConsumers = 0;
 
     const QueueEngineUtil_AppState::Consumers& consumers = app->consumers();
-    for (QueueEngineUtil_AppState::Consumers::const_iterator citConsumer =
-             consumers.begin();
-         citConsumer != consumers.end();
-         ++citConsumer) {
-        mqbi::QueueHandle* const queueHandle_p = citConsumer->first;
+    for (const auto& consumerEntry : consumers) {
+        mqbi::QueueHandle* const queueHandle_p = consumerEntry.first;
 
         const mqbi::QueueHandle::SubStreams& subStreamInfos =
             queueHandle_p->subStreamInfos();
 
-        for (mqbi::QueueHandle::SubStreams::const_iterator citSubStreams =
-                 subStreamInfos.begin();
-             citSubStreams != subStreamInfos.end();
-             ++citSubStreams) {
-            numConsumers += citSubStreams->second.d_counts.d_readCount;
+        for (const auto& subStreamEntry : subStreamInfos) {
+            numConsumers += subStreamEntry.second.d_counts.d_readCount;
 
             const int level = 2, spacesPerLevel = 2;
 
@@ -2019,8 +2006,8 @@ void RootQueueEngine::logAlarmCb(
 
             const bsl::vector<const mqbu::ResourceUsageMonitor*> monitors =
                 queueHandle_p->unconfirmedMonitors(app->appId());
-            for (size_t i = 0; i < monitors.size(); ++i) {
-                ss << "\n  " << *monitors[i];
+            for (const mqbu::ResourceUsageMonitor* monitor : monitors) {
+                ss << "\n  " << *monitor;
             }
         }
     }
@@ -2136,14 +2123,12 @@ void RootQueueEngine::afterAppIdRegistered(
         return;  // RETURN;
     }
 
-    for (mqbi::Storage::AppInfos::const_iterator cit = addedAppIds.cbegin();
-         cit != addedAppIds.cend();
-         ++cit) {
+    for (const auto& appInfo : addedAppIds) {
         // We need to handle 2 scenarios here: a consumer with the specified
         // 'appId' may have already opened the queue, or otherwise.
 
-        const bsl::string&      appId  = cit->first;
-        const mqbu::StorageKey& appKey = cit->second;
+        const bsl::string&      appId  = appInfo.first;
+        const mqbu::StorageKey& appKey = appInfo.second;
 
         BSLS_ASSERT_SAFE(!appKey.isNull());
 
@@ -2184,10 +2169,8 @@ void RootQueueEngine::afterAppIdUnregistered(
         return;  // RETURN
     }
 
-    for (mqbi::Storage::AppInfos::const_iterator cit = removedAppIds.cbegin();
-         cit != removedAppIds.cend();
-         ++cit) {
-        const bsl::string& appId = cit->first;
+    for (const auto& appInfo : removedAppIds) {
+        const bsl::string& appId = appInfo.first;
 
         Apps::iterator iter = d_apps.find(appId);
         BSLS_ASSERT_SAFE(iter != d_apps.end());
@@ -2289,8 +2272,8 @@ void RootQueueEngine::evaluateAppSubscriptions(
     d_queueState_p->storage()->selectForAutoConfirming(
         putHeader.messageGUID());
 
-    for (Apps::iterator it = d_apps.begin(); it != d_apps.end(); ++it) {
-        AppStateSp& app = it->second;
+    for (auto& appEntry : d_apps) {
+        AppStateSp& app = appEntry.second;
         if (!app->evaluateAppSubcription()) {
             d_queueState_p->storage()->autoConfirm(app->appKey());
         }
