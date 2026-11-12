@@ -149,7 +149,7 @@ SchemaLearner::observe(Context& context, const MessagePropertiesInfo& input)
     BSLS_ASSERT_SAFE(context);
 
     // Lookup the schema within this source
-    HandlesMap::iterator it = context->d_handles.find(inputId);
+    auto it = context->d_handles.find(inputId);
 
     if (it == context->d_handles.end()) {
         HandlePtr newHandle(new (*d_allocator_p) SchemaHandle(inputId),
