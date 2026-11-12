@@ -71,8 +71,8 @@
 //
 //    private:
 //      // PRIVATE MANIPULATORS
-//      void startDispatched(bsl::ostream *errorDescription,
-//                           int          *rc);
+//      void startImpl(bsl::ostream *errorDescription,
+//                     int          *rc);
 //      void onNodeStateChange(
 //                     mqbnet::ClusterNode                           *node,
 //                     const bsl::shared_ptr<const mqbnet::Session>&  session);
@@ -89,8 +89,8 @@
 //  };
 //
 //  void
-//  ClusterProxy::startDispatched(bsl::ostream *errorDescription,
-//                                int          *rc)
+//  ClusterProxy::startImpl(bsl::ostream *errorDescription,
+//                          int          *rc)
 //  {
 //                                       // executed by the *DISPATCHER* thread
 //

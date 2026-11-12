@@ -2732,7 +2732,7 @@ void StorageUtil::unregisterQueueStorage(mqbs::FileStore*     fs,
 
     guard.release()->unlock();
 
-    // Flush the partition.  This routine ('unregisterQueue[Dispatched]') is
+    // Flush the partition.  This routine ('unregisterQueueStorage') is
     // invoked only at the primary when a LocalQueue is deleted.  In case it
     // was the last instance of LocalQueue at this node, we need to make sure
     // that the partition is flushed and the QueueDeletion record reaches

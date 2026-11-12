@@ -1645,7 +1645,7 @@ bool ClientSession::validateMessage(mqbi::QueueHandle**   queueHandle,
     }
 
     // Do not lookup 'queueId.subId()'.
-    // 'QueueHandle::confirmMessageDispatched' does the check.
+    // 'QueueHandle::processConfirm' does the check.
     // Note, that it does not update stats (on "bmq://invalid/queue").
     // It does log warnings.
 
