@@ -295,10 +295,7 @@ void Cluster::startImpl(bsl::ostream* errorDescription, int* rc)
     // than once, but this is ok since this event is idempotent.
 
     mqbnet::Cluster::NodesList& nodes = netCluster->nodes();
-    for (mqbnet::Cluster::NodesList::iterator it = nodes.begin();
-         it != nodes.end();
-         ++it) {
-        mqbnet::ClusterNode* node = *it;
+    for (mqbnet::ClusterNode* node : nodes) {
         if (node->nodeId() != netCluster->selfNodeId() &&
             node->isAvailable()) {
             d_clusterOrchestrator.processNodeStateChangeEvent(node, true);
@@ -364,11 +361,9 @@ void Cluster::stopImpl()
                   << d_clusterData.membership().clusterNodeSessionMap().size()
                   << " ClusterNodeSession";
 
-    for (ClusterNodeSessionMapIter it =
-             d_clusterData.membership().clusterNodeSessionMap().begin();
-         it != d_clusterData.membership().clusterNodeSessionMap().end();
-         ++it) {
-        it->second->teardown();
+    for (const auto& sessionEntry :
+         d_clusterData.membership().clusterNodeSessionMap()) {
+        sessionEntry.second->teardown();
     }
 
     d_clusterMonitor.unregisterObserver(this);
@@ -2115,12 +2110,9 @@ Cluster::Cluster(const bslstl::StringRef&           name,
     mqbc::ClusterMembership::ClusterNodeSessionMap& nodeSessionMap =
         d_clusterData.membership().clusterNodeSessionMap();
 
-    NodeListIter nodeIter = netCluster_p->nodes().begin();
-    NodeListIter endIter  = netCluster_p->nodes().end();
-
-    for (; nodeIter != endIter; ++nodeIter) {
+    for (mqbnet::ClusterNode* node : netCluster_p->nodes()) {
         // Create stat context for each cluster node
-        bmqst::StatContextConfiguration config((*nodeIter)->hostName());
+        bmqst::StatContextConfiguration config(node->hostName());
 
         StatContextMp statContextMp =
             d_clusterData.clusterNodesStatContext()->addSubcontext(config);
@@ -2129,7 +2121,7 @@ Cluster::Cluster(const bslstl::StringRef&           name,
         mqbc::ClusterMembership::ClusterNodeSessionSp nodeSessionSp;
         nodeSessionSp.createInplace(d_allocator_p,
                                     this,
-                                    *nodeIter,
+                                    node,
                                     d_clusterData.identity().name(),
                                     d_clusterData.identity().identity(),
                                     statContextSp,
@@ -2137,9 +2129,9 @@ Cluster::Cluster(const bslstl::StringRef&           name,
         nodeSessionSp->setNodeStatus(bmqp_ctrlmsg::NodeStatus::E_UNKNOWN,
                                      bmqp_ctrlmsg::NodeStatus::E_UNKNOWN);
 
-        nodeSessionMap.insert(bsl::make_pair(*nodeIter, nodeSessionSp));
+        nodeSessionMap.insert(bsl::make_pair(node, nodeSessionSp));
 
-        if (netCluster_p->selfNodeId() == (*nodeIter)->nodeId()) {
+        if (netCluster_p->selfNodeId() == node->nodeId()) {
             d_clusterData.membership().setSelfNodeSession(nodeSessionSp.get());
         }
     }
@@ -2156,12 +2148,9 @@ Cluster::Cluster(const bslstl::StringRef&           name,
 
     // We don't call mqbi::Dispatcher::registerClient for node sessions,
     // have to pass the parameters the dispatcher set for this Cluster
-    for (mqbc::ClusterMembership::ClusterNodeSessionMap::iterator iter =
-             nodeSessionMap.begin();
-         iter != nodeSessionMap.end();
-         iter++) {
+    for (auto& sessionEntry : nodeSessionMap) {
         mqbc::ClusterMembership::ClusterNodeSessionSp& nodeSessionSp =
-            iter->second;
+            sessionEntry.second;
         nodeSessionSp->setThreadId(this->getThreadId());
         nodeSessionSp->setEventSource(this->getEventSource());
     }
@@ -3313,23 +3302,20 @@ void Cluster::getPrimaryNodes(int*          rc,
     nodes->clear();
     *isSelfPrimary = false;
 
-    for (mqbc::ClusterState::PartitionsInfo::const_iterator pit =
-             partitionsInfo.begin();
-         pit != partitionsInfo.end();
-         pit++) {
-        if (pit->primaryStatus() !=
+    for (const ClusterStatePartitionInfo& partitionInfo : partitionsInfo) {
+        if (partitionInfo.primaryStatus() !=
             // TODO: Handle this case (will want to buffer)
             bmqp_ctrlmsg::PrimaryStatus::E_ACTIVE) {
             BALL_LOG_WARN << "While collecting primary nodes: "
-                          << "primary for partition " << pit->partitionId()
-                          << " is not active";
+                          << "primary for partition "
+                          << partitionInfo.partitionId() << " is not active";
             errorDescription << "Primary is not active for partition id "
-                             << pit->partitionId();
+                             << partitionInfo.partitionId();
             *rc = rc_ERROR;
             return;  // RETURN
         }
 
-        mqbnet::ClusterNode* primary = pit->primaryNode();
+        mqbnet::ClusterNode* primary = partitionInfo.primaryNode();
 
         if (primary) {
             // Don't add duplicate
@@ -3338,7 +3324,7 @@ void Cluster::getPrimaryNodes(int*          rc,
                 continue;  // CONTINUE
             }
             // Check for self
-            if (d_state.isSelfActivePrimary(pit->partitionId())) {
+            if (d_state.isSelfActivePrimary(partitionInfo.partitionId())) {
                 *isSelfPrimary = true;
                 continue;  // CONTINUE
             }
@@ -3347,9 +3333,9 @@ void Cluster::getPrimaryNodes(int*          rc,
         else {
             BALL_LOG_WARN << "Error while collecting primary nodes: No "
                              "primary found for partition id "
-                          << pit->partitionId();
+                          << partitionInfo.partitionId();
             errorDescription << "No primary found for partition id "
-                             << pit->partitionId();
+                             << partitionInfo.partitionId();
             *rc = rc_ERROR;
             return;  // RETURN
         }
