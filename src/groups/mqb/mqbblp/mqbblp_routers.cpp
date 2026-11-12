@@ -73,11 +73,7 @@ void Routers::Consumer::registerSubscriptions(mqbi::QueueHandle* handle)
 {
     const Routers::SubscriptionList& subscriptions = d_highestSubscriptions;
 
-    for (Routers::SubscriptionList::const_iterator it = subscriptions.begin();
-         it != subscriptions.end();
-         ++it) {
-        const Subscription* subscription = *it;
-
+    for (const Subscription* subscription : subscriptions) {
         handle->registerSubscription(subscription->subQueueId(),
                                      subscription->d_downstreamSubscriptionId,
                                      subscription->d_ci,
@@ -439,12 +435,7 @@ unsigned int Routers::AppContext::finalize()
             Consumer& consumer = subscriber.d_itConsumer->value();
             // 'consumer' is per App, not per priority.
 
-            for (Subscriber::Subscriptions::iterator itSubscription =
-                     subscriptions.begin();
-                 itSubscription != subscriptions.end();
-                 ++itSubscription) {
-                const Subscription& subscription = *itSubscription;
-
+            for (const Subscription& subscription : subscriptions) {
                 const PriorityGroups::SharedItem& itGroup =
                     subscription.d_itGroup;
                 PriorityGroup& group = itGroup->value();
@@ -559,12 +550,8 @@ void Routers::QueueRoutingContext::loadInternals(mqbcmd::Routing* out) const
             SubscriptionList& subscriptions =
                 priorityGroup->d_highestSubscriptions;
 
-            for (SubscriptionList::iterator itSubscription =
-                     subscriptions.begin();
-                 itSubscription != subscriptions.end();
-                 ++itSubscription) {
-                const Subscription* subscription = *itSubscription;
-                const Subscriber&   subscriber =
+            for (const Subscription* subscription : subscriptions) {
+                const Subscriber& subscriber =
                     subscription->d_itSubscriber->value();
                 mqbcmd::Subscription  outSubscription;
                 mqbcmd::ConsumerInfo& outCI = outSubscription.consumer();
@@ -815,11 +802,7 @@ const Routers::Subscription* Routers::AppContext::selectSubscription(
     const Consumer&          consumer      = itConsumer->value();
     const SubscriptionList&  subscriptions = consumer.d_highestSubscriptions;
 
-    for (SubscriptionList::const_iterator it = subscriptions.begin();
-         it != subscriptions.end();
-         ++it) {
-        const Subscription* subscription = *it;
-
+    for (const Subscription* subscription : subscriptions) {
         if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(handle->canDeliver(
                 subscription->d_downstreamSubscriptionId))) {
             PriorityGroup& group = subscription->d_itGroup->value();
@@ -861,11 +844,7 @@ void Routers::AppContext::loadInternals(mqbcmd::RoundRobinRouter* out) const
             const Subscriber::Subscriptions& subscriptions =
                 subscriber.d_subscriptions;
 
-            for (Subscriber::Subscriptions::const_iterator it =
-                     subscriptions.begin();
-                 it != subscriptions.end();
-                 ++it) {
-                const Subscription& subscription = *it;
+            for (const Subscription& subscription : subscriptions) {
                 out->consumers().resize(out->consumers().size() + 1);
                 mqbcmd::RouterConsumer& rc = out->consumers().back();
 
@@ -902,12 +881,7 @@ void Routers::RoundRobin::print(bsl::ostream& os,
             const Subscriber::Subscriptions& subscriptions =
                 subscriber.d_subscriptions;
 
-            for (Subscriber::Subscriptions::const_iterator it =
-                     subscriptions.begin();
-                 it != subscriptions.end();
-                 ++it) {
-                const Subscription& subscription = *it;
-
+            for (const Subscription& subscription : subscriptions) {
                 os << bmqu::PrintUtil::newlineAndIndent(level + 1,
                                                         spacesPerLevel)
                    << "priority .........: "
