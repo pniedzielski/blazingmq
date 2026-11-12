@@ -41,6 +41,7 @@
 #include <bmqtst_testhelper.h>
 #include <bmqu_tempdirectory.h>
 #include <bmqu_time.h>
+#include <bmqu_uniqueptr.h>
 #include <bsl_memory.h>
 #include <bsl_ostream.h>
 #include <bsl_utility.h>
@@ -289,7 +290,7 @@ struct Tester {
     bsl::shared_ptr<mqbsi::LogFactory>     d_logFactory_sp;
     bmqu::TempDirectory                    d_tempDir;
     mqbsi::LedgerConfig                    d_config;
-    bslma::ManagedPtr<mqbsi::Ledger>       d_ledger_mp;
+    bmqu::UniquePtr<mqbsi::Ledger>         d_ledger_mp;
     bdlbb::PooledBlobBufferFactory         d_bufferFactory;
 
   public:
@@ -300,7 +301,7 @@ struct Tester {
     , d_logFactory_sp(0)
     , d_tempDir(allocator)
     , d_config(allocator)
-    , d_ledger_mp(0)
+    , d_ledger_mp()
     , d_bufferFactory(1024, allocator)
     {
         // Instantiate ledger config
@@ -338,8 +339,9 @@ struct Tester {
             .setCleanupCallback(&cleanupCallback);
 
         // Create and open the ledger
-        d_ledger_mp.load(new (*allocator) mqbsl::Ledger(d_config, allocator),
-                         allocator);
+        d_ledger_mp = bmqu::UniquePtrUtil::adopt(
+            new (*allocator) mqbsl::Ledger(d_config, allocator),
+            allocator);
 
         BSLS_ASSERT_OPT(d_ledger_mp->open(mqbsi::Log::e_CREATE_IF_MISSING) ==
                         mqbsi::LedgerOpResult::e_SUCCESS);
