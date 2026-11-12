@@ -51,6 +51,7 @@
 #include <bsl_ios.h>
 #include <bsl_iostream.h>
 #include <bsl_limits.h>
+#include <bsl_memory.h>
 #include <bsl_sstream.h>
 #include <bsl_unordered_map.h>
 #include <bsl_utility.h>
@@ -808,13 +809,15 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char* argv[])
     // may be called on the 'Session' before it is started.
     BALL_LOG_INFO << "Starting the session with the BlazingMQ broker";
 
-    EventHandler* eventHandler = new EventHandler();
+    // The session takes ownership of the event handler; keep a non-owning
+    // pointer to it so that it can still be configured afterwards.
+    bsl::unique_ptr<EventHandler> handler = bsl::make_unique<EventHandler>();
+    EventHandler*                 eventHandler = handler.get();
 
     QueueManager queueManager;
     eventHandler->setQueueManager(&queueManager);
 
-    bslma::ManagedPtr<bmqa::SessionEventHandler> eventHandlerMp(eventHandler);
-    bmqa::Session                                session(eventHandlerMp);
+    bmqa::Session session(bsl::move(handler));
     eventHandler->setSession(&session);
 
     int rc = session.start();
