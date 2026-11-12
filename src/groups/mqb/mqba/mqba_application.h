@@ -30,6 +30,7 @@
 
 // BMQ
 #include <bmqma_countingallocatorstore.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -105,17 +106,17 @@ class Application {
 
   private:
     // PRIVATE TYPES
-    typedef bslma::ManagedPtr<mqbplug::PluginManager>  PluginManagerMp;
-    typedef bslma::ManagedPtr<mqbblp::ClusterCatalog>  ClusterCatalogMp;
-    typedef bslma::ManagedPtr<ConfigProvider>          ConfigProviderMp;
-    typedef bslma::ManagedPtr<Dispatcher>              DispatcherMp;
-    typedef bslma::ManagedPtr<DomainManager>           DomainManagerMp;
-    typedef bslma::ManagedPtr<mqbstat::StatController> StatControllerMp;
-    typedef bslma::ManagedPtr<mqbauthn::AuthenticationController>
+    typedef bmqu::UniquePtr<mqbplug::PluginManager>  PluginManagerMp;
+    typedef bmqu::UniquePtr<mqbblp::ClusterCatalog>  ClusterCatalogMp;
+    typedef bmqu::UniquePtr<ConfigProvider>          ConfigProviderMp;
+    typedef bmqu::UniquePtr<Dispatcher>              DispatcherMp;
+    typedef bmqu::UniquePtr<DomainManager>           DomainManagerMp;
+    typedef bmqu::UniquePtr<mqbstat::StatController> StatControllerMp;
+    typedef bmqu::UniquePtr<mqbauthn::AuthenticationController>
         AuthenticationControllerMp;
     typedef bslma::ManagedPtr<mqbauthz::AuthorizationController>
         AuthorizationControllerMp;
-    typedef bslma::ManagedPtr<mqbnet::TransportManager> TransportManagerMp;
+    typedef bmqu::UniquePtr<mqbnet::TransportManager> TransportManagerMp;
     typedef bdlcc::SharedObjectPool<
         bdlbb::Blob,
         bdlcc::ObjectPoolFunctors::DefaultCreator,

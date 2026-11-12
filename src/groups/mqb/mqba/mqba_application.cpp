@@ -262,9 +262,10 @@ int Application::start(bsl::ostream& errorDescription)
 
     // Start the PluginManager
     {
-        d_pluginManager_mp.load(new (*d_allocator_p)
-                                    mqbplug::PluginManager(d_allocator_p),
-                                d_allocator_p);
+        d_pluginManager_mp =
+            bmqu::UniquePtrUtil::adopt<mqbplug::PluginManager>(
+                new (*d_allocator_p) mqbplug::PluginManager(d_allocator_p),
+                d_allocator_p);
         rc = d_pluginManager_mp->start(mqbcfg::BrokerConfig::get().plugins(),
                                        errorDescription);
         if (rc != 0) {
@@ -278,7 +279,7 @@ int Application::start(bsl::ostream& errorDescription)
                                      d_pushElementsPool_sp);
 
     // Start the StatController
-    d_statController_mp.load(
+    d_statController_mp = bmqu::UniquePtrUtil::adopt<mqbstat::StatController>(
         new (*d_allocator_p) mqbstat::StatController(
             [this](const bslstl::StringRef& source,
                    const bsl::string&       cmd,
@@ -297,11 +298,12 @@ int Application::start(bsl::ostream& errorDescription)
     }
 
     // Start the AuthenticationController
-    d_authenticationController_mp.load(
-        new (*d_allocator_p) mqbauthn::AuthenticationController(
-            d_pluginManager_mp.get(),
-            d_allocators.get("AuthenticationController")),
-        d_allocator_p);
+    d_authenticationController_mp =
+        bmqu::UniquePtrUtil::adopt<mqbauthn::AuthenticationController>(
+            new (*d_allocator_p) mqbauthn::AuthenticationController(
+                d_pluginManager_mp.get(),
+                d_allocators.get("AuthenticationController")),
+            d_allocator_p);
     rc = d_authenticationController_mp->start(errorDescription);
     if (rc != 0) {
         return (rc * 100) + rc_AUTHENTICATIONCONTROLLER;  // RETURN
@@ -320,21 +322,23 @@ int Application::start(bsl::ostream& errorDescription)
     }
 
     // Start the config provider
-    d_configProvider_mp.load(new (*d_allocator_p) ConfigProvider(
-                                 d_allocators.get("ConfigProvider")),
-                             d_allocator_p);
+    d_configProvider_mp = bmqu::UniquePtrUtil::adopt<ConfigProvider>(
+        new (*d_allocator_p)
+            ConfigProvider(d_allocators.get("ConfigProvider")),
+        d_allocator_p);
     rc = d_configProvider_mp->start(errorDescription);
     if (rc != 0) {
         return (rc * 100) + rc_CONFIGPROVIDER;  // RETURN
     }
 
     // Start dispatcher
-    d_dispatcher_mp.load(new (*d_allocator_p) Dispatcher(
-                             mqbcfg::BrokerConfig::get().dispatcherConfig(),
-                             d_statController_mp->dispatcherStatContext(),
-                             d_scheduler_p,
-                             d_allocators.get("Dispatcher")),
-                         d_allocator_p);
+    d_dispatcher_mp = bmqu::UniquePtrUtil::adopt<Dispatcher>(
+        new (*d_allocator_p)
+            Dispatcher(mqbcfg::BrokerConfig::get().dispatcherConfig(),
+                       d_statController_mp->dispatcherStatContext(),
+                       d_scheduler_p,
+                       d_allocators.get("Dispatcher")),
+        d_allocator_p);
     rc = d_dispatcher_mp->start(errorDescription);
     if (0 != rc) {
         return (rc * 100) + rc_DISPATCHER;  // RETURN
@@ -378,14 +382,16 @@ int Application::start(bsl::ostream& errorDescription)
         bmqu::UniquePtrUtil::adopt<mqbnet::Negotiator>(sessionNegotiator,
                                                        d_allocator_p);
 
-    d_transportManager_mp.load(new (*d_allocator_p) mqbnet::TransportManager(
-                                   d_scheduler_p,
-                                   &d_bufferFactory,
-                                   authenticatorMp,
-                                   negotiatorMp,
-                                   d_statController_mp.get(),
-                                   d_allocators.get("TransportManager")),
-                               d_allocator_p);
+    d_transportManager_mp =
+        bmqu::UniquePtrUtil::adopt<mqbnet::TransportManager>(
+            new (*d_allocator_p)
+                mqbnet::TransportManager(d_scheduler_p,
+                                         &d_bufferFactory,
+                                         authenticatorMp,
+                                         negotiatorMp,
+                                         d_statController_mp.get(),
+                                         d_allocators.get("TransportManager")),
+            d_allocator_p);
 
     rc = d_transportManager_mp->start(errorDescription);
     if (rc != 0) {
@@ -403,13 +409,14 @@ int Application::start(bsl::ostream& errorDescription)
     d_statController_mp->loadStatContexts(&statContextsMap);
 
     // Start the ClusterCatalog
-    d_clusterCatalog_mp.load(new (*d_allocator_p) mqbblp::ClusterCatalog(
-                                 d_dispatcher_mp.get(),
-                                 d_transportManager_mp.get(),
-                                 statContextsMap,
-                                 resources,
-                                 d_allocators.get("ClusterCatalog")),
-                             d_allocator_p);
+    d_clusterCatalog_mp = bmqu::UniquePtrUtil::adopt<mqbblp::ClusterCatalog>(
+        new (*d_allocator_p)
+            mqbblp::ClusterCatalog(d_dispatcher_mp.get(),
+                                   d_transportManager_mp.get(),
+                                   statContextsMap,
+                                   resources,
+                                   d_allocators.get("ClusterCatalog")),
+        d_allocator_p);
 
     d_clusterCatalog_mp->setAdminCommandEnqueueCallback(
         [this](const bsl::string&                              source,
@@ -431,15 +438,16 @@ int Application::start(bsl::ostream& errorDescription)
     }
 
     // Start the DomainManager
-    d_domainManager_mp.load(new (*d_allocator_p) DomainManager(
-                                d_configProvider_mp.get(),
-                                &d_bufferFactory,
-                                d_clusterCatalog_mp.get(),
-                                d_dispatcher_mp.get(),
-                                d_statController_mp->domainsStatContext(),
-                                d_statController_mp->domainQueuesStatContext(),
-                                d_allocators.get("DomainManager")),
-                            d_allocator_p);
+    d_domainManager_mp = bmqu::UniquePtrUtil::adopt<DomainManager>(
+        new (*d_allocator_p)
+            DomainManager(d_configProvider_mp.get(),
+                          &d_bufferFactory,
+                          d_clusterCatalog_mp.get(),
+                          d_dispatcher_mp.get(),
+                          d_statController_mp->domainsStatContext(),
+                          d_statController_mp->domainQueuesStatContext(),
+                          d_allocators.get("DomainManager")),
+        d_allocator_p);
 
     sessionNegotiator->setDomainFactory(d_domainManager_mp.get());
     d_clusterCatalog_mp->setDomainFactory(d_domainManager_mp.get());
