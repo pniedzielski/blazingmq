@@ -197,13 +197,11 @@ MaybeError checkInvariants(const Invariants&                invariants,
                            const mqbblp::QueueEngineTester& tester,
                            const Operation&                 op)
 {
-    for (Invariants::const_iterator i = invariants.begin();
-         i != invariants.end();
-         ++i) {
-        const MaybeError rv = i->d_clause(model, tester);
+    for (const Invariant& invariant : invariants) {
+        const MaybeError rv = invariant.d_clause(model, tester);
         if (!rv.isNull()) {
             bmqu::MemOutStream out;
-            out << "invariant \"" << i->d_name
+            out << "invariant \"" << invariant.d_name
                 << "\" failed after operation \"" << op << "\", "
                 << rv.value();
             return MaybeError(out.str());
@@ -451,10 +449,8 @@ struct Post : public Operation {
 
         // Compute the current highest priority
         int highestPriority = bsl::numeric_limits<int>::min();
-        for (ActiveConsumersModel::iterator iter = model->begin();
-             iter != model->end();
-             ++iter) {
-            ConsumerStatus& status = iter->second;
+        for (auto& consumerEntry : *model) {
+            ConsumerStatus& status = consumerEntry.second;
 
             if (status.priority > highestPriority) {
                 highestPriority = status.priority;
@@ -462,10 +458,8 @@ struct Post : public Operation {
         }
 
         // Update the expected counters
-        for (ActiveConsumersModel::iterator iter = model->begin();
-             iter != model->end();
-             ++iter) {
-            ConsumerStatus& status = iter->second;
+        for (auto& consumerEntry : *model) {
+            ConsumerStatus& status = consumerEntry.second;
 
             if (status.active && status.priority == highestPriority) {
                 ++status.expectedCount;
@@ -492,17 +486,15 @@ MaybeError checkReceivedForConsumers(
     // 'MaybeError' for success or a 'MaybeError' containint the error message
     // otherwise.
 
-    for (ActiveConsumersModel::const_iterator iter = model.begin();
-         iter != model.end();
-         ++iter) {
-        const ConsumerStatus& status = iter->second;
+    for (const auto& consumerEntry : model) {
+        const ConsumerStatus& status = consumerEntry.second;
         mqbmock::QueueHandle* handle = status.handle;
         BMQTST_ASSERT(handle);
         if (handle->_numMessages() != status.expectedCount) {
             bmqu::MemOutStream out;
             out << "actual messages (" << handle->_numMessages()
                 << ") != expected messages(" << status.expectedCount << ")"
-                << " for client \"" << iter->first << "\"";
+                << " for client \"" << consumerEntry.first << "\"";
             if (handle->_numMessages()) {
                 out << " pending messages: [" << handle->_messages() << "]";
             }
@@ -548,10 +540,8 @@ void regress(Operations*       operations,
         MaybeError rv = checkInvariants(invariants, model, tester, Start());
         if (rv.isNull()) {
             // For each specified operation...
-            for (Operations::const_iterator iter = operations->begin();
-                 iter != operations->end();
-                 ++iter) {
-                const Operation& op = **iter;
+            for (const OperationSp& operationSp : *operations) {
+                const Operation& op = *operationSp;
 
                 // Apply the operation...
                 rv = op(&model, &tester);
