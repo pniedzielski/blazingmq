@@ -305,8 +305,8 @@ class PushStreamIterator : public mqbi::StorageIterator {
 
   private:
     // NOT IMPLEMENTED
-    PushStreamIterator(const StorageIterator&);                // = delete
-    PushStreamIterator& operator=(const PushStreamIterator&);  // = delete
+    PushStreamIterator(const StorageIterator&)               = delete;
+    PushStreamIterator& operator=(const PushStreamIterator&) = delete;
 
   protected:
     // PRIVATE ACCESSORS
@@ -420,9 +420,9 @@ class PushStreamIterator : public mqbi::StorageIterator {
 class VirtualPushStreamIterator : public PushStreamIterator {
   private:
     // NOT IMPLEMENTED
-    VirtualPushStreamIterator(const VirtualPushStreamIterator&);  // = delete
+    VirtualPushStreamIterator(const VirtualPushStreamIterator&) = delete;
     VirtualPushStreamIterator&
-    operator=(const VirtualPushStreamIterator&);  // = delete
+    operator=(const VirtualPushStreamIterator&) = delete;
 
   public:
     // CREATORS

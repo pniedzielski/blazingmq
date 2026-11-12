@@ -186,8 +186,8 @@ class ClusterOrchestrator {
 
   private:
     // NOT IMPLEMENTED
-    ClusterOrchestrator(const ClusterOrchestrator&);             // = delete;
-    ClusterOrchestrator& operator=(const ClusterOrchestrator&);  // = delete;
+    ClusterOrchestrator(const ClusterOrchestrator&)            = delete;
+    ClusterOrchestrator& operator=(const ClusterOrchestrator&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

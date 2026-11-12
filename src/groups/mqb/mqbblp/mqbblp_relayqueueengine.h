@@ -355,8 +355,8 @@ class RelayQueueEngine final : public mqbi::QueueEngine {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    RelayQueueEngine(const RelayQueueEngine&);
-    RelayQueueEngine& operator=(const RelayQueueEngine&);
+    RelayQueueEngine(const RelayQueueEngine&)            = delete;
+    RelayQueueEngine& operator=(const RelayQueueEngine&) = delete;
 
   public:
     // TRAITS

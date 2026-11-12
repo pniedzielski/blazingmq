@@ -159,8 +159,8 @@ class ClusterStateManager final : public mqbc::ClusterStateObserver,
 
   private:
     // NOT IMPLEMENTED
-    ClusterStateManager(const ClusterStateManager&);             // = delete;
-    ClusterStateManager& operator=(const ClusterStateManager&);  // = delete;
+    ClusterStateManager(const ClusterStateManager&)            = delete;
+    ClusterStateManager& operator=(const ClusterStateManager&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

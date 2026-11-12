@@ -309,8 +309,8 @@ class RemoteQueue {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    RemoteQueue(const RemoteQueue&);             // = delete;
-    RemoteQueue& operator=(const RemoteQueue&);  // = delete;
+    RemoteQueue(const RemoteQueue&)            = delete;
+    RemoteQueue& operator=(const RemoteQueue&) = delete;
 
   public:
     // TRAITS

@@ -59,8 +59,8 @@ class ScopeExit {
 
   private:
     // NOT IMPLEMENTED
-    ScopeExit(const ScopeExit&);
-    ScopeExit& operator=(const ScopeExit&);
+    ScopeExit(const ScopeExit&)            = delete;
+    ScopeExit& operator=(const ScopeExit&) = delete;
 };
 
 }  // close unnamed namespace

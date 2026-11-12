@@ -210,8 +210,8 @@ class Domain final : public mqbi::Domain {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    Domain(const Domain&);             // = delete;
-    Domain& operator=(const Domain&);  // = delete;
+    Domain(const Domain&)            = delete;
+    Domain& operator=(const Domain&) = delete;
 
     /// Call close for all `queues`.
     void closeAllQueues(const QueueMap& queues);

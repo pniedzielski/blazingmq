@@ -149,8 +149,8 @@ class QueueHandleCatalog {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    QueueHandleCatalog(const QueueHandleCatalog&);             // = delete;
-    QueueHandleCatalog& operator=(const QueueHandleCatalog&);  // = delete;
+    QueueHandleCatalog(const QueueHandleCatalog&)            = delete;
+    QueueHandleCatalog& operator=(const QueueHandleCatalog&) = delete;
 
   private:
     // PRIVATE MANIPULATOR

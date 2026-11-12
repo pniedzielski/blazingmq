@@ -964,8 +964,8 @@ class ClusterQueueHelper final : public mqbc::ClusterStateObserver,
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    ClusterQueueHelper(const ClusterQueueHelper&);             // = delete;
-    ClusterQueueHelper& operator=(const ClusterQueueHelper&);  // = delete;
+    ClusterQueueHelper(const ClusterQueueHelper&)            = delete;
+    ClusterQueueHelper& operator=(const ClusterQueueHelper&) = delete;
 
   public:
     // TRAITS

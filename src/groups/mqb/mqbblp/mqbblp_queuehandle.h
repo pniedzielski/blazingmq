@@ -105,8 +105,8 @@ class QueueHandle : public mqbi::QueueHandle {
 
         /// Copy constructor and assignment operator are not implemented.
         Subscription(const Subscription& original,
-                     bslma::Allocator*   allocator = 0);       // = delete
-        Subscription& operator=(const Subscription& other);  // = delete
+                     bslma::Allocator*   allocator = 0)    = delete;
+        Subscription& operator=(const Subscription& other) = delete;
 
       public:
         // CREATORS

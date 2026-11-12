@@ -804,8 +804,8 @@ class RecoveryManager : public mqbnet::ClusterObserver {
 
   private:
     // NOT IMPLEMENTED
-    RecoveryManager(const RecoveryManager&);
-    RecoveryManager& operator=(const RecoveryManager&);
+    RecoveryManager(const RecoveryManager&)            = delete;
+    RecoveryManager& operator=(const RecoveryManager&) = delete;
 
   private:
     // PRIVATE MANIPULATORS

@@ -173,8 +173,8 @@ class QueueState {
     // NOT IMPLEMENTED
 
     /// Copy constructor and assignment operator are not implemented.
-    QueueState(const QueueState&);             // = delete;
-    QueueState& operator=(const QueueState&);  // = delete;
+    QueueState(const QueueState&)            = delete;
+    QueueState& operator=(const QueueState&) = delete;
 
   public:
     // TRAITS
