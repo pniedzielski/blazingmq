@@ -25,12 +25,9 @@
 #include <bmqt_authncredential.h>
 #include <bmqu_blob.h>
 #include <bmqu_memoutstream.h>
-#include <bmqu_weakmemfn.h>
 
 // BDE
 #include <ball_log.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdlt_currenttime.h>
 #include <bdlt_datetime.h>
@@ -194,15 +191,16 @@ void AuthenticatedChannelFactory::readResponse(
     const ResultCallback&                  cb) const
 {
     // Initiate a read for the broker's authentication response message
-    bmqio::Channel::ReadCallback readCb = bdlf::BindUtil::bind(
-        bmqu::WeakMemFnUtil::weakMemFn(
-            &AuthenticatedChannelFactory::readPacketsCb,
-            d_self.acquireWeak()),
-        channel,
-        cb,
-        bdlf::PlaceHolders::_1,   // status
-        bdlf::PlaceHolders::_2,   // numNeeded
-        bdlf::PlaceHolders::_3);  // blob
+    bmqio::Channel::ReadCallback readCb = [weakSelf = d_self.acquireWeak(),
+                                           channel,
+                                           cb](const bmqio::Status& readStatus,
+                                               int*                 numNeeded,
+                                               bdlbb::Blob*         blob) {
+        if (bsl::shared_ptr<AuthenticatedChannelFactory> factory =
+                weakSelf.lock()) {
+            factory->readPacketsCb(channel, cb, readStatus, numNeeded, blob);
+        }
+    };
 
     bmqio::Status status;
     channel->read(&status,
@@ -250,10 +248,12 @@ void AuthenticatedChannelFactory::baseResultCallback(
     }
 
     channel->onClose(
-        bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-                                 &AuthenticatedChannelFactory::onChannelDown,
-                                 d_self.acquireWeak()),
-                             bdlf::PlaceHolders::_1));  // status
+        [weakSelf = d_self.acquireWeak()](const bmqio::Status& closeStatus) {
+            if (bsl::shared_ptr<AuthenticatedChannelFactory> factory =
+                    weakSelf.lock()) {
+                factory->onChannelDown(closeStatus);
+            }
+        });
 
     // We will skip authentication if no authentication credential
     // callback provided.
@@ -412,12 +412,12 @@ bool AuthenticatedChannelFactory::processAuthenticationEvent(
         d_config.d_scheduler_p->scheduleEvent(
             &d_reauthenticationTimeoutHandle,
             d_config.d_scheduler_p->now().addMilliseconds(intervalMs),
-            bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-                                     &AuthenticatedChannelFactory::sendRequest,
-                                     d_self.acquireWeak()),
-                                 channel,
-                                 cb,
-                                 true));
+            [weakSelf = d_self.acquireWeak(), channel, cb]() {
+                if (bsl::shared_ptr<AuthenticatedChannelFactory> factory =
+                        weakSelf.lock()) {
+                    factory->sendRequest(channel, cb, true);
+                }
+            });
     }
     else {
         BALL_LOG_INFO << "Authentication with broker was successful: "
@@ -464,14 +464,18 @@ void AuthenticatedChannelFactory::connect(bmqio::Status*               status,
         status,
         handle,
         options,
-        bdlf::BindUtil::bind(
-            bmqu::WeakMemFnUtil::weakMemFn(
-                &AuthenticatedChannelFactory::baseResultCallback,
-                d_self.acquireWeak()),
-            cb,
-            bdlf::PlaceHolders::_1,    // event
-            bdlf::PlaceHolders::_2,    // status
-            bdlf::PlaceHolders::_3));  // channel
+        [weakSelf = d_self.acquireWeak(),
+         cb](bmqio::ChannelFactoryEvent::Enum       factoryEvent,
+             const bmqio::Status&                   factoryStatus,
+             const bsl::shared_ptr<bmqio::Channel>& factoryChannel) {
+            if (bsl::shared_ptr<AuthenticatedChannelFactory> factory =
+                    weakSelf.lock()) {
+                factory->baseResultCallback(cb,
+                                            factoryEvent,
+                                            factoryStatus,
+                                            factoryChannel);
+            }
+        });
 }
 
 int AuthenticatedChannelFactory::start()
