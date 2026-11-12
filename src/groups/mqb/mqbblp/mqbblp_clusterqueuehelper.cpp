@@ -679,7 +679,7 @@ void ClusterQueueHelper::onQueueAssignmentResponse(
                 // Note that the first QueueAssignmentResponse does responds to
                 // the second openQueue request (see d_liveQInfo.d_pending).
 
-                QueueContextMapIter qit = d_queues.find(uri);
+                auto qit = d_queues.find(uri);
                 if (qit != d_queues.end()) {
                     finishAllOpening(qit->second, status);
                     d_queues.erase(qit);
@@ -1182,7 +1182,7 @@ void ClusterQueueHelper::sendOpenQueueRequest(
         return;  // RETURN
     }
 
-    StreamsMap::iterator subStreamIt = qinfo.d_subQueueIds.findBySubId(
+    auto subStreamIt = qinfo.d_subQueueIds.findBySubId(
         context->d_upstreamSubQueueId);
 
     SubQueueContext&          subQueueContext = subStreamIt->value();
@@ -1370,7 +1370,7 @@ void ClusterQueueHelper::onOpenQueueResponse(const RequestSp& requestContext,
     BSLS_ASSERT_SAFE(qcontext);
     QueueLiveState& qinfo = qcontext->d_liveQInfo;
 
-    StreamsMap::iterator subStreamIt = qinfo.d_subQueueIds.findBySubIdSafe(
+    auto subStreamIt = qinfo.d_subQueueIds.findBySubIdSafe(
         context->d_upstreamSubQueueId);
 
     if (subStreamIt == qinfo.d_subQueueIds.end()) {
@@ -1569,7 +1569,7 @@ void ClusterQueueHelper::onReopenQueueResponse(
         req.handleParameters();
     const bmqt::Uri uri(reqParameters.uri());
 
-    QueueContextMapIter it = d_queues.find(uri.canonical());
+    auto it = d_queues.find(uri.canonical());
     if (it == d_queues.end()) {
         // Can occur if client requested to close the queue or queue was GC'ed
         // before Reopen response was received.
@@ -1588,8 +1588,7 @@ void ClusterQueueHelper::onReopenQueueResponse(
     const bsl::string  appId = bmqp::QueueUtil::extractAppId(reqParameters);
     const unsigned int upstreamSubQueueId = bmqp::QueueUtil::extractSubQueueId(
         reqParameters);
-    StreamsMap::iterator sqit = qinfo.d_subQueueIds.findBySubIdSafe(
-        upstreamSubQueueId);
+    auto sqit = qinfo.d_subQueueIds.findBySubIdSafe(upstreamSubQueueId);
 
     if (sqit == qinfo.d_subQueueIds.end()) {
         // REVISIT: This is the result of Close request in between
@@ -1802,7 +1801,7 @@ void ClusterQueueHelper::onConfigureQueueResponse(
         return;  // RETURN
     }
 
-    QueueContextMapIter it = d_queues.find(uri.canonical());
+    auto it = d_queues.find(uri.canonical());
     if (it == d_queues.end()) {
         // Can occur if client requested to close the queue or queue was GC'ed
         // before Configure response was received.
@@ -1958,9 +1957,8 @@ void ClusterQueueHelper::retryReopenQueue(
     }
     const unsigned int upstreamSubQueueId = bmqp::QueueUtil::extractSubQueueId(
         reqParameters);
-    QueueLiveState&      qinfo = queueContext->d_liveQInfo;
-    StreamsMap::iterator sqit  = qinfo.d_subQueueIds.findBySubIdSafe(
-        upstreamSubQueueId);
+    QueueLiveState& qinfo = queueContext->d_liveQInfo;
+    auto sqit = qinfo.d_subQueueIds.findBySubIdSafe(upstreamSubQueueId);
 
     if (sqit == qinfo.d_subQueueIds.end()) {
         BMQ_LOGTHROTTLE_WARN
@@ -2164,7 +2162,7 @@ bool ClusterQueueHelper::createQueue(
     BSLS_ASSERT_SAFE(bmqp::QueueId::k_PRIMARY_QUEUE_ID != upstreamQueueId);
 
     // Update _upstream_ view on that particular subQueueId
-    StreamsMap::iterator subStreamIt = qinfo.d_subQueueIds.findBySubId(
+    auto subStreamIt = qinfo.d_subQueueIds.findBySubId(
         context->d_upstreamSubQueueId);
 
     subtractCounters(&qinfo, parameters, subStreamIt);
@@ -2381,7 +2379,7 @@ void ClusterQueueHelper::processHandleReleased(
         BSLS_ASSERT_SAFE(handle);
 
         // An event that may need erasing stream(s)
-        CNSQueueHandleMapIter it = requester->queueHandles().find(queueId);
+        auto it = requester->queueHandles().find(queueId);
         if (it != requester->queueHandles().end()) {
             // Erase handle.  First erase the subQueueId
 
@@ -2523,7 +2521,7 @@ void ClusterQueueHelper::addPeerSubscriptions(
     BSLS_ASSERT_SAFE(d_cluster_p->inDispatcherThread());
 
     // Need to rebuild Subscriptions
-    CNSQueueHandleMap::iterator it = requester->queueHandles().find(qId);
+    auto it = requester->queueHandles().find(qId);
     if (it == requester->queueHandles().end()) {
         // Failure.
 
@@ -2753,7 +2751,7 @@ void ClusterQueueHelper::processPeerGetQueueHandleResult(
         openQueue.handleParameters();
     const unsigned int queueId = handleParams.qId();
 
-    CNSQueueHandleMapIter iter = requester->queueHandles().find(queueId);
+    auto iter = requester->queueHandles().find(queueId);
     if (iter != requester->queueHandles().end()) {
         BMQ_LOGTHROTTLE_INFO
             << d_cluster_p->description()
@@ -2881,7 +2879,7 @@ void ClusterQueueHelper::configureQueueImpl(
         return;  // RETURN
     }
 
-    QueueContextMapIter queueContextIt = d_queues.find(uri);
+    auto queueContextIt = d_queues.find(uri);
 
     if (queueContextIt == d_queues.end()) {
         // This can occur in this scenario: self node sent a reopen-queue
@@ -2918,8 +2916,7 @@ void ClusterQueueHelper::configureQueueImpl(
     BSLS_ASSERT_SAFE(queueContext);
     BSLS_ASSERT_SAFE(isQueueAssigned(*queueContext));
 
-    StreamsMap::iterator iter = qinfo.d_subQueueIds.findBySubIdSafe(
-        upstreamSubQueueId);
+    auto iter = qinfo.d_subQueueIds.findBySubIdSafe(upstreamSubQueueId);
     if (iter == qinfo.d_subQueueIds.end()) {
         // SubStream got deleted because of outgoing close request(s) but
         // before close response(s), the handle drops and tries to send
@@ -3029,8 +3026,8 @@ void ClusterQueueHelper::closeQueueImpl(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_cluster_p->inDispatcherThread());
 
-    bmqt::Uri           uri(handleParameters.uri());
-    QueueContextMapIter queueContextIt = d_queues.find(uri.canonical());
+    bmqt::Uri uri(handleParameters.uri());
+    auto      queueContextIt = d_queues.find(uri.canonical());
     if (queueContextIt == d_queues.end()) {
         // This can occur in this scenario: self node sent a reopen-queue
         // request to upstream, which failed for some reason.  Queue was
@@ -3069,8 +3066,7 @@ void ClusterQueueHelper::closeQueueImpl(
 
     // If reopen previously failed, should not send close queue request for it
 
-    StreamsMap::iterator iter = qinfo.d_subQueueIds.findBySubIdSafe(
-        upstreamSubQueueId);
+    auto iter = qinfo.d_subQueueIds.findBySubIdSafe(upstreamSubQueueId);
     if (iter == qinfo.d_subQueueIds.end()) {
         BMQ_LOGTHROTTLE_ERROR
             << d_cluster_p->description()
@@ -3255,7 +3251,7 @@ void ClusterQueueHelper::processQueueHandleCreated(mqbi::Queue*     queue,
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_cluster_p->inDispatcherThread());
 
-    QueueContextMapIter queueContextIt = d_queues.find(uri);
+    auto queueContextIt = d_queues.find(uri);
     if (queueContextIt == d_queues.end()) {
         BMQ_LOGTHROTTLE_ERROR
             << d_cluster_p->description()
@@ -3298,7 +3294,7 @@ void ClusterQueueHelper::processQueueHandleDestroyed(mqbi::Queue*     queue,
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_cluster_p->inDispatcherThread());
 
-    QueueContextMapIter queueContextIt = d_queues.find(uri);
+    auto queueContextIt = d_queues.find(uri);
     if (queueContextIt == d_queues.end()) {
         // This could occur when replica receives a queue-unassignment advisory
         // from the primary, but has non-zero handles for the queue.  In that
@@ -4231,8 +4227,8 @@ void ClusterQueueHelper::onQueueAssigned(
                                                ? leaderNode->nodeDescription()
                                                : "** UNKNOWN**";
 
-    QueueContextSp      queueContext;
-    QueueContextMapIter queueContextIt = d_queues.find(info->uri());
+    QueueContextSp queueContext;
+    auto           queueContextIt = d_queues.find(info->uri());
 
     if (queueContextIt != d_queues.end()) {
         // We already have a queueContext created for that queue
@@ -4455,7 +4451,7 @@ void ClusterQueueHelper::onQueueUpdated(
     }
     BSLS_ASSERT_SAFE(uri.qualifiedDomain() == domain);
 
-    QueueContextMapIter qiter = d_queues.find(uri);
+    auto qiter = d_queues.find(uri);
     BSLS_ASSERT_SAFE(qiter != d_queues.end());
 
     QueueContext& queueContext = *qiter->second;
@@ -4718,7 +4714,7 @@ void ClusterQueueHelper::openQueue(
     // Get the 'uri' that should be used as 'canonical' representation of
     // that queue on that host.
 
-    QueueContextMapIter queueContextIt = d_queues.find(uriKey);
+    auto queueContextIt = d_queues.find(uriKey);
 
     // NOTE: See TBD in 'processGetDomainResult': if the request comes from a
     //       peer inside the cluster, 'clientIdentity' will represent our own
@@ -5168,7 +5164,7 @@ void ClusterQueueHelper::processPeerCloseQueueRequest(
         bmqp::QueueUtil::createQueueIdFromHandleParameters(
             req.handleParameters());
     // Lookup the handle
-    CNSQueueHandleMapIter it = requester->queueHandles().find(queueId.id());
+    auto it = requester->queueHandles().find(queueId.id());
     if (it == requester->queueHandles().end()) {
         // Failure ...
         BMQ_LOGTHROTTLE_WARN << d_cluster_p->description()
