@@ -1221,7 +1221,7 @@ void RelayQueueEngine::resetState(bool isShuttingDown)
     d_realStorageIter_mp = storage()->getIterator(
         mqbu::StorageKey::k_NULL_KEY);
 
-    d_storageIter_mp.load(
+    d_storageIter_mp = bmqu::UniquePtrUtil::adopt<PushStreamIterator>(
         new (*d_allocator_p) PushStreamIterator(storage(),
                                                 &d_pushStream,
                                                 d_pushStream.d_stream.begin()),

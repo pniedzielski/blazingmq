@@ -143,7 +143,7 @@ class RelayQueueEngine final : public mqbi::QueueEngine {
 
   private:
     // PRIVATE TYPES
-    typedef bslma::ManagedPtr<mqbi::StorageIterator> StorageIterMp;
+    typedef bmqu::UniquePtr<mqbi::StorageIterator>   StorageIterMp;
     typedef bsl::shared_ptr<mqbi::StorageIterator>   StorageIterSp;
 
     /// (queueHandlePtr, downstreamSubQueueId)
@@ -189,7 +189,7 @@ class RelayQueueEngine final : public mqbi::QueueEngine {
     QueueEngineUtil_AppsDeliveryContext d_appsDeliveryContext;
 
     /// Storage iterator to the PushStream.
-    bslma::ManagedPtr<PushStreamIterator> d_storageIter_mp;
+    bmqu::UniquePtr<PushStreamIterator> d_storageIter_mp;
 
     /// Storage iterator to access storage state.
     bmqu::UniquePtr<mqbi::StorageIterator> d_realStorageIter_mp;
