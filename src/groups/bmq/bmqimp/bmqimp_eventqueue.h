@@ -137,6 +137,7 @@
 #include <bmqc_monitoredqueue_bdlccsingleproducerqueue.h>
 #include <bmqc_multiqueuethreadpool.h>
 #include <bmqu_time.h>
+#include <bmqu_uniqueptr.h>
 
 #include <bmqst_basictableinfoprovider.h>
 #include <bmqst_statcontext.h>
@@ -191,7 +192,7 @@ class EventQueue {
     // PRIVATE TYPES
 
     /// Shortcut alias
-    typedef bslma::ManagedPtr<bdlmt::FixedThreadPool> FixedThreadPoolMP;
+    typedef bmqu::UniquePtr<bdlmt::FixedThreadPool> FixedThreadPoolMP;
 
     /// Struct holding a pointer to the enqueued event and a timestamp
     /// representing the time the event was pushed into the queue.

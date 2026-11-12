@@ -449,12 +449,12 @@ int EventQueue::start()
 
     bslmt::ThreadAttributes threadAttributes;
     threadAttributes.setThreadName("bmqEventQueue");
-    d_threadPool_mp.load(new (*d_allocator_p)
-                             bdlmt::FixedThreadPool(threadAttributes,
+    d_threadPool_mp = bmqu::UniquePtrUtil::adopt(
+        new (*d_allocator_p) bdlmt::FixedThreadPool(threadAttributes,
                                                     d_numProcessingThreads,
                                                     d_numProcessingThreads,
                                                     d_allocator_p),
-                         d_allocator_p);
+        d_allocator_p);
 
     // Start the ThreadPool
     rc = d_threadPool_mp->start();
