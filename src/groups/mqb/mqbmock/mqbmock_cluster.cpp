@@ -22,6 +22,7 @@
 #include <mqbcmd_messages.h>
 #include <mqbconfm_messages.h>
 #include <mqbnet_mockcluster.h>
+#include <mqbnet_negotiator.h>
 #include <mqbstat_clusterstats.h>
 
 // BMQ

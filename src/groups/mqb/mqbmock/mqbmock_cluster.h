@@ -49,6 +49,9 @@
 #include <mqbnet_cluster.h>
 #include <mqbnet_transportmanager.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bdlbb_blob.h>
 #include <bdlbb_pooledblobbufferfactory.h>
@@ -121,9 +124,9 @@ class Cluster : public mqbi::Cluster {
     typedef bsl::function<void(const mqbi::DispatcherEvent& event)>
         EventProcessor;
 
-    typedef bslma::ManagedPtr<mqbnet::Negotiator> NegotiatorMp;
+    typedef bmqu::UniquePtr<mqbnet::Negotiator> NegotiatorMp;
 
-    typedef bslma::ManagedPtr<mqbnet::Authenticator> AuthenticatorMp;
+    typedef bmqu::UniquePtr<mqbnet::Authenticator> AuthenticatorMp;
 
     typedef bslma::ManagedPtr<mqbnet::Cluster> NetClusterMp;
 

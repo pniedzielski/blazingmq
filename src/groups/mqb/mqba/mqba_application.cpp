@@ -51,6 +51,7 @@
 #include <bmqu_memoutstream.h>
 #include <bmqu_operationlogger.h>
 #include <bmqu_time.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <baljsn_encoder.h>
@@ -340,12 +341,14 @@ int Application::start(bsl::ostream& errorDescription)
     }
 
     // Start the transport manager
-    bslma::ManagedPtr<mqbnet::Authenticator> authenticatorMp(
-        new (*d_allocator_p) Authenticator(d_authenticationController_mp.get(),
-                                           &d_blobSpPool,
-                                           d_scheduler_p,
-                                           d_allocators.get("Authenticator")),
-        d_allocator_p);
+    bmqu::UniquePtr<mqbnet::Authenticator> authenticatorMp =
+        bmqu::UniquePtrUtil::adopt<mqbnet::Authenticator>(
+            new (*d_allocator_p)
+                Authenticator(d_authenticationController_mp.get(),
+                              &d_blobSpPool,
+                              d_scheduler_p,
+                              d_allocators.get("Authenticator")),
+            d_allocator_p);
 
     bsl::shared_ptr<mqbi::Authorizer> authorizer_sp =
         bsl::allocate_shared<mqba::Authorizer>(
@@ -371,7 +374,8 @@ int Application::start(bsl::ostream& errorDescription)
                 enqueueCommand(source, cmd, onProcessedCb, fromReroute);
             });
 
-    bslma::ManagedPtr<mqbnet::Negotiator> negotiatorMp(sessionNegotiator,
+    bmqu::UniquePtr<mqbnet::Negotiator> negotiatorMp =
+        bmqu::UniquePtrUtil::adopt<mqbnet::Negotiator>(sessionNegotiator,
                                                        d_allocator_p);
 
     d_transportManager_mp.load(new (*d_allocator_p) mqbnet::TransportManager(

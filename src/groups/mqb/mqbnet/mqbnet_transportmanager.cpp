@@ -25,6 +25,7 @@
 #include <mqbnet_cluster.h>
 #include <mqbnet_clusterimp.h>
 #include <mqbnet_initialconnectioncontext.h>
+#include <mqbnet_negotiator.h>
 #include <mqbnet_session.h>
 #include <mqbnet_tcpsessionfactory.h>
 
@@ -320,18 +321,18 @@ int TransportManager::selfNodeIdLocked(
 }
 
 TransportManager::TransportManager(
-    bdlmt::EventScheduler*            scheduler,
-    bdlbb::BlobBufferFactory*         blobBufferFactory,
-    bslma::ManagedPtr<Authenticator>& authenticator,
-    bslma::ManagedPtr<Negotiator>&    negotiator,
-    mqbstat::StatController*          statController,
-    bslma::Allocator*                 allocator)
+    bdlmt::EventScheduler*          scheduler,
+    bdlbb::BlobBufferFactory*       blobBufferFactory,
+    bmqu::UniquePtr<Authenticator>& authenticator,
+    bmqu::UniquePtr<Negotiator>&    negotiator,
+    mqbstat::StatController*        statController,
+    bslma::Allocator*               allocator)
 : d_allocators(allocator)
 , d_state(e_STOPPED)
 , d_scheduler_p(scheduler)
 , d_blobBufferFactory_p(blobBufferFactory)
-, d_authenticator_mp(authenticator)
-, d_negotiator_mp(negotiator)
+, d_authenticator_mp(bsl::move(authenticator))
+, d_negotiator_mp(bsl::move(negotiator))
 , d_statController_p(statController)
 , d_tcpSessionFactory_mp(0)
 , d_connectionsState(allocator)

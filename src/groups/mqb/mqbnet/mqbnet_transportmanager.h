@@ -67,6 +67,7 @@
 
 #include <bmqio_channel.h>
 #include <bmqio_channelfactory.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -180,10 +181,10 @@ class TransportManager {
     // sessions
 
     /// Authenticator to use for authenticating a connection.
-    bslma::ManagedPtr<mqbnet::Authenticator> d_authenticator_mp;
+    bmqu::UniquePtr<mqbnet::Authenticator> d_authenticator_mp;
 
     /// Negotiator to use for negotiating and creating a session.
-    bslma::ManagedPtr<mqbnet::Negotiator> d_negotiator_mp;
+    bmqu::UniquePtr<mqbnet::Negotiator> d_negotiator_mp;
 
     mqbstat::StatController* d_statController_p;
     // Stat controller
@@ -298,12 +299,12 @@ class TransportManager {
     /// Create a new `TransportManager` using the specified `scheduler`,
     /// `blobBufferFactory`, `negotiator` and `statController` and the
     /// specified `allocator` for any memory allocation.
-    TransportManager(bdlmt::EventScheduler*            scheduler,
-                     bdlbb::BlobBufferFactory*         blobBufferFactory,
-                     bslma::ManagedPtr<Authenticator>& authenticator,
-                     bslma::ManagedPtr<Negotiator>&    negotiator,
-                     mqbstat::StatController*          statController,
-                     bslma::Allocator*                 allocator);
+    TransportManager(bdlmt::EventScheduler*          scheduler,
+                     bdlbb::BlobBufferFactory*       blobBufferFactory,
+                     bmqu::UniquePtr<Authenticator>& authenticator,
+                     bmqu::UniquePtr<Negotiator>&    negotiator,
+                     mqbstat::StatController*        statController,
+                     bslma::Allocator*               allocator);
 
     /// Destructor
     virtual ~TransportManager();
