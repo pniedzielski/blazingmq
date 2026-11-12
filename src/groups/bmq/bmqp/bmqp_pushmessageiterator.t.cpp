@@ -188,7 +188,7 @@ generateSubQueueInfos(bsl::vector<bmqp::SubQueueInfo>* subQueueInfos,
     for (int i = 0; i < numSubQueueInfos; ++i) {
         unsigned int currId = static_cast<unsigned int>(
             generateRandomInteger(0, 200));
-        while (generatedIds.find(currId) != generatedIds.end()) {
+        while (generatedIds.contains(currId)) {
             currId = static_cast<unsigned int>(generateRandomInteger(0, 200));
         }
         generatedIds.insert(currId);
