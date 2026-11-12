@@ -43,6 +43,7 @@
 #include <mqbsl_ondisklog.h>
 
 #include <bmqu_blob.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bslma_allocator.h>
@@ -80,7 +81,7 @@ class MemoryMappedOnDiskLogFactory final : public mqbsi::LogFactory {
     // MANIPULATORS
 
     /// Create a new log using the specified `config`.
-    bslma::ManagedPtr<mqbsi::Log>
+    bmqu::UniquePtr<mqbsi::Log>
     create(const mqbsi::LogConfig& config) override;
 };
 

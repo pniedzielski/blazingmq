@@ -46,6 +46,7 @@
 #include <bmqtst_testhelper.h>
 #include <bmqu_tempdirectory.h>
 #include <bmqu_time.h>
+#include <bmqu_uniqueptr.h>
 
 // CONVENIENCE
 using namespace BloombergLP;
@@ -225,7 +226,7 @@ struct Tester {
                                        false,
                                        d_allocator_p);
 
-            bslma::ManagedPtr<mqbsi::Log> log = d_logFactory_sp->create(
+            bmqu::UniquePtr<mqbsi::Log> log = d_logFactory_sp->create(
                 logConfig);
 
             int rc = log->open(mqbsi::Log::e_CREATE_IF_MISSING);

@@ -20,6 +20,7 @@
 #include <mqbs_filesystemutil.h>
 
 #include <bmqu_memoutstream.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bdlb_scopeexit.h>
@@ -71,12 +72,12 @@ MemoryMappedOnDiskLogFactory::~MemoryMappedOnDiskLogFactory()
 }
 
 // MANIPULATORS
-bslma::ManagedPtr<mqbsi::Log>
+bmqu::UniquePtr<mqbsi::Log>
 MemoryMappedOnDiskLogFactory::create(const mqbsi::LogConfig& config)
 {
-    bslma::ManagedPtr<mqbsi::Log> log(new (*d_allocator_p)
-                                          MemoryMappedOnDiskLog(config),
-                                      d_allocator_p);
+    bmqu::UniquePtr<mqbsi::Log> log = bmqu::UniquePtrUtil::adopt<mqbsi::Log>(
+        new (*d_allocator_p) MemoryMappedOnDiskLog(config),
+        d_allocator_p);
     return log;
 }
 

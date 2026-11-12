@@ -39,6 +39,7 @@
 #include <mqbu_storagekey.h>
 
 #include <bmqu_blob.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bdlbb_blob.h>
@@ -69,7 +70,7 @@ class LogFactory {
     // MANIPULATORS
 
     /// Create a new log using the specified `config`.
-    virtual bslma::ManagedPtr<Log> create(const LogConfig& config) = 0;
+    virtual bmqu::UniquePtr<Log> create(const LogConfig& config) = 0;
 };
 
 // ==================
