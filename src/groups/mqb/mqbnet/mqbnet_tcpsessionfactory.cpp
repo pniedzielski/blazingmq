@@ -263,10 +263,10 @@ struct ChannelFactoryBuilders {
                       const ntca::InterfaceConfig& interfaceConfig,
                       bdlbb::BlobBufferFactory*    blobBufferFactory)
     {
-        bsl::shared_ptr<bmqio::NtcChannelFactory> factory =
-            bsl::allocate_shared<bmqio::NtcChannelFactory>(allocator,
-                                                           interfaceConfig,
-                                                           blobBufferFactory);
+        auto factory = bsl::allocate_shared<bmqio::NtcChannelFactory>(
+            allocator,
+            interfaceConfig,
+            blobBufferFactory);
         factory->onCreate(
             [](const bsl::shared_ptr<bmqio::NtcChannel>& channel,
                const bsl::shared_ptr<bmqio::ChannelFactoryOperationHandle>&
@@ -420,7 +420,7 @@ void TCPSessionFactory::handleInitialConnection(
     // `handleEvent()`, its lifetime ends when `InitialConnectionCompleteCb`
     // finishes.
 
-    bsl::shared_ptr<InitialConnectionContext> initialConnectionContext_sp =
+    auto initialConnectionContext_sp =
         bsl::allocate_shared<InitialConnectionContext>(
             d_allocator_p,
             context->d_isIncoming,
@@ -767,8 +767,8 @@ void TCPSessionFactory::onSessionDestroyed(
     void*                                   sprep)
 {
     // Delete the session object by releasing its associated rep.
-    bslma::SharedPtrRep* rep = static_cast<bslma::SharedPtrRep*>(sprep);
-    bool isClient            = isClientOrProxy(static_cast<Session*>(session));
+    auto* rep      = static_cast<bslma::SharedPtrRep*>(sprep);
+    bool  isClient = isClientOrProxy(static_cast<Session*>(session));
     rep->releaseRef();
 
     bsl::shared_ptr<TCPSessionFactory> strongSelf = self.lock();
@@ -1592,8 +1592,7 @@ int TCPSessionFactory::listen(const mqbcfg::TcpInterfaceListener& listener,
     // 'ChannelFactory::listen' because it may delete the context
     // (on stopListening) while operation (readCallback / negotiation) is in
     // progress.
-    bsl::shared_ptr<OperationContext> context =
-        bsl::allocate_shared<OperationContext>(d_allocator_p);
+    auto context = bsl::allocate_shared<OperationContext>(d_allocator_p);
     d_listenContexts.emplace(port, context);
 
     context->d_resultCb      = resultCallback;
