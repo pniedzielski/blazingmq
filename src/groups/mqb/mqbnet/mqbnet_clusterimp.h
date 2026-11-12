@@ -387,11 +387,9 @@ inline bool ClusterNodeImp::isAvailable() const
 // MANIPULATORS
 inline ClusterNode* ClusterImp::lookupNode(int nodeId)
 {
-    for (bsl::list<ClusterNodeImp>::iterator it = d_nodes.begin();
-         it != d_nodes.end();
-         ++it) {
-        if (it->nodeId() == nodeId) {
-            return &(*it);  // RETURN
+    for (auto& clusterNode : d_nodes) {
+        if (clusterNode.nodeId() == nodeId) {
+            return &clusterNode;  // RETURN
         }
     }
 

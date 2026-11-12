@@ -173,10 +173,8 @@ void ClusterImp::notifyObserversOfNodeStateChange(ClusterNode* node,
         //       observers callback.  If required, this can be changed by
         //       making a copy of the set inside the mutex, and iterating over
         //       the copy after releasing the mutex.
-        for (ObserversSet::iterator it = d_nodeStateObservers.begin();
-             it != d_nodeStateObservers.end();
-             ++it) {
-            (*it)->onNodeStateChange(node, state);
+        for (const auto& observer : d_nodeStateObservers) {
+            observer->onNodeStateChange(node, state);
         }
     }
 
@@ -244,12 +242,10 @@ Cluster* ClusterImp::unregisterObserver(ClusterObserver* observer)
 void ClusterImp::writeAll(const bsl::shared_ptr<bdlbb::Blob>& blob,
                           bmqp::EventType::Enum               type)
 {
-    for (bsl::list<ClusterNodeImp>::iterator it = d_nodes.begin();
-         it != d_nodes.end();
-         ++it) {
+    for (auto& clusterNode : d_nodes) {
         // Write to all peers (except self)
-        if (it->nodeId() != selfNodeId()) {
-            bmqt::GenericResult::Enum rc = it->write(blob, type);
+        if (clusterNode.nodeId() != selfNodeId()) {
+            bmqt::GenericResult::Enum rc = clusterNode.write(blob, type);
 
             if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(
                     bmqt::GenericResult::e_SUCCESS != rc &&
@@ -260,8 +256,8 @@ void ClusterImp::writeAll(const bsl::shared_ptr<bdlbb::Blob>& blob,
                     BALL_LOG_ERROR << "#CLUSTER_SEND_FAILURE "
                                    << "Failed to write blob of length ["
                                    << blob->length() << "] bytes, to node "
-                                   << it->nodeDescription() << ", rc: " << rc
-                                   << ".";
+                                   << clusterNode.nodeDescription()
+                                   << ", rc: " << rc << ".";
                 }
             }
         }
@@ -276,16 +272,12 @@ void ClusterImp::broadcast(const bsl::shared_ptr<bdlbb::Blob>& blob)
 void ClusterImp::closeChannels()
 {
     // first, start draining all channels
-    for (bsl::list<ClusterNodeImp>::iterator it = d_nodes.begin();
-         it != d_nodes.end();
-         ++it) {
-        it->channel().requestToStop();
+    for (auto& clusterNode : d_nodes) {
+        clusterNode.channel().requestToStop();
     }
     // then, join all channels threads
-    for (bsl::list<ClusterNodeImp>::iterator it = d_nodes.begin();
-         it != d_nodes.end();
-         ++it) {
-        it->channel().stop();
+    for (auto& clusterNode : d_nodes) {
+        clusterNode.channel().stop();
     }
 }
 
@@ -296,11 +288,9 @@ void ClusterImp::enableRead()
 
     d_isReadEnabled = true;
 
-    for (bsl::list<ClusterNodeImp>::iterator it = d_nodes.begin();
-         it != d_nodes.end();
-         ++it) {
-        if (it->nodeId() != d_selfNodeId) {
-            it->enableRead();
+    for (auto& clusterNode : d_nodes) {
+        if (clusterNode.nodeId() != d_selfNodeId) {
+            clusterNode.enableRead();
         }
     }
 }
@@ -317,10 +307,8 @@ void ClusterImp::onProxyConnectionUp(
     //       callback.  If required, this can be changed by making a copy of
     //       the set inside the mutex, and iterating over the copy after
     //       releasing the mutex.
-    for (ObserversSet::iterator it = d_nodeStateObservers.begin();
-         it != d_nodeStateObservers.end();
-         ++it) {
-        (*it)->onProxyConnectionUp(channel, identity, description);
+    for (const auto& observer : d_nodeStateObservers) {
+        observer->onProxyConnectionUp(channel, identity, description);
     }
 }
 
