@@ -60,10 +60,9 @@ static void test1_partitionIdExtractor()
                                  bmqtst::TestHelperUtil::allocator()),
                      -1);
 
-    TestData::const_iterator cIt = testData.begin();
-    for (; cIt != testData.end(); ++cIt) {
-        int result = extractor.extract(cIt->first);
-        BMQTST_ASSERT_EQ(result, cIt->second);
+    for (const auto& [input, expected] : testData) {
+        int result = extractor.extract(input);
+        BMQTST_ASSERT_EQ(result, expected);
     }
 }
 
