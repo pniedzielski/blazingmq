@@ -41,11 +41,10 @@ static void test1_basic()
 {
     bmqtst::TestHelper::printTestName("PushStream basic test");
 
-    bsl::shared_ptr<bdlma::ConcurrentPool> pushElementsPool(
-        bsl::allocate_shared<bdlma::ConcurrentPool>(
-            bmqtst::TestHelperUtil::allocator(),
-            sizeof(mqbblp::PushStream::Element),
-            bmqtst::TestHelperUtil::allocator()));
+    auto pushElementsPool = bsl::allocate_shared<bdlma::ConcurrentPool>(
+        bmqtst::TestHelperUtil::allocator(),
+        sizeof(mqbblp::PushStream::Element),
+        bmqtst::TestHelperUtil::allocator());
 
     mqbblp::PushStream                                 ps(pushElementsPool,
                           bmqtst::TestHelperUtil::allocator());
@@ -71,11 +70,10 @@ static void test2_iterations()
 
     // Imitate {m1, a1}, {m2, a2}, {m1, a2}, {m2, a1}
 
-    bsl::shared_ptr<bdlma::ConcurrentPool> pushElementsPool(
-        bsl::allocate_shared<bdlma::ConcurrentPool>(
-            bmqtst::TestHelperUtil::allocator(),
-            sizeof(mqbblp::PushStream::Element),
-            bmqtst::TestHelperUtil::allocator()));
+    auto pushElementsPool = bsl::allocate_shared<bdlma::ConcurrentPool>(
+        bmqtst::TestHelperUtil::allocator(),
+        sizeof(mqbblp::PushStream::Element),
+        bmqtst::TestHelperUtil::allocator());
 
     mqbblp::PushStream ps(pushElementsPool,
                           bmqtst::TestHelperUtil::allocator());
