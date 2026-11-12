@@ -65,7 +65,6 @@
 #include <bmqu_memoutstream.h>
 #include <bmqu_printutil.h>
 #include <bmqu_time.h>
-#include <bmqu_weakmemfn.h>
 
 // BDE
 #include <ball_log.h>
@@ -927,11 +926,12 @@ void TCPSessionFactory::onClose(const bsl::shared_ptr<bmqio::Channel>& channel,
                 //       'disableHeartbeat' in this case.
                 d_scheduler_p->scheduleEvent(
                     bsls::SystemTime::nowMonotonicClock(),
-                    [weakFn = bmqu::WeakMemFnUtil::weakMemFn(
-                         &TCPSessionFactory::disableHeartbeat,
-                         d_self.acquireWeak()),
+                    [weakSelf   = d_self.acquireWeak(),
                      channelPtr = channel.get()]() {
-                        weakFn(channelPtr);
+                        if (bsl::shared_ptr<TCPSessionFactory> strongSelf =
+                                weakSelf.lock()) {
+                            strongSelf->disableHeartbeat(channelPtr);
+                        }
                     });
             }
         }
@@ -1380,9 +1380,12 @@ int TCPSessionFactory::start(bsl::ostream& errorDescription)
         d_scheduler_p->scheduleRecurringEvent(
             &d_heartbeatSchedulerHandle,
             interval,
-            bmqu::WeakMemFnUtil::weakMemFn(
-                &TCPSessionFactory::onHeartbeatSchedulerEvent,
-                d_self.acquireWeak()));
+            [weakSelf = d_self.acquireWeak()]() {
+                if (bsl::shared_ptr<TCPSessionFactory> strongSelf =
+                        weakSelf.lock()) {
+                    strongSelf->onHeartbeatSchedulerEvent();
+                }
+            });
         d_heartbeatSchedulerActive = true;
     }
     else {
@@ -1547,8 +1550,12 @@ void TCPSessionFactory::stop()
 
         d_scheduler_p->scheduleEvent(
             bsls::TimeInterval(0),
-            bmqu::WeakMemFnUtil::weakMemFn(&TCPSessionFactory::stopHeartbeats,
-                                           d_self.acquireWeak()));
+            [weakSelf = d_self.acquireWeak()]() {
+                if (bsl::shared_ptr<TCPSessionFactory> strongSelf =
+                        weakSelf.lock()) {
+                    strongSelf->stopHeartbeats();
+                }
+            });
 
         // No need to wait for 'stopHeartbeats' because 'd_heartbeatChannels'
         // keep counted reference to sessions ('ChannelInfo::d_session_sp') and
