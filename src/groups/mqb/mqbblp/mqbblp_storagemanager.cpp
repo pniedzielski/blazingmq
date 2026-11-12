@@ -641,7 +641,7 @@ void StorageManager::updatePrimaryForPartition(
 
                 mqbc::StorageUtil::forceIssueAdvisoryAndSyncPt(d_clusterData_p,
                                                                fs,
-                                                               NULL,
+                                                               nullptr,
                                                                pinfo);
             }
             // else: self is not primary, or it is, but not an active one.  In

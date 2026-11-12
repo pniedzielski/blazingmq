@@ -538,7 +538,7 @@ void ClientSession::sendAck(bmqt::AckResult::Enum    status,
     //       not the first hop, correlationId will be NULL.  But this method
     //       does not care about them.
 
-    const bmqt::Uri* uri_p = NULL;
+    const bmqt::Uri* uri_p = nullptr;
     if (status != bmqt::AckResult::e_SUCCESS) [[unlikely]] {
         // When we receive a PUT event for an unknown queue (likely the queue
         // was already closed), we NACK it with e_INVALID_ARGUMENT; in this

@@ -1325,7 +1325,7 @@ void StorageManager::applyPrimaryStateResponse(const RequestSp&     context,
     BSLS_ASSERT_SAFE(d_cluster_p->inDispatcherThread());
     BSLS_ASSERT_SAFE(!d_clusterData_p->cluster().isLocal());
 
-    BSLS_ASSERT_SAFE(context->response().rId() != NULL);
+    BSLS_ASSERT_SAFE(context->response().rId() != nullptr);
     if (context->request().rId().isNull()) {
         BSLS_ASSERT_SAFE(context->response().rId().isNull());
     }
@@ -1575,7 +1575,7 @@ void StorageManager::applyReplicaDataResponse(const RequestSp&     context,
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_cluster_p->inDispatcherThread());
     BSLS_ASSERT_SAFE(!d_clusterData_p->cluster().isLocal());
-    BSLS_ASSERT_SAFE(context->response().rId() != NULL);
+    BSLS_ASSERT_SAFE(context->response().rId() != nullptr);
     BSLS_ASSERT_SAFE(context->request().rId().value() ==
                      context->response().rId().value());
 

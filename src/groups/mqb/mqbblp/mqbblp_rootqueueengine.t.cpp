@@ -4937,15 +4937,15 @@ static void test47_handleParametersLimits()
         // 1. readCount
         mqbmock::QueueHandle* C1 = tester.getHandle(
             "C1_r readCount=1000000000");
-        BMQTST_ASSERT(C1 != NULL);
+        BMQTST_ASSERT(C1 != nullptr);
         mqbmock::QueueHandle* C2 = tester.getHandle(
             "C2_r readCount=1000000000");
-        BMQTST_ASSERT(C2 != NULL);
+        BMQTST_ASSERT(C2 != nullptr);
         mqbmock::QueueHandle* C3 = tester.getHandle(
             "C3_r readCount=1000000000");
-        BMQTST_ASSERT(C3 == NULL);
+        BMQTST_ASSERT(C3 == nullptr);
         mqbmock::QueueHandle* C4 = tester.getHandle("C4_r readCount=1");
-        BMQTST_ASSERT(C4 != NULL);
+        BMQTST_ASSERT(C4 != nullptr);
 
         tester.configureHandle(
             "C1_r consumerPriority=1 consumerPriorityCount=1");
@@ -4958,15 +4958,15 @@ static void test47_handleParametersLimits()
         // 2. writeCount
         mqbmock::QueueHandle* C1 = tester.getHandle(
             "C1_w writeCount=1000000000");
-        BMQTST_ASSERT(C1 != NULL);
+        BMQTST_ASSERT(C1 != nullptr);
         mqbmock::QueueHandle* C2 = tester.getHandle(
             "C2_w writeCount=1000000000");
-        BMQTST_ASSERT(C2 != NULL);
+        BMQTST_ASSERT(C2 != nullptr);
         mqbmock::QueueHandle* C3 = tester.getHandle(
             "C3_w writeCount=1000000000");
-        BMQTST_ASSERT(C3 == NULL);
+        BMQTST_ASSERT(C3 == nullptr);
         mqbmock::QueueHandle* C4 = tester.getHandle("C4_w readCount=1");
-        BMQTST_ASSERT(C4 != NULL);
+        BMQTST_ASSERT(C4 != nullptr);
 
         tester.configureHandle(
             "C1_w consumerPriority=1 consumerPriorityCount=1");
@@ -4979,15 +4979,15 @@ static void test47_handleParametersLimits()
         // 3. adminCount (all admin opens are rejected)
         mqbmock::QueueHandle* C1 = tester.getHandle(
             "C1_a adminCount=1000000000");
-        BMQTST_ASSERT(C1 == NULL);
+        BMQTST_ASSERT(C1 == nullptr);
         mqbmock::QueueHandle* C2 = tester.getHandle(
             "C2_a adminCount=1000000000");
-        BMQTST_ASSERT(C2 == NULL);
+        BMQTST_ASSERT(C2 == nullptr);
         mqbmock::QueueHandle* C3 = tester.getHandle(
             "C3_a adminCount=1000000000");
-        BMQTST_ASSERT(C3 == NULL);
+        BMQTST_ASSERT(C3 == nullptr);
         mqbmock::QueueHandle* C4 = tester.getHandle("C4_a readCount=1");
-        BMQTST_ASSERT(C4 != NULL);
+        BMQTST_ASSERT(C4 != nullptr);
 
         tester.configureHandle(
             "C4_a consumerPriority=1 consumerPriorityCount=1");

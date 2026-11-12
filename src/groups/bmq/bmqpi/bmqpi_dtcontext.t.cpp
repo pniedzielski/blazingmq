@@ -103,7 +103,7 @@ static void test1_breathingTest()
     PV("Verify that all methods are public and virtual");
 
     BSLS_PROTOCOLTEST_ASSERT(context, span());
-    BSLS_PROTOCOLTEST_ASSERT(context, scope(NULL));
+    BSLS_PROTOCOLTEST_ASSERT(context, scope(nullptr));
 }
 
 // ============================================================================

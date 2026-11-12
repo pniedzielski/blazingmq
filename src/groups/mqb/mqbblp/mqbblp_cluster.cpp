@@ -395,7 +395,7 @@ void Cluster::sendAck(bmqt::AckResult::Enum           status,
     // uri, for logging (we don't leverage that the caller might already have
     // that queue looked up, because not all code path calling 'sendAck' have
     // it).
-    const bmqt::Uri* uri_p = NULL;
+    const bmqt::Uri* uri_p = nullptr;
     if (status != bmqt::AckResult::e_SUCCESS) [[unlikely]] {
         QueueHandleMap::const_iterator it = nodeSession->queueHandles().find(
             queueId);
@@ -3305,7 +3305,7 @@ void Cluster::getPartitionPrimaryNode(int*                  rc,
     BSLS_ASSERT_SAFE(inDispatcherThread());
 
     // Reset if uninitialized
-    *node          = NULL;
+    *node          = nullptr;
     *isSelfPrimary = false;
 
     enum RcEnum {

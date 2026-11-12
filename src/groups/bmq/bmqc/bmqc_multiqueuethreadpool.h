@@ -632,7 +632,7 @@ inline void MultiQueueThreadPool<TYPE>::processMonitorEvents()
 
             queue.d_processQueueRefCount.addRelaxed(1);
             const int ret = queue.d_queue_p->tryPushBack(
-                NULL /* monitor event */);
+                nullptr /* monitor event */);
             if (ret != 0) {
                 BALL_LOG_ERROR << d_config.d_monitorAlarmString
                                << " Couldn't enqueue monitor event on queue '"
@@ -859,7 +859,7 @@ inline void MultiQueueThreadPool<TYPE>::stop()
         // These two updates balance each other (+1 -1 = 0), so we can keep
         // the current value of `info.d_processQueueRefCount` unchanged.
 
-        info.d_queue_p->pushBack(NULL /* monitor event */);
+        info.d_queue_p->pushBack(nullptr /* monitor event */);
         // It is possible that something is enqueued to the queue between the
         // last monitor event and `disablePushBack()` call, this is expected.
         info.d_queue_p->disablePushBack();

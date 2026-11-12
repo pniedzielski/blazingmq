@@ -407,7 +407,7 @@ static void test5_exit_shutdown()
     sa.sa_flags   = 0;
     sa.sa_handler = dummySignalHandler;
 
-    int rc = ::sigaction(SIGINT, &sa, NULL);
+    int rc = ::sigaction(SIGINT, &sa, nullptr);
     if (rc != 0) {
         PRINT("Can't catch SIGINT [rc: " << rc << "]");
         BSLS_ASSERT_OPT(false);

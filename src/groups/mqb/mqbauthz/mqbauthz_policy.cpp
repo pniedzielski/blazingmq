@@ -104,7 +104,7 @@ int Policy_UriResource::parse(Policy_UriResource* result,
     enum { k_OK = 0, k_NO_MATCH };
 
     bdlpcre::RegEx uriResourcePattern;
-    uriResourcePattern.prepare(NULL, NULL, k_PATTERN);
+    uriResourcePattern.prepare(nullptr, nullptr, k_PATTERN);
 
     typedef bsl::vector<bsl::string_view> PatternMatches;
     PatternMatches                        matches;
@@ -313,7 +313,7 @@ bool Policy_Permission::matchUri(bsl::string_view    uriStr,
 
     */
     bmqt::Uri uri;
-    int       rc = bmqt::UriParser::parse(&uri, NULL, uriStr);
+    int       rc = bmqt::UriParser::parse(&uri, nullptr, uriStr);
     if (rc != 0) {
         // Invalid URIs don't match
         return false;

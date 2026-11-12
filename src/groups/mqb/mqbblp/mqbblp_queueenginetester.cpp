@@ -909,7 +909,7 @@ int QueueEngineTester::configureHandle(const bsl::string& clientText)
 
     // 2. Configure the handle
     mqbi::QueueHandle* handle = client(clientKey);
-    BSLS_ASSERT_OPT(handle != NULL);
+    BSLS_ASSERT_OPT(handle != nullptr);
 
     int rc = bmqp_ctrlmsg::StatusCategory::E_UNKNOWN;
     const mqbi::QueueHandle::HandleConfiguredCallback configuredCb =

@@ -247,7 +247,7 @@ DefaultAuthorizerPluginFactory::create(bslma::Allocator* allocator)
         mqbplug::AuthorizerUtil::findAuthorizerConfig(
             DefaultAuthorizer::k_NAME);
 
-    if (config == NULL) {
+    if (config == nullptr) {
         BALL_LOG_WARN << "No authorizer is configured";
         // TODO(tfoxhall): A little unclear what to do here, I think we want to
         // preserve the old allow-all behavior assuming that this is an older

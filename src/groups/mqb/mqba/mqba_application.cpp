@@ -112,7 +112,7 @@ void Application::oneTimeInit()
         // information to take care of scenarios when nodes are started at the
         // same time or on the same physical host.
         unsigned int seed =
-            bsl::time(NULL) +
+            bsl::time(nullptr) +
             static_cast<unsigned int>(bdls::ProcessUtil::getProcessId()) +
             static_cast<unsigned int>(bmqu::Time::highResolutionTimer() &
                                       0xFFFFFFFF);
@@ -784,7 +784,7 @@ Application::getRelevantCluster(bsl::ostream&          errorDescription,
         }
         else {
             errorDescription << "Cannot extract cluster for that command";
-            return NULL;  // RETURN
+            return nullptr;  // RETURN
         }
 
         // Attempt to locate the domain
@@ -792,7 +792,7 @@ Application::getRelevantCluster(bsl::ostream&          errorDescription,
         if (0 !=
             d_domainManager_mp->locateOrCreateDomain(&domainSp, domainName)) {
             errorDescription << "Domain '" << domainName << "' doesn't exist";
-            return NULL;  // RETURN
+            return nullptr;  // RETURN
         }
 
         return domainSp->cluster();  // RETURN
@@ -804,13 +804,13 @@ Application::getRelevantCluster(bsl::ostream&          errorDescription,
         if (!d_clusterCatalog_mp->findCluster(&clusterOut, clusterName)) {
             errorDescription << "Cluster '" << clusterName
                              << "' doesn't exist";
-            return NULL;  // RETURN
+            return nullptr;  // RETURN
         }
         return clusterOut.get();  // RETURN
     }
 
     errorDescription << "Cannot extract cluster for that command";
-    return NULL;  // RETURN
+    return nullptr;  // RETURN
 }
 
 void Application::executeCommand(const mqbcmd::Command&  command,
@@ -964,7 +964,7 @@ int Application::processCommand(const bsl::string& source,
         bmqu::MemOutStream errorDescription;
 
         mqbi::Cluster* cluster = getRelevantCluster(errorDescription, command);
-        if (cluster == NULL) {  // Error occurred getting cluster
+        if (cluster == nullptr) {  // Error occurred getting cluster
             cmdResult.makeError().message() = errorDescription.str();
             mqbcmd::Util::printCommandResult(cmdResult,
                                              command.encoding(),

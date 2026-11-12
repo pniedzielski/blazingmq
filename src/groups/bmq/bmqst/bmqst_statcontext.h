@@ -849,7 +849,7 @@ class StatContext {
     /// Return a modifiable pointer to the user data associated with this
     /// context, or 0 if no such data exists.
     /// NOTE: keep for ABI compatibility.
-    StatContextUserData* userData() const { return NULL; }
+    StatContextUserData* userData() const { return nullptr; }
 
     /// Return a pointer to the datum allocator in this context.
     bslma::Allocator* datumAllocator() const;

@@ -1087,7 +1087,7 @@ static void testUserData(bslma::Allocator* allocator)
 
     LocalType* ptr = dynamic_cast<LocalType*>(context.userData());
 
-    ASSERT(NULL == ptr);
+    ASSERT(nullptr == ptr);
 }
 
 //=============================================================================

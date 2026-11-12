@@ -149,10 +149,10 @@ bsl::ostream& SessionOptions::print(bsl::ostream& stream,
     printer.printAttribute("eventQueueHighWatermark",
                            d_eventQueueHighWatermark);
     printer.printAttribute("hasAuthnCredentialCb",
-                           d_authnCredentialCb != NULL);
+                           d_authnCredentialCb != nullptr);
     printer.printAttribute("hasHostHealthMonitor",
-                           d_hostHealthMonitor_sp != NULL);
-    printer.printAttribute("hasDistributedTracing", d_dtTracer_sp != NULL);
+                           d_hostHealthMonitor_sp != nullptr);
+    printer.printAttribute("hasDistributedTracing", d_dtTracer_sp != nullptr);
     printer.printAttribute("userAgentPrefix", d_userAgentPrefix);
     printer.end();
 

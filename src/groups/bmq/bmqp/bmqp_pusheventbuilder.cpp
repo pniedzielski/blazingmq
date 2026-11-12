@@ -162,7 +162,7 @@ PushEventBuilder::PushEventBuilder(BlobSpPool*       blobSpPool_p,
     // all don't have buffer factory, and check it once for a sample blob.
     // We require this since we do `Blob::setLength`:
     BSLS_ASSERT_SAFE(
-        NULL != d_blobSpCreator()->factory() &&
+        nullptr != d_blobSpCreator()->factory() &&
         "Passed BlobSpPool must build Blobs with set BlobBufferFactory");
 
     reset();
@@ -184,7 +184,7 @@ PushEventBuilder::PushEventBuilder(const BlobSpCreator& blobSpCreator,
     // all don't have buffer factory, and check it once for a sample blob.
     // We require this since we do `Blob::setLength`:
     BSLS_ASSERT_SAFE(
-        NULL != d_blobSpCreator()->factory() &&
+        nullptr != d_blobSpCreator()->factory() &&
         "Passed BlobSpPool must build Blobs with set BlobBufferFactory");
 
     reset();

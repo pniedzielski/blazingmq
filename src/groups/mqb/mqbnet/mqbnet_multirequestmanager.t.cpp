@@ -514,7 +514,7 @@ static void test2_creatorsTest()
     {
         // Null RequestManager pointer
         BMQTST_ASSERT_SAFE_FAIL(
-            MultiReqManagerType(NULL, bmqtst::TestHelperUtil::allocator()));
+            MultiReqManagerType(nullptr, bmqtst::TestHelperUtil::allocator()));
     }
 
     {

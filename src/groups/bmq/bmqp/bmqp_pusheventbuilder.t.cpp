@@ -1299,7 +1299,7 @@ int main(int argc, char* argv[])
             bslmf::NestedTraitDeclaration<Data, bslma::UsesBslmaAllocator> >(
             dummy));
 
-    unsigned int seed = bsl::time(NULL);
+    unsigned int seed = bsl::time(nullptr);
     bsl::srand(seed);
     PV("Seed: " << seed);
 

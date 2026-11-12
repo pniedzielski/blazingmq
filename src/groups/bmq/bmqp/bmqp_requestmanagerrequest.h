@@ -399,8 +399,8 @@ inline RequestManagerRequest::RequestManagerRequest(
 , d_haveResponse(false)
 , d_groupId(k_NO_GROUP_ID)
 , d_componentId(RequestManagerComponentId::k_NO_COMPONENT_ID)
-, d_dtSpan_sp(NULL)
-, d_dtContext_p(NULL)
+, d_dtSpan_sp(nullptr)
+, d_dtContext_p(nullptr)
 , d_userData(allocator)
 {
     // NOTHING
@@ -431,7 +431,7 @@ inline void RequestManagerRequest::clear()
     d_groupId     = k_NO_GROUP_ID;
     d_componentId = RequestManagerComponentId::k_NO_COMPONENT_ID;
     d_dtSpan_sp.reset();
-    d_dtContext_p = NULL;
+    d_dtContext_p = nullptr;
 }
 
 inline void RequestManagerRequest::signal()

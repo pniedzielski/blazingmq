@@ -51,7 +51,7 @@ RecoveryEventBuilder::RecoveryEventBuilder(BlobSpPool*       blobSpPool_p,
     // all don't have buffer factory, and check it once for a sample blob.
     // We require this since we do `Blob::setLength`:
     BSLS_ASSERT_SAFE(
-        NULL != blobSpPool_p->getObject()->factory() &&
+        nullptr != blobSpPool_p->getObject()->factory() &&
         "Passed BlobSpPool must build Blobs with set BlobBufferFactory");
 
     reset();

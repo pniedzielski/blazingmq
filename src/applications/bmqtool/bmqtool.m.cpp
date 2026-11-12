@@ -63,7 +63,7 @@ static void ignoreSigpipe()
     sigemptyset(&sa.sa_mask);
     sa.sa_flags   = 0;
     sa.sa_handler = SIG_IGN;
-    if (0 != sigaction(SIGPIPE, &sa, NULL)) {
+    if (0 != sigaction(SIGPIPE, &sa, nullptr)) {
         bsl::cerr << "Failed to ignore SIGPIPE!" << bsl::endl;
     }
 #endif

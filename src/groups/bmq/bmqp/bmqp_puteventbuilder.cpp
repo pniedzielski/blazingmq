@@ -196,7 +196,7 @@ int PutEventBuilder::reset()
 
     // The following prerequisite is necessary since we do `Blob::setLength`:
     BSLS_ASSERT_SAFE(
-        NULL != d_blob_sp->factory() &&
+        nullptr != d_blob_sp->factory() &&
         "Passed BlobSpPool must build Blobs with set BlobBufferFactory");
 
     d_msgStarted       = false;

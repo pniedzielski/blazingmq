@@ -174,7 +174,7 @@ static void test1_breathingTest()
         char* p = addRecords(bmqtst::TestHelperUtil::allocator(),
                              &mfd,
                              &fh,
-                             NULL,  // No messages
+                             nullptr,  // No messages
                              0);
 
         DataFileIterator it(&mfd, fh);
@@ -190,7 +190,7 @@ static void test1_breathingTest()
         char* p = addRecords(bmqtst::TestHelperUtil::allocator(),
                              &mfd,
                              &fh,
-                             NULL,  // No messages
+                             nullptr,  // No messages
                              0);
 
         DataFileIterator it(&mfd, fh);

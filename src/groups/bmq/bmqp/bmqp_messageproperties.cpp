@@ -828,7 +828,7 @@ int MessageProperties::streamIn(const bdlbb::Blob& blob,
             }
         }
 
-        inline void release() { d_properties_p = NULL; }
+        inline void release() { d_properties_p = nullptr; }
     } cleanOnFailure(this);
 
     int rc = streamInHeader(blob);

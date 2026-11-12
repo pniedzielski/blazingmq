@@ -63,7 +63,7 @@ class WrappedChannelFactory : public bmqio::ChannelFactory {
     WrappedChannelFactory(bmqio::ChannelFactory* wrapped)
     : d_wrapped(wrapped)
     {
-        BSLS_ASSERT(d_wrapped != NULL);
+        BSLS_ASSERT(d_wrapped != nullptr);
     }
 
     void listen(bmqio::Status*               status,
@@ -163,7 +163,7 @@ TEST_F(ChannelFactoryPipelineConfigTest, addWithFails)
         make(BSLA_UNUSED bsl::shared_ptr<bmqio::ChannelFactory>& prev)
         {
             // This is a contract failure.
-            return NULL;
+            return nullptr;
         }
     };
 

@@ -102,7 +102,7 @@ static void test1_breathingTest()
 
     PV("Verify that all methods are public and virtual");
     bmqpi::DTSpan::Baggage empty;
-    BSLS_PROTOCOLTEST_ASSERT(tracer, createChildSpan(NULL, "", empty));
+    BSLS_PROTOCOLTEST_ASSERT(tracer, createChildSpan(nullptr, "", empty));
 }
 
 // ============================================================================

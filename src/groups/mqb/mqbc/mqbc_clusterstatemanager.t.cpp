@@ -3015,7 +3015,7 @@ static void test28_watchdogFollowerRetryExhaustion()
     BMQTST_ASSERT_EQ(static_cast<int>(s_sigintReceived), 1);
 
     // Restore original handler
-    sigaction(SIGINT, &oldSa, NULL);
+    sigaction(SIGINT, &oldSa, nullptr);
 }
 
 static void test29_watchdogLeaderRetryExhaustion()
@@ -3086,7 +3086,7 @@ static void test29_watchdogLeaderRetryExhaustion()
     BMQTST_ASSERT_EQ(static_cast<int>(s_sigintReceived), 1);
 
     // Restore original handler
-    sigaction(SIGINT, &oldSa, NULL);
+    sigaction(SIGINT, &oldSa, nullptr);
 }
 
 // ============================================================================

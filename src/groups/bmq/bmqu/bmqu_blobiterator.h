@@ -192,7 +192,7 @@ inline BlobIterator::BlobIterator(const bdlbb::Blob*        blob,
 }
 
 inline BlobIterator::BlobIterator()
-: d_blob_p(NULL)
+: d_blob_p(nullptr)
 , d_remaining(0)
 , d_advancingLength(false)
 {

@@ -1974,7 +1974,7 @@ static void test6_emptyBuilder()
     BMQTST_ASSERT_SAFE_FAIL(obj.setCrc32c(0));
     BMQTST_ASSERT_SAFE_FAIL(
         obj.setMessagePayload(k_PAYLOAD, bsl::strlen(k_PAYLOAD)));
-    BMQTST_ASSERT_SAFE_FAIL(obj.setMessagePayload(NULL));
+    BMQTST_ASSERT_SAFE_FAIL(obj.setMessagePayload(nullptr));
 
     obj.startMessage();
 

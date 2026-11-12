@@ -162,11 +162,11 @@ inline T* ChannelFactoryPipeline::get()
 {
     for (const ChannelFactorySP& factory : d_pipeline) {
         auto* test = dynamic_cast<T*>(factory.get());
-        if (test != NULL) {
+        if (test != nullptr) {
             return test;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 }

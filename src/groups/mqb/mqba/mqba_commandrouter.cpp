@@ -103,7 +103,7 @@ int CommandRouter::SinglePartitionPrimaryRoutingMode::getRouteTargets(
     BSLS_ASSERT_SAFE(routeTargets);
     BSLS_ASSERT_SAFE(cluster);
 
-    mqbnet::ClusterNode* node = NULL;
+    mqbnet::ClusterNode* node = nullptr;
 
     int rc;
 

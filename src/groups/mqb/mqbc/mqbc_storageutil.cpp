@@ -3351,7 +3351,7 @@ void StorageUtil::purgeDomainInPartition(
         mqbcmd::PurgeQueueResult result;
         // No need to pass a Semaphore here because we call it in
         // a synchronous way
-        purgeQueue(&result, NULL, domainStorages[i], fileStore, "");
+        purgeQueue(&result, nullptr, domainStorages[i], fileStore, "");
         purgedQueuesResults.push_back(result);
     }
 
@@ -3589,7 +3589,7 @@ void StorageUtil::processCommand(
 
         BSLS_ASSERT_SAFE(uri.isCanonical());
 
-        mqbi::Storage* queueStorage = NULL;
+        mqbi::Storage* queueStorage = nullptr;
         for (size_t i = 0; i < storageMapVec->size(); ++i) {
             bslmt::LockGuard<bslmt::Mutex> guard(
                 (*storageLockVec)[i].get());  // LOCK

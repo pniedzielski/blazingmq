@@ -204,7 +204,7 @@ RequestManager::RequestManager(bmqp::EventType::Enum  eventType,
                                        // invoke the function in the callers
                                        // thread instead of spawning a new
                                        // thread every time.
-, d_dtContext_sp(NULL)
+, d_dtContext_sp(nullptr)
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_scheduler_p->clockType() ==
@@ -225,7 +225,7 @@ RequestManager::RequestManager(bmqp::EventType::Enum  eventType,
 , d_schemaEventBuilder(blobSpPool_p, bmqp::EncodingType::e_BER, allocator)
 , d_lateResponseMode(lateResponseMode)
 , d_executor(executor)
-, d_dtContext_sp(NULL)
+, d_dtContext_sp(nullptr)
 {
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_scheduler_p->clockType() ==

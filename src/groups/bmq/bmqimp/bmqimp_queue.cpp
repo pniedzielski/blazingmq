@@ -415,7 +415,7 @@ Queue::print(bsl::ostream& stream, int level, int spacesPerLevel) const
         printer.printAttribute("requestGroupId", d_requestGroupId.value());
     }
     else {
-        printer.printAttribute("requestGroupId", static_cast<void*>(NULL));
+        printer.printAttribute("requestGroupId", static_cast<void*>(nullptr));
     }
     printer.printAttribute("isSuspended", d_isSuspended.load());
     printer.printAttribute("isSuspendedWithBroker", d_isSuspendedWithBroker);

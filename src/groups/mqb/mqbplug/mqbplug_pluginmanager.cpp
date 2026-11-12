@@ -222,7 +222,7 @@ void PluginManager::loadPluginLibrary(const char*            path,
     PluginEntryFnPtr entryPoint = reinterpret_cast<PluginEntryFnPtr>(
         dlsym(objectHandle, k_PLUGIN_ENTRY_POINT));
     char* dlerrorText = dlerror();
-    if (dlerrorText != NULL) {
+    if (dlerrorText != nullptr) {
         BALL_LOG_WARN << "Error while loading plugin entry point [symbol: '"
                       << k_PLUGIN_ENTRY_POINT << "', pluginPath: '" << path
                       << "', dlerror: '" << dlerrorText << "']";

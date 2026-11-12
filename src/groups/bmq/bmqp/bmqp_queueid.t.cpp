@@ -203,7 +203,7 @@ int main(int argc, char* argv[])
 {
     TEST_PROLOG(bmqtst::TestHelper::e_DEFAULT);
 
-    unsigned int seed = bsl::time(NULL);
+    unsigned int seed = bsl::time(nullptr);
     bsl::srand(seed);
     PV("Seed: " << seed);
 

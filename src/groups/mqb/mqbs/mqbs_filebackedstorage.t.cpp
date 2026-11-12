@@ -363,7 +363,7 @@ class MockDataStore : public mqbs::DataStore {
         *options = d_options.at(id);
     }
 
-    mqbi::Dispatcher* dispatcher() override { return NULL; }
+    mqbi::Dispatcher* dispatcher() override { return nullptr; }
 
     mqbi::DispatcherClientData& dispatcherClientData() override
     {
@@ -374,7 +374,7 @@ class MockDataStore : public mqbs::DataStore {
 
     void flush() override {}
 
-    const mqbi::Dispatcher* dispatcher() const override { return NULL; }
+    const mqbi::Dispatcher* dispatcher() const override { return nullptr; }
 
     const mqbi::DispatcherClientData& dispatcherClientData() const override
     {

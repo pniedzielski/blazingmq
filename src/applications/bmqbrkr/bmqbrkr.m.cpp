@@ -202,13 +202,13 @@ static void ignoreSigpipe()
 
     int rc = 0;
 
-    rc = ::sigaction(SIGPIPE, &sa, NULL);
+    rc = ::sigaction(SIGPIPE, &sa, nullptr);
     if (rc != 0) {
         bsl::cerr << "Failed to ignore SIGPIPE (rc: " << rc << ")\n"
                   << bsl::flush;
     }
 
-    rc = ::sigaction(SIGXFSZ, &sa, NULL);
+    rc = ::sigaction(SIGXFSZ, &sa, nullptr);
     if (rc != 0) {
         bsl::cerr << "Failed to ignore SIGXFSZ (rc: " << rc << ")\n"
                   << bsl::flush;
@@ -669,12 +669,12 @@ int main(int argc, const char* argv[])
     sa.sa_flags   = 0;
     sa.sa_handler = appShutdownSignal;
 
-    int rc = ::sigaction(SIGINT, &sa, NULL);
+    int rc = ::sigaction(SIGINT, &sa, nullptr);
     if (rc != 0) {
         bsl::cerr << "Failed to install SIGINT handler  (rc: " << rc << ")\n"
                   << bsl::flush;
     }
-    rc = ::sigaction(SIGTERM, &sa, NULL);
+    rc = ::sigaction(SIGTERM, &sa, nullptr);
     if (rc != 0) {
         bsl::cerr << "Failed to install SIGTERM handler  (rc: " << rc << ")\n"
                   << bsl::flush;

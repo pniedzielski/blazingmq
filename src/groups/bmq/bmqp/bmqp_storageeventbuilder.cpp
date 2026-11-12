@@ -120,7 +120,7 @@ StorageEventBuilder::StorageEventBuilder(int storageProtocolVersion,
     // all don't have buffer factory, and check it once for `d_emptyBlob_sp`.
     // We require this since we do `Blob::setLength`:
     BSLS_ASSERT_SAFE(
-        NULL != d_emptyBlob_sp->factory() &&
+        nullptr != d_emptyBlob_sp->factory() &&
         "Passed BlobSpPool must build Blobs with set BlobBufferFactory");
 
     reset();

@@ -743,7 +743,7 @@ void Tester::closeChannel(int line, const bslstl::StringRef& channelName)
 
 void Tester::blockChannelIo(int line, const bslstl::StringRef& channelName)
 {
-    ChannelInfo* info = NULL;
+    ChannelInfo* info = nullptr;
     {
         bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCK
         info = &d_channelMap[channelName];
@@ -758,7 +758,7 @@ void Tester::blockChannelIo(int line, const bslstl::StringRef& channelName)
 
 void Tester::unblockChannelIo(int line, const bslstl::StringRef& channelName)
 {
-    ChannelInfo* info = NULL;
+    ChannelInfo* info = nullptr;
     {
         bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // LOCK
         info = &d_channelMap[channelName];

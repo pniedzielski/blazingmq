@@ -106,7 +106,7 @@ TEST_F(TestPolicy_UriResource, defaultMatchesNone)
                                                   end = testCases.cend();
          it != end;
          ++it) {
-        ASSERT_EQ(0, bmqt::UriParser::parse(&uri, NULL, *it));
+        ASSERT_EQ(0, bmqt::UriParser::parse(&uri, nullptr, *it));
         EXPECT_FALSE(uriResource.matches(uri));
     }
 }
@@ -127,7 +127,7 @@ TEST_F(TestPolicy_UriResource, allowAllMatchesAll)
                                                        end = testCases.cend();
          it != end;
          ++it) {
-        ASSERT_EQ(0, bmqt::UriParser::parse(&uri, NULL, *it));
+        ASSERT_EQ(0, bmqt::UriParser::parse(&uri, nullptr, *it));
         EXPECT_TRUE(uriResource.matches(uri));
     }
 }
@@ -151,7 +151,7 @@ TEST_F(TestPolicy_UriResource, domainPatternMatchesAllQueuesInDomain)
     typedef bsl::vector<TestCase>::const_iterator It;
     for (It it = bsl::cbegin(testCases), end = bsl::cend(testCases); it != end;
          ++it) {
-        ASSERT_EQ(0, bmqt::UriParser::parse(&uri, NULL, it->d_uri));
+        ASSERT_EQ(0, bmqt::UriParser::parse(&uri, nullptr, it->d_uri));
         EXPECT_EQ(it->d_shouldMatch, uriResource.matches(uri));
     }
 }
@@ -177,7 +177,7 @@ TEST_F(TestPolicy_UriResource, queuePatternMatchesQueue)
                         *end = bsl::cend(testCases);
          it != end;
          ++it) {
-        ASSERT_EQ(0, bmqt::UriParser::parse(&uri, NULL, it->d_uri));
+        ASSERT_EQ(0, bmqt::UriParser::parse(&uri, nullptr, it->d_uri));
         EXPECT_EQ(it->d_shouldMatch, uriResource.matches(uri));
     }
 }
@@ -788,7 +788,7 @@ TEST_F(TestPolicy, doctestPolicyDefinition)
     bsl::optional<const mqbauthz::Policy::Permission*> anonPermissionOpt =
         policy.get("anonymous");
     ASSERT_TRUE(anonPermissionOpt.has_value());
-    ASSERT_TRUE(NULL != *anonPermissionOpt);
+    ASSERT_TRUE(nullptr != *anonPermissionOpt);
 
     const mqbauthz::Policy::Permission& anonPermission = **anonPermissionOpt;
     EXPECT_TRUE(anonPermission.isConnectClientAllowed());
@@ -822,7 +822,7 @@ TEST_F(TestPolicy, noPermissions)
     bsl::optional<const mqbauthz::Policy::Permission*> anonPermissionOpt =
         policy.get("anonymous");
     ASSERT_TRUE(anonPermissionOpt.has_value());
-    ASSERT_TRUE(NULL != *anonPermissionOpt);
+    ASSERT_TRUE(nullptr != *anonPermissionOpt);
 
     const mqbauthz::Policy::Permission& anonPermission = **anonPermissionOpt;
     EXPECT_FALSE(anonPermission.isConnectClientAllowed());

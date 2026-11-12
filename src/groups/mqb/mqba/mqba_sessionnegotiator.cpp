@@ -417,7 +417,7 @@ bsl::shared_ptr<mqbnet::Session> SessionNegotiator::onClientIdentityMessage(
     default: {
         errorDescription << "Unknown ClientIdentity client type: "
                          << bmqu::StringUtil::logSafe(clientIdentity);
-        return NULL;  // RETURN
+        return nullptr;  // RETURN
     }
     }
 
@@ -436,7 +436,7 @@ bsl::shared_ptr<mqbnet::Session> SessionNegotiator::onClientIdentityMessage(
 
         bmqu::MemOutStream sendError;
         sendNegotiationMessage(sendError, refusedMessage, negotiationContext);
-        return NULL;  // RETURN
+        return nullptr;  // RETURN
     }
 
     bmqp_ctrlmsg::NegotiationMessage negotiationResponse;
@@ -533,7 +533,7 @@ bsl::shared_ptr<mqbnet::Session> SessionNegotiator::onClientIdentityMessage(
     // Populate the negotiation context based on the received client identity.
     int rc = populateNegotiationContext(errorDescription, context_p);
     if (rc != 0) {
-        return NULL;  // RETURN
+        return nullptr;  // RETURN
     }
 
     // Communicate heartbeat settings.  Currently, only for SDK use
@@ -550,7 +550,7 @@ bsl::shared_ptr<mqbnet::Session> SessionNegotiator::onClientIdentityMessage(
                                 negotiationResponse,
                                 negotiationContext);
     if (rc != 0) {
-        return NULL;  // RETURN
+        return nullptr;  // RETURN
     }
 
     // Create the session.
@@ -588,7 +588,7 @@ bsl::shared_ptr<mqbnet::Session> SessionNegotiator::onBrokerResponseMessage(
         bmqp_ctrlmsg::StatusCategory::E_SUCCESS) {
         errorDescription << "Failure broker's response ["
                          << bmqu::StringUtil::logSafe(brokerResponse) << "]";
-        return NULL;  // RETURN
+        return nullptr;  // RETURN
     }
 
     // Resolve 'hostName' of the brokerIdentity
@@ -604,7 +604,7 @@ bsl::shared_ptr<mqbnet::Session> SessionNegotiator::onBrokerResponseMessage(
     {
         const int rc = populateNegotiationContext(errorDescription, context_p);
         if (rc != 0) {
-            return NULL;  // RETURN
+            return nullptr;  // RETURN
         }
     }
 

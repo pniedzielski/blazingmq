@@ -90,7 +90,7 @@ class Todo {
 // INLINE DEFINITIONS
 
 inline Todo::Todo()
-: d_message(NULL)
+: d_message(nullptr)
 {
 }
 
@@ -103,7 +103,7 @@ template <typename T>
 inline Todo::operator T()
 {
     bsl::string message;
-    if (d_message == NULL) {
+    if (d_message == nullptr) {
         message = bsl::format("not yet implemented: {}", d_message);
     }
     else {

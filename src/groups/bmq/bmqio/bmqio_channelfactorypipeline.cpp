@@ -25,7 +25,7 @@ ChannelFactoryPipeline::Config::Config(const ChannelFactorySP& baseFactory,
                                        const allocator_type&   allocator)
 : d_pipeline(1, baseFactory, allocator)
 {
-    BSLS_ASSERT(baseFactory != NULL);
+    BSLS_ASSERT(baseFactory != nullptr);
 }
 
 ChannelFactoryPipeline::Config::Config(Config&& other) noexcept
@@ -48,7 +48,7 @@ ChannelFactoryPipeline::Config::get_allocator() const
 ChannelFactoryPipeline::Config&
 ChannelFactoryPipeline::Config::add(const ChannelFactorySP& channelFactory)
 {
-    BSLS_ASSERT(channelFactory != NULL);
+    BSLS_ASSERT(channelFactory != nullptr);
 
     d_pipeline.push_back(channelFactory);
 

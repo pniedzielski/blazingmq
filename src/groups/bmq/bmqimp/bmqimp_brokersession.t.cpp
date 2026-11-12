@@ -2319,7 +2319,7 @@ class DTTestContext : public bmqpi::DTContext {
     DTTestContext(bslma::Allocator* allocator_p)
     : DTContext()
     , d_mutex()
-    , d_currentSpan_sp(NULL)
+    , d_currentSpan_sp(nullptr)
     , d_allocator_p(bslma::Default::allocator(allocator_p))
     {
         // NOTHING
@@ -7724,9 +7724,9 @@ static void test44_hostHealthMonitoringMultipleQueues()
                                      numSensitiveReaders,
                                      naiveReaders,
                                      numNaiveReaders,
-                                     NULL,
+                                     nullptr,
                                      0,
-                                     NULL,
+                                     nullptr,
                                      0);
 
     PVV_SAFE("Step 5. Test with mixed readers and writers.");
@@ -7756,9 +7756,9 @@ static void test44_hostHealthMonitoringMultipleQueues()
     }
     testHostHealthWithMultipleQueues(&obj,
                                      monitor,
-                                     NULL,
+                                     nullptr,
                                      0,
-                                     NULL,
+                                     nullptr,
                                      0,
                                      sensitiveWriters,
                                      numSensitiveWriters,

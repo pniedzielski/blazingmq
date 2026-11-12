@@ -3425,7 +3425,7 @@ static void test21_watchdogMultipleRetries()
     BMQTST_ASSERT_EQ(static_cast<int>(s_sigintReceived), 1);
 
     // Restore original handler
-    sigaction(SIGINT, &oldSa, NULL);
+    sigaction(SIGINT, &oldSa, nullptr);
 
     // Cleanup
     storageManager.stopPFSMs();
