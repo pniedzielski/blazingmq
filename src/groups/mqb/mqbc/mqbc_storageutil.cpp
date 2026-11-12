@@ -153,8 +153,7 @@ bool StorageUtil::loadDifference(mqbi::Storage::AppInfos*       result,
 {
     bool noConflicts = true;
     for (const auto& baseEntry : baseSet) {
-        mqbi::Storage::AppInfos::const_iterator match = subtractionSet.find(
-            baseEntry.first);
+        auto match = subtractionSet.find(baseEntry.first);
 
         if (subtractionSet.end() == match) {
             result->insert(bsl::make_pair(baseEntry.first, baseEntry.second));
@@ -945,7 +944,7 @@ bool StorageUtil::isStorageEmpty(bslmt::Mutex*       storagesLock,
 
     bslmt::LockGuard<bslmt::Mutex> guard(storagesLock);  // LOCK
 
-    StorageSpMapConstIter cit = storageMap.find(uri);
+    auto cit = storageMap.find(uri);
     if (cit == storageMap.end()) {
         return true;  // RETURN
     }
@@ -1582,9 +1581,8 @@ void StorageUtil::recoveredQueuesCb(
     DomainMap domainMap(allocator);
 
     typedef bsl::unordered_map<mqbu::StorageKey, mqbs::ReplicatedStorage*>
-                                         QueueKeyStorageMap;
-    typedef QueueKeyStorageMap::iterator QueueKeyStorageMapIter;
-    QueueKeyStorageMap                   queueKeyStorageMap;
+                       QueueKeyStorageMap;
+    QueueKeyStorageMap queueKeyStorageMap;
 
     // In 1st pass over 'queueKeyInfoMap', create a unique list of domains
     // encountered, for which we will need to create a concrete instance of
@@ -1739,7 +1737,7 @@ void StorageUtil::recoveredQueuesCb(
 
         // Ensure queueKey uniqueness.
 
-        QueueKeyStorageMapIter it = queueKeyStorageMap.find(queueKey);
+        auto it = queueKeyStorageMap.find(queueKey);
         if (it != queueKeyStorageMap.end()) {
             // Encountered the queueKey again.  This is an error.
 
@@ -1807,15 +1805,14 @@ void StorageUtil::recoveredQueuesCb(
             bslmt::LockGuard<bslmt::Mutex> unrecognizedDomainsLockGuard(
                 unrecognizedDomainsLock);  // LOCK
 
-            DomainQueueMessagesCountMap::iterator iter =
-                unrecognizedDomains->find(domainName);
+            auto iter = unrecognizedDomains->find(domainName);
             if (iter != unrecognizedDomains->end()) {
                 iter->second.insert(bsl::make_pair(queueUri, 0));
                 continue;  // CONTINUE
             }
         }
 
-        DomainMapIter dit = domainMap.find(domainName);
+        auto dit = domainMap.find(domainName);
         BSLS_ASSERT_SAFE(dit != domainMap.end());
         BSLS_ASSERT_SAFE(0 != dit->second);
         mqbi::Domain* domain = dit->second;
@@ -2011,27 +2008,23 @@ void StorageUtil::recoveredQueuesCb(
 
         BSLS_ASSERT_SAFE(!queueKey.isNull());
 
-        QueueKeyStorageMapIter storageMapIt = queueKeyStorageMap.find(
-            queueKey);
+        auto storageMapIt = queueKeyStorageMap.find(queueKey);
 
         const mqbs::DataStoreRecordHandle& handle = fsIt.handle();
 
         // If queue is either not recovered or belongs to an unrecognized
         // domain.
         if (storageMapIt == queueKeyStorageMap.end()) {
-            QueueKeyInfoMapConstIter infoMapCit = queueKeyInfoMap->find(
-                queueKey);
+            auto infoMapCit = queueKeyInfoMap->find(queueKey);
             // If queue is recovered, implying that it belongs to an
             // unrecognized domain.
             if (infoMapCit != queueKeyInfoMap->cend()) {
                 const bmqt::Uri uri(infoMapCit->second.canonicalQueueUri());
 
-                DomainQueueMessagesCountMap::iterator domIt =
-                    unrecognizedDomains->find(uri.qualifiedDomain());
+                auto domIt = unrecognizedDomains->find(uri.qualifiedDomain());
                 BSLS_ASSERT_SAFE(domIt != unrecognizedDomains->end());
 
-                mqbs::StorageUtil::QueueMessagesCountMap::iterator countMapIt =
-                    domIt->second.find(uri);
+                auto countMapIt = domIt->second.find(uri);
                 BSLS_ASSERT_SAFE(countMapIt != domIt->second.end());
                 ++countMapIt->second;
                 recordsToPurge.push_back(handle);
@@ -2103,8 +2096,7 @@ void StorageUtil::recoveredQueuesCb(
             // even if indicated by the storage record.
         }
         else if (mqbs::RecordType::e_MESSAGE == fsIt.type()) {
-            QueueKeyInfoMapConstIter infoMapCit = queueKeyInfoMap->find(
-                queueKey);
+            auto infoMapCit = queueKeyInfoMap->find(queueKey);
             BSLS_ASSERT_SAFE(infoMapCit != queueKeyInfoMap->end());
 
             const mqbs::DataStoreRecordKey current(handle.primaryLeaseId(),
@@ -2466,7 +2458,7 @@ void StorageUtil::registerQueueAsPrimary(const mqbi::Cluster*    cluster,
 
     bslmt::LockGuard<bslmt::Mutex> guard(storagesLock);  // LOCK
 
-    StorageSpMapIter it = storageMap->find(uri);
+    auto it = storageMap->find(uri);
     if (storageMap->end() != it) {
         const StorageSp& storageSp = it->second;
 
@@ -2651,7 +2643,7 @@ void StorageUtil::unregisterQueueDispatched(mqbs::FileStore*     fs,
 
     bslmt::LockGuard<bslmt::Mutex> guard(storagesLock);  // LOCK
 
-    StorageSpMapIter it = storageMap->find(uri);
+    auto it = storageMap->find(uri);
     if (it == storageMap->end()) {
         // This can occur in the following scenario: replica receives
         // open-queue request for an unknown queue, sends queue-assignment
@@ -2770,7 +2762,7 @@ int StorageUtil::updateQueuePrimary(StorageSpMap*    storageMap,
 
     bslmt::LockGuard<bslmt::Mutex> guard(storagesLock);  // LOCK
 
-    StorageSpMapIter it = storageMap->find(uri);
+    auto it = storageMap->find(uri);
     if (storageMap->end() == it) {
         bmqu::Printer<AppInfos> printer1(&addedIdKeyPairs);
         bmqu::Printer<AppInfos> printer2(&removedIdKeyPairs);
@@ -2820,7 +2812,7 @@ void StorageUtil::createQueueStorageAsReplica(
 
     bslmt::LockGuard<bslmt::Mutex> guard(storagesLock);  // LOCK
 
-    StorageSpMapIter it = storageMap->find(uri);
+    auto it = storageMap->find(uri);
     if (it != storageMap->end()) {
         // In the transition phase, queue creation trigger can be either
         // storage event or CSL commit.  Moreover, some versions have a race.
@@ -2974,7 +2966,7 @@ void StorageUtil::removeQueueStorageDispatched(
 
     bslmt::LockGuard<bslmt::Mutex> guard(storagesLock);  // LOCK
 
-    StorageSpMapIter it = storageMap->find(uri);
+    auto it = storageMap->find(uri);
     if (it == storageMap->end()) {
         // Storage manager is not aware of this uri.  This indicates a bug BMQ
         // replication.
@@ -3060,7 +3052,7 @@ void StorageUtil::updateQueueStorageDispatched(
 
     bslmt::LockGuard<bslmt::Mutex> guard(storagesLock);  // LOCK
 
-    StorageSpMapIter it = storageMap->find(uri);
+    auto it = storageMap->find(uri);
     if (it == storageMap->end()) {
         // Cluster state and/or partition are out of sync at this replica.
 
@@ -3607,7 +3599,7 @@ void StorageUtil::processCommand(
         for (size_t i = 0; i < storageMapVec->size(); ++i) {
             bslmt::LockGuard<bslmt::Mutex> guard(
                 (*storageLockVec)[i].get());  // LOCK
-            StorageSpMap::iterator storageIter = (*storageMapVec)[i].find(uri);
+            auto storageIter = (*storageMapVec)[i].find(uri);
             if (storageIter != (*storageMapVec)[i].end()) {
                 queueStorage = storageIter->second.get();
                 break;  // BREAK
