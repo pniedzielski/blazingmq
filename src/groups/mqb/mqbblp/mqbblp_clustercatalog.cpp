@@ -427,18 +427,13 @@ int ClusterCatalog::loadBrokerClusterConfig(bsl::ostream&)
     BALL_LOG_INFO << "Read config from " << configFilename << ": "
                   << jsonString;
 
-    struct local {
-        static const bsl::string&
-        clusterName(const mqbcfg::ClusterDefinition& cluster)
-        {
+    bsl::transform(
+        d_clustersDefinition.myClusters().begin(),
+        d_clustersDefinition.myClusters().end(),
+        bsl::inserter(d_myClusters, d_myClusters.begin()),
+        [](const mqbcfg::ClusterDefinition& cluster) -> const bsl::string& {
             return cluster.name();
-        }
-    };
-
-    bsl::transform(d_clustersDefinition.myClusters().begin(),
-                   d_clustersDefinition.myClusters().end(),
-                   bsl::inserter(d_myClusters, d_myClusters.begin()),
-                   local::clusterName);
+        });
 
     // Populate the virtual clusters map
     for (const mqbcfg::VirtualClusterInformation& virtualCluster :
