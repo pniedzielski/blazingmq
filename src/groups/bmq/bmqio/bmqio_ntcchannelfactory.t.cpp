@@ -202,24 +202,6 @@ struct Tester_HandleInfo {
     }
 };
 
-// ===========================
-// class Tester_ChannelVisitor
-// ===========================
-
-struct Tester_ChannelVisitor {
-    // DATA
-    int d_numChannels;
-
-    // CREATORS
-    Tester_ChannelVisitor()
-    : d_numChannels(0)
-    {
-    }
-
-    // MANIPULATORS
-    void operator()(const bsl::shared_ptr<NtcChannel>&) { ++d_numChannels; }
-};
-
 // ============
 // class Tester
 // ============
@@ -724,9 +706,12 @@ void Tester::connect(int                      line,
 
 void Tester::callVisitChannels(int line, int numChannels)
 {
-    Tester_ChannelVisitor visitor;
+    int  numVisitedChannels = 0;
+    auto visitor = [&numVisitedChannels](const bsl::shared_ptr<NtcChannel>&) {
+        ++numVisitedChannels;
+    };
     d_object->visitChannels(visitor);
-    BMQTST_ASSERT_EQ_D(line, numChannels, visitor.d_numChannels);
+    BMQTST_ASSERT_EQ_D(line, numChannels, numVisitedChannels);
 }
 
 void Tester::cancelHandle(int line, const bslstl::StringRef& handleName)
