@@ -1205,10 +1205,10 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(K1_T&&    k1,
     bool hasInserted = false;
 
     // try inserting in k1Map
-    bsl::pair<K1MapIter, bool> pair1 = d_k1Map.emplace(bsl::forward<K1_T>(k1),
-                                                       static_cast<Node*>(0));
-    K1MapIter k1MapIter = pair1.first;
-    hasInserted         = pair1.second;
+    auto pair1     = d_k1Map.emplace(bsl::forward<K1_T>(k1),
+                                     static_cast<Node*>(0));
+    auto k1MapIter = pair1.first;
+    hasInserted    = pair1.second;
 
     if (!hasInserted) {
         return bsl::make_pair(iterator(e_FIRST_KEY, this, k1MapIter->second),
@@ -1221,10 +1221,10 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(K1_T&&    k1,
     });
 
     // try inserting in k2Map
-    bsl::pair<K2MapIter, bool> pair2 = d_k2Map.emplace(bsl::forward<K2_T>(k2),
-                                                       static_cast<Node*>(0));
-    K2MapIter k2MapIter = pair2.first;
-    hasInserted         = pair2.second;
+    auto pair2     = d_k2Map.emplace(bsl::forward<K2_T>(k2),
+                                     static_cast<Node*>(0));
+    auto k2MapIter = pair2.first;
+    hasInserted    = pair2.second;
 
     if (!hasInserted) {
         return bsl::make_pair(iterator(e_SECOND_KEY, this, k2MapIter->second),
@@ -1421,7 +1421,7 @@ template <class K1, class K2, class VALUE, class H1, class H2>
 inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::iterator
 TwoKeyHashMap<K1, K2, VALUE, H1, H2>::findByKey1(const first_key_type& k1)
 {
-    K1MapIter it = d_k1Map.find(k1);
+    auto it = d_k1Map.find(k1);
     return (it == d_k1Map.end()) ? end(e_FIRST_KEY)
                                  : iterator(e_FIRST_KEY, this, it->second);
 }
@@ -1431,7 +1431,7 @@ inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator
 TwoKeyHashMap<K1, K2, VALUE, H1, H2>::findByKey1(
     const first_key_type& k1) const
 {
-    K1MapConstIter it = d_k1Map.find(k1);
+    auto it = d_k1Map.find(k1);
     return (it == d_k1Map.end())
                ? end(e_FIRST_KEY)
                : const_iterator(e_FIRST_KEY, this, it->second);
@@ -1441,7 +1441,7 @@ template <class K1, class K2, class VALUE, class H1, class H2>
 inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::iterator
 TwoKeyHashMap<K1, K2, VALUE, H1, H2>::findByKey2(const second_key_type& k2)
 {
-    K2MapIter it = d_k2Map.find(k2);
+    auto it = d_k2Map.find(k2);
     return (it == d_k2Map.end()) ? end(e_SECOND_KEY)
                                  : iterator(e_SECOND_KEY, this, it->second);
 }
@@ -1451,7 +1451,7 @@ inline typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator
 TwoKeyHashMap<K1, K2, VALUE, H1, H2>::findByKey2(
     const second_key_type& k2) const
 {
-    K2MapConstIter it = d_k2Map.find(k2);
+    auto it = d_k2Map.find(k2);
     return (it == d_k2Map.end())
                ? end(e_SECOND_KEY)
                : const_iterator(e_SECOND_KEY, this, it->second);
@@ -1572,11 +1572,9 @@ inline bool bmqc::operator==(const TwoKeyHashMap<K1, K2, VALUE, H1, H2>& lhs,
     if (lhs.size() != rhs.size()) {
         return false;  // RETURN
     }
-    typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator lIt =
-        lhs.cbegin();
+    auto lIt = lhs.cbegin();
     for (; lIt != lhs.cend(); ++lIt) {
-        typename TwoKeyHashMap<K1, K2, VALUE, H1, H2>::const_iterator rIt =
-            rhs.findByKey1(lIt->key1());
+        auto rIt = rhs.findByKey1(lIt->key1());
         if (rIt == rhs.cend() || lIt->key2() != rIt->key2() ||
             lIt->value() != rIt->value()) {
             return false;  // RETURN
