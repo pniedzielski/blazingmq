@@ -857,12 +857,13 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] const char* argv[])
     // may be called on the 'Session' before it is started.
     BALL_LOG_INFO << "Starting the session with the BlazingMQ broker";
 
-    QueueManager  queueManager;
-    EventHandler* eventHandler = new EventHandler();
+    QueueManager                  queueManager;
+    bsl::unique_ptr<EventHandler> eventHandler =
+        bsl::make_unique<EventHandler>();
     eventHandler->setQueueManager(&queueManager);
 
-    bslma::ManagedPtr<bmqa::SessionEventHandler> eventHandlerMP(eventHandler);
-    bmqa::Session                                session(eventHandlerMP);
+    // The session takes ownership of the event handler.
+    bmqa::Session session(bsl::move(eventHandler));
 
     int rc = session.start();
     if (rc != 0) {
