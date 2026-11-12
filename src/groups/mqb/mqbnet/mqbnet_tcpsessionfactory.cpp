@@ -506,9 +506,13 @@ void TCPSessionFactory::readCallback(const bmqio::Status& status,
         return;  // RETURN
     }
 
-    Reader reader(this, channelInfo);
-
-    const int rc = bmqio::ChannelUtil::handleRead(reader, numNeeded, blob);
+    const int rc = bmqio::ChannelUtil::handleRead(
+        [this,
+         channelInfo](const bdlbb::Blob& source, int offset, int length) {
+            read(channelInfo, source, offset, length);
+        },
+        numNeeded,
+        blob);
 
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(rc != 0)) {
         BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
