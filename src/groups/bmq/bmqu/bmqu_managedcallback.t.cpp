@@ -376,9 +376,9 @@ static void testN1_ManagedCallbackPerformance()
               << bsl::endl;
     {
         bsl::function<void(void)> callback;
-        callback = bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                         increment,
-                                         &calls);
+        callback = [callsPtr = &calls]() {
+            increment(callsPtr);
+        };
         const bsls::Types::Int64 begin = bsls::TimeUtil::getTimer();
         for (size_t i = 0; i < k_ITERS_NUM; i++) {
             callback();
@@ -427,9 +427,9 @@ static void testN1_ManagedCallbackPerformance()
 
         const bsls::Types::Int64 begin = bsls::TimeUtil::getTimer();
         for (size_t i = 0; i < k_ITERS_NUM; i++) {
-            cbs[i] = bdlf::BindUtil::bindS(bmqtst::TestHelperUtil::allocator(),
-                                           increment,
-                                           &calls);
+            cbs[i] = [callsPtr = &calls]() {
+                increment(callsPtr);
+            };
         }
         const bsls::Types::Int64 end = bsls::TimeUtil::getTimer();
 
@@ -488,10 +488,9 @@ static void testN1_ManagedCallbackPerformance()
 
         const bsls::Types::Int64 begin = bsls::TimeUtil::getTimer();
         for (size_t i = 0; i < k_ITERS_NUM; i++) {
-            callback = bdlf::BindUtil::bindS(
-                bmqtst::TestHelperUtil::allocator(),
-                increment,
-                &calls);
+            callback = [callsPtr = &calls]() {
+                increment(callsPtr);
+            };
             callback();
         }
         const bsls::Types::Int64 end = bsls::TimeUtil::getTimer();
@@ -539,15 +538,14 @@ static void testN1_ManagedCallbackPerformance()
 
         const bsls::Types::Int64 begin = bsls::TimeUtil::getTimer();
         for (size_t i = 0; i < k_ITERS_NUM; i++) {
-            callback = bdlf::BindUtil::bindS(
-                bmqtst::TestHelperUtil::allocator(),
-                complexFunction,
-                &calls,
-                args[0],
-                args[1],
-                args[2],
-                args[3],
-                args[4]);
+            callback = [callsPtr = &calls,
+                        arg1     = args[0],
+                        arg2     = args[1],
+                        arg3     = args[2],
+                        arg4     = args[3],
+                        arg5     = args[4]]() {
+                complexFunction(callsPtr, arg1, arg2, arg3, arg4, arg5);
+            };
             callback();
         }
         const bsls::Types::Int64 end = bsls::TimeUtil::getTimer();
