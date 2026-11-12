@@ -201,8 +201,8 @@ class OrderedHashMap_Node : public OrderedHashMap_Link {
   private:
     // NOT IMPLEMENTED
     OrderedHashMap_Node();
-    OrderedHashMap_Node(const OrderedHashMap_Node&);
-    OrderedHashMap_Node& operator=(const OrderedHashMap_Node&);
+    OrderedHashMap_Node(const OrderedHashMap_Node&)            = delete;
+    OrderedHashMap_Node& operator=(const OrderedHashMap_Node&) = delete;
     ~OrderedHashMap_Node();
 
   public:
