@@ -73,7 +73,7 @@ const size_t k_HEADER_SIZE = sizeof(mqbs::FileHeader) +
 typedef bsl::list<bmqt::MessageGUID> GuidsList;
 // List of message guids.
 
-bslma::ManagedPtr<CommandProcessor>
+bmqu::UniquePtr<CommandProcessor>
 createCommandProcessor(const Parameters*               params,
                        const bsl::shared_ptr<Printer>& printer,
                        bmqu::UniquePtr<FileManager>&   fileManager,
@@ -104,13 +104,14 @@ createCommandProcessor(const Parameters*               params,
                                                 payloadDumper,
                                                 alloc);
     // Create commandProcessor.
-    bslma::ManagedPtr<CommandProcessor> commandProcessor(
-        new (*alloc) JournalFileProcessor(params,
-                                          fileManager,
-                                          searchResult,
-                                          ostream,
-                                          alloc),
-        alloc);
+    bmqu::UniquePtr<CommandProcessor> commandProcessor =
+        bmqu::UniquePtrUtil::adopt(new (*alloc)
+                                       JournalFileProcessor(params,
+                                                            fileManager,
+                                                            searchResult,
+                                                            ostream,
+                                                            alloc),
+                                   alloc);
     return commandProcessor;
 }
 
@@ -379,12 +380,12 @@ static void test1_breathingTest()
         bmqtst::TestHelperUtil::allocator());
 
     // Create command processor
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     Sequence s;
     // Prepare expected output with list of message GUIDs in Journal file
@@ -465,12 +466,12 @@ static void test2_searchGuidTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
     // Run search
     searchProcessor->process();
 }
@@ -529,12 +530,12 @@ static void test3_searchNonExistingGuidTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     Sequence s;
     EXPECT_CALL(*printer, printFooter(0, 0, 0, params.d_processRecordTypes))
@@ -627,12 +628,12 @@ static void test4_searchExistingAndNonExistingGuidTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Run search
     searchProcessor->process();
@@ -680,12 +681,12 @@ static void test5_searchOutstandingMessagesTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     const size_t messageCount     = k_NUM_RECORDS / 3;
     const int    outstandingRatio = static_cast<int>(bsl::floor(
@@ -753,12 +754,12 @@ static void test6_searchConfirmedMessagesTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     const size_t messageCount     = k_NUM_RECORDS / 3;
     const size_t outstandingCount = messageCount - confirmedGUIDS.size();
@@ -828,12 +829,12 @@ static void test7_searchPartiallyConfirmedMessagesTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     const size_t messageCount     = (k_NUM_RECORDS + 2) / 3;
     const size_t outstandingCount = partiallyConfirmedGUIDS.size() + 1;
@@ -905,12 +906,12 @@ static void test8_searchMessagesByQueueKeyTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     Sequence s;
     for (const bmqt::MessageGUID& guid : queueKey1GUIDS) {
@@ -979,12 +980,12 @@ static void test9_searchMessagesByQueueNameTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     Sequence s;
     for (const bmqt::MessageGUID& guid : queueKey1GUIDS) {
@@ -1057,12 +1058,12 @@ static void test10_searchMessagesByQueueNameAndQueueKeyTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     Sequence s;
     for (const bmqt::MessageGUID& guid : queueKey1GUIDS) {
@@ -1117,12 +1118,12 @@ static void test11_searchMessagesByTimestamp()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     bsl::size_t msgCnt = 0;
 
@@ -1197,12 +1198,12 @@ static void test12_printMessagesDetailsTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     Sequence s;
 
@@ -1311,7 +1312,7 @@ static void test13_searchMessagesWithPayloadDumpTest()
 
     // Run search
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
+    bmqu::UniquePtr<CommandProcessor> searchProcessor =
         CommandProcessorFactory::createCommandProcessor(
             &params,
             fileManager,
@@ -1401,12 +1402,12 @@ static void test14_summaryTest()
 
     // Create processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     Sequence s;
     EXPECT_CALL(*printer,
@@ -1754,12 +1755,12 @@ static void test17_searchMessagesBySequenceNumbersRange()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Get GUIDs of messages inside sequence numbers range and prepare
     // expected calls
@@ -1831,12 +1832,12 @@ static void test18_searchMessagesByOffsetsRange()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Get GUIDs of messages within offsets range and prepare expected
     // calls
@@ -1907,12 +1908,12 @@ static void test19_searchQueueOpRecords()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Get queueOp records content within offsets range and prepare
     // expected calls
@@ -1985,12 +1986,12 @@ static void test20_searchJournalOpRecords()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Get journalOp records content within offsets range and prepare
     // expected calls
@@ -2064,12 +2065,12 @@ static void test21_searchAllTypesRecords()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Get all records content within offsets range and prepare expected
     // output
@@ -2188,12 +2189,12 @@ static void test22_searchQueueOpRecordsByOffset()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     EXPECT_CALL(
         *printer,
@@ -2268,12 +2269,12 @@ static void test23_searchJournalOpRecordsBySeqNumber()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     EXPECT_CALL(
         *printer,
@@ -2361,12 +2362,12 @@ static void test24_searchConfirmAndDeletionRecordsByOffset()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     EXPECT_CALL(*printer,
                 printExactMatchFooter(0,
@@ -2460,12 +2461,12 @@ static void test25_searchConfirmAndDeletionRecordsBySeqNumber()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     EXPECT_CALL(*printer,
                 printExactMatchFooter(0,
@@ -2530,12 +2531,12 @@ static void test26_summaryWithQueueDetailsTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Prepare expected QueueDetails
     QueueDetailsMap m(bmqtst::TestHelperUtil::allocator());

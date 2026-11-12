@@ -54,7 +54,7 @@ static void test1_breathingTest()
         new (*bmqtst::TestHelperUtil::allocator()) FileManagerMock(),
         bmqtst::TestHelperUtil::allocator());
 
-    bslma::ManagedPtr<CommandProcessor> cmdProcessor =
+    bmqu::UniquePtr<CommandProcessor> cmdProcessor =
         CommandProcessorFactory::createCommandProcessor(
             &params,
             fileManager,
@@ -84,7 +84,7 @@ static void test2_cslProcessorTest()
         new (*bmqtst::TestHelperUtil::allocator()) FileManagerMock(),
         bmqtst::TestHelperUtil::allocator());
 
-    bslma::ManagedPtr<CommandProcessor> cmdProcessor =
+    bmqu::UniquePtr<CommandProcessor> cmdProcessor =
         CommandProcessorFactory::createCommandProcessor(
             &params,
             fileManager,

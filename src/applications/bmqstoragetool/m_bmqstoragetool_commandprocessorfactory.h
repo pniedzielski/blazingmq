@@ -48,7 +48,7 @@ class CommandProcessorFactory {
 
     /// Create command processor for specified 'params' using specified
     /// 'ostream' and 'allocator'.
-    static bslma::ManagedPtr<CommandProcessor>
+    static bmqu::UniquePtr<CommandProcessor>
     createCommandProcessor(const Parameters*             params,
                            bmqu::UniquePtr<FileManager>& fileManager,
                            bsl::ostream&                 ostream,

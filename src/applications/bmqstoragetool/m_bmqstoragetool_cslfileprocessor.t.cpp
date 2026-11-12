@@ -251,7 +251,7 @@ void writeRecord(bsl::vector<RecordInfo>*                   recordInfos,
 }
 
 /// Create a 'CommandProcessor' instance with the specified arguments
-bslma::ManagedPtr<CommandProcessor>
+bmqu::UniquePtr<CommandProcessor>
 createCommandProcessor(const Parameters*                  params,
                        const bsl::shared_ptr<CslPrinter>& printer,
                        bmqu::UniquePtr<FileManager>&      fileManager,
@@ -267,13 +267,13 @@ createCommandProcessor(const Parameters*                  params,
     bsl::shared_ptr<CslSearchResult> searchResult =
         SearchResultFactory::createCslSearchResult(params, printer, alloc);
     // Create commandProcessor.
-    bslma::ManagedPtr<CommandProcessor> commandProcessor(
-        new (*alloc) CslFileProcessor(params,
-                                      fileManager,
-                                      searchResult,
-                                      ostream,
-                                      alloc),
-        alloc);
+    bmqu::UniquePtr<CommandProcessor> commandProcessor =
+        bmqu::UniquePtrUtil::adopt(new (*alloc) CslFileProcessor(params,
+                                                                 fileManager,
+                                                                 searchResult,
+                                                                 ostream,
+                                                                 alloc),
+                                   alloc);
     return commandProcessor;
 }
 
@@ -505,12 +505,12 @@ static void test1_breathingTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Prepare expected output with list of snapshot records in CSL file
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());
@@ -675,12 +675,12 @@ static void test2_searchRecordsByTypeTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Prepare expected output
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());
@@ -844,12 +844,12 @@ static void test3_searchRecordsByQueueKeyTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Prepare expected output
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());
@@ -990,12 +990,12 @@ static void test4_searchRecordsByTimestampRangeTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Prepare expected output with list of snapshot records in CSL file
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());
@@ -1133,12 +1133,12 @@ static void test5_searchRecordsByOffsetRangeTest()
         bmqtst::TestHelperUtil::allocator());
 
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Prepare expected output with list of snapshot records in CSL file
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());
@@ -1280,12 +1280,12 @@ static void test6_searchRecordsBySeqNumberRangeTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Prepare expected output with list of snapshot records in CSL file
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());
@@ -1425,12 +1425,12 @@ static void test7_searchRecordsByOffsetTest()
         bmqtst::TestHelperUtil::allocator());
 
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Prepare expected output with list of snapshot records in CSL file
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());
@@ -1571,12 +1571,12 @@ static void test8_searchRecordsBySeqNumberTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Prepare expected output with list of snapshot records in CSL file
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());
@@ -1734,12 +1734,12 @@ static void test9_summaryTest()
 
     // Create command processor
     bmqu::MemOutStream resultStream(bmqtst::TestHelperUtil::allocator());
-    bslma::ManagedPtr<CommandProcessor> searchProcessor =
-        createCommandProcessor(&params,
-                               printer,
-                               fileManager,
-                               resultStream,
-                               bmqtst::TestHelperUtil::allocator());
+    bmqu::UniquePtr<CommandProcessor> searchProcessor = createCommandProcessor(
+        &params,
+        printer,
+        fileManager,
+        resultStream,
+        bmqtst::TestHelperUtil::allocator());
 
     // Prepare expected output with list of snapshot records in CSL file
     mqbc::IncoreClusterStateLedgerIterator standardCslIt(tester.ledger());

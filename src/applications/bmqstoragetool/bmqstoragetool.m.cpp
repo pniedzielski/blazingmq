@@ -30,7 +30,6 @@
 #include <bdls_filesystemutil.h>
 #include <bsl_exception.h>
 #include <bsl_iostream.h>
-#include <bslma_managedptr.h>
 
 using namespace BloombergLP;
 using namespace m_bmqstoragetool;
@@ -258,7 +257,7 @@ int main(int argc, const char* argv[])
     }
 
     // Create command processor
-    bslma::ManagedPtr<CommandProcessor> processor =
+    bmqu::UniquePtr<CommandProcessor> processor =
         CommandProcessorFactory::createCommandProcessor(&parameters,
                                                         fileManager,
                                                         bsl::cout,

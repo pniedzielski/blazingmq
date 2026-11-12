@@ -29,7 +29,7 @@ namespace m_bmqstoragetool {
 // class CommandProcessorFactory
 // =============================
 
-bslma::ManagedPtr<CommandProcessor>
+bmqu::UniquePtr<CommandProcessor>
 CommandProcessorFactory::createCommandProcessor(
     const Parameters*             params,
     bmqu::UniquePtr<FileManager>& fileManager,
@@ -51,13 +51,13 @@ CommandProcessorFactory::createCommandProcessor(
             SearchResultFactory::createCslSearchResult(params, printer, alloc);
 
         // Create CslFileProcessor
-        return bslma::ManagedPtr<CommandProcessor>(
-            new (*alloc) CslFileProcessor(params,
-                                          fileManager,
-                                          cslSearchResult,
-                                          ostream,
-                                          alloc),
-            alloc);  // RETURN
+        return bmqu::UniquePtrUtil::adopt(new (*alloc)
+                                              CslFileProcessor(params,
+                                                               fileManager,
+                                                               cslSearchResult,
+                                                               ostream,
+                                                               alloc),
+                                          alloc);  // RETURN
     }
     else {
         // Create printer
@@ -84,13 +84,14 @@ CommandProcessorFactory::createCommandProcessor(
                                                     payloadDumper,
                                                     alloc);
         // Create commandProcessor.
-        bslma::ManagedPtr<CommandProcessor> commandProcessor(
-            new (*alloc) JournalFileProcessor(params,
-                                              fileManager,
-                                              searchResult,
-                                              ostream,
-                                              alloc),
-            alloc);
+        bmqu::UniquePtr<CommandProcessor> commandProcessor =
+            bmqu::UniquePtrUtil::adopt(new (*alloc)
+                                           JournalFileProcessor(params,
+                                                                fileManager,
+                                                                searchResult,
+                                                                ostream,
+                                                                alloc),
+                                       alloc);
         return commandProcessor;
     }
 }
