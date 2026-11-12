@@ -426,21 +426,23 @@ void QueueEngineTester::init(const mqbconfm::Domain& domainConfig,
     int                rc = 0;
 
     // Dispatcher
-    d_mockDispatcher_mp.load(new (*d_allocator_p)
-                                 mqbmock::Dispatcher(d_allocator_p),
-                             d_allocator_p);
-
-    d_mockDispatcherClient_mp.load(
-        new (*d_allocator_p) mqbmock::DispatcherClient(d_allocator_p),
+    d_mockDispatcher_mp = bmqu::UniquePtrUtil::adopt<mqbmock::Dispatcher>(
+        new (*d_allocator_p) mqbmock::Dispatcher(d_allocator_p),
         d_allocator_p);
+
+    d_mockDispatcherClient_mp =
+        bmqu::UniquePtrUtil::adopt<mqbmock::DispatcherClient>(
+            new (*d_allocator_p) mqbmock::DispatcherClient(d_allocator_p),
+            d_allocator_p);
     d_mockDispatcherClient_mp->_setDescription("test.tsk:1");
 
     // To pass `inDispatcherThread` checks:
     d_mockDispatcherClient_mp->setThreadId(bslmt::ThreadUtil::selfId());
 
     // Cluster
-    d_mockCluster_mp.load(new (*d_allocator_p) mqbmock::Cluster(d_allocator_p),
-                          d_allocator_p);
+    d_mockCluster_mp = bmqu::UniquePtrUtil::adopt<mqbmock::Cluster>(
+        new (*d_allocator_p) mqbmock::Cluster(d_allocator_p),
+        d_allocator_p);
     d_mockCluster_mp->_setIsClusterMember(true);
 
     // To pass `inDispatcherThread` checks:
@@ -454,10 +456,10 @@ void QueueEngineTester::init(const mqbconfm::Domain& domainConfig,
     }
 
     // Domain
-    d_mockDomain_mp.load(new (*d_allocator_p)
-                             mqbmock::Domain(d_mockCluster_mp.get(),
-                                             d_allocator_p),
-                         d_allocator_p);
+    d_mockDomain_mp = bmqu::UniquePtrUtil::adopt<mqbmock::Domain>(
+        new (*d_allocator_p)
+            mqbmock::Domain(d_mockCluster_mp.get(), d_allocator_p),
+        d_allocator_p);
 
     mqbconfm::Domain domainDef(d_allocator_p);
     domainDef.name() = "my.domain";
@@ -505,8 +507,8 @@ void QueueEngineTester::init(const mqbconfm::Domain& domainConfig,
     BSLS_ASSERT_OPT(d_mockCluster_mp->inDispatcherThread());
 
     // Queue State
-    d_queueState_mp.load(new (*d_allocator_p)
-                             mqbblp::QueueState(d_mockQueue_sp.get(),
+    d_queueState_mp = bmqu::UniquePtrUtil::adopt<mqbblp::QueueState>(
+        new (*d_allocator_p) mqbblp::QueueState(d_mockQueue_sp.get(),
                                                 d_mockQueue_sp->uri(),
                                                 k_UNASSIGNED_QUEUE_ID,
                                                 k_NULL_QUEUE_KEY,
@@ -514,7 +516,7 @@ void QueueEngineTester::init(const mqbconfm::Domain& domainConfig,
                                                 d_mockDomain_mp.get(),
                                                 d_mockCluster_mp->_resources(),
                                                 d_allocator_p),
-                         d_allocator_p);
+        d_allocator_p);
 
     bmqp_ctrlmsg::RoutingConfiguration routingConfig;
 
@@ -591,8 +593,9 @@ void QueueEngineTester::init(const mqbconfm::Domain& domainConfig,
     d_mockQueue_sp->_setStorage(storage_p);
     storage_p->setQueue(d_mockQueue_sp.get());
 
-    bslma::ManagedPtr<mqbi::Storage> storage_mp(storage_p, d_allocator_p);
-    d_queueState_mp->setStorage(storage_mp);
+    bmqu::UniquePtr<mqbi::Storage> storage_mp =
+        bmqu::UniquePtrUtil::adopt<mqbi::Storage>(storage_p, d_allocator_p);
+    d_queueState_mp->setStorage(bsl::move(storage_mp));
 
     // Verify
     BSLS_ASSERT_OPT(d_mockQueue_sp->storage() == storage_p);

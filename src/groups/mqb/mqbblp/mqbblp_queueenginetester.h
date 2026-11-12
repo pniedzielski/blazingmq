@@ -131,6 +131,7 @@
 #include <bmqc_orderedhashmap.h>
 #include <bmqt_messageguid.h>
 #include <bmqu_time.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -196,25 +197,25 @@ class QueueEngineTester {
     const bmqt::MessageGUID d_invalidGuid;
 
     /// Mock dispatcher.
-    bslma::ManagedPtr<mqbmock::Dispatcher> d_mockDispatcher_mp;
+    bmqu::UniquePtr<mqbmock::Dispatcher> d_mockDispatcher_mp;
 
     /// Mock dispatcher client.
-    bslma::ManagedPtr<mqbmock::DispatcherClient> d_mockDispatcherClient_mp;
+    bmqu::UniquePtr<mqbmock::DispatcherClient> d_mockDispatcherClient_mp;
 
     /// Mock cluster.
-    bslma::ManagedPtr<mqbmock::Cluster> d_mockCluster_mp;
+    bmqu::UniquePtr<mqbmock::Cluster> d_mockCluster_mp;
 
     /// Mock domain.
-    bslma::ManagedPtr<mqbmock::Domain> d_mockDomain_mp;
+    bmqu::UniquePtr<mqbmock::Domain> d_mockDomain_mp;
 
     /// Mock queue.
     bsl::shared_ptr<mqbmock::Queue> d_mockQueue_sp;
 
     /// Queue state.
-    bslma::ManagedPtr<mqbblp::QueueState> d_queueState_mp;
+    bmqu::UniquePtr<mqbblp::QueueState> d_queueState_mp;
 
     /// Queue Engine being tested.
-    bslma::ManagedPtr<mqbi::QueueEngine> d_queueEngine_mp;
+    bmqu::UniquePtr<mqbi::QueueEngine> d_queueEngine_mp;
 
     /// Map of all created handles.  Note that a handle in this map is owned by
     /// the Queue Handle Catalog and therefore must be "released" accordingly.
@@ -642,7 +643,7 @@ inline T* QueueEngineTester::createQueueEngine()
     BSLS_ASSERT_OPT(!d_queueEngine_mp && "'createQueueEngine()' was called");
 
     // Create and configure Queue Engine
-    d_queueEngine_mp = bslma::ManagedPtrUtil::allocateManaged<T>(
+    d_queueEngine_mp = bmqu::UniquePtrUtil::allocateUnique<T>(
         d_allocator_p,
         d_queueState_mp.get(),
         *d_queueState_mp->queue()->domain()->config());
