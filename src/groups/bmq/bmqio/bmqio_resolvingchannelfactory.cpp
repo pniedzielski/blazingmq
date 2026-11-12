@@ -19,11 +19,9 @@
 
 #include <bmqex_executionutil.h>
 #include <bmqio_resolveutil.h>
-#include <bmqu_weakmemfn.h>
 
 // BDE
 #include <ball_log.h>
-#include <bdlf_bind.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_string_view.h>
 #include <bsls_assert.h>
@@ -154,10 +152,12 @@ void ResolvingChannelFactory::baseResultCallback(
 
     bmqex::ExecutionUtil::execute(
         d_config.d_executionPolicy,
-        bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-                                 &ResolvingChannelFactory::resolveUriFn,
-                                 d_self.acquireWeak()),
-                             newChannel));
+        [weakSelf = d_self.acquireWeak(), newChannel]() {
+            if (bsl::shared_ptr<ResolvingChannelFactory> factory =
+                    weakSelf.lock()) {
+                factory->resolveUriFn(newChannel);
+            }
+        });
 
     userCb(event, status, newChannel);
 }
