@@ -53,6 +53,7 @@
 #include <bmqc_multiqueuethreadpool.h>
 #include <bmqex_executor.h>
 #include <bmqu_atomicgate.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -155,9 +156,9 @@ class Dispatcher final : public mqbi::Dispatcher {
     // PRIVATE TYPES
     typedef bmqc::MultiQueueThreadPool<mqbi::DispatcherEvent> ProcessorPool;
 
-    typedef bslma::ManagedPtr<bdlmt::ThreadPool> ThreadPoolMp;
+    typedef bmqu::UniquePtr<bdlmt::ThreadPool> ThreadPoolMp;
 
-    typedef bslma::ManagedPtr<ProcessorPool> ProcessorPoolMp;
+    typedef bmqu::UniquePtr<ProcessorPool> ProcessorPoolMp;
 
     typedef bsl::vector<mqbi::DispatcherClient*> DispatcherClientPtrVector;
 

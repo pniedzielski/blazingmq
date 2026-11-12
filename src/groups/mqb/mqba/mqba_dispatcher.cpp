@@ -185,7 +185,7 @@ int Dispatcher::startContext(bsl::ostream&                    errorDescription,
             mqbi::DispatcherClientType::toAscii(type),
             d_allocator_p);
     // Create and start the threadPool
-    context->d_threadPool_mp.load(
+    context->d_threadPool_mp = bmqu::UniquePtrUtil::adopt<bdlmt::ThreadPool>(
         new (*d_allocator_p)
             bdlmt::ThreadPool(bslmt::ThreadAttributes(),
                               config.numProcessors(),           // min threads
@@ -196,7 +196,7 @@ int Dispatcher::startContext(bsl::ostream&                    errorDescription,
 
     rc = context->d_threadPool_mp->start();
     if (rc != 0) {
-        context->d_threadPool_mp.clear();
+        context->d_threadPool_mp.reset();
         errorDescription << "Failed to start thread pool for '" << type
                          << "' [rc: " << rc << "]";
         return rc_THREAD_POOL_START_FAILED;  // RETURN
@@ -226,16 +226,16 @@ int Dispatcher::startContext(bsl::ostream&                    errorDescription,
         .setMonitorWarningTimeout(
             bsls::TimeInterval(d_config.warningTimeoutMs() / 1000.0));
 
-    context->d_processorPool_mp.load(
+    context->d_processorPool_mp = bmqu::UniquePtrUtil::adopt<ProcessorPool>(
         new (*d_allocator_p) ProcessorPool(processorPoolConfig, d_allocator_p),
         d_allocator_p);
 
     rc = context->d_processorPool_mp->start();
 
     if (rc != 0) {
-        context->d_processorPool_mp.clear();
+        context->d_processorPool_mp.reset();
         context->d_threadPool_mp->stop();
-        context->d_threadPool_mp.clear();
+        context->d_threadPool_mp.reset();
         errorDescription << "Failed to start processor pool for '" << type
                          << "' [rc: " << rc << "]";
         return rc_PROCESSOR_POOL_START_FAILED;  // RETURN
@@ -391,7 +391,7 @@ void Dispatcher::stop()
 #define STOP_AND_CLEAR(OBJ)                                                   \
     if (OBJ) {                                                                \
         OBJ->stop();                                                          \
-        OBJ.clear();                                                          \
+        OBJ.reset();                                                          \
     }
 
     DispatcherContext* context = 0;
