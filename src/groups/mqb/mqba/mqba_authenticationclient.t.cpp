@@ -28,6 +28,7 @@
 #include <bmqtst_scopedlogobserver.h>
 #include <bmqu_memoutstream.h>
 #include <bmqu_time.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_severity.h>
@@ -38,7 +39,6 @@
 #include <bsl_string.h>
 #include <bsl_vector.h>
 #include <bslma_allocator.h>
-#include <bslma_managedptr.h>
 #include <bsls_systemclocktype.h>
 #include <bsls_timeinterval.h>
 #include <bsls_types.h>
@@ -182,18 +182,18 @@ class TestBench {
 
     // MANIPULATORS
     template <class CRED_CB>
-    bslma::ManagedPtr<mqba::AuthenticationClient>
+    bmqu::UniquePtr<mqba::AuthenticationClient>
     createClient(const CRED_CB& credentialCb)
     {
         mqbplug::CredentialProvider::CredentialCb cb(bsl::allocator_arg,
                                                      d_allocator_p,
                                                      credentialCb);
-        return bslma::ManagedPtrUtil::allocateManaged<
-            mqba::AuthenticationClient>(d_allocator_p,
-                                        cb,
-                                        d_channel,
-                                        d_blobSpPool_sp.get(),
-                                        &d_scheduler);
+        return bmqu::UniquePtrUtil::allocateUnique<mqba::AuthenticationClient>(
+            d_allocator_p,
+            cb,
+            d_channel,
+            d_blobSpPool_sp.get(),
+            &d_scheduler);
     }
 };
 
@@ -224,7 +224,7 @@ static void test1_authenticateSuccess()
     TestBench         tb(alloc);
 
     // 1)
-    bslma::ManagedPtr<mqba::AuthenticationClient> client = tb.createClient(
+    bmqu::UniquePtr<mqba::AuthenticationClient> client = tb.createClient(
         SuccessCredentialCb());
 
     // 2)
@@ -271,7 +271,7 @@ static void test2_authenticateChannelGone()
     TestBench         tb(alloc);
 
     // 1)
-    bslma::ManagedPtr<mqba::AuthenticationClient> client = tb.createClient(
+    bmqu::UniquePtr<mqba::AuthenticationClient> client = tb.createClient(
         SuccessCredentialCb());
 
     // 2)
@@ -305,7 +305,7 @@ static void test3_authenticateCredentialFailure()
     TestBench         tb(alloc);
 
     // 1)
-    bslma::ManagedPtr<mqba::AuthenticationClient> client = tb.createClient(
+    bmqu::UniquePtr<mqba::AuthenticationClient> client = tb.createClient(
         FailingCredentialCb());
 
     // 2)
@@ -338,7 +338,7 @@ static void test4_authenticateWriteFails()
     TestBench         tb(alloc);
 
     // 1)
-    bslma::ManagedPtr<mqba::AuthenticationClient> client = tb.createClient(
+    bmqu::UniquePtr<mqba::AuthenticationClient> client = tb.createClient(
         SuccessCredentialCb());
 
     // 2)
@@ -371,7 +371,7 @@ static void test5_handleResponseSuccessNoLifetime()
     bslma::Allocator* alloc = bmqtst::TestHelperUtil::allocator();
     TestBench         tb(alloc);
 
-    bslma::ManagedPtr<mqba::AuthenticationClient> client = tb.createClient(
+    bmqu::UniquePtr<mqba::AuthenticationClient> client = tb.createClient(
         SuccessCredentialCb());
 
     // 1)
@@ -415,7 +415,7 @@ static void test6_handleResponseSuccessWithLifetime()
     bslma::Allocator* alloc = bmqtst::TestHelperUtil::allocator();
     TestBench         tb(alloc);
 
-    bslma::ManagedPtr<mqba::AuthenticationClient> client = tb.createClient(
+    bmqu::UniquePtr<mqba::AuthenticationClient> client = tb.createClient(
         SuccessCredentialCb());
 
     // 1)
@@ -472,7 +472,7 @@ static void test7_handleResponseAuthenticationFailure()
     TestBench         tb(alloc);
 
     // 1)
-    bslma::ManagedPtr<mqba::AuthenticationClient> client = tb.createClient(
+    bmqu::UniquePtr<mqba::AuthenticationClient> client = tb.createClient(
         SuccessCredentialCb());
 
     // 2)
@@ -506,7 +506,7 @@ static void test8_handleResponseInvalidMessage()
     TestBench         tb(alloc);
 
     // 1)
-    bslma::ManagedPtr<mqba::AuthenticationClient> client = tb.createClient(
+    bmqu::UniquePtr<mqba::AuthenticationClient> client = tb.createClient(
         SuccessCredentialCb());
 
     // 2)
@@ -545,7 +545,7 @@ static void test9_destructorCancelsReauthTimer()
     size_t writeCountAfterAuth;
 
     {
-        bslma::ManagedPtr<mqba::AuthenticationClient> client = tb.createClient(
+        bmqu::UniquePtr<mqba::AuthenticationClient> client = tb.createClient(
             SuccessCredentialCb());
 
         // 1)
@@ -595,7 +595,7 @@ static void test10_reauthChannelGoneAtTimerFire()
     bslma::Allocator* alloc = bmqtst::TestHelperUtil::allocator();
     TestBench         tb(alloc);
 
-    bslma::ManagedPtr<mqba::AuthenticationClient> client = tb.createClient(
+    bmqu::UniquePtr<mqba::AuthenticationClient> client = tb.createClient(
         SuccessCredentialCb());
 
     // 1)
@@ -648,7 +648,7 @@ static void test11_onCloseCancelsReauthTimer()
     bslma::Allocator* alloc = bmqtst::TestHelperUtil::allocator();
     TestBench         tb(alloc);
 
-    bslma::ManagedPtr<mqba::AuthenticationClient> client = tb.createClient(
+    bmqu::UniquePtr<mqba::AuthenticationClient> client = tb.createClient(
         SuccessCredentialCb());
 
     // 1)
