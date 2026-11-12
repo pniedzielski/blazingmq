@@ -54,6 +54,7 @@
 
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
+#include <bmqu_uniqueptr.h>
 
 // CONVENIENCE
 using namespace BloombergLP;
@@ -173,7 +174,7 @@ struct DomainTester {
     bsl::shared_ptr<mqbmock::Cluster>     d_cluster_sp;
     bsl::shared_ptr<bmqst::StatContext>   d_domainsStatContext_sp;
     bslma::ManagedPtr<bmqst::StatContext> d_queuesStatContext_mp;
-    bslma::ManagedPtr<mqbblp::Domain>     d_domain_mp;
+    bmqu::UniquePtr<mqbblp::Domain>       d_domain_mp;
 
     // CREATORS
 
@@ -188,7 +189,7 @@ struct DomainTester {
     , d_cluster_sp(0)
     , d_domainsStatContext_sp(0)
     , d_queuesStatContext_mp(0)
-    , d_domain_mp(0)
+    , d_domain_mp()
     {
         // The Domain's dispatcher only needs to accept the reconfigure
         // functors 'Domain::configure' posts; setting 'enqueueOnly' prevents
@@ -236,15 +237,15 @@ struct DomainTester {
 
         bsl::shared_ptr<mqbi::Cluster> clusterBase = d_cluster_sp;
 
-        d_domain_mp.load(new (*d_allocator_p)
-                             mqbblp::Domain("domain-test",
-                                            &d_dispatcher,
-                                            &d_bufferFactory,
-                                            clusterBase,
-                                            d_domainsStatContext_sp.get(),
-                                            d_queuesStatContext_mp,
-                                            d_allocator_p),
-                         d_allocator_p);
+        d_domain_mp = bmqu::UniquePtrUtil::adopt<mqbblp::Domain>(
+            new (*d_allocator_p) mqbblp::Domain("domain-test",
+                                                &d_dispatcher,
+                                                &d_bufferFactory,
+                                                clusterBase,
+                                                d_domainsStatContext_sp.get(),
+                                                d_queuesStatContext_mp,
+                                                d_allocator_p),
+            d_allocator_p);
     }
 
     ~DomainTester()

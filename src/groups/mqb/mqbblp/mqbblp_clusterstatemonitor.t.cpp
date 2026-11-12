@@ -46,6 +46,7 @@
 // TEST DRIVER
 #include <bmqtst_testhelper.h>
 #include <bmqu_tempdirectory.h>
+#include <bmqu_uniqueptr.h>
 
 // CONVENIENCE
 using namespace BloombergLP;
@@ -116,7 +117,7 @@ struct TestHelper {
 
   public:
     // PUBLIC DATA
-    bslma::ManagedPtr<mqbmock::Cluster> d_cluster_mp;
+    bmqu::UniquePtr<mqbmock::Cluster> d_cluster_mp;
 
     bsl::vector<mqbnet::MockClusterNode*> d_nodes;
 
@@ -124,7 +125,7 @@ struct TestHelper {
 
     // CREATORS
     TestHelper()
-    : d_cluster_mp(0)
+    : d_cluster_mp()
     , d_nodes(bmqtst::TestHelperUtil::allocator())
     , d_tempDir(bmqtst::TestHelperUtil::allocator())
     {
@@ -167,7 +168,7 @@ struct TestHelper {
             mqbmock::Cluster::k_LEADER_NODE_ID + 4,
             bmqtst::TestHelperUtil::allocator());
 
-        d_cluster_mp.load(
+        d_cluster_mp = bmqu::UniquePtrUtil::adopt<mqbmock::Cluster>(
             new (*bmqtst::TestHelperUtil::allocator())
                 mqbmock::Cluster(bmqtst::TestHelperUtil::allocator(),
                                  true,   // isClusterMember
