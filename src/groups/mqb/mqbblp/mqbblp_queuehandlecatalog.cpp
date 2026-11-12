@@ -298,9 +298,8 @@ void QueueHandleCatalog::loadHandles(
 
     out->reserve(d_handles.size());
 
-    for (HandleMap::iterator it = d_handles.begin(); it != d_handles.end();
-         ++it) {
-        out->push_back(it->key1());
+    for (const auto& handleEntry : d_handles) {
+        out->push_back(handleEntry.key1());
     }
 }
 
@@ -311,24 +310,19 @@ void QueueHandleCatalog::iterateConsumers(const Visitor& visitor) const
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queue_p->inDispatcherThread());
 
-    for (HandleMap::iterator itHandle = d_handles.begin();
-         itHandle != d_handles.end();
-         ++itHandle) {
-        mqbi::QueueHandle* handle(itHandle->value().get());
+    for (const auto& handleEntry : d_handles) {
+        mqbi::QueueHandle* handle(handleEntry.value().get());
 
         if (!bmqt::QueueFlagsUtil::isReader(
                 handle->handleParameters().flags())) {
             continue;  // CONTINUE
         }
-        for (mqbi::QueueHandle::SubStreams::const_iterator citer =
-                 handle->subStreamInfos().begin();
-             citer != handle->subStreamInfos().end();
-             ++citer) {
+        for (const auto& subStreamEntry : handle->subStreamInfos()) {
             const bmqp_ctrlmsg::StreamParameters& parameters =
-                citer->second.d_streamParameters;
+                subStreamEntry.second.d_streamParameters;
 
             if (parameters.subscriptions().size() > 0) {
-                visitor(handle, citer->second);
+                visitor(handle, subStreamEntry.second);
             }
         }
     }
@@ -343,10 +337,9 @@ void QueueHandleCatalog::loadInternals(
     BSLS_ASSERT_SAFE(d_queue_p->inDispatcherThread());
 
     out->reserve(d_handles.size());
-    for (HandleMap::iterator it = d_handles.begin(); it != d_handles.end();
-         ++it) {
+    for (const auto& handleEntry : d_handles) {
         out->resize(out->size() + 1);
-        mqbi::QueueHandle* handle = it->key1();
+        mqbi::QueueHandle* handle = handleEntry.key1();
         bmqu::MemOutStream description;
         description << handle << "  ~ "
                     << handle->clientContext()->description();
@@ -364,10 +357,8 @@ bsls::Types::Int64 QueueHandleCatalog::countUnconfirmed() const
 
     bsls::Types::Int64 result = 0;
 
-    for (HandleMap::const_iterator cit = d_handles.begin();
-         cit != d_handles.end();
-         ++cit) {
-        const mqbi::QueueHandle* handle(cit->value().get());
+    for (const auto& handleEntry : d_handles) {
+        const mqbi::QueueHandle* handle(handleEntry.value().get());
 
         result += handle->countUnconfirmed();
     }
