@@ -1273,10 +1273,10 @@ void RootQueueEngine::releaseHandle(
                     handle->setStreamParameters(nullStreamParams);
                     // Create new Routing from scratch using Subscription Ids
                     // from the old routing.
-                    bsl::shared_ptr<Routers::AppContext> replacement(
+                    auto replacement =
                         bsl::allocate_shared<Routers::AppContext>(
                             d_allocator_p,
-                            &d_queueState_p->routingContext()));
+                            &d_queueState_p->routingContext());
 
                     bmqu::MemOutStream errorStream(d_allocator_p);
                     app->rebuildConsumers(currSubStreamInfo.appId().c_str(),
