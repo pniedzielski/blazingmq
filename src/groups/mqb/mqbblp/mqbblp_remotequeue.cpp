@@ -149,7 +149,7 @@ int RemoteQueue::configureAsProxy(bsl::ostream& errorDescription,
     d_state_p->setStorage(storageSp);
 
     // Create the queueEngine.
-    d_queueEngine_mp.load(
+    d_queueEngine_mp = bmqu::UniquePtrUtil::adopt<RelayQueueEngine>(
         new (*d_allocator_p)
             RelayQueueEngine(d_state_p, mqbconfm::Domain(), d_allocator_p),
         d_allocator_p);
@@ -243,7 +243,7 @@ int RemoteQueue::configureAsClusterMember(bool isReconfigure)
         d_state_p->setStorage(storageSp);
 
         // Create the queueEngine.
-        d_queueEngine_mp.load(
+        d_queueEngine_mp = bmqu::UniquePtrUtil::adopt<RelayQueueEngine>(
             new (*d_allocator_p)
                 RelayQueueEngine(d_state_p, *domainCfg, d_allocator_p),
             d_allocator_p);
@@ -462,7 +462,7 @@ RemoteQueue::RemoteQueue(QueueState*       state,
                          bslma::Allocator* allocator)
 : d_self(this, allocator)
 , d_state_p(state)
-, d_queueEngine_mp(0)
+, d_queueEngine_mp()
 , d_pendingMessages(allocator)
 , d_pendingConfirms(allocator)
 , d_subStreamMessages_mp()

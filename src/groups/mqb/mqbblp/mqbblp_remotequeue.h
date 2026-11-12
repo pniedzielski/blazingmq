@@ -42,6 +42,7 @@
 #include <bmqp_protocol.h>
 #include <bmqu_atomicstate.h>
 #include <bmqu_sharedresource.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -176,7 +177,7 @@ class RemoteQueue {
                         bmqp::Protocol::k_SUBID_ARRAY_STATIC_LEN>
         SubQueueIds;
 
-    typedef bslma::ManagedPtr<mqbs::VirtualStorageCatalog> SubStreamMessagesMp;
+    typedef bmqu::UniquePtr<mqbs::VirtualStorageCatalog> SubStreamMessagesMp;
 
     typedef mqbi::Storage::StorageKeys StorageKeys;
 
@@ -188,7 +189,7 @@ class RemoteQueue {
 
     QueueState* d_state_p;
 
-    bslma::ManagedPtr<RelayQueueEngine> d_queueEngine_mp;
+    bmqu::UniquePtr<RelayQueueEngine> d_queueEngine_mp;
 
     /// Map of GUID->Item, to use for ACKs/NACKs and retransmissions.
     Puts d_pendingMessages;
