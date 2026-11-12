@@ -43,7 +43,7 @@ int ClusterActiveNodeManager::onNodeUp(
     ClusterNode*                        node,
     const bmqp_ctrlmsg::ClientIdentity& identity)
 {
-    NodesMap::iterator nodeIt = d_nodes.find(node);
+    auto nodeIt = d_nodes.find(node);
 
     BSLS_ASSERT_SAFE(nodeIt != d_nodes.end());
 
@@ -73,7 +73,7 @@ int ClusterActiveNodeManager::onNodeStatusChange(
     ClusterNode*                    node,
     bmqp_ctrlmsg::NodeStatus::Value status)
 {
-    NodesMap::iterator nodeIt = d_nodes.find(node);
+    auto nodeIt = d_nodes.find(node);
 
     BSLS_ASSERT_SAFE(nodeIt != d_nodes.end());
 
@@ -87,7 +87,7 @@ int ClusterActiveNodeManager::onNodeStatusChange(
 
 int ClusterActiveNodeManager::onNodeDown(ClusterNode* node)
 {
-    NodesMap::iterator nodeIt = d_nodes.find(node);
+    auto nodeIt = d_nodes.find(node);
 
     BSLS_ASSERT_SAFE(nodeIt != d_nodes.end());
 
@@ -271,7 +271,7 @@ void ClusterActiveNodeManager::initialize(TransportManager* transportManager)
     // 'mqbnet::Session::negotiationMessage' is read-only (safe to access).
     for (TransportManagerIterator sessIt(transportManager); sessIt; ++sessIt) {
         bsl::shared_ptr<Session> session = sessIt.session().lock();
-        NodesMap::iterator       nodeIt = d_nodes.find(session->clusterNode());
+        auto                     nodeIt = d_nodes.find(session->clusterNode());
 
         if (nodeIt == d_nodes.end()) {
             continue;  // CONTINUE
