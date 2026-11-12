@@ -630,11 +630,10 @@ class ClusterQueueHelper final : public mqbc::ClusterStateObserver,
                             const bsl::shared_ptr<PartitionReopenCycle>& cycle,
                             int numAttempts);
 
-    void onReopenQueueRetryDispatched(
-        const RequestSp&                             requestContext,
-        mqbnet::ClusterNode*                         activeNode,
-        const bsl::shared_ptr<PartitionReopenCycle>& cycle,
-        int                                          numAttempts);
+    void retryReopenQueue(const RequestSp&     requestContext,
+                          mqbnet::ClusterNode* activeNode,
+                          const bsl::shared_ptr<PartitionReopenCycle>& cycle,
+                          int numAttempts);
 
     /// Custom deleter of the openQueue confirmationCookie (in the specified
     /// `value`), for an open queue from the specified `request`.
@@ -670,18 +669,18 @@ class ClusterQueueHelper final : public mqbc::ClusterStateObserver,
                           const mqbi::QueueHandleReleaseResult&     result,
                           const bmqp_ctrlmsg::ControlMessage&       request,
                           mqbc::ClusterNodeSession*                 requester);
-    void onHandleReleasedDispatched(
-        const bsl::shared_ptr<mqbi::QueueHandle>& handle,
-        const mqbi::QueueHandleReleaseResult&     result,
-        const bmqp_ctrlmsg::ControlMessage&       request,
-        mqbc::ClusterNodeSession*                 requester);
+    void
+    processHandleReleased(const bsl::shared_ptr<mqbi::QueueHandle>& handle,
+                          const mqbi::QueueHandleReleaseResult&     result,
+                          const bmqp_ctrlmsg::ControlMessage&       request,
+                          mqbc::ClusterNodeSession*                 requester);
 
     void
          onHandleConfigured(const bmqp_ctrlmsg::Status&           status,
                             const bmqp_ctrlmsg::StreamParameters& streamParameters,
                             const bmqp_ctrlmsg::ControlMessage&   request,
                             mqbc::ClusterNodeSession*             requester);
-    void onHandleConfiguredDispatched(
+    void addPeerSubscriptions(
         int                                   qId,
         const bmqp_ctrlmsg::StreamParameters& streamParameters,
         mqbc::ClusterNodeSession*             requester);
@@ -699,11 +698,11 @@ class ClusterQueueHelper final : public mqbc::ClusterStateObserver,
     /// specified `domain` contains a pointer to the result; otherwise
     /// `status` contains the category, error code and description of the
     /// failure.
-    void onGetDomainDispatched(const bmqp_ctrlmsg::Status&         status,
-                               mqbi::Domain*                       domain,
-                               const bmqp_ctrlmsg::ControlMessage& request,
-                               mqbc::ClusterNodeSession*           requester,
-                               const int requesterId);
+    void processGetDomainResult(const bmqp_ctrlmsg::Status&         status,
+                                mqbi::Domain*                       domain,
+                                const bmqp_ctrlmsg::ControlMessage& request,
+                                mqbc::ClusterNodeSession*           requester,
+                                const int requesterId);
 
     void onGetQueueHandle(
         const bmqp_ctrlmsg::Status&                status,
@@ -721,7 +720,7 @@ class ClusterQueueHelper final : public mqbc::ClusterStateObserver,
     /// to indicate receiving and processing of that response; otherwise
     /// `status` contains the category, error code and description of the
     /// failure.  The `queueHandle` must be released once no longer needed.
-    void onGetQueueHandleDispatched(
+    void processPeerGetQueueHandleResult(
         const bmqp_ctrlmsg::Status&                status,
         mqbi::QueueHandle*                         queueHandle,
         const bmqp_ctrlmsg::OpenQueueResponse&     openQueueResponse,
@@ -745,28 +744,27 @@ class ClusterQueueHelper final : public mqbc::ClusterStateObserver,
                      bool                isOpen,
                      bool                isWriterOnly = false);
 
-    void configureQueueDispatched(
+    void configureQueueImpl(
         const bmqt::Uri&                                   uri,
         unsigned int                                       queueId,
         unsigned int                                       upstreamSubQueueId,
         const bmqp_ctrlmsg::StreamParameters&              streamParameters,
         const mqbi::QueueHandle::HandleConfiguredCallback& callback);
 
-    void closeQueueDispatched(
-        const bmqp_ctrlmsg::QueueHandleParameters&   handleParameters,
-        unsigned int                                 upstreamSubQueueId,
-        const mqbi::Cluster::HandleReleasedCallback& callback);
+    void
+    closeQueueImpl(const bmqp_ctrlmsg::QueueHandleParameters& handleParameters,
+                   unsigned int upstreamSubQueueId,
+                   const mqbi::Cluster::HandleReleasedCallback& callback);
 
     void onCloseQueueResponse(
         const RequestSp&                             requestContext,
         const mqbi::Cluster::HandleReleasedCallback& callback);
 
-    void onQueueHandleCreatedDispatched(mqbi::Queue*     queue,
-                                        const bmqt::Uri& uri,
-                                        bool             handleCreated);
+    void processQueueHandleCreated(mqbi::Queue*     queue,
+                                   const bmqt::Uri& uri,
+                                   bool             handleCreated);
 
-    void onQueueHandleDestroyedDispatched(mqbi::Queue*     queue,
-                                          const bmqt::Uri& uri);
+    void processQueueHandleDestroyed(mqbi::Queue* queue, const bmqt::Uri& uri);
 
     bool sendConfigureQueueRequest(
         const bmqp_ctrlmsg::StreamParameters&              streamParameters,
@@ -824,15 +822,15 @@ class ClusterQueueHelper final : public mqbc::ClusterStateObserver,
     /// availability.  Notify all affected queues.
     void onUpstreamNodeChange(mqbnet::ClusterNode* node, int partitionId);
 
-    void checkUnconfirmedV2Dispatched(
-        const bsls::TimeInterval&    whenToStop,
-        const bsl::function<void()>& completionCallback);
+    void
+    checkUnconfirmedV2Impl(const bsls::TimeInterval&    whenToStop,
+                           const bsl::function<void()>& completionCallback);
 
     /// Send StopResponse to the request in the specified 'context.
     void finishStopSequence(StopContext* context);
 
     /// Send StopResponse to the request in the specified 'context.
-    void finishStopSequenceDispatched(StopContext* context);
+    void completeStopSequence(StopContext* context);
 
     void contextHolder(const bsl::shared_ptr<StopContext>& contextSp,
                        const VoidFunctor&                  action);

@@ -127,30 +127,6 @@ void createQueueUriKey(bmqt::Uri*        out,
     BSLS_ASSERT_OPT(rc == 0);
 }
 
-void afterAppIdRegisteredDispatched(
-    mqbi::Queue*                                 queue,
-    const mqbc::ClusterStateQueueInfo::AppInfos& appInfos)
-{
-    // executed by the *QUEUE DISPATCHER* thread
-
-    // PRECONDITIONS
-    BSLS_ASSERT_SAFE(queue->inDispatcherThread());
-
-    queue->queueEngine()->afterAppIdRegistered(appInfos);
-}
-
-void afterAppIdUnregisteredDispatched(
-    mqbi::Queue*                                 queue,
-    const mqbc::ClusterStateQueueInfo::AppInfos& appInfos)
-{
-    // executed by the *QUEUE DISPATCHER* thread
-
-    // PRECONDITIONS
-    BSLS_ASSERT_SAFE(queue->inDispatcherThread());
-
-    queue->queueEngine()->afterAppIdUnregistered(appInfos);
-}
-
 void handleHolderDummy(
     [[maybe_unused]] const bsl::shared_ptr<mqbi::QueueHandle>& handle)
 {
@@ -224,8 +200,8 @@ void ClusterQueueHelper::finishOpening(
     // First step in this routine is to update the cookie with the queue handle
     // if 'confirmationCookie' is valid.  If this open-queue request has
     // succeeded, this object should eventually set 'confirmationCookie' to 0
-    // (see 'onGetQueueHandleDispatched').  Note that this also applies to the
-    // 'mqba::ClientSession' case ('onQueueOpenCb').  The rough equivalent
+    // (see 'processPeerGetQueueHandleResult').  Note that this also applies to
+    // the 'mqba::ClientSession' case ('onQueueOpenCb').  The rough equivalent
     // of a client session here is the cluster node session represented by
     // 'requester'.
 
@@ -1891,15 +1867,12 @@ void ClusterQueueHelper::onReopenQueueRetry(
 
     d_cluster_p->dispatcher()->execute(
         [this, requestContext, activeNode, cycle, numAttempts]() {
-            onReopenQueueRetryDispatched(requestContext,
-                                         activeNode,
-                                         cycle,
-                                         numAttempts);
+            retryReopenQueue(requestContext, activeNode, cycle, numAttempts);
         },
         d_cluster_p);
 }
 
-void ClusterQueueHelper::onReopenQueueRetryDispatched(
+void ClusterQueueHelper::retryReopenQueue(
     const RequestSp&                             requestContext,
     mqbnet::ClusterNode*                         activeNode,
     const bsl::shared_ptr<PartitionReopenCycle>& cycle,
@@ -2384,12 +2357,12 @@ void ClusterQueueHelper::onHandleReleased(
 
     d_cluster_p->dispatcher()->execute(
         [this, handle, result, request, requester]() {
-            onHandleReleasedDispatched(handle, result, request, requester);
+            processHandleReleased(handle, result, request, requester);
         },
         d_cluster_p);
 }
 
-void ClusterQueueHelper::onHandleReleasedDispatched(
+void ClusterQueueHelper::processHandleReleased(
     const bsl::shared_ptr<mqbi::QueueHandle>& handle,
     const mqbi::QueueHandleReleaseResult&     result,
     const bmqp_ctrlmsg::ControlMessage&       request,
@@ -2534,7 +2507,7 @@ void ClusterQueueHelper::onHandleConfigured(
         // Need to rebuild Subscriptions in the Cluster thread.
         d_cluster_p->dispatcher()->execute(
             [this, qId, streamParameters, requester]() {
-                onHandleConfiguredDispatched(qId, streamParameters, requester);
+                addPeerSubscriptions(qId, streamParameters, requester);
             },
             d_cluster_p);
     }
@@ -2544,7 +2517,7 @@ void ClusterQueueHelper::onHandleConfigured(
         requester->clusterNode());
 }
 
-void ClusterQueueHelper::onHandleConfiguredDispatched(
+void ClusterQueueHelper::addPeerSubscriptions(
     int                                   qId,
     const bmqp_ctrlmsg::StreamParameters& streamParameters,
     mqbc::ClusterNodeSession*             requester)
@@ -2581,16 +2554,16 @@ void ClusterQueueHelper::onGetDomain(
 
     d_cluster_p->dispatcher()->execute(
         [this, status, domain, request, requester, requesterId]() {
-            onGetDomainDispatched(status,
-                                  domain,
-                                  request,
-                                  requester,
-                                  requesterId);
+            processGetDomainResult(status,
+                                   domain,
+                                   request,
+                                   requester,
+                                   requesterId);
         },
         d_cluster_p);
 }
 
-void ClusterQueueHelper::onGetDomainDispatched(
+void ClusterQueueHelper::processGetDomainResult(
     const bmqp_ctrlmsg::Status&         status,
     mqbi::Domain*                       domain,
     const bmqp_ctrlmsg::ControlMessage& request,
@@ -2638,7 +2611,7 @@ void ClusterQueueHelper::onGetDomainDispatched(
     //      CQH::onGetDomain          QueueSessionManager::onDomainOpenCb
     //               |                     |
     //               V                     |
-    //      CQH::onGetDomainDispatched     |
+    //      CQH::processGetDomainResult     |
     //                       |             |
     //                       V             V
     //                      Domain::openQueue
@@ -2659,7 +2632,7 @@ void ClusterQueueHelper::onGetDomainDispatched(
     //                      Domain::onOpenQueueResponse
     //                        |                  |
     //                        V                  V
-    //  CQH::onGetQueueHandleDispatched     QueueSessionManager::onQueueOpenCb
+    //  CQH::processPeerGetQueueHandleResult QueueSessionManager::onQueueOpenCb
     //
 
     domain->openQueue(
@@ -2671,13 +2644,13 @@ void ClusterQueueHelper::onGetDomainDispatched(
             mqbi::QueueHandle*                         queueHandle,
             const bmqp_ctrlmsg::OpenQueueResponse&     openQueueResponse,
             const mqbi::OpenQueueConfirmationCookieSp& confirmationCookie) {
-            onGetQueueHandleDispatched(handleStatus,
-                                       queueHandle,
-                                       openQueueResponse,
-                                       confirmationCookie,
-                                       request,
-                                       requester,
-                                       requesterId);
+            processPeerGetQueueHandleResult(handleStatus,
+                                            queueHandle,
+                                            openQueueResponse,
+                                            confirmationCookie,
+                                            request,
+                                            requester,
+                                            requesterId);
         });
 }
 
@@ -2708,7 +2681,7 @@ void ClusterQueueHelper::onGetQueueHandle(
         d_cluster_p);
 }
 
-void ClusterQueueHelper::onGetQueueHandleDispatched(
+void ClusterQueueHelper::processPeerGetQueueHandleResult(
     const bmqp_ctrlmsg::Status&                status,
     mqbi::QueueHandle*                         queueHandle,
     const bmqp_ctrlmsg::OpenQueueResponse&     openQueueResponse,
@@ -2885,7 +2858,7 @@ void ClusterQueueHelper::reconfigureCallback(
     // TODO: consider success even before reconfigure response
 }
 
-void ClusterQueueHelper::configureQueueDispatched(
+void ClusterQueueHelper::configureQueueImpl(
     const bmqt::Uri&                                   uri,
     unsigned int                                       queueId,
     unsigned int                                       upstreamSubQueueId,
@@ -3051,7 +3024,7 @@ void ClusterQueueHelper::configureQueueDispatched(
                               upstreamSubQueueId);
 }
 
-void ClusterQueueHelper::closeQueueDispatched(
+void ClusterQueueHelper::closeQueueImpl(
     const bmqp_ctrlmsg::QueueHandleParameters&   handleParameters,
     unsigned int                                 upstreamSubQueueId,
     const mqbi::Cluster::HandleReleasedCallback& callback)
@@ -3071,7 +3044,7 @@ void ClusterQueueHelper::closeQueueDispatched(
         // handles associated with the queue" warning).  Eventually the
         // downstream client went down, and self node attempted to configure/
         // close/drop the queue handle, and we end up here.  See similar note
-        // in 'configureQueueDispatched'.
+        // in 'configureQueueImpl'.
 
         BMQ_LOGTHROTTLE_ERROR
             << d_cluster_p->description()
@@ -3278,9 +3251,9 @@ void ClusterQueueHelper::onCloseQueueResponse(
     }
 }
 
-void ClusterQueueHelper::onQueueHandleCreatedDispatched(mqbi::Queue*     queue,
-                                                        const bmqt::Uri& uri,
-                                                        bool handleCreated)
+void ClusterQueueHelper::processQueueHandleCreated(mqbi::Queue*     queue,
+                                                   const bmqt::Uri& uri,
+                                                   bool handleCreated)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -3322,8 +3295,8 @@ void ClusterQueueHelper::onQueueHandleCreatedDispatched(mqbi::Queue*     queue,
     }
 }
 
-void ClusterQueueHelper::onQueueHandleDestroyedDispatched(mqbi::Queue* queue,
-                                                          const bmqt::Uri& uri)
+void ClusterQueueHelper::processQueueHandleDestroyed(mqbi::Queue*     queue,
+                                                     const bmqt::Uri& uri)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -4498,7 +4471,7 @@ void ClusterQueueHelper::onQueueUpdated(
     if (queue) {
         // This node is either replica or primary.
         // Currently, 'RelayQueueEngine' does not do anything in
-        // 'afterAppIdRegisteredDispatched' / 'afterAppIdRegisteredDispatched'.
+        // 'afterAppIdRegistered' / 'afterAppIdUnregistered'.
         // Replicas create/update/delete storage upon Replication events
         // (queueCreationCb/queueDeletionCb).
         //
@@ -4509,13 +4482,23 @@ void ClusterQueueHelper::onQueueUpdated(
         // TODO: replace with one call
         d_cluster_p->dispatcher()->execute(
             [queue, addedAppIds]() {
-                afterAppIdRegisteredDispatched(queue, addedAppIds);
+                // executed by the *QUEUE DISPATCHER* thread
+
+                // PRECONDITIONS
+                BSLS_ASSERT_SAFE(queue->inDispatcherThread());
+
+                queue->queueEngine()->afterAppIdRegistered(addedAppIds);
             },
             queue);
 
         d_cluster_p->dispatcher()->execute(
             [queue, removedAppIds]() {
-                afterAppIdUnregisteredDispatched(queue, removedAppIds);
+                // executed by the *QUEUE DISPATCHER* thread
+
+                // PRECONDITIONS
+                BSLS_ASSERT_SAFE(queue->inDispatcherThread());
+
+                queue->queueEngine()->afterAppIdUnregistered(removedAppIds);
             },
             queue);
     }
@@ -4746,7 +4729,7 @@ void ClusterQueueHelper::openQueue(
 
     QueueContextMapIter queueContextIt = d_queues.find(uriKey);
 
-    // NOTE: See TBD in 'onGetDomainDispatched': if the request comes from a
+    // NOTE: See TBD in 'processGetDomainResult': if the request comes from a
     //       peer inside the cluster, 'clientIdentity' will represent our own
     //       identity instead of that of the peer; which is obviously wrong;
     //       however, here we only want to use it to determine whether the
@@ -4922,11 +4905,11 @@ void ClusterQueueHelper::configureQueue(
          upstreamSubQueueId,     // Use upstream subQueueId
          streamParameters,
          callback]() {
-            configureQueueDispatched(uri,
-                                     queueId,
-                                     upstreamSubQueueId,
-                                     streamParameters,
-                                     callback);
+            configureQueueImpl(uri,
+                               queueId,
+                               upstreamSubQueueId,
+                               streamParameters,
+                               callback);
         },
         d_cluster_p);
 }
@@ -4953,7 +4936,7 @@ void ClusterQueueHelper::closeQueue(
 
     d_cluster_p->dispatcher()->execute(
         [this, handleParams, upstreamSubQueueId, callback]() {
-            closeQueueDispatched(handleParams, upstreamSubQueueId, callback);
+            closeQueueImpl(handleParams, upstreamSubQueueId, callback);
         },
         d_cluster_p);
 }
@@ -4970,7 +4953,7 @@ void ClusterQueueHelper::onQueueHandleCreated(mqbi::Queue*     queue,
 
     d_cluster_p->dispatcher()->execute(
         [this, queue, uri, handleCreated]() {
-            onQueueHandleCreatedDispatched(queue, uri, handleCreated);
+            processQueueHandleCreated(queue, uri, handleCreated);
         },
         d_cluster_p);
 }
@@ -4984,7 +4967,7 @@ void ClusterQueueHelper::onQueueHandleDestroyed(mqbi::Queue*     queue,
 
     d_cluster_p->dispatcher()->execute(
         [this, queue, uri]() {
-            onQueueHandleDestroyedDispatched(queue, uri);
+            processQueueHandleDestroyed(queue, uri);
         },
         d_cluster_p);
 }
@@ -5615,12 +5598,12 @@ void ClusterQueueHelper::finishStopSequence(StopContext* context)
     // executed by *ANY* thread
     d_cluster_p->dispatcher()->execute(
         [this, context]() {
-            finishStopSequenceDispatched(context);
+            completeStopSequence(context);
         },
         d_cluster_p);
 }
 
-void ClusterQueueHelper::finishStopSequenceDispatched(StopContext* context)
+void ClusterQueueHelper::completeStopSequence(StopContext* context)
 {
     // executed by the cluster *DISPATCHER* thread
 
@@ -5648,12 +5631,12 @@ void ClusterQueueHelper::checkUnconfirmedV2(
 {
     d_cluster_p->dispatcher()->execute(
         [this, whenToStop, completionCallback]() {
-            checkUnconfirmedV2Dispatched(whenToStop, completionCallback);
+            checkUnconfirmedV2Impl(whenToStop, completionCallback);
         },
         d_cluster_p);
 }
 
-void ClusterQueueHelper::checkUnconfirmedV2Dispatched(
+void ClusterQueueHelper::checkUnconfirmedV2Impl(
     const bsls::TimeInterval&    whenToStop,
     const bsl::function<void()>& completionCallback)
 {
