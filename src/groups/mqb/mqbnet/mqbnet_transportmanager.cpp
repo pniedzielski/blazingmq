@@ -574,7 +574,7 @@ int TransportManager::createCluster(
                              << tcpConfig.endpoint() << "': [rc: " << rc
                              << ", cluster: '" << name << "']";
             // Remove any connections about that cluster
-            ConnectionsStateMap::iterator stateIt = d_connectionsState.begin();
+            auto stateIt = d_connectionsState.begin();
             while (stateIt != d_connectionsState.end()) {
                 if (stateIt->first->d_node_p &&
                     stateIt->first->d_node_p->cluster() == cluster.get()) {
