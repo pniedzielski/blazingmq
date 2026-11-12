@@ -141,10 +141,8 @@ void MockCluster::notifyObserversOfNodeStateChange(ClusterNode* node,
         //       observers callback.  If required, this can be changed by
         //       making a copy of the set inside the mutex, and iterating over
         //       the copy after releasing the mutex.
-        for (ObserversSet::iterator it = d_nodeStateObservers.begin();
-             it != d_nodeStateObservers.end();
-             ++it) {
-            (*it)->onNodeStateChange(node, state);
+        for (const auto& observer : d_nodeStateObservers) {
+            observer->onNodeStateChange(node, state);
         }
     }
 
@@ -200,12 +198,10 @@ Cluster* MockCluster::unregisterObserver(ClusterObserver* observer)
 void MockCluster::writeAll(const bsl::shared_ptr<bdlbb::Blob>& blob,
                            bmqp::EventType::Enum               type)
 {
-    for (bsl::list<MockClusterNode>::iterator it = d_nodes.begin();
-         it != d_nodes.end();
-         ++it) {
+    for (auto& clusterNode : d_nodes) {
         // Write to all peers (except self)
-        if (it->nodeId() != selfNodeId()) {
-            it->write(blob, type);
+        if (clusterNode.nodeId() != selfNodeId()) {
+            clusterNode.write(blob, type);
         }
     }
 }
@@ -223,25 +219,19 @@ void MockCluster::broadcast(const bsl::shared_ptr<bdlbb::Blob>& blob)
 
 void MockCluster::closeChannels()
 {
-    for (bsl::list<MockClusterNode>::iterator it = d_nodes.begin();
-         it != d_nodes.end();
-         ++it) {
-        it->channel().requestToStop();
+    for (auto& clusterNode : d_nodes) {
+        clusterNode.channel().requestToStop();
     }
-    for (bsl::list<MockClusterNode>::iterator it = d_nodes.begin();
-         it != d_nodes.end();
-         ++it) {
-        it->channel().stop();
+    for (auto& clusterNode : d_nodes) {
+        clusterNode.channel().stop();
     }
 }
 
 ClusterNode* MockCluster::lookupNode(int nodeId)
 {
-    for (bsl::list<MockClusterNode>::iterator it = d_nodes.begin();
-         it != d_nodes.end();
-         ++it) {
-        if (it->nodeId() == nodeId) {
-            return &(*it);  // RETURN
+    for (auto& clusterNode : d_nodes) {
+        if (clusterNode.nodeId() == nodeId) {
+            return &clusterNode;  // RETURN
         }
     }
 
@@ -254,11 +244,9 @@ void MockCluster::enableRead()
     BSLS_ASSERT_SAFE(!d_isReadEnabled);
 
     d_isReadEnabled = true;
-    for (bsl::list<MockClusterNode>::iterator it = d_nodes.begin();
-         it != d_nodes.end();
-         ++it) {
-        if (it->nodeId() != d_selfNodeId) {
-            it->enableRead();
+    for (auto& clusterNode : d_nodes) {
+        if (clusterNode.nodeId() != d_selfNodeId) {
+            clusterNode.enableRead();
         }
     }
 }

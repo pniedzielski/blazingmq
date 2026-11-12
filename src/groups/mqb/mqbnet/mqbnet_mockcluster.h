@@ -384,11 +384,9 @@ inline int MockCluster::selfNodeId() const
 
 inline const mqbnet::ClusterNode* MockCluster::selfNode() const
 {
-    for (bsl::list<MockClusterNode>::const_iterator cit = d_nodes.begin();
-         cit != d_nodes.end();
-         ++cit) {
-        if (cit->nodeId() == d_selfNodeId) {
-            return &(*cit);  // RETURN
+    for (const auto& clusterNode : d_nodes) {
+        if (clusterNode.nodeId() == d_selfNodeId) {
+            return &clusterNode;  // RETURN
         }
     }
 
