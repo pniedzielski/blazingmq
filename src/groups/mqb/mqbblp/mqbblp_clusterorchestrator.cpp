@@ -736,12 +736,9 @@ void ClusterOrchestrator::updateDatumStats(
 {
     bsl::vector<mqbc::ClusterNodeSession*> nodes;
     if (nodeSession == 0) {
-        ClusterNodeSessionMapIter iter =
-            d_clusterData_p->membership().clusterNodeSessionMap().begin();
-        ClusterNodeSessionMapIter endIter =
-            d_clusterData_p->membership().clusterNodeSessionMap().end();
-        for (; iter != endIter; ++iter) {
-            nodes.push_back((iter->second).get());
+        for (const auto& sessionEntry :
+             d_clusterData_p->membership().clusterNodeSessionMap()) {
+            nodes.push_back(sessionEntry.second.get());
         }
     }
     else {
@@ -757,17 +754,17 @@ void ClusterOrchestrator::updateDatumStats(
     }
 
     int status = 0;
-    for (size_t i = 0; i < nodes.size(); ++i) {
+    for (mqbc::ClusterNodeSession* session : nodes) {
         // status is -1 if node is self, 0 if node is down, 1 if node is up
-        if (d_clusterData_p->membership().selfNodeSession() == nodes[i]) {
+        if (d_clusterData_p->membership().selfNodeSession() == session) {
             status = -1;
         }
         else {
-            status = nodes[i]->clusterNode()->isAvailable();
+            status = session->clusterNode()->isAvailable();
         }
 
-        bslma::Allocator* alloc = nodes[i]->statContext()->datumAllocator();
-        ManagedDatumMp    datum = nodes[i]->statContext()->datum();
+        bslma::Allocator* alloc = session->statContext()->datumAllocator();
+        ManagedDatumMp    datum = session->statContext()->datum();
 
         bdld::DatumMapBuilder builder(alloc);
         builder.pushBack("leader", bdld::Datum::copyString(leader, alloc));
