@@ -20,7 +20,6 @@
 // BDE
 #include <ball_log.h>
 #include <ball_severity.h>
-#include <bdlf_bind.h>
 #include <bdlt_timeunitratio.h>
 #include <bslmt_threadutil.h>
 #include <bsls_timeutil.h>

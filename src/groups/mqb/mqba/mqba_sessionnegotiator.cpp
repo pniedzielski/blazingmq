@@ -79,13 +79,12 @@
 
 // BDE
 #include <ball_log.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdls_pathutil.h>
 #include <bdls_processutil.h>
 #include <bsl_functional.h>
 #include <bsl_iostream.h>
+#include <bsl_memory.h>
 #include <bsl_string.h>
 #include <bslma_managedptr.h>
 #include <bsls_assert.h>
