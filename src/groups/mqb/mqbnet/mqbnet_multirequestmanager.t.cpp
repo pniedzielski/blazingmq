@@ -587,9 +587,8 @@ static void test4_handleResponseTest()
         }
 
         BMQTST_ASSERT(!called);
-        bsl::vector<Mes>::const_iterator rIt = responses.begin();
-        for (; rIt != responses.end(); ++rIt) {
-            context.manager()->processResponse(*rIt);
+        for (const auto& responseMsg : responses) {
+            context.manager()->processResponse(responseMsg);
         }
         BMQTST_ASSERT(called);
 
