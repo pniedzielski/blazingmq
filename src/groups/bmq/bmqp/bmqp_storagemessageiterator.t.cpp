@@ -670,8 +670,8 @@ static void test6_corruptedStorageEvent_part4()
     malformedMessageWords.push_back(0);
     malformedMessageWords.push_back(k_HEADER_WORDS - 1);
 
-    for (size_t i = 0; i < malformedMessageWords.size(); ++i) {
-        PVV("MESSAGE WORDS: " << malformedMessageWords[i]);
+    for (int malformedWords : malformedMessageWords) {
+        PVV("MESSAGE WORDS: " << malformedWords);
 
         bdlbb::PooledBlobBufferFactory bufferFactory(
             1024,
@@ -694,7 +694,7 @@ static void test6_corruptedStorageEvent_part4()
             .setHeaderWords(k_HEADER_WORDS)
             .setMessageType(bmqp::StorageMessageType::e_CONFIRM)
             .setPartitionId(0)
-            .setMessageWords(malformedMessageWords[i]);
+            .setMessageWords(malformedWords);
 
         bdlbb::BlobUtil::append(&eventBlob,
                                 reinterpret_cast<const char*>(&shd),
