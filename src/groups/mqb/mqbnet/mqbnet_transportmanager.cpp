@@ -608,12 +608,12 @@ void* TransportManager::getClusterNodeAndState(
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // d_mutex LOCK
 
     ConnectionState* state = 0;
-    for (ConnectionsStateMap::iterator it = d_connectionsState.begin();
-         it != d_connectionsState.end();
-         ++it) {
-        if (it->first->d_node_p && it->first->d_node_p->nodeId() == nodeId &&
-            it->first->d_node_p->cluster()->name() == clusterName) {
-            state = it->first;
+    for (const auto& connectionEntry : d_connectionsState) {
+        if (connectionEntry.first->d_node_p &&
+            connectionEntry.first->d_node_p->nodeId() == nodeId &&
+            connectionEntry.first->d_node_p->cluster()->name() ==
+                clusterName) {
+            state = connectionEntry.first;
             break;  // BREAK
         }
     }
