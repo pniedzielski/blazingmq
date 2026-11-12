@@ -705,7 +705,7 @@ ClusterStateManager::ClusterStateManager(
 , d_cluster_p(cluster)
 , d_clusterData_p(clusterData)
 , d_state_p(clusterState)
-, d_clusterStateLedger_mp(clusterStateLedger)
+, d_clusterStateLedger_mp(bsl::move(clusterStateLedger))
 , d_storageManager_p(0)
 {
     // executed by *ANY* thread

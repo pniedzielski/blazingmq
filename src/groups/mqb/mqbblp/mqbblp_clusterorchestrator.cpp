@@ -36,6 +36,7 @@
 #include <bmqtsk_alarmlog.h>
 #include <bmqu_memoutstream.h>
 #include <bmqu_time.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bdld_datummapbuilder.h>
@@ -572,13 +573,13 @@ ClusterOrchestrator::ClusterOrchestrator(
 , d_stateManager_mp(
       clusterConfig.clusterAttributes().isFSMWorkflow()
           ? static_cast<mqbi::ClusterStateManager*>(
-                new(*d_allocator_p) mqbc::ClusterStateManager(
+                new (*d_allocator_p) mqbc::ClusterStateManager(
                     clusterConfig,
                     d_cluster_p,
                     d_clusterData_p,
                     clusterState,
                     ClusterStateManager::ClusterStateLedgerMp(
-                        bslma::ManagedPtrUtil::allocateManaged<
+                        bmqu::UniquePtrUtil::allocateUnique<
                             mqbc::IncoreClusterStateLedger>(
                             d_allocators.get("ClusterStateLedger"),
                             clusterConfig,
@@ -591,13 +592,13 @@ ClusterOrchestrator::ClusterOrchestrator(
                         .clusterFsmWatchdogNumRetries(),
                     d_allocators.get("ClusterStateManager")))
           : static_cast<mqbi::ClusterStateManager*>(
-                new(*d_allocator_p) ClusterStateManager(
+                new (*d_allocator_p) ClusterStateManager(
                     clusterConfig,
                     d_cluster_p,
                     d_clusterData_p,
                     clusterState,
                     ClusterStateManager::ClusterStateLedgerMp(
-                        bslma::ManagedPtrUtil::allocateManaged<
+                        bmqu::UniquePtrUtil::allocateUnique<
                             mqbc::IncoreClusterStateLedger>(
                             d_allocators.get("ClusterStateLedger"),
                             clusterConfig,

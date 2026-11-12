@@ -44,6 +44,7 @@
 // BMQ
 #include <bmqma_countingallocatorstore.h>
 #include <bmqp_ctrlmsg_messages.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -91,7 +92,7 @@ class ClusterStateManager final
 
   public:
     // TYPES
-    typedef bslma::ManagedPtr<mqbc::ClusterStateLedger> ClusterStateLedgerMp;
+    typedef bmqu::UniquePtr<mqbc::ClusterStateLedger> ClusterStateLedgerMp;
 
   private:
     // PRIVATE TYPES

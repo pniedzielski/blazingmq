@@ -41,7 +41,7 @@
 
 // BDE
 #include <bsl_memory.h>
-#include <bslma_managedptr.h>
+#include <bsl_utility.h>
 #include <bsls_assert.h>
 #include <bsls_systemtime.h>
 #include <bsls_types.h>
@@ -179,12 +179,13 @@ struct Tester {
             bmqtst::TestHelperUtil::allocator());
 
         // Create the cluster state ledger
-        ClusterStateLedgerMp clusterStateLedger_mp(
-            new (*bmqtst::TestHelperUtil::allocator())
-                mqbmock::ClusterStateLedger(
-                    d_cluster_mp->_clusterData(),
-                    bmqtst::TestHelperUtil::allocator()),
-            bmqtst::TestHelperUtil::allocator());
+        ClusterStateLedgerMp clusterStateLedger_mp =
+            bmqu::UniquePtrUtil::adopt<mqbc::ClusterStateLedger>(
+                new (*bmqtst::TestHelperUtil::allocator())
+                    mqbmock::ClusterStateLedger(
+                        d_cluster_mp->_clusterData(),
+                        bmqtst::TestHelperUtil::allocator()),
+                bmqtst::TestHelperUtil::allocator());
         d_clusterStateLedger_p = dynamic_cast<mqbmock::ClusterStateLedger*>(
             clusterStateLedger_mp.get());
 
@@ -197,7 +198,7 @@ struct Tester {
                         d_cluster_mp.get(),
                         d_cluster_mp->_clusterData(),
                         d_cluster_mp->_state(),
-                        clusterStateLedger_mp,
+                        bsl::move(clusterStateLedger_mp),
                         watchdogTimeout,
                         numRetries,
                         bmqtst::TestHelperUtil::allocator()),

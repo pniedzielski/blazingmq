@@ -34,6 +34,7 @@
 // BDE
 #include <bmqp_protocol.h>
 #include <bsl_ostream.h>
+#include <bsl_utility.h>
 #include <bsl_vector.h>
 #include <bsla_annotations.h>
 #include <bsls_assert.h>
@@ -74,7 +75,7 @@ ClusterStateManager::ClusterStateManager(
 , d_clusterFSM(*this, allocator)
 , d_nodeToLedgerLSNMap(allocator)
 // TODO Add cluster config to determine Eventual vs Strong
-, d_clusterStateLedger_mp(clusterStateLedger)
+, d_clusterStateLedger_mp(bsl::move(clusterStateLedger))
 , d_storageManager_p(0)
 , d_afterPartitionPrimaryAssignmentCb()
 {
