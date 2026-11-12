@@ -364,8 +364,7 @@ static void appendMessages1(bmqp::EventHeader*                 eh,
     }
 
     // Set EventHeader length
-    bmqp::EventHeader* e = reinterpret_cast<bmqp::EventHeader*>(
-        blob->buffer(0).data());
+    auto* e = reinterpret_cast<bmqp::EventHeader*>(blob->buffer(0).data());
     e->setLength(eventLength);
     eh->setLength(eventLength);
 }
@@ -574,8 +573,7 @@ void populateBlob(bdlbb::Blob*              blob,
     }
 
     // set EventHeader length
-    bmqp::EventHeader* e = reinterpret_cast<bmqp::EventHeader*>(
-        blob->buffer(0).data());
+    auto* e = reinterpret_cast<bmqp::EventHeader*>(blob->buffer(0).data());
     e->setLength(eventLength);
 }
 
