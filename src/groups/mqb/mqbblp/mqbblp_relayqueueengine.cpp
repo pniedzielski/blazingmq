@@ -39,14 +39,11 @@
 #include <bmqtsk_alarmlog.h>
 #include <bmqu_memoutstream.h>
 #include <bmqu_time.h>
-#include <bmqu_weakmemfn.h>
 
 // BDE
 #include <ball_logthrottle.h>
 #include <bdlb_print.h>
 #include <bdlb_scopeexit.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_cstddef.h>
 #include <bsl_functional.h>
@@ -614,13 +611,11 @@ void RelayQueueEngine::onHandleReleased(
     const bsl::shared_ptr<QueueEngineUtil_ReleaseHandleProctor>& proctor)
 {
     d_queueState_p->queue()->dispatcher()->execute(
-        bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-                                 &RelayQueueEngine::processReleaseResponse,
-                                 d_self.acquireWeak()),
-                             status,
-                             handle,
-                             hp,
-                             proctor),
+        [weakSelf = d_self.acquireWeak(), status, handle, hp, proctor]() {
+            if (bsl::shared_ptr<RelayQueueEngine> self = weakSelf.lock()) {
+                self->processReleaseResponse(status, handle, hp, proctor);
+            }
+        },
         d_queueState_p->queue());
 }
 
@@ -1622,13 +1617,17 @@ void RelayQueueEngine::releaseHandleImpl(
             d_queueState_p->queue(),
             effectiveHandleParam,
             upstreamSubQueueId,
-            bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-                                     &RelayQueueEngine::onHandleReleased,
-                                     d_self.acquireWeak()),
-                                 bdlf::PlaceHolders::_1,  // Status
-                                 handle,
-                                 effectiveHandleParam,
-                                 proctor));
+            [weakSelf = d_self.acquireWeak(),
+             handle,
+             effectiveHandleParam,
+             proctor](const bmqp_ctrlmsg::Status& releaseStatus) {
+                if (bsl::shared_ptr<RelayQueueEngine> self = weakSelf.lock()) {
+                    self->onHandleReleased(releaseStatus,
+                                           handle,
+                                           effectiveHandleParam,
+                                           proctor);
+                }
+            });
     }
 }
 
