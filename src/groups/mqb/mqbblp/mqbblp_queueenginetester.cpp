@@ -573,7 +573,7 @@ void QueueEngineTester::init(const mqbconfm::Domain& domainConfig,
             mqbu::StorageKey appKey;
             mqbs::StorageUtil::generateStorageKey(&appKey, &appKeys, appId);
             BSLS_ASSERT_SAFE(!appKey.isNull());
-            BSLS_ASSERT_SAFE(appKeys.find(appKey) != appKeys.end());
+            BSLS_ASSERT_SAFE(appKeys.contains(appKey));
 
             rc = storage_p->addVirtualStorage(errorDescription, appId, appKey);
             BSLS_ASSERT_SAFE(rc == 0);
@@ -774,8 +774,7 @@ QueueEngineTester::getHandle(const bsl::string& clientText)
     }
     else {
         // This is a new client, we need to create client data for it
-        BSLS_ASSERT_OPT(d_clientContexts.find(clientKey) ==
-                        d_clientContexts.end());
+        BSLS_ASSERT_OPT(!d_clientContexts.contains(clientKey));
 
         // Client data
 
@@ -929,7 +928,7 @@ QueueEngineTester::client(const bslstl::StringRef& clientKey)
     // PRECONDITIONS
     BSLS_ASSERT_OPT(d_queueEngine_mp &&
                     "'createQueueEngine()' was not called");
-    BSLS_ASSERT_OPT(d_handles.find(clientKey) != d_handles.end());
+    BSLS_ASSERT_OPT(d_handles.contains(clientKey));
 
     return d_handles.find(clientKey)->second;
 }
@@ -1426,9 +1425,8 @@ void QueueEngineTester::dropHandle(const bslstl::StringRef& clientKey)
     // PRECONDITIONS
     BSLS_ASSERT_OPT(d_queueEngine_mp &&
                     "'createQueueEngine()' was not called");
-    BSLS_ASSERT_OPT(d_handles.find(clientKey) != d_handles.end());
-    BSLS_ASSERT_OPT(d_clientContexts.find(clientKey) !=
-                    d_clientContexts.end());
+    BSLS_ASSERT_OPT(d_handles.contains(clientKey));
+    BSLS_ASSERT_OPT(d_clientContexts.contains(clientKey));
 
     mqbmock::QueueHandle* handle = client(clientKey);
     if (handle != 0) {
@@ -1450,8 +1448,7 @@ void QueueEngineTester::dropHandles()
 
     auto iter = d_handles.begin();
     while (iter != d_handles.end()) {
-        BSLS_ASSERT_OPT(d_clientContexts.find(iter->first) !=
-                            d_clientContexts.end() &&
+        BSLS_ASSERT_OPT(d_clientContexts.contains(iter->first) &&
                         "No client data corresponding to handle");
 
         const bsl::string clientKey(iter->first, d_allocator_p);
