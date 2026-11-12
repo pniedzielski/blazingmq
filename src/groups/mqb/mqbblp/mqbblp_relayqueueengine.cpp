@@ -699,7 +699,7 @@ void RelayQueueEngine::processReleaseResponse(
     unsigned int upstreamSubQueueId = itStream->second.d_upstreamSubQueueId;
 
     // Look up App_State
-    AppsMap::iterator appStateIt = d_apps.find(upstreamSubQueueId);
+    auto appStateIt = d_apps.find(upstreamSubQueueId);
     BSLS_ASSERT_SAFE(appStateIt != d_apps.end());
     BSLS_ASSERT_SAFE(appStateIt->second);
 
@@ -1525,8 +1525,7 @@ void RelayQueueEngine::releaseHandleImpl(
     App_State*   app                = findApp(upstreamSubQueueId);
 
     BSLS_ASSERT_SAFE(app);
-    App_State::CachedParametersMap::iterator itHandle = app->d_cache.find(
-        handle);
+    auto itHandle = app->d_cache.find(handle);
     BSLS_ASSERT_SAFE(itHandle != app->d_cache.end());
     bmqp_ctrlmsg::QueueHandleParameters& cachedHandleParameters =
         itHandle->second.d_handleParameters;
@@ -1953,7 +1952,7 @@ void RelayQueueEngine::registerStorage(const bsl::string&      appId,
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queueState_p->queue()->inDispatcherThread());
 
-    AppIds::iterator iter = d_appIds.find(appId);
+    auto iter = d_appIds.find(appId);
 
     if (iter == d_appIds.end()) {
         // No consumer has opened the queue with 'appId'.
@@ -1982,7 +1981,7 @@ void RelayQueueEngine::unregisterStorage(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queueState_p->queue()->inDispatcherThread());
 
-    AppIds::iterator iter = d_appIds.find(appId);
+    auto             iter = d_appIds.find(appId);
     mqbu::StorageKey key;
 
     if (iter == d_appIds.end()) {
@@ -2135,8 +2134,7 @@ void RelayQueueEngine::push(mqbi::StorageMessageAttributes*     attributes,
             processAppRedelivery(subQueueId, app);
         }
         else {
-            PushStream::Apps::iterator itApp = d_pushStream.d_apps.find(
-                subQueueId);
+            auto itApp = d_pushStream.d_apps.find(subQueueId);
 
             if (itApp == d_pushStream.d_apps.end()) {
                 AppsMap::const_iterator app_cit = d_apps.find(subQueueId);
