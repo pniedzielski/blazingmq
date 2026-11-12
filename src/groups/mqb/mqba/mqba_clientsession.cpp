@@ -187,7 +187,6 @@
 #include <bmqu_printutil.h>
 #include <bmqu_stringutil.h>
 #include <bmqu_time.h>
-#include <bmqu_weakmemfn.h>
 
 // BDE
 #include <ball_log.h>
@@ -197,9 +196,7 @@
 #include <bdld_datum.h>
 #include <bdld_datummapbuilder.h>
 #include <bdld_manageddatum.h>
-#include <bdlf_bind.h>
 #include <bdlf_noop.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bdlt_timeunitratio.h>
 #include <bsl_ios.h>
@@ -409,12 +406,11 @@ void ClientSession::sendPacket(const bsl::shared_ptr<bdlbb::Blob>& blob,
     // executed by *ANY* thread
 
     dispatcher()->execute(
-        bdlf::BindUtil::bindS(
-            d_state.d_allocator_p,
-            bmqu::WeakMemFnUtil::weakMemFn(&ClientSession::writePacket,
-                                           d_self.acquireWeak()),
-            blob,
-            flushBuilders),
+        [weakSelf = d_self.acquireWeak(), blob, flushBuilders]() {
+            if (bsl::shared_ptr<ClientSession> self = weakSelf.lock()) {
+                self->writePacket(blob, flushBuilders);
+            }
+        },
         this);
 }
 
@@ -982,12 +978,11 @@ void ClientSession::processDisconnectAllQueues(
     dispatcher()->executeOnAllQueues(
         mqbi::Dispatcher::VoidFunction(),  // empty
         mqbi::DispatcherClientType::e_QUEUE,
-        bdlf::BindUtil::bind(
-            bmqu::WeakMemFnUtil::weakMemFn(
-                &ClientSession::processDisconnectAllQueuesDone,
-                d_self.acquireWeak()),
-            controlMessage,
-            opLogger));
+        [weakSelf = d_self.acquireWeak(), controlMessage, opLogger]() {
+            if (bsl::shared_ptr<ClientSession> self = weakSelf.lock()) {
+                self->processDisconnectAllQueuesDone(controlMessage, opLogger);
+            }
+        });
 }
 
 void ClientSession::processDisconnectAllQueuesDone(
@@ -1002,11 +997,11 @@ void ClientSession::processDisconnectAllQueuesDone(
     // thread.
 
     dispatcher()->execute(
-        bdlf::BindUtil::bind(
-            bmqu::WeakMemFnUtil::weakMemFn(&ClientSession::processDisconnect,
-                                           d_self.acquireWeak()),
-            controlMessage,
-            opLogger),
+        [weakSelf = d_self.acquireWeak(), controlMessage, opLogger]() {
+            if (bsl::shared_ptr<ClientSession> self = weakSelf.lock()) {
+                self->processDisconnect(controlMessage, opLogger);
+            }
+        },
         this);
 }
 
@@ -1345,13 +1340,16 @@ void ClientSession::processConfigureStream(
     // QE should validate consumerPriority and consumerPriorityCount
     handle->configure(
         req.streamParameters(),
-        bdlf::BindUtil::bind(
-            bmqu::WeakMemFnUtil::weakMemFn(&ClientSession::onHandleConfigured,
-                                           d_self.acquireWeak()),
-            bdlf::PlaceHolders::_1,  // status
-            bdlf::PlaceHolders::_2,  // streamParams
-            streamParamsCtrlMsg,
-            opLogger));
+        [weakSelf = d_self.acquireWeak(), streamParamsCtrlMsg, opLogger](
+            const bmqp_ctrlmsg::Status&           status,
+            const bmqp_ctrlmsg::StreamParameters& streamParameters) {
+            if (bsl::shared_ptr<ClientSession> self = weakSelf.lock()) {
+                self->onHandleConfigured(status,
+                                         streamParameters,
+                                         streamParamsCtrlMsg,
+                                         opLogger);
+            }
+        });
 }
 
 void ClientSession::onAckEvent(const mqbevt::AckEvent& event)
@@ -2959,12 +2957,12 @@ void ClientSession::processClusterMessage(
         ShutdownContextSp context;
         context.createInplace(
             d_state.d_allocator_p,
-            bdlf::BindUtil::bindS(
-                d_state.d_allocator_p,
-                bmqu::WeakMemFnUtil::weakMemFn(&ClientSession::sendPacket,
-                                               d_self.acquireWeak()),
-                d_state.d_schemaEventBuilder.blob(),
-                false));
+            [weakSelf = d_self.acquireWeak(),
+             blob     = d_state.d_schemaEventBuilder.blob()]() {
+                if (bsl::shared_ptr<ClientSession> self = weakSelf.lock()) {
+                    self->sendPacket(blob, false);
+                }
+            });
 
         processStopRequest(context);
     }
