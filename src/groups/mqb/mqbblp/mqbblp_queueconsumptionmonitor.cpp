@@ -413,11 +413,8 @@ void QueueConsumptionMonitor::cancelIdleEvents(bool resetStates)
     // Should always be called from the queue thread, but will be invoked from
     // the cluster thread once upon queue creation.
 
-    for (SubStreamInfoMapIter iter = d_subStreamInfos.begin(),
-                              last = d_subStreamInfos.end();
-         iter != last;
-         ++iter) {
-        SubStreamInfo& info = iter->second;
+    for (auto& subStreamEntry : d_subStreamInfos) {
+        SubStreamInfo& info = subStreamEntry.second;
         cancelIdleEvents(&info);
 
         if (resetStates) {
@@ -459,12 +456,9 @@ void QueueConsumptionMonitor::processAlarmEvent()
     bsls::TimeInterval minAlarmTime;
     minAlarmTime.addMicroseconds(
         bsl::numeric_limits<bsls::Types::Int64>::max());
-    for (SubStreamInfoMapIter iter = d_subStreamInfos.begin(),
-                              last = d_subStreamInfos.end();
-         iter != last;
-         ++iter) {
-        SubStreamInfo&     info  = iter->second;
-        const bsl::string& appId = iter->first;
+    for (auto& subStreamEntry : d_subStreamInfos) {
+        SubStreamInfo&     info  = subStreamEntry.second;
+        const bsl::string& appId = subStreamEntry.first;
 
         if (info.d_state == State::e_IDLE) {
             // skip substream in idle state,
