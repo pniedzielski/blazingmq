@@ -1251,7 +1251,7 @@ void RemoteQueue::processAckEvent(const mqbevt::AckEvent& event)
     const bmqp::AckMessage& ackMessage = event.ackMessage();
     bmqt::AckResult::Enum   ackResult  = bmqp::ProtocolUtil::ackResultFromCode(
         ackMessage.status());
-    Puts::iterator it = d_pendingMessages.find(ackMessage.messageGUID());
+    auto it = d_pendingMessages.find(ackMessage.messageGUID());
 
     if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(it != d_pendingMessages.end())) {
         source = it->second.d_handle;
