@@ -312,13 +312,10 @@ int RecoveryManager::processSendDataChunks(
         fileSet = d_recoveryContextVec[partitionId].d_recoveryFileSet;
     }
 
-    bsl::shared_ptr<mqbs::MappedFileDescriptor> mappedJournalFd =
-        bsl::make_shared<mqbs::MappedFileDescriptor>();
-    bsl::shared_ptr<mqbs::MappedFileDescriptor> mappedDataFd =
-        bsl::make_shared<mqbs::MappedFileDescriptor>();
+    auto mappedJournalFd = bsl::make_shared<mqbs::MappedFileDescriptor>();
+    auto mappedDataFd    = bsl::make_shared<mqbs::MappedFileDescriptor>();
     // Only used if d_qlistAware == true
-    bsl::shared_ptr<mqbs::MappedFileDescriptor> mappedQlistFd =
-        bsl::make_shared<mqbs::MappedFileDescriptor>();
+    auto mappedQlistFd = bsl::make_shared<mqbs::MappedFileDescriptor>();
 
     int rc = RecoveryUtil::loadFileDescriptors(
         mappedJournalFd.get(),
@@ -338,13 +335,10 @@ int RecoveryManager::processSendDataChunks(
         mqbu::ExitUtil::terminate(mqbu::ExitCode::e_RECOVERY_FAILURE);  // EXIT
     }
 
-    bsl::shared_ptr<bsls::AtomicInt> journalChunkDeleterCounter =
-        bsl::make_shared<bsls::AtomicInt>(0);
-    bsl::shared_ptr<bsls::AtomicInt> dataChunkDeleterCounter =
-        bsl::make_shared<bsls::AtomicInt>(0);
+    auto journalChunkDeleterCounter = bsl::make_shared<bsls::AtomicInt>(0);
+    auto dataChunkDeleterCounter    = bsl::make_shared<bsls::AtomicInt>(0);
     // Only used if d_qlistAware == true
-    bsl::shared_ptr<bsls::AtomicInt> qlistChunkDeleterCounter =
-        bsl::make_shared<bsls::AtomicInt>(0);
+    auto qlistChunkDeleterCounter = bsl::make_shared<bsls::AtomicInt>(0);
 
     // Scope Exit Guards to unmap the fds incase of errors.
     bdlb::ScopeExit<ChunkDeleter> guardJournalFd(
