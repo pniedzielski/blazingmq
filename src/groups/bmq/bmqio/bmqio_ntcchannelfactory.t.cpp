@@ -16,6 +16,7 @@
 #include <bmqio_ntcchannelfactory.h>
 
 #include <bmqu_blob.h>
+#include <bmqu_uniqueptr.h>
 
 #include <ntcf_system.h>
 #include <ntsf_system.h>
@@ -231,7 +232,7 @@ class Tester {
     HandleMap                            d_handleMap;
     PreCreateCbCallList                  d_preCreateCbCalls;
     bool                                 d_setPreCreateCb;
-    bslma::ManagedPtr<NtcChannelFactory> d_object;
+    bmqu::UniquePtr<NtcChannelFactory>   d_object;
     bslmt::Mutex                         d_mutex;
 
     // PRIVATE MANIPULATORS
@@ -582,10 +583,11 @@ void Tester::init(int line)
     ntca::InterfaceConfig interfaceConfig;
     interfaceConfig.setThreadName("test");
 
-    d_object.load(new (*d_allocator_p) NtcChannelFactory(interfaceConfig,
-                                                         &d_blobBufferFactory,
-                                                         d_allocator_p),
-                  d_allocator_p);
+    d_object = bmqu::UniquePtrUtil::adopt(
+        new (*d_allocator_p) NtcChannelFactory(interfaceConfig,
+                                               &d_blobBufferFactory,
+                                               d_allocator_p),
+        d_allocator_p);
 
     if (d_setPreCreateCb) {
         d_object->onCreate(
