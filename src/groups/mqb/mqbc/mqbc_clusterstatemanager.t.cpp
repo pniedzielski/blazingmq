@@ -632,7 +632,7 @@ static void test1_breathingTestLeader()
     const NodeToLSNMap& lsnMap =
         tester.d_clusterStateManager_mp->nodeToLSNMap();
     BMQTST_ASSERT_EQ(lsnMap.size(), 1U);
-    NodeToLSNMapCIter citer = lsnMap.find(const_cast<mqbnet::ClusterNode*>(
+    auto citer = lsnMap.find(const_cast<mqbnet::ClusterNode*>(
         tester.d_cluster_mp->netCluster().selfNode()));
     BMQTST_ASSERT(citer != lsnMap.cend());
     BMQTST_ASSERT_LT(citer->second,
@@ -906,7 +906,7 @@ static void test6_registrationRequestHandlingLeader()
     const NodeToLSNMap& lsnMap =
         tester.d_clusterStateManager_mp->nodeToLSNMap();
     BMQTST_ASSERT_EQ(lsnMap.size(), 2U);  // 2 including self LSN
-    NodeToLSNMapCIter citer = lsnMap.find(source);
+    auto citer = lsnMap.find(source);
     BMQTST_ASSERT(citer != lsnMap.cend());
     BMQTST_ASSERT_EQ(citer->second.electorTerm(), 2U);
     BMQTST_ASSERT_EQ(citer->second.sequenceNumber(), 5U);
