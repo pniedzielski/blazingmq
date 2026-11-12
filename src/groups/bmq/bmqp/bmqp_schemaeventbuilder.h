@@ -240,8 +240,7 @@ int SchemaEventBuilder::setMessage(const TYPE& message, EventType::Enum type)
                      "The buffers allocated by the supplied bufferFactory "
                      "are too small");
 
-    EventHeader* eventHeader = new (d_blob_sp->buffer(0).data())
-        EventHeader(type);
+    auto* eventHeader = new (d_blob_sp->buffer(0).data()) EventHeader(type);
 
     // Specify the encoding type in the EventHeader for control or
     // authentication messages
