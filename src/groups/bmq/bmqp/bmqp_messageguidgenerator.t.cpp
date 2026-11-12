@@ -21,6 +21,7 @@
 #include <bmqc_orderedhashmap.h>
 #include <bmqu_memoutstream.h>
 #include <bmqu_printutil.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bdlb_guid.h>
@@ -1505,13 +1506,14 @@ static void testN10_hashCollisionsComparison()
             guids->resize(num);
 
             static const int k_NUM_GENERATORS = 10;
-            bsl::vector<bslma::ManagedPtr<bmqp::MessageGUIDGenerator> >
+            bsl::vector<bmqu::UniquePtr<bmqp::MessageGUIDGenerator> >
                 generators;
             generators.resize(10);
             for (int i = 0; i < k_NUM_GENERATORS; i++) {
-                generators[i].load(new (*bmqtst::TestHelperUtil::allocator())
-                                       bmqp::MessageGUIDGenerator(i),
-                                   bmqtst::TestHelperUtil::allocator());
+                generators[i] = bmqu::UniquePtrUtil::adopt(
+                    new (*bmqtst::TestHelperUtil::allocator())
+                        bmqp::MessageGUIDGenerator(i),
+                    bmqtst::TestHelperUtil::allocator());
             }
 
             bmqp::MessageGUIDGenerator generator(0);
