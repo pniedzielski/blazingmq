@@ -595,11 +595,9 @@ void QueueHandle::deliverMessageImpl(
             isOutOfOrder);
 
     if (result == mqbi::InlineResult::e_SUCCESS) {
-        for (bmqp::Protocol::SubQueueInfosArray::size_type i = 0;
-             i < subscriptions.size();
-             ++i) {
+        for (const bmqp::SubQueueInfo& subQueueInfo : subscriptions) {
             Subscriptions::iterator itSubscription = d_subscriptions.find(
-                subscriptions[i].id());
+                subQueueInfo.id());
 
             // Broadcast PUSH carry 'bmqp::Protocol::k_DEFAULT_SUBSCRIPTION_ID'
             // (0) as SubscriptionId until last hop before SDK.
@@ -957,8 +955,8 @@ void QueueHandle::deliverMessage(
     const unsigned int msgSize = iter.attributes().appDataLen();
     bmqp::Protocol::SubQueueInfosArray targetSubscriptions;
     bsls::Types::Int64                 now = bmqu::Time::highResolutionTimer();
-    for (size_t i = 0; i < subscriptions.size(); ++i) {
-        unsigned int          subscriptionId = subscriptions[i].id();
+    for (const bmqp::SubQueueInfo& subQueueInfo : subscriptions) {
+        unsigned int          subscriptionId = subQueueInfo.id();
         const SubscriptionSp& subscription   = d_subscriptions[subscriptionId];
 
         BSLS_ASSERT_SAFE(canDeliver(subscriptionId));
@@ -997,7 +995,7 @@ void QueueHandle::deliverMessage(
             continue;  // CONTINUE
         }
 
-        targetSubscriptions.push_back(subscriptions[i]);
+        targetSubscriptions.push_back(subQueueInfo);
 
         // NOTE: Updating the unconfirmedMonitors may cause the state of the
         //       monitor to change to 'STATE_FULL' and thus may impact the
@@ -1026,7 +1024,7 @@ void QueueHandle::deliverMessage(
             // maxUnconfirmed limit.
             BMQ_LOGTHROTTLE_INFO
                 << "Queue '" << d_queue_sp->description()
-                << "' with subscription [" << subscriptions[i] << "]"
+                << "' with subscription [" << subQueueInfo << "]"
                 << " of client '" << d_clientContext_sp->description()
                 << "' has too many outstanding data ["
                 << bmqu::PrintUtil::prettyNumber(
