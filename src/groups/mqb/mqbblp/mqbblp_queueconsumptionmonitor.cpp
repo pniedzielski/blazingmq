@@ -197,7 +197,7 @@ void QueueConsumptionMonitor::unregisterSubStream(const bsl::string& appId)
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queueState_p->queue()->inDispatcherThread());
 
-    SubStreamInfoMapIter iter = d_subStreamInfos.find(appId);
+    auto iter = d_subStreamInfos.find(appId);
     BSLS_ASSERT_SAFE(iter != d_subStreamInfos.end());
     SubStreamInfo& info = iter->second;
 
@@ -508,7 +508,7 @@ void QueueConsumptionMonitor::processIdleEvent(const bsl::string& appId)
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queueState_p->queue()->inDispatcherThread());
 
-    SubStreamInfoMapIter iter = d_subStreamInfos.find(appId);
+    auto iter = d_subStreamInfos.find(appId);
 
     if (BSLS_PERFORMANCEHINT_PREDICT_UNLIKELY(iter ==
                                               d_subStreamInfos.end())) {
