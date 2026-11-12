@@ -24,7 +24,6 @@
 #include <bmqio_status.h>
 #include <bmqu_memoutstream.h>
 #include <bmqu_time.h>
-#include <bmqu_weakmemfn.h>
 
 // BDE
 #include <ball_log.h>
@@ -174,12 +173,13 @@ int AuthenticationContext::setAuthenticatedAndScheduleReauthn(
         &d_timeoutHandle,
         bsls::TimeInterval(bmqu::Time::nowMonotonicClock())
             .addMilliseconds(lifetime),
-        [weakFn = bmqu::WeakMemFnUtil::weakMemFn(
-             &AuthenticationContext::onReauthenticationTimeout,
-             d_self.acquireWeak()),
+        [weakSelf   = d_self.acquireWeak(),
          channel_wp = bsl::weak_ptr<bmqio::Channel>(channel_sp),
          lifetime]() {
-            weakFn(channel_wp, lifetime);
+            if (bsl::shared_ptr<AuthenticationContext> strongSelf =
+                    weakSelf.lock()) {
+                strongSelf->onReauthenticationTimeout(channel_wp, lifetime);
+            }
         });
 
     return 0;
