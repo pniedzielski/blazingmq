@@ -54,13 +54,10 @@
 #include <bmqio_status.h>
 #include <bmqu_blob.h>
 #include <bmqu_printutil.h>
-#include <bmqu_weakmemfn.h>
 
 // BDE
 #include <ball_log.h>
 #include <bdlb_scopeexit.h>
-#include <bdlf_bind.h>
-#include <bdlf_placeholder.h>
 #include <bdlma_localsequentialallocator.h>
 #include <bsl_limits.h>
 #include <bsl_memory.h>
@@ -257,13 +254,15 @@ void AdminSession::enqueueAdminCommand(
     d_adminCb(
         d_channel_sp->peerUri(),
         req.command(),
-        bdlf::BindUtil::bind(bmqu::WeakMemFnUtil::weakMemFn(
-                                 &AdminSession::onProcessedAdminCommand,
-                                 d_self.acquireWeak()),
-                             adminCommandCtrlMsg,
-                             bdlf::PlaceHolders::_1,   // rc
-                             bdlf::PlaceHolders::_2),  // commandExecResults
-        false);                                        // fromReroute
+        [weakSelf = d_self.acquireWeak(),
+         adminCommandCtrlMsg](int commandRc, const bsl::string& execResults) {
+            if (bsl::shared_ptr<AdminSession> session = weakSelf.lock()) {
+                session->onProcessedAdminCommand(adminCommandCtrlMsg,
+                                                 commandRc,
+                                                 execResults);
+            }
+        },
+        false);  // fromReroute
 }
 
 // CREATORS
