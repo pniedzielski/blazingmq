@@ -32,7 +32,6 @@
 #include <bsl_string.h>
 #include <bsla_annotations.h>
 #include <bslma_allocator.h>
-#include <bslma_managedptr.h>
 #include <bsls_assert.h>
 #include <bsls_types.h>
 
@@ -154,7 +153,7 @@ struct Tester {
     bsl::shared_ptr<mqbsi::LogIdGenerator> d_logIdGenerator_sp;
     bsl::shared_ptr<mqbsi::LogFactory>     d_logFactory_sp;
     mqbsi::LedgerConfig                    d_config;
-    bslma::ManagedPtr<mqbsi::Ledger>       d_ledger_mp;
+    bmqu::UniquePtr<mqbsi::Ledger>         d_ledger_mp;
     bmqu::TempDirectory                    d_tempDir;
     bdlbb::PooledBlobBufferFactory         d_bufferFactory;
     bdlbb::PooledBlobBufferFactory         d_miniBufferFactory;
@@ -166,7 +165,7 @@ struct Tester {
            bsls::Types::Int64 maxLogSize  = k_LOG_MAX_SIZE,
            bslma::Allocator*  allocator = bmqtst::TestHelperUtil::allocator())
     : d_config(allocator)
-    , d_ledger_mp(0)
+    , d_ledger_mp()
     , d_tempDir(allocator)
     , d_bufferFactory(k_LONG_ENTRY_LEN * 2, allocator)
     , d_miniBufferFactory(k_ENTRY_LEN, allocator)
@@ -204,8 +203,9 @@ struct Tester {
             .setCleanupCallback(&cleanupCallback);
 
         // Create and open the ledger
-        d_ledger_mp.load(new (*allocator) mqbsl::Ledger(d_config, allocator),
-                         allocator);
+        d_ledger_mp = bmqu::UniquePtrUtil::adopt<mqbsi::Ledger>(
+            new (*allocator) mqbsl::Ledger(d_config, allocator),
+            allocator);
     }
 
     // MANIPULATORS
@@ -248,13 +248,14 @@ struct Tester {
     }
 
     /// Return a new ledger with the specified `keepOldLogs` flags.
-    bslma::ManagedPtr<mqbsi::Ledger> createNewLedger(bool keepOldLogs)
+    bmqu::UniquePtr<mqbsi::Ledger> createNewLedger(bool keepOldLogs)
     {
         bool oldFlag = d_config.keepOldLogs();
         d_config.setKeepOldLogs(keepOldLogs);
-        bslma::ManagedPtr<mqbsi::Ledger> ledger(
-            new (*d_allocator_p) mqbsl::Ledger(d_config, d_allocator_p),
-            d_allocator_p);
+        bmqu::UniquePtr<mqbsi::Ledger> ledger =
+            bmqu::UniquePtrUtil::adopt<mqbsi::Ledger>(
+                new (*d_allocator_p) mqbsl::Ledger(d_config, d_allocator_p),
+                d_allocator_p);
         d_config.setKeepOldLogs(oldFlag);
 
         return ledger;
@@ -388,7 +389,7 @@ static void test3_openMultipleLogsNoKeep()
     BSLS_ASSERT_OPT(ledger->close() == LedgerOpResult::e_SUCCESS);
 
     // Extract an obsolete logId.
-    bslma::ManagedPtr<mqbsi::Ledger> keepLogsLedger = tester.createNewLedger(
+    bmqu::UniquePtr<mqbsi::Ledger> keepLogsLedger = tester.createNewLedger(
         true);
     BSLS_ASSERT_OPT(keepLogsLedger->open(mqbsi::Ledger::e_READ_ONLY) ==
                     LedgerOpResult::e_SUCCESS);
