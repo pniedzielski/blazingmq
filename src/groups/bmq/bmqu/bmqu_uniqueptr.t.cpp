@@ -23,6 +23,7 @@
 #include <bsl_string.h>
 #include <bsl_utility.h>
 #include <bslma_defaultallocatorguard.h>
+#include <bslma_managedptr.h>
 #include <bslma_testallocator.h>
 
 // CONVENIENCE
@@ -271,6 +272,43 @@ static void test5_defaultConstruction()
     BMQTST_ASSERT_EQ(da.numBlocksTotal(), 0);
 }
 
+static void test6_toManaged()
+// ------------------------------------------------------------------------
+// TO MANAGED
+//
+// Concerns:
+//   1. 'toManaged' transfers ownership to a 'bslma::ManagedPtr', leaving
+//      the 'UniquePtr' empty.
+//   2. The object is destroyed and returned to the original allocator when
+//      the 'bslma::ManagedPtr' is destroyed.
+//
+// Testing:
+//   toManaged
+// ------------------------------------------------------------------------
+{
+    bmqtst::TestHelper::printTestName("TO MANAGED");
+
+    bslma::TestAllocator ta("test", false);
+    int                  destructionCount = 0;
+    {
+        bmqu::UniquePtr<Base> base =
+            bmqu::UniquePtrUtil::allocateUnique<Derived>(&ta,
+                                                         9,
+                                                         &destructionCount,
+                                                         &ta);
+
+        bslma::ManagedPtr<Base> managed = bmqu::UniquePtrUtil::toManaged(
+            bsl::move(base));
+
+        BMQTST_ASSERT(!base);
+        BMQTST_ASSERT_EQ(managed->value(), 9);
+        BMQTST_ASSERT_EQ(destructionCount, 0);
+        BMQTST_ASSERT_EQ(ta.numBlocksInUse(), 2);
+    }
+    BMQTST_ASSERT_EQ(destructionCount, 1);
+    BMQTST_ASSERT_EQ(ta.numBlocksInUse(), 0);
+}
+
 // ============================================================================
 //                                 MAIN PROGRAM
 // ----------------------------------------------------------------------------
@@ -281,6 +319,7 @@ int main(int argc, char* argv[])
 
     switch (_testCase) {
     case 0:
+    case 6: test6_toManaged(); break;
     case 5: test5_defaultConstruction(); break;
     case 4: test4_adopt(); break;
     case 3: test3_derivedToBaseConversion(); break;

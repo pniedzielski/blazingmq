@@ -21,7 +21,7 @@
 //@CLASSES:
 //  bmqu::AllocatorDeleter: deleter returning objects to a 'bslma::Allocator'
 //  bmqu::UniquePtr:        'bsl::unique_ptr' using 'bmqu::AllocatorDeleter'
-//  bmqu::UniquePtrUtil:    factory functions for 'bmqu::UniquePtr'
+//  bmqu::UniquePtrUtil:    factory/conversion functions for 'bmqu::UniquePtr'
 //
 //@SEE_ALSO: bslma_managedptr
 //
@@ -101,6 +101,7 @@
 #include <bslma_allocator.h>
 #include <bslma_allocatorutil.h>
 #include <bslma_default.h>
+#include <bslma_managedptr.h>
 
 namespace BloombergLP {
 namespace bmqu {
@@ -181,6 +182,14 @@ struct UniquePtrUtil {
     template <class TYPE>
     static UniquePtr<TYPE> adopt(TYPE*             object,
                                  bslma::Allocator* allocator) noexcept;
+
+    /// Return a `bslma::ManagedPtr` taking ownership of the object owned by
+    /// the specified `object`, which is left empty.  The object will be
+    /// returned to the same allocator.  This is useful at boundaries with
+    /// interfaces that still traffic in `bslma::ManagedPtr` (e.g., public
+    /// or plugin interfaces that cannot change).
+    template <class TYPE>
+    static bslma::ManagedPtr<TYPE> toManaged(UniquePtr<TYPE>&& object);
 };
 
 // ============================================================================
@@ -245,6 +254,14 @@ inline UniquePtr<TYPE>
 UniquePtrUtil::adopt(TYPE* object, bslma::Allocator* allocator) noexcept
 {
     return UniquePtr<TYPE>(object, AllocatorDeleter(allocator));
+}
+
+template <class TYPE>
+inline bslma::ManagedPtr<TYPE>
+UniquePtrUtil::toManaged(UniquePtr<TYPE>&& object)
+{
+    bslma::Allocator* allocator = object.get_deleter().allocator();
+    return bslma::ManagedPtr<TYPE>(object.release(), allocator);
 }
 
 }  // close package namespace
