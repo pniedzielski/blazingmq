@@ -2594,13 +2594,13 @@ void StorageUtil::createQueueStorageAsPrimary(StorageSpMap*    storageMap,
     }
 }
 
-void StorageUtil::unregisterQueueDispatched(mqbs::FileStore*     fs,
-                                            StorageSpMap*        storageMap,
-                                            bslmt::Mutex*        storagesLock,
-                                            const ClusterData*   clusterData,
-                                            int                  partitionId,
-                                            const PartitionInfo& pinfo,
-                                            const bmqt::Uri&     uri)
+void StorageUtil::unregisterQueueStorage(mqbs::FileStore*     fs,
+                                         StorageSpMap*        storageMap,
+                                         bslmt::Mutex*        storagesLock,
+                                         const ClusterData*   clusterData,
+                                         int                  partitionId,
+                                         const PartitionInfo& pinfo,
+                                         const bmqt::Uri&     uri)
 {
     // executed by *QUEUE_DISPATCHER* thread with the specified 'partitionId'
 

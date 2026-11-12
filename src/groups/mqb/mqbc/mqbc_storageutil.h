@@ -640,13 +640,13 @@ struct StorageUtil {
                                        mqbi::Domain*           domain);
 
     /// THREAD: Executed by the Queue's dispatcher thread.
-    static void unregisterQueueDispatched(mqbs::FileStore*     fs,
-                                          StorageSpMap*        storageMap,
-                                          bslmt::Mutex*        storagesLock,
-                                          const ClusterData*   clusterData,
-                                          int                  partitionId,
-                                          const PartitionInfo& pinfo,
-                                          const bmqt::Uri&     uri);
+    static void unregisterQueueStorage(mqbs::FileStore*     fs,
+                                       StorageSpMap*        storageMap,
+                                       bslmt::Mutex*        storagesLock,
+                                       const ClusterData*   clusterData,
+                                       int                  partitionId,
+                                       const PartitionInfo& pinfo,
+                                       const bmqt::Uri&     uri);
 
     /// Configure the fanout queue having specified `uri` and `queueKey`,
     /// assigned to the specified `fs` to have the specified

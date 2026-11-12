@@ -1130,13 +1130,13 @@ void StorageManager::unregisterQueue(const bmqt::Uri& uri, int partitionId)
          partitionId,
          &pinfo = d_partitionInfoVec[partitionId],
          uri]() {
-            mqbc::StorageUtil::unregisterQueueDispatched(fs,
-                                                         storageMap,
-                                                         storagesLock,
-                                                         clusterData,
-                                                         partitionId,
-                                                         pinfo,
-                                                         uri);
+            mqbc::StorageUtil::unregisterQueueStorage(fs,
+                                                      storageMap,
+                                                      storagesLock,
+                                                      clusterData,
+                                                      partitionId,
+                                                      pinfo,
+                                                      uri);
         });
 
     fs->dispatchEvent(bsl::move(event_sp));
