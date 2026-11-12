@@ -130,7 +130,7 @@ class Cluster : public mqbi::Cluster {
 
     typedef bslma::ManagedPtr<mqbnet::Cluster> NetClusterMp;
 
-    typedef bslma::ManagedPtr<mqbc::ClusterData> ClusterDataMp;
+    typedef bmqu::UniquePtr<mqbc::ClusterData> ClusterDataMp;
 
     typedef mqbnet::Cluster::NodesList NodesList;
     typedef NodesList::iterator        NodesListIter;

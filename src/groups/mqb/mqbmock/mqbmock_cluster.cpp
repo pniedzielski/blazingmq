@@ -241,7 +241,7 @@ Cluster::Cluster(bslma::Allocator*        allocator,
                      0,  // mqbstat::StatController*
                      allocator)
 , d_netCluster_mp(0)
-, d_clusterData_mp(0)
+, d_clusterData_mp()
 , d_isClusterMember(isClusterMember)
 , d_state(this,
           4,      // partitionsCount
@@ -281,8 +281,9 @@ Cluster::Cluster(bslma::Allocator*        allocator,
     // To pass `inDispatcherThread` checks:
     setThreadId(bslmt::ThreadUtil::selfId());
 
-    d_clusterData_mp.load(new (*d_allocator_p) mqbc::ClusterData(
-                              d_name,
+    d_clusterData_mp = bmqu::UniquePtrUtil::adopt<mqbc::ClusterData>(
+        new (*d_allocator_p)
+            mqbc::ClusterData(d_name,
                               d_resources,
                               d_clusterDefinition,
                               mqbcfg::ClusterProxyDefinition(d_allocator_p),
@@ -293,7 +294,7 @@ Cluster::Cluster(bslma::Allocator*        allocator,
                               d_statContext_sp.get(),
                               d_statContexts,
                               d_allocator_p),
-                          d_allocator_p);
+        d_allocator_p);
 
     mqbconfm::Domain domainConfig(d_allocator_p);
     domainConfig.name() = "mock-domain";
