@@ -1809,7 +1809,7 @@ TCPSessionFactory::ChannelRegistry::remove(const bmqio::Channel* channel)
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(channel);
 
-    ChannelMap::iterator it = d_channels.find(channel);
+    auto it = d_channels.find(channel);
     if (it == d_channels.end()) {
         return ChannelInfoSp();  // RETURN
     }
@@ -1826,8 +1826,7 @@ TCPSessionFactory::ChannelRegistry::findStarting(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(channel);
 
-    InitialConnectionContextMap::const_iterator it = d_startingChannels.find(
-        channel);
+    auto it = d_startingChannels.find(channel);
     if (it == d_startingChannels.end()) {
         return bsl::shared_ptr<InitialConnectionContext>();  // RETURN
     }
@@ -1861,7 +1860,7 @@ TCPSessionFactory::PortManager::addChannelContext(bmqst::StatContext* parent,
 
     bslma::ManagedPtr<bmqst::StatContext> channelStatContext;
 
-    PortMap::iterator portIt = d_portMap.find(port);
+    auto portIt = d_portMap.find(port);
 
     if (portIt != d_portMap.end()) {
         channelStatContext = portIt->second.d_portContext->addSubcontext(
@@ -1886,7 +1885,7 @@ TCPSessionFactory::PortManager::addChannelContext(bmqst::StatContext* parent,
 void TCPSessionFactory::PortManager::onDeleteChannelContext(bsl::uint16_t port)
 {
     // Lookup the port's StatContext and remove it from the internal containers
-    PortMap::iterator it = d_portMap.find(port);
+    auto it = d_portMap.find(port);
     if (it != d_portMap.end() && --it->second.d_numChannels == 0) {
         d_portMap.erase(it);
     }
