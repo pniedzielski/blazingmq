@@ -349,12 +349,11 @@ struct StorageUtil {
     /// THREAD: Executed by the Queue's dispatcher thread for the specified
     ///         `partitionId`.
 
-    static void
-    purgeQueueDispatched(mqbcmd::PurgeQueueResult* purgedQueueResult,
-                         bslmt::Semaphore*         purgeFinishedSemaphore,
-                         mqbi::Storage*            storage,
-                         const mqbs::FileStore*    fileStore,
-                         const bsl::string&        appId);
+    static void purgeQueue(mqbcmd::PurgeQueueResult* purgedQueueResult,
+                           bslmt::Semaphore*         purgeFinishedSemaphore,
+                           mqbi::Storage*            storage,
+                           const mqbs::FileStore*    fileStore,
+                           const bsl::string&        appId);
     /// Execute the queue purge command for the specified `storage` with
     /// the specified `appId`.  The optionally specified
     /// `purgeFinishedSemaphore` used to notify the calling thread that this

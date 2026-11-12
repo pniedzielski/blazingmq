@@ -3351,19 +3351,18 @@ void StorageUtil::purgeDomainInPartition(
         mqbcmd::PurgeQueueResult result;
         // No need to pass a Semaphore here because we call it in
         // a synchronous way
-        purgeQueueDispatched(&result, NULL, domainStorages[i], fileStore, "");
+        purgeQueue(&result, NULL, domainStorages[i], fileStore, "");
         purgedQueuesResults.push_back(result);
     }
 
     latch->arrive();
 }
 
-void StorageUtil::purgeQueueDispatched(
-    mqbcmd::PurgeQueueResult* purgedQueueResult,
-    bslmt::Semaphore*         purgeFinishedSemaphore,
-    mqbi::Storage*            storage,
-    const mqbs::FileStore*    fileStore,
-    const bsl::string&        appId)
+void StorageUtil::purgeQueue(mqbcmd::PurgeQueueResult* purgedQueueResult,
+                             bslmt::Semaphore*         purgeFinishedSemaphore,
+                             mqbi::Storage*            storage,
+                             const mqbs::FileStore*    fileStore,
+                             const bsl::string&        appId)
 {
     // executed by *QUEUE_DISPATCHER* thread with the specified 'fileStore'
 
@@ -3625,11 +3624,11 @@ void StorageUtil::processCommand(
                             queueStorage,
                             fs = fileStore.get(),
                             appId]() {
-            purgeQueueDispatched(&purgedQueueResult,
-                                 &purgeFinishedSemaphore,
-                                 queueStorage,
-                                 fs,
-                                 appId);
+            purgeQueue(&purgedQueueResult,
+                       &purgeFinishedSemaphore,
+                       queueStorage,
+                       fs,
+                       appId);
         });
 
         purgeFinishedSemaphore.wait();
