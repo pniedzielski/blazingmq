@@ -46,6 +46,7 @@
 #include <bmqp_ctrlmsg_messages.h>
 #include <bmqp_event.h>
 #include <bmqu_managedcallback.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -93,9 +94,9 @@ class ClusterOrchestrator {
 
   private:
     // PRIVATE TYPES
-    typedef bslma::ManagedPtr<mqbnet::Elector> ElectorMp;
+    typedef bmqu::UniquePtr<mqbnet::Elector> ElectorMp;
 
-    typedef bslma::ManagedPtr<mqbi::ClusterStateManager> ClusterStateManagerMp;
+    typedef bmqu::UniquePtr<mqbi::ClusterStateManager> ClusterStateManagerMp;
 
     typedef mqbc::ClusterMembership::ClusterNodeSessionMapIter
         ClusterNodeSessionMapIter;

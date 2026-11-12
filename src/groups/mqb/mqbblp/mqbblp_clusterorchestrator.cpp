@@ -570,7 +570,7 @@ ClusterOrchestrator::ClusterOrchestrator(
 , d_clusterConfig(clusterConfig)
 , d_cluster_p(cluster)
 , d_clusterData_p(clusterData)
-, d_stateManager_mp(
+, d_stateManager_mp(bmqu::UniquePtrUtil::adopt<mqbi::ClusterStateManager>(
       clusterConfig.clusterAttributes().isFSMWorkflow()
           ? static_cast<mqbi::ClusterStateManager*>(
                 new (*d_allocator_p) mqbc::ClusterStateManager(
@@ -606,7 +606,7 @@ ClusterOrchestrator::ClusterOrchestrator(
                             clusterState,
                             &d_clusterData_p->blobSpPool())),
                     d_allocators.get("ClusterStateManager"))),
-      d_allocator_p)
+      d_allocator_p))
 , d_queueHelper(d_clusterData_p,
                 clusterState,
                 d_stateManager_mp.get(),
@@ -686,7 +686,7 @@ int ClusterOrchestrator::start(bsl::ostream& errorDescription)
 
     d_clusterData_p->electorInfo().setLeaderMessageSequence(ledgerLSN);
 
-    d_elector_mp.load(
+    d_elector_mp = bmqu::UniquePtrUtil::adopt<mqbnet::Elector>(
         new (*d_allocator_p) mqbnet::Elector(
             d_clusterConfig.elector(),
             &d_clusterData_p->cluster(),
