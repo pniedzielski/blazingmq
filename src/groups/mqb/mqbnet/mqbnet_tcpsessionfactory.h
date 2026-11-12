@@ -256,8 +256,8 @@ class TCPSessionFactory {
 
       private:
         // NOT IMPLEMENTED
-        ChannelInfo(const ChannelInfo&);
-        ChannelInfo& operator=(const ChannelInfo&);
+        ChannelInfo(const ChannelInfo&)            = delete;
+        ChannelInfo& operator=(const ChannelInfo&) = delete;
     };
 
     /// This class provides mechanism to store a map of port stat contexts.
@@ -770,8 +770,9 @@ class TCPSessionFactoryIterator {
 
   private:
     // NOT IMPLEMENTED
-    TCPSessionFactoryIterator(const TCPSessionFactoryIterator&);
-    TCPSessionFactoryIterator& operator=(const TCPSessionFactoryIterator&);
+    TCPSessionFactoryIterator(const TCPSessionFactoryIterator&) = delete;
+    TCPSessionFactoryIterator&
+    operator=(const TCPSessionFactoryIterator&) = delete;
 
   public:
     // CREATORS

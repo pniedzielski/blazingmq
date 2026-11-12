@@ -118,9 +118,9 @@ class MultiRequestManagerRequestContext {
   private:
     // NOT IMPLEMENTED
     MultiRequestManagerRequestContext(
-        const MultiRequestManagerRequestContext&);
+        const MultiRequestManagerRequestContext&) = delete;
     MultiRequestManagerRequestContext&
-    operator=(const MultiRequestManagerRequestContext&);
+    operator=(const MultiRequestManagerRequestContext&) = delete;
 
   public:
     // TRAITS

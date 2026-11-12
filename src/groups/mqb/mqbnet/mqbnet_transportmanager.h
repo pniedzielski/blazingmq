@@ -409,8 +409,9 @@ class TransportManagerIterator {
 
   private:
     // NOT IMPLEMENTED
-    TransportManagerIterator(const TransportManagerIterator&);
-    TransportManagerIterator& operator=(const TransportManagerIterator&);
+    TransportManagerIterator(const TransportManagerIterator&) = delete;
+    TransportManagerIterator&
+    operator=(const TransportManagerIterator&) = delete;
 
   public:
     // CREATORS
