@@ -31,6 +31,7 @@
 
 #include <bmqu_tempdirectory.h>
 #include <bmqu_time.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bdlbb_blobutil.h>
@@ -46,7 +47,6 @@
 #include <bsl_unordered_set.h>
 #include <bsl_utility.h>
 #include <bsl_vector.h>
-#include <bslma_managedptr.h>
 #include <bslmt_barrier.h>
 #include <bslmt_lockguard.h>
 #include <bslmt_mutex.h>
@@ -125,7 +125,7 @@ class TestContext {
     bmqu::TempDirectory d_tempDir;
 
     /// Cluster object used for generating mock nodes
-    bslma::ManagedPtr<mqbmock::Cluster> d_cluster_mp;
+    bmqu::UniquePtr<mqbmock::Cluster> d_cluster_mp;
 
     /// Cluster nodes used to send them request by MultiRequestManager
     Nodes d_nodes;
@@ -232,16 +232,17 @@ class TestContext {
 TestContext::TestContext(int nodesCount, bslma::Allocator* allocator)
 : d_allocator_p(bslma::Default::allocator(allocator))
 , d_tempDir(d_allocator_p)
-, d_cluster_mp(new(*d_allocator_p) mqbmock::Cluster(
-                   d_allocator_p,
-                   true,   // isClusterMember
-                   false,  // isLeader
-                   false,  // isFSMWorkflow
-                   false,  // doesFSMwriteQLIST
-                   generateNodeDefs(nodesCount, d_allocator_p),
-                   "testCluster",
-                   d_tempDir.path()),
-               d_allocator_p)
+, d_cluster_mp(bmqu::UniquePtrUtil::adopt(
+      new (*d_allocator_p)
+          mqbmock::Cluster(d_allocator_p,
+                           true,   // isClusterMember
+                           false,  // isLeader
+                           false,  // isFSMWorkflow
+                           false,  // doesFSMwriteQLIST
+                           generateNodeDefs(nodesCount, d_allocator_p),
+                           "testCluster",
+                           d_tempDir.path()),
+      d_allocator_p))
 , d_nodes(clusterNodes(d_cluster_mp.get(), d_allocator_p), d_allocator_p)
 , d_blobSpPool_sp(
       bmqp::BlobPoolUtil::createBlobPool(d_cluster_mp->bufferFactory(),
