@@ -2320,16 +2320,16 @@ int Elector::start()
     }
 
     typedef Cluster::NodesList       NodeList;
-    typedef NodeList::const_iterator NodeListType;
     const NodeList&                  nodeList = d_netCluster_p->nodes();
 
-    for (NodeListType nit = nodeList.begin(); nit != nodeList.end(); ++nit) {
-        if (k_INVALID_NODE_ID == (*nit)->nodeId()) {
+    for (const auto& clusterNode : nodeList) {
+        if (k_INVALID_NODE_ID == clusterNode->nodeId()) {
             return rc_INVALID_NODE_ID;  // RETURN
         }
 
         if (false ==
-            d_nodes.insert(bsl::make_pair((*nit)->nodeId(), *nit)).second) {
+            d_nodes.insert(bsl::make_pair(clusterNode->nodeId(), clusterNode))
+                .second) {
             return rc_DUPLICATE_NODE_ID;  // RETURN
         }
     }

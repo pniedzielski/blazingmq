@@ -1257,10 +1257,8 @@ inline size_t ElectorStateMachineScoutingInfo::numSupportingNodes() const
 {
     size_t result = 0;
 
-    for (NodeIdResponseMap::const_iterator cit = d_responses.begin();
-         cit != d_responses.end();
-         ++cit) {
-        if (cit->second == true) {
+    for (const auto& response : d_responses) {
+        if (response.second == true) {
             ++result;
         }
     }
