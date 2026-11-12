@@ -19,12 +19,12 @@
 #include <bmqtst_testhelper.h>
 
 #include <bmqex_sequentialcontext.h>
-#include <bmqu_weakmemfn.h>
 
 // BDE
 #include <bdlmt_threadpool.h>
 #include <bsl_cstddef.h>
 #include <bsl_iostream.h>
+#include <bsl_memory.h>
 #include <bsl_ostream.h>
 #include <bslma_testallocator.h>
 #include <bslmt_threadutil.h>
@@ -101,10 +101,13 @@ void MyService::doStuff()
 
 void MyService::asyncDoStuff()
 {
-    // acquire the shared resource and bind to the async operation
-    d_threadPool_p->enqueueJob(
-        bmqu::WeakMemFnUtil::weakMemFn(&MyService::doStuff,
-                                       d_self.acquireWeak()));
+    // acquire the shared resource weakly and capture it in the async
+    // operation
+    d_threadPool_p->enqueueJob([weakSelf = d_self.acquireWeak()]() {
+        if (bsl::shared_ptr<MyService> self = weakSelf.lock()) {
+            self->doStuff();
+        }
+    });
 }
 
 // ============================================================================
