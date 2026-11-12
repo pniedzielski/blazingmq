@@ -81,7 +81,7 @@ void ClusterNodeSession::teardown()
     // executed by the *DISPATCHER* thread
 
     // Release all queue handles that were associated with this session
-    QueueHandleMapIter qit = d_queueHandles.begin();
+    auto qit = d_queueHandles.begin();
 
     while (qit != d_queueHandles.end()) {
         mqbi::QueueHandle* handle_p = qit->second.d_handle_p;
@@ -148,9 +148,9 @@ bool ClusterNodeSession::removePartitionSafe(int partitionId)
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(inDispatcherThread());
 
-    bsl::vector<int>::iterator it = bsl::find(d_primaryPartitions.begin(),
-                                              d_primaryPartitions.end(),
-                                              partitionId);
+    auto it = bsl::find(d_primaryPartitions.begin(),
+                        d_primaryPartitions.end(),
+                        partitionId);
     if (it == d_primaryPartitions.end()) {
         return false;  // RETURN
     }
