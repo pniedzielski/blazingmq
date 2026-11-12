@@ -236,7 +236,7 @@ static void test1_breathingTest()
         const bmqp::EventType::Enum minEventType =
             bmqp::EventType::e_UNDEFINED;
         const unsigned char minHeaderWords  = 0;
-        const unsigned char minTypeSpecific = 0;  // 0b00000000 in C++14
+        const unsigned char minTypeSpecific = 0b00000000;
 
         eh3.setLength(minLength);
         eh3.setProtocolVersion(minProtocolVersion);
@@ -258,7 +258,7 @@ static void test1_breathingTest()
         const bmqp::EventType::Enum maxEventType =
             bmqp::EventType::e_HEARTBEAT_RSP;
         const unsigned char maxHeaderWords  = 255;
-        const unsigned char maxTypeSpecific = 255;  // 0b11111111 in C++14
+        const unsigned char maxTypeSpecific = 0b11111111;
 
         eh4.setLength(maxLength);
         eh4.setProtocolVersion(maxProtocolVersion);
