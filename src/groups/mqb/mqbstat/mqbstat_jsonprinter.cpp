@@ -292,8 +292,13 @@ inline void JsonPrinter::JsonPrinterImpl::printStats(bsl::ostream& stream,
 JsonPrinter::JsonPrinter(const StatContextsMap& statContextsMap,
                          bslma::Allocator*      allocator)
 : d_impl_mp(
-      bslma::ManagedPtrUtil::allocateManaged<JsonPrinterImpl>(allocator,
-                                                              statContextsMap))
+      bmqu::UniquePtrUtil::allocateUnique<JsonPrinterImpl>(allocator,
+                                                           statContextsMap))
+{
+    // NOTHING
+}
+
+JsonPrinter::~JsonPrinter()
 {
     // NOTHING
 }

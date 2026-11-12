@@ -27,6 +27,7 @@
 // must be done before calling to this component.
 
 #include <bmqst_statcontext.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bsl_ostream.h>
@@ -51,8 +52,8 @@ class JsonPrinter {
     class JsonPrinterImpl;
 
     // DATA
-    /// Managed pointer to the printer implementation.
-    bslma::ManagedPtr<JsonPrinterImpl> d_impl_mp;
+    /// Owning pointer to the printer implementation.
+    bmqu::UniquePtr<JsonPrinterImpl> d_impl_mp;
 
   private:
     // NOT IMPLEMENTED
@@ -73,6 +74,9 @@ class JsonPrinter {
     /// `statContextsMap` and the optionally specified `allocator`.
     explicit JsonPrinter(const StatContextsMap& statContextsMap,
                          bslma::Allocator*      allocator = 0);
+
+    /// Destroy this object.
+    ~JsonPrinter();
 
     // MANIPULATORS
 
