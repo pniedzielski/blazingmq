@@ -1237,7 +1237,7 @@ TwoKeyHashMap<K1, K2, VALUE, H1, H2>::insert(K1_T&&    k1,
     });
 
     // store the value
-    Node* p = new (*d_nodeAllocator)
+    auto* p = new (*d_nodeAllocator)
         Node(k1MapIter, k2MapIter, bsl::forward<VALUE_T>(value), allocator());
 
     k1MapIter->second = k2MapIter->second = p;
