@@ -119,8 +119,8 @@ void movePartitionFiles(int                      partitionId,
         return;  // RETURN
     }
 
-    for (unsigned int i = 0; i < fileSets.size(); ++i) {
-        mqbs::FileStoreUtil::archiveFileSet(fileSets[i], archiveLocation);
+    for (const mqbs::FileStoreSet& fileSet : fileSets) {
+        mqbs::FileStoreUtil::archiveFileSet(fileSet, archiveLocation);
     }
 }
 
@@ -391,14 +391,12 @@ void RecoveryManager::checkPeersAfterStartupWait(int partitionId)
     // its AVAILABLE.
 
     bsl::vector<mqbnet::ClusterNode*> availableNodes;
-    ClusterNodeSessionMapConstIter    cit;
-    for (cit = d_clusterData_p->membership().clusterNodeSessionMap().begin();
-         cit != d_clusterData_p->membership().clusterNodeSessionMap().end();
-         ++cit) {
-        const mqbc::ClusterNodeSession* ns = cit->second.get();
+    for (const auto& sessionEntry :
+         d_clusterData_p->membership().clusterNodeSessionMap()) {
+        const mqbc::ClusterNodeSession* ns = sessionEntry.second.get();
         BSLS_ASSERT_SAFE(ns);
         if (bmqp_ctrlmsg::NodeStatus::E_AVAILABLE == ns->nodeStatus()) {
-            availableNodes.push_back(cit->first);
+            availableNodes.push_back(sessionEntry.first);
         }
     }
 
@@ -1164,9 +1162,9 @@ void RecoveryManager::processStorageSyncResponse(
                           << d_dataStoreConfig.location() << "], rc: " << rc;
         }
         else {
-            for (unsigned int i = 0; i < fileSets.size(); ++i) {
+            for (const mqbs::FileStoreSet& fileSetToArchive : fileSets) {
                 mqbs::FileStoreUtil::archiveFileSet(
-                    fileSets[i],
+                    fileSetToArchive,
                     d_dataStoreConfig.archiveLocation());
             }
         }
@@ -1941,8 +1939,7 @@ void RecoveryManager::syncPeerPartitions(PrimarySyncContext* primarySyncCtx)
                                      ChunkDeleter(primarySyncCtx));
     fti.incrementAliasedChunksCount();
 
-    for (size_t i = 0; i < ppStates.size(); ++i) {
-        const PeerPartitionState& pps = ppStates[i];
+    for (const PeerPartitionState& pps : ppStates) {
         BSLS_ASSERT_SAFE(pps.peer());
         BSLS_ASSERT_SAFE(pps.peer() !=
                          d_clusterData_p->membership().selfNode());
@@ -3724,11 +3721,7 @@ void RecoveryManager::processStorageSyncRequest(
     {  // Lock scope
         bsls::SpinLockGuard guard(&d_recoveryRequestContextLock);  // LOCK
 
-        for (RequestContextIter it = d_recoveryRequestContexts.begin();
-             it != d_recoveryRequestContexts.end();
-             ++it) {
-            const RequestContext& ctx = *it;
-
+        for (const RequestContext& ctx : d_recoveryRequestContexts) {
             if (ctx.requesterNode() == source &&
                 ctx.partitionId() == req.partitionId()) {
                 BSLS_ASSERT_SAFE(RequestContextType::e_RECOVERY ==
@@ -4378,9 +4371,9 @@ void RecoveryManager::startPartitionPrimarySync(
     BSLS_ASSERT_SAFE(!peers.empty());
 
     PeerPartitionStates& ppStates = primarySyncCtx.peerPartitionStates();
-    for (size_t idx = 0; idx < peers.size(); ++idx) {
-        BSLS_ASSERT_SAFE(peers[idx]);
-        ppStates.emplace_back(peers[idx],
+    for (mqbnet::ClusterNode* peer : peers) {
+        BSLS_ASSERT_SAFE(peer);
+        ppStates.emplace_back(peer,
                               bmqp_ctrlmsg::PartitionSequenceNumber(),
                               bmqp_ctrlmsg::SyncPointOffsetPair(),
                               false);  // need partition sync
@@ -4495,11 +4488,7 @@ void RecoveryManager::processPartitionSyncDataRequest(
     {  // Lock scope
         bsls::SpinLockGuard guard(&d_primarySyncRequestContextLock);  // LOCK
 
-        for (RequestContextIter it = d_primarySyncRequestContexts.begin();
-             it != d_primarySyncRequestContexts.end();
-             ++it) {
-            const RequestContext& ctx = *it;
-
+        for (const RequestContext& ctx : d_primarySyncRequestContexts) {
             if (ctx.requesterNode() == source &&
                 ctx.partitionId() == req.partitionId()) {
                 BSLS_ASSERT_SAFE(RequestContextType::e_PARTITION_SYNC ==
