@@ -42,6 +42,7 @@
 #include <bmqt_messageguid.h>
 #include <bmqt_resultcode.h>
 #include <bmqt_uri.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -109,8 +110,8 @@ class Queue final : public mqbi::Queue {
     bslma::Allocator*              d_allocator_p;
     mutable bmqp::SchemaLearner    d_schemaLearner;  // must precede d_state
     QueueState                     d_state;
-    bslma::ManagedPtr<LocalQueue>  d_localQueue_mp;
-    bslma::ManagedPtr<RemoteQueue> d_remoteQueue_mp;
+    bmqu::UniquePtr<LocalQueue>    d_localQueue_mp;
+    bmqu::UniquePtr<RemoteQueue>   d_remoteQueue_mp;
 
   private:
     // NOT IMPLEMENTED
@@ -462,7 +463,7 @@ inline bool Queue::isLocal() const
     BSLS_ASSERT_SAFE(!(d_localQueue_mp && d_remoteQueue_mp));
     // Can only be either local, remote, or not initialized but not both.
 
-    return d_localQueue_mp;
+    return static_cast<bool>(d_localQueue_mp);
 }
 
 inline bool Queue::isRemote() const
@@ -471,7 +472,7 @@ inline bool Queue::isRemote() const
     BSLS_ASSERT_SAFE(!(d_localQueue_mp && d_remoteQueue_mp));
     // Can only be either local, remote, or not initialized but not both.
 
-    return d_remoteQueue_mp;
+    return static_cast<bool>(d_remoteQueue_mp);
 }
 
 inline mqbu::CapacityMeter* Queue::capacityMeter()

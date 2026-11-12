@@ -410,7 +410,7 @@ void Queue::convertToLocalImpl()
     // Move remoteQueue to a temporary stack based managed pointer, so that
     // we can bypass all precondition checks (since we are temporarily
     // going to have both local and remote queue co-existing).
-    bslma::ManagedPtr<RemoteQueue> remoteQueue = d_remoteQueue_mp;
+    bmqu::UniquePtr<RemoteQueue> remoteQueue = bsl::move(d_remoteQueue_mp);
 
     d_state.setId(bmqp::QueueId::k_PRIMARY_QUEUE_ID);
     createLocal();
@@ -451,7 +451,7 @@ void Queue::convertToLocalImpl()
         });
 
     remoteQueue->resetState();  // ResetState to prevent assert at destruction
-    remoteQueue.clear();
+    remoteQueue.reset();
 
     updateStats();
 
@@ -532,8 +532,8 @@ Queue::Queue(const bmqt::Uri&                          uri,
 : d_allocator_p(allocator)
 , d_schemaLearner(allocator)
 , d_state(this, uri, id, key, partitionId, domain, resources, allocator)
-, d_localQueue_mp(0)
-, d_remoteQueue_mp(0)
+, d_localQueue_mp()
+, d_remoteQueue_mp()
 {
     BALL_LOG_INFO << d_state.uri() << ": constructor (" << this << ")";
 
@@ -574,9 +574,9 @@ void Queue::createLocal()
     BSLS_ASSERT_SAFE(!d_localQueue_mp);
     BSLS_ASSERT_SAFE(!d_remoteQueue_mp);
 
-    d_localQueue_mp.load(new (*d_allocator_p)
-                             LocalQueue(&d_state, d_allocator_p),
-                         d_allocator_p);
+    d_localQueue_mp = bmqu::UniquePtrUtil::adopt<LocalQueue>(
+        new (*d_allocator_p) LocalQueue(&d_state, d_allocator_p),
+        d_allocator_p);
 }
 
 void Queue::createRemote(int                       deduplicationTimeoutMs,
@@ -587,13 +587,13 @@ void Queue::createRemote(int                       deduplicationTimeoutMs,
     BSLS_ASSERT_SAFE(!d_localQueue_mp);
     BSLS_ASSERT_SAFE(!d_remoteQueue_mp);
 
-    d_remoteQueue_mp.load(new (*d_allocator_p)
-                              RemoteQueue(&d_state,
-                                          deduplicationTimeoutMs,
-                                          ackWindowSize,
-                                          statePool,
-                                          d_allocator_p),
-                          d_allocator_p);
+    d_remoteQueue_mp = bmqu::UniquePtrUtil::adopt<RemoteQueue>(
+        new (*d_allocator_p) RemoteQueue(&d_state,
+                                         deduplicationTimeoutMs,
+                                         ackWindowSize,
+                                         statePool,
+                                         d_allocator_p),
+        d_allocator_p);
 }
 
 void Queue::convertToLocal()
