@@ -313,12 +313,12 @@ void StatContextTableInfoProvider::addDefaultIdColumn(
     int                      maxSize)
 {
     if (!d_defaultIdColumn_p) {
-        d_defaultIdColumn_p.load(new (*d_allocator_p)
-                                     DefaultIdColumn(maxSize, d_allocator_p),
-                                 d_allocator_p);
+        d_defaultIdColumn_p = bmqu::UniquePtrUtil::adopt(
+            new (*d_allocator_p) DefaultIdColumn(maxSize, d_allocator_p),
+            d_allocator_p);
     }
 
-    addColumn(name, d_defaultIdColumn_p.ptr());
+    addColumn(name, d_defaultIdColumn_p.get());
 }
 
 void StatContextTableInfoProvider::addColumn(const bslstl::StringRef& name,

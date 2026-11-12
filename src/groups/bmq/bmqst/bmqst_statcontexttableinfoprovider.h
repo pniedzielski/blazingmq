@@ -37,6 +37,8 @@
 
 #include <bmqst_tableinfoprovider.h>
 
+#include <bmqu_uniqueptr.h>
+
 #include <bsl_functional.h>
 #include <bsl_ostream.h>
 #include <bsl_utility.h>
@@ -206,7 +208,7 @@ class StatContextTableInfoProvider : public bmqst::TableInfoProvider {
     };
 
     // DATA
-    bslma::ManagedPtr<CustomColumn> d_defaultIdColumn_p;
+    bmqu::UniquePtr<CustomColumn> d_defaultIdColumn_p;
     // Created the first time
     // 'addDefaultIdColumn' is called.
 
