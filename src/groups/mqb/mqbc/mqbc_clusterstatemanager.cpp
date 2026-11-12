@@ -281,9 +281,9 @@ void ClusterStateManager::do_applyCSLSelf(const EventWithMetadata& event)
             ClusterStateLedger::ClusterMessageCRefList uncommitted(
                 d_allocator_p);
             d_clusterStateLedger_mp->uncommittedAdvisories(&uncommitted);
-            for (size_t i = 0; i < uncommitted.size(); ++i) {
+            for (const auto& uncommittedMsg : uncommitted) {
                 const bmqp_ctrlmsg::ClusterMessageChoice& choice =
-                    uncommitted[i].get().choice();
+                    uncommittedMsg.get().choice();
                 if (choice.isLeaderAdvisoryValue() &&
                     choice.leaderAdvisory().sequenceNumber().electorTerm() ==
                         d_clusterData_p->electorInfo().electorTerm()) {
