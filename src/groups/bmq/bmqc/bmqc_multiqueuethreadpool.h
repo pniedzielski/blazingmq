@@ -383,36 +383,6 @@ class MultiQueueThreadPool final {
         QueueInfo& operator=(const QueueInfo&) = delete;
     };
 
-    /// The thread functor.
-    struct ProcessQueueJob {
-        bslmt::Latch*              d_ready_p;
-        ThisClass*                 d_pool_p;
-        bsl::shared_ptr<QueueInfo> d_queueInfo_sp;
-
-        explicit ProcessQueueJob(
-            bslmt::Latch*                     ready_p,
-            ThisClass*                        pool_p,
-            const bsl::shared_ptr<QueueInfo>& queueInfo_sp)
-        : d_ready_p(ready_p)
-        , d_pool_p(pool_p)
-        , d_queueInfo_sp(queueInfo_sp)
-        {
-            // PRECONDITIONS
-            BSLS_ASSERT_SAFE(d_pool_p);
-            BSLS_ASSERT_SAFE(d_queueInfo_sp);
-            BSLS_ASSERT_SAFE(d_ready_p);
-        }
-
-        void operator()()
-        {
-            d_queueInfo_sp->d_threadId = bslmt::ThreadUtil::selfId();
-            d_ready_p->arrive();
-            d_ready_p = 0;
-
-            d_pool_p->processQueue(*d_queueInfo_sp);
-        }
-    };
-
   private:
     // CLASS-SCOPE CATEGORY
     BALL_LOG_SET_CLASS_CATEGORY("BMQC.MULTIQUEUETHREADPOOL");
@@ -827,7 +797,13 @@ inline int MultiQueueThreadPool<TYPE>::start()
     bslmt::Latch latch(d_config.d_numQueues);
     for (const bsl::shared_ptr<QueueInfo>& queueSp : d_queues) {
         [[maybe_unused]] const int rc = d_config.d_threadPool_p->enqueueJob(
-            ThisClass::ProcessQueueJob(&latch, this, queueSp));
+            [ready_p = &latch, this, queueSp]() mutable {
+                queueSp->d_threadId = bslmt::ThreadUtil::selfId();
+                ready_p->arrive();
+                ready_p = 0;
+
+                processQueue(*queueSp);
+            });
         BSLS_ASSERT_SAFE(rc == 0);
     }
     latch.wait();
