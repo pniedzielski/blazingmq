@@ -3191,10 +3191,10 @@ void StorageUtil::processReplicaStatusAdvisory(
     }
 }
 
-void StorageUtil::processShutdownEventDispatched(ClusterData*     clusterData,
-                                                 PartitionInfo*   pinfo,
-                                                 mqbs::FileStore* fs,
-                                                 int              partitionId)
+void StorageUtil::processShutdownEvent(ClusterData*     clusterData,
+                                       PartitionInfo*   pinfo,
+                                       mqbs::FileStore* fs,
+                                       int              partitionId)
 {
     // executed by *QUEUE_DISPATCHER* thread with the specified 'partitionId'
 

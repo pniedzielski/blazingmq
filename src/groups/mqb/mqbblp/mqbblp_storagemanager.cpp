@@ -996,11 +996,10 @@ void StorageManager::processShutdownEventForPartition(int partitionId)
     // recovery to be initiated in future.
     d_recoveryManager_mp->processShutdownEvent(partitionId);
 
-    mqbc::StorageUtil::processShutdownEventDispatched(
-        d_clusterData_p,
-        &d_partitionInfoVec[partitionId],
-        d_fileStores[partitionId].get(),
-        partitionId);
+    mqbc::StorageUtil::processShutdownEvent(d_clusterData_p,
+                                            &d_partitionInfoVec[partitionId],
+                                            d_fileStores[partitionId].get(),
+                                            partitionId);
 }
 
 // CREATORS

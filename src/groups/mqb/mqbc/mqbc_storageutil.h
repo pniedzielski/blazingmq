@@ -710,10 +710,10 @@ struct StorageUtil {
                                  mqbnet::ClusterNode*            source,
                                  bmqp_ctrlmsg::NodeStatus::Value status);
 
-    static void processShutdownEventDispatched(ClusterData*     clusterData,
-                                               PartitionInfo*   pinfo,
-                                               mqbs::FileStore* fs,
-                                               int              partitionId);
+    static void processShutdownEvent(ClusterData*     clusterData,
+                                     PartitionInfo*   pinfo,
+                                     mqbs::FileStore* fs,
+                                     int              partitionId);
 
     /// Explicitly call `flush` on the specified `fileStores` to enforce
     /// their GC.

@@ -1773,11 +1773,10 @@ void StorageManager::processPartitionShutdownEvent(int partitionId)
     mqbs::FileStore* fs = d_fileStores[partitionId].get();
     BSLS_ASSERT_SAFE(fs);
 
-    StorageUtil::processShutdownEventDispatched(
-        d_clusterData_p,
-        &d_partitionInfoVec[partitionId],
-        fs,
-        partitionId);
+    StorageUtil::processShutdownEvent(d_clusterData_p,
+                                      &d_partitionInfoVec[partitionId],
+                                      fs,
+                                      partitionId);
 }
 
 void StorageManager::forceFlushFileStores()
