@@ -284,8 +284,7 @@ struct TestHelper {
     {
         for (const auto& [clusterNode, testChannel] :
              d_cluster_mp->_channels()) {
-            NodeIdToPSNMapCIter replicaCit = destinationReplicas.find(
-                clusterNode->nodeId());
+            auto replicaCit = destinationReplicas.find(clusterNode->nodeId());
             if (replicaCit != destinationReplicas.end()) {
                 // TODO The logic is flawed if self and primary have different
                 // primary leaseIds, e.g. (2,10) vs (1,2).  We will have to fix
