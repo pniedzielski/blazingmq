@@ -2136,7 +2136,7 @@ void Elector::emitIOEvent(const ElectorStateMachineOutput& output)
     }
     else {
         // Unicast to the specified 'destinationNodeId'.
-        NodesMapIter it = d_nodes.find(output.destination());
+        auto it = d_nodes.find(output.destination());
         if (d_nodes.end() == it) {
             BALL_LOG_ERROR << "#ELECTOR_INVALID_NODEID " << "Invalid nodeId ["
                            << output.destination()
