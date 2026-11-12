@@ -20,6 +20,7 @@
 #include <bsl_ctime.h>
 #include <bsl_functional.h>
 #include <bsl_string.h>
+#include <bsl_type_traits.h>
 #include <bsl_unordered_set.h>
 #include <bsl_utility.h>
 #include <bsla_annotations.h>
@@ -196,23 +197,18 @@ class ManagedCallbackBuffer final {
     }
 
     /// Note: this class exists for evaluation only, and we don't define
-    ///       `createInplace` for it, because it requires generation of C++03
-    ///       compatible code.  We don't want to make UTs more complicated with
-    ///       it, so we only define a simpler function `place` that is used
-    ///       with "placement new".
+    ///       `createInplace` for it.  We don't want to make UTs more
+    ///       complicated with it, so we only define a simpler function
+    ///       `place` that is used with "placement new".
     template <class CALLBACK_TYPE>
     inline char* place()
     {
         // PRECONDITIONS
         BSLS_ASSERT_SAFE(d_empty);
-        /// The compilation will fail here on the outer `static_cast` if we
-        /// don't provide a type that is inherited from the base
-        /// `CallbackFunctor` type.
-        /// TODO: replace by static_assert on C++ standard update
-        BSLS_ASSERT_SAFE(
-            0 ==
-            static_cast<CALLBACK_TYPE*>(
-                reinterpret_cast<bmqu::ManagedCallback::CallbackFunctor*>(0)));
+        static_assert(
+            bsl::is_base_of<bmqu::ManagedCallback::CallbackFunctor,
+                            CALLBACK_TYPE>::value,
+            "CALLBACK_TYPE must derive from ManagedCallback::CallbackFunctor");
         d_empty = false;
         return d_callbackBuffer;
     }
