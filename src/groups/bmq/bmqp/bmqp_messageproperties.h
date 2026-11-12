@@ -804,7 +804,7 @@ inline const TYPE& MessageProperties::getPropertyOr(bsl::string_view name,
 inline MessageProperties::PropertyMapIter
 MessageProperties::findProperty(bsl::string_view name) const
 {
-    PropertyMapIter cit = d_properties.find(name);
+    auto cit = d_properties.find(name);
     if (cit != d_properties.end()) {
         // Property might be removed
         return (cit->second.d_isValid) ? cit : d_properties.end();  // RETURN

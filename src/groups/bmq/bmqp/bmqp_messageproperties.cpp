@@ -206,7 +206,7 @@ MessageProperties_Schema::~MessageProperties_Schema()
 bool MessageProperties_Schema::loadIndex(int*             index,
                                          bsl::string_view name) const
 {
-    PropertyMap::const_iterator cit = d_indices.find(name);
+    auto cit = d_indices.find(name);
 
     if (cit == d_indices.end()) {
         // Unknown property
