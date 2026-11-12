@@ -310,9 +310,9 @@ void MultiRequestManagerRequestContext<TARGET>::setDestinationNodes(
     const Nodes& nodes)
 {
     d_nodeResponsePairs.clear();
-    for (NodesConstIter it = nodes.begin(); it != nodes.end(); ++it) {
+    for (const auto& node : nodes) {
         d_nodeResponsePairs.push_back(
-            bsl::make_pair(*it, bmqp_ctrlmsg::ControlMessage()));
+            bsl::make_pair(node, bmqp_ctrlmsg::ControlMessage()));
     }
 
     d_numOutstandingRequests = static_cast<int>(d_nodeResponsePairs.size());
@@ -465,17 +465,15 @@ void MultiRequestManager<TARGET>::sendRequest(const RequestContextSp& context,
     NodeResponsePairs& nodeResponsePairs = context->d_nodeResponsePairs;
     int                numRequests       = context->d_numOutstandingRequests;
 
-    for (NodeResponsePairsIter it = nodeResponsePairs.begin();
-         it != nodeResponsePairs.end();
-         ++it) {
+    for (auto& nodeResponsePair : nodeResponsePairs) {
         RequestSp singleRequestCtx  = d_requestManager_p->createRequest();
         singleRequestCtx->request() = context->d_request;
         singleRequestCtx->setResponseCb(
-            [this, context, node = it->first](
+            [this, context, node = nodeResponsePair.first](
                 const RequestSp& singleRequestContext) {
                 onSingleResponse(singleRequestContext, context, node);
             });
-        setGroupId(singleRequestCtx, it->first);
+        setGroupId(singleRequestCtx, nodeResponsePair.first);
         if (context->componentId() !=
             bmqp::RequestManagerComponentId::k_NO_COMPONENT_ID) {
             singleRequestCtx->setComponentId(context->componentId());
@@ -484,8 +482,8 @@ void MultiRequestManager<TARGET>::sendRequest(const RequestContextSp& context,
         bsl::string               errorDescription;
         bmqt::GenericResult::Enum sendRc = d_requestManager_p->sendRequest(
             singleRequestCtx,
-            sendFn(it->first),
-            bsl::string(targetDescription(it->first)),
+            sendFn(nodeResponsePair.first),
+            bsl::string(targetDescription(nodeResponsePair.first)),
             timeout,
             &errorDescription);
         if (bmqt::GenericResult::e_SUCCESS != sendRc) {
@@ -493,7 +491,8 @@ void MultiRequestManager<TARGET>::sendRequest(const RequestContextSp& context,
 
             numRequests = --(context->d_numOutstandingRequests);
 
-            bmqp_ctrlmsg::Status& failure = it->second.choice().makeStatus();
+            bmqp_ctrlmsg::Status& failure =
+                nodeResponsePair.second.choice().makeStatus();
             [[maybe_unused]] const int rc =
                 bmqp_ctrlmsg::StatusCategory::fromInt(
                     &failure.category(),
@@ -503,7 +502,7 @@ void MultiRequestManager<TARGET>::sendRequest(const RequestContextSp& context,
 
             bmqu::MemOutStream errorMsg;
             errorMsg << "Unable to send request to '"
-                     << targetDescription(it->first)
+                     << targetDescription(nodeResponsePair.first)
                      << "' [reason: " << errorMsg.str()
                      << "]: " << singleRequestCtx->request();
             failure.message() = errorMsg.str();

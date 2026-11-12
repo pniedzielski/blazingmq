@@ -385,11 +385,8 @@ Nodes TestContext::clusterNodes(mqbmock::Cluster* cluster,
 {
     Nodes nodes(allocator);
     nodes.reserve(cluster->netCluster().nodes().size());
-    for (mqbnet::Cluster::NodesList::iterator iter =
-             cluster->netCluster().nodes().begin();
-         iter != cluster->netCluster().nodes().end();
-         ++iter) {
-        nodes.push_back(*iter);
+    for (const auto& clusterNode : cluster->netCluster().nodes()) {
+        nodes.push_back(clusterNode);
     }
     return nodes;
 }
@@ -786,10 +783,8 @@ static void test5_cancelByComponentIdTest()
 
         // Verify the CLUSTER_FSM responses have cancel status
         const NodeResponses& clusterResponses = clusterCtx->response();
-        for (NodeResponsesIt rIt = clusterResponses.begin();
-             rIt != clusterResponses.end();
-             ++rIt) {
-            BMQTST_ASSERT_EQ(rIt->second.choice().status().category(),
+        for (const auto& response : clusterResponses) {
+            BMQTST_ASSERT_EQ(response.second.choice().status().category(),
                              bmqp_ctrlmsg::StatusCategory::E_CANCELED);
         }
     }
