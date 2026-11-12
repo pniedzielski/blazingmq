@@ -111,8 +111,7 @@ void populateBlob(bdlbb::Blob*       blob,
     }
 
     // set EventHeader length
-    bmqp::EventHeader* e = reinterpret_cast<bmqp::EventHeader*>(
-        blob->buffer(0).data());
+    auto* e = reinterpret_cast<bmqp::EventHeader*>(blob->buffer(0).data());
     e->setLength(eventLength);
 }
 
