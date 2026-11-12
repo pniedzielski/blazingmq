@@ -2971,11 +2971,11 @@ void Cluster::onNodeLowWatermark([[maybe_unused]] mqbnet::ClusterNode* node)
     // TBD: Enqueue an event to be processed in the cluster's DISPATCHER thread
     //      to resume flushing data from the channelBufferQueue of the 'node'.
 
-    // dispatcher()->execute(bdlf::BindUtil::bind(
-    //                                       &Cluster::flushChannelBufferQueue,
-    //                                       this,
-    //                                       node),
-    //                       this);
+    // dispatcher()->execute(
+    //     [this, node]() {
+    //         flushChannelBufferQueue(node);
+    //     },
+    //     this);
 }
 
 void Cluster::onClusterLeader(mqbnet::ClusterNode*                node,

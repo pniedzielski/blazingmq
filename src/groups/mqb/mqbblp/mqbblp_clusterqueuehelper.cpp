@@ -2889,7 +2889,7 @@ void ClusterQueueHelper::configureQueueImpl(
         // handles associated with the queue" warning).  Eventually the
         // downstream client went down, and self node attempted to configure/
         // close/drop the queue handle, and we end up here.  See similar note
-        // in 'releaseQueueDispatched'.
+        // in 'closeQueueImpl'.
 
         BMQ_LOGTHROTTLE_ERROR
             << d_cluster_p->description()

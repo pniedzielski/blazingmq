@@ -1010,17 +1010,20 @@ static void test3_close()
 
 static void test4_buffering()
 // ------------------------------------------------------------------------
-// nackPendingPosts
+// buffering
 //
 // Concerns:
-//   Proper behavior of the 'onUnavailableUpstreamDispatched' method.
+//   PUTs posted while the upstream is lost are buffered and sent upstream
+//   once the upstream is reopened.
 //
 // Plan:
-//   Post un-acknowledged message(s) and then call
-//   'onUnavailableUpstreamDispatched' method.
+//   Post message(s), call the 'onLostUpstream' method, post more
+//   message(s), then call the 'onOpenUpstream' method and post more
+//   message(s).
 //
 // Testing:
-//   onUnavailableUpstreamDispatched
+//   onLostUpstream
+//   onOpenUpstream
 // ------------------------------------------------------------------------
 {
     bmqtst::TestHelper::printTestName("buffering");

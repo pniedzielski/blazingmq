@@ -127,8 +127,9 @@ class QueueHandle : public mqbi::QueueHandle {
                         bmqp::Protocol::k_SUBID_ARRAY_STATIC_LEN>
         Downstreams;
 
-    /// The purpose is to avoid memory allocation by bdlf::BindUtil::bind
-    /// when dispatching CONFIRM from Cluster to Queue.
+    /// The purpose is to avoid allocating a type-erased callback when
+    /// dispatching CONFIRM from Cluster to Queue: this functor is built in
+    /// place in the reusable buffer of a `bmqu::ManagedCallback`.
     class ConfirmFunctor : public bmqu::ManagedCallback::CallbackFunctor {
       private:
         // PRIVATE DATA
