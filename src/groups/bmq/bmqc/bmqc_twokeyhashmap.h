@@ -131,6 +131,8 @@
 //: o if an exception is thrown by an 'eraseByKey1()' or 'eraseByKey2()'
 //:   function, that function has no effects.
 
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bdlb_scopeexit.h>
 #include <bdlf_bind.h>
@@ -502,7 +504,7 @@ class TwoKeyHashMap {
 
     K2Map d_k2Map;  // Map key2 -> node
 
-    bslma::ManagedPtr<bdlma::Pool> d_nodeAllocator;  // Pool of nodes
+    bmqu::UniquePtr<bdlma::Pool> d_nodeAllocator;  // Pool of nodes
 
     // FRIENDS
     friend class iterator;
@@ -997,8 +999,9 @@ inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::TwoKeyHashMap(
           H2(),
           typename K2Map::key_equal(),
           basicAllocator)
-, d_nodeAllocator(new(*allocator()) bdlma::Pool(sizeof(Node), allocator()),
-                  allocator())
+, d_nodeAllocator(bmqu::UniquePtrUtil::adopt(
+      new (*allocator()) bdlma::Pool(sizeof(Node), allocator()),
+      allocator()))
 {
     // POSTCONDITIONS
     BSLS_ASSERT_SAFE(assertInvariants());
@@ -1016,8 +1019,9 @@ inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::TwoKeyHashMap(
           H2(),
           typename K2Map::key_equal(),
           basicAllocator)
-, d_nodeAllocator(new(*allocator()) bdlma::Pool(sizeof(Node), allocator()),
-                  allocator())
+, d_nodeAllocator(bmqu::UniquePtrUtil::adopt(
+      new (*allocator()) bdlma::Pool(sizeof(Node), allocator()),
+      allocator()))
 {
     // POSTCONDITIONS
     BSLS_ASSERT_SAFE(assertInvariants());
@@ -1036,8 +1040,9 @@ inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::TwoKeyHashMap(
           hash2,
           typename K2Map::key_equal(),
           basicAllocator)
-, d_nodeAllocator(new(*allocator()) bdlma::Pool(sizeof(Node), allocator()),
-                  allocator())
+, d_nodeAllocator(bmqu::UniquePtrUtil::adopt(
+      new (*allocator()) bdlma::Pool(sizeof(Node), allocator()),
+      allocator()))
 {
     // POSTCONDITIONS
     BSLS_ASSERT_SAFE(assertInvariants());
@@ -1055,8 +1060,9 @@ inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::TwoKeyHashMap(
           original.d_k2Map.hash_function(),
           original.d_k2Map.key_eq(),
           basicAllocator)
-, d_nodeAllocator(new(*allocator()) bdlma::Pool(sizeof(Node), allocator()),
-                  allocator())
+, d_nodeAllocator(bmqu::UniquePtrUtil::adopt(
+      new (*allocator()) bdlma::Pool(sizeof(Node), allocator()),
+      allocator()))
 {
     // free memory on failure
     BDLB_SCOPEEXIT_PROCTOR(guard, [this]() {
@@ -1088,8 +1094,9 @@ inline TwoKeyHashMap<K1, K2, VALUE, H1, H2>::TwoKeyHashMap(
           H2(),
           typename K2Map::key_equal(),
           basicAllocator)
-, d_nodeAllocator(new (*allocator()) bdlma::Pool(sizeof(Node), allocator()),
-                  allocator())
+, d_nodeAllocator(bmqu::UniquePtrUtil::adopt(
+      new (*allocator()) bdlma::Pool(sizeof(Node), allocator()),
+      allocator()))
 {
     if (allocator() == original.allocator()) {
         // '*this' and 'original' use the same allocator. Move the contents.
