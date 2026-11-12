@@ -1139,9 +1139,9 @@ QueueEngineUtil_AppState::processDeliveryList(bsls::TimeInterval*    delay,
     }
 
     // For each reader in the pending redelivery list
-    RedeliveryList::iterator it          = list.begin();
-    bmqt::MessageGUID        firstGuid   = *it;
-    size_t                   numMessages = 0;
+    auto              it          = list.begin();
+    bmqt::MessageGUID firstGuid   = *it;
+    size_t            numMessages = 0;
 
     while (!list.isEnd(it)) {
         Routers::Result result = Routers::e_INVALID;
@@ -1518,7 +1518,7 @@ bool QueueEngineUtil_AppState::getOldestMessageIteratorFromList(
         return false;  // RETURN
     }
 
-    RedeliveryList::iterator it = list.begin();
+    auto it = list.begin();
 
     // Iterate through the list until the oldest valid message is found.
     while (!list.isEnd(it)) {
