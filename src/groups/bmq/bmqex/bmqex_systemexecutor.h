@@ -57,6 +57,8 @@
 //  ex.post([](){ bsl::cout << "I'm executed!"; });
 //..
 
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bdlma_concurrentpoolallocator.h>
 #include <bsl_memory.h>
@@ -405,8 +407,8 @@ inline void SystemExecutor_Context::executeAsync(
     typedef SystemExecutor_ThreadData<typename bsl::decay<FUNCTION>::type>
         ThreadData;
 
-    bslma::ManagedPtr<ThreadData> threadData =
-        bslma::ManagedPtrUtil::allocateManaged<ThreadData>(
+    bmqu::UniquePtr<ThreadData> threadData =
+        bmqu::UniquePtrUtil::allocateUnique<ThreadData>(
             &d_threadDataAllocator,
             this,  // context
             bsl::forward<FUNCTION>(f),
@@ -430,7 +432,7 @@ inline void SystemExecutor_Context::executeAsync(
     d_unjoinedThreads.addRelaxed(1);
 
     // transfer ownership of thread data to the spawned thread
-    threadData.release();
+    static_cast<void>(threadData.release());
 }
 
 template <class FUNCTION>
