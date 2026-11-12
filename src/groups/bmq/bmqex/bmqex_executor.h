@@ -643,8 +643,7 @@ inline Executor_Box::Executor_Box(EXECUTOR          executor,
     // PRECONDITIONS
     BSLS_ASSERT(allocator);
 
-    d_imp.createInPlace<Imp>(bslmf::Util::moveIfSupported(executor),
-                             allocator);
+    d_imp.createInPlace<Imp>(bsl::move(executor), allocator);
 }
 
 // --------------
@@ -654,8 +653,7 @@ inline Executor_Box::Executor_Box(EXECUTOR          executor,
 // CREATORS
 template <class EXECUTOR>
 inline Executor::Executor(EXECUTOR executor, bslma::Allocator* basicAllocator)
-: d_box(bslmf::Util::moveIfSupported(executor),
-        bslma::Default::allocator(basicAllocator))
+: d_box(bsl::move(executor), bslma::Default::allocator(basicAllocator))
 {
     // NOTHING
 }
@@ -664,7 +662,7 @@ inline Executor::Executor(EXECUTOR executor, bslma::Allocator* basicAllocator)
 template <class EXECUTOR>
 inline Executor& Executor::operator=(EXECUTOR executor)
 {
-    Executor(bslmf::Util::moveIfSupported(executor)).swap(*this);
+    Executor(bsl::move(executor)).swap(*this);
     return *this;
 }
 
@@ -672,8 +670,7 @@ template <class EXECUTOR>
 inline void Executor::assign(EXECUTOR          executor,
                              bslma::Allocator* basicAllocator)
 {
-    Executor(bslmf::Util::moveIfSupported(executor), basicAllocator)
-        .swap(*this);
+    Executor(bsl::move(executor), basicAllocator).swap(*this);
 }
 
 template <class FUNCTION>

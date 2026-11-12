@@ -302,10 +302,9 @@ inline typename ExecutionPolicy<EXECUTOR>::template RebindExecutor<
     EXECUTOR_PARAM>::Type
 ExecutionPolicy<EXECUTOR>::useExecutor(EXECUTOR_PARAM executor) const
 {
-    return typename RebindExecutor<EXECUTOR_PARAM>::Type(
-        d_blocking,
-        bslmf::Util::moveIfSupported(executor),
-        d_allocator_p);
+    return typename RebindExecutor<EXECUTOR_PARAM>::Type(d_blocking,
+                                                         bsl::move(executor),
+                                                         d_allocator_p);
 }
 
 template <class EXECUTOR>
@@ -367,8 +366,7 @@ template <class EXECUTOR>
 inline typename ExecutionPolicy<>::RebindExecutor<EXECUTOR>::Type
 ExecutionPolicyUtil::useExecutor(EXECUTOR executor)
 {
-    return defaultPolicy().useExecutor<EXECUTOR>(
-        bslmf::Util::moveIfSupported(executor));
+    return defaultPolicy().useExecutor<EXECUTOR>(bsl::move(executor));
 }
 
 inline ExecutionPolicy<>

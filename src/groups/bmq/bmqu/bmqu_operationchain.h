@@ -753,7 +753,7 @@ inline void
 OperationChain_CompletionCallbackWrapper<CO_CALLBACK>::operator()() const
 {
     try {
-        bslmf::Util::moveIfSupported((*d_coCallback_p))();
+        bsl::move((*d_coCallback_p))();
     }
     catch (...) {
         d_chain_p->onOperationCompleted(d_jobHandle);
@@ -847,7 +847,7 @@ inline void OperationChain_Job::Target<OP_CALLBACK, CO_CALLBACK>::execute(
 
     typedef OperationChain_CompletionCallbackWrapper<CO_CALLBACK> CoCbWrapper;
 
-    bslmf::Util::moveIfSupported(d_opCallback.object())(
+    bsl::move(d_opCallback.object())(
         CoCbWrapper(chain, jobHandle, &d_coCallback.object()));
 }
 

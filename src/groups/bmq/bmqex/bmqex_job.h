@@ -199,7 +199,7 @@ inline Job_Target<FUNCTION>::Job_Target(FUNCTION_PARAM&&  function,
 template <class FUNCTION>
 inline void Job_Target<FUNCTION>::invoke()
 {
-    bslmf::Util::moveIfSupported(d_function.object())();
+    bsl::move(d_function.object())();
 }
 
 }  // close package namespace

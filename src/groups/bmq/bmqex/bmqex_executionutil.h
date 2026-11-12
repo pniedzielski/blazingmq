@@ -433,14 +433,14 @@ template <class R, class F>
 inline void ExecutionUtil_OneOffFunction<R, F>::invoke(
     [[maybe_unused]] bsl::true_type voidResultTag)
 {
-    bslmf::Util::moveIfSupported(d_functionValue.object().value())();
+    bsl::move(d_functionValue.object().value())();
 }
 
 template <class R, class F>
 inline R ExecutionUtil_OneOffFunction<R, F>::invoke(
     [[maybe_unused]] bsl::false_type voidResultTag)
 {
-    return bslmf::Util::moveIfSupported(d_functionValue.object().value())();
+    return bsl::move(d_functionValue.object().value())();
 }
 
 // CREATORS

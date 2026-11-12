@@ -576,7 +576,7 @@ inline void StrandExecutor<EXECUTOR>::dispatch(FUNCTION&& f) const
             d_context_p->allocator());
 
         // invoke in-place
-        bslmf::Util::moveIfSupported(f2.object())();
+        bsl::move(f2.object())();
     }
     else {
         // fallback to 'post()'

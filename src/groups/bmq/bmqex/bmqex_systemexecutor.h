@@ -381,7 +381,7 @@ SystemExecutor_Context::onThreadRun(THREAD_DATA* threadData) noexcept
     threadData->d_spinLock.unlock();           // UNLOCK
 
     // invoke the functor
-    bslmf::Util::moveIfSupported(threadData->d_function.object())();
+    bsl::move(threadData->d_function.object())();
 
     // read this thread's handle
     bslmt::ThreadUtil::Handle thisThread = threadData->d_thread;
@@ -444,7 +444,7 @@ inline void SystemExecutor_Context::executeInPlace(FUNCTION&& f)
         d_allocator_p);
 
     // invoke in-place
-    bslmf::Util::moveIfSupported(f2.object())();
+    bsl::move(f2.object())();
 }
 
 // --------------------
