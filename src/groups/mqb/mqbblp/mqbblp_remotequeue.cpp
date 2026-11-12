@@ -1323,14 +1323,12 @@ size_t RemoteQueue::iteratePendingMessages(const PutsVisitor& visitor)
     size_t numMessages  = d_pendingMessages.size();
     size_t numProcessed = 0;
 
-    for (Puts::iterator it = d_pendingMessages.begin();
-         it != d_pendingMessages.end();
-         ++it) {
-        if (it->second.d_appData) {
-            visitor(it->second.d_header,
-                    it->second.d_appData,
-                    it->second.d_options,
-                    it->second.d_handle);
+    for (const auto& pendingPut : d_pendingMessages) {
+        if (pendingPut.second.d_appData) {
+            visitor(pendingPut.second.d_header,
+                    pendingPut.second.d_appData,
+                    pendingPut.second.d_options,
+                    pendingPut.second.d_handle);
             ++numProcessed;
         }
     }
@@ -1352,10 +1350,10 @@ size_t RemoteQueue::iteratePendingConfirms(const ConfirmsVisitor& visitor)
     if (!d_pendingConfirms.empty()) {
         const bmqt::MessageGUID firstGUID = d_pendingConfirms.begin()->d_guid;
 
-        for (Confirms::iterator it = d_pendingConfirms.begin();
-             it != d_pendingConfirms.end();
-             ++it) {
-            visitor(it->d_guid, it->d_upstreamSubQueueId, it->d_handle);
+        for (const ConfirmMessage& confirm : d_pendingConfirms) {
+            visitor(confirm.d_guid,
+                    confirm.d_upstreamSubQueueId,
+                    confirm.d_handle);
 
             ++numProcessed;
         }
@@ -1708,11 +1706,9 @@ void RemoteQueue::onLostUpstream()
     BSLS_ASSERT_SAFE(d_state_p->queue()->inDispatcherThread());
 
     // Connection with upstream was lost.
-    for (SubQueueIds::iterator i = d_subStreams.begin();
-         i != d_subStreams.end();
-         ++i) {
-        i->d_state    = SubStreamContext::e_STOPPED;
-        i->d_genCount = 0;
+    for (SubStreamContext& subStream : d_subStreams) {
+        subStream.d_state    = SubStreamContext::e_STOPPED;
+        subStream.d_genCount = 0;
     }
 
     d_producerState.d_state    = SubStreamContext::e_STOPPED;
