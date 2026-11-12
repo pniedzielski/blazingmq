@@ -258,7 +258,7 @@ VirtualPushStreamIterator::VirtualPushStreamIterator(
 : PushStreamIterator(storage, owner, owner->d_stream.end())
 {
     /// An iterator to the App being iterated
-    PushStream::Apps::iterator itApp = owner->d_apps.find(upstreamSubQueueId);
+    auto itApp = owner->d_apps.find(upstreamSubQueueId);
 
     if (itApp != owner->d_apps.end()) {
         const PushStream::App& app = itApp->second;
