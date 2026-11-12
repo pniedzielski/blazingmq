@@ -1342,7 +1342,7 @@ int ClusterStateManager::loadClusterStateSnapshot(ClusterState* out)
     BSLS_ASSERT_SAFE(d_cluster_p->inDispatcherThread());
     BSLS_ASSERT_SAFE(out);
 
-    bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator> cslIter =
+    bmqu::UniquePtr<mqbc::ClusterStateLedgerIterator> cslIter =
         d_clusterStateLedger_mp->getIterator();
 
     return mqbc::ClusterUtil::load(out,

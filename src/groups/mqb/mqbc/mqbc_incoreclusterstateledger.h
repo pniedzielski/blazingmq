@@ -57,6 +57,7 @@
 #include <bmqc_orderedhashmap.h>
 #include <bmqp_ctrlmsg_messages.h>
 #include <bmqu_blob.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <ball_log.h>
@@ -406,7 +407,7 @@ class IncoreClusterStateLedger final : public ClusterStateLedger {
     ///
     /// THREAD: This method is invoked in the associated cluster's
     ///         dispatcher thread.
-    bslma::ManagedPtr<ClusterStateLedgerIterator> getIterator() const override;
+    bmqu::UniquePtr<ClusterStateLedgerIterator> getIterator() const override;
 
     // ACCESSORS
 

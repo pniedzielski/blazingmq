@@ -285,7 +285,7 @@ void ClusterStateLedger::_commitAdvisories(
 
 // ACCESSORS
 //   (virtual mqbc::ClusterStateLedger)
-bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator>
+bmqu::UniquePtr<mqbc::ClusterStateLedgerIterator>
 ClusterStateLedger::getIterator() const
 {
     // executed by the *CLUSTER DISPATCHER* thread
@@ -293,7 +293,7 @@ ClusterStateLedger::getIterator() const
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_clusterData_p->cluster().inDispatcherThread());
 
-    return bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator>(
+    return bmqu::UniquePtrUtil::adopt<mqbc::ClusterStateLedgerIterator>(
         new (*d_allocator_p) mqbmock::ClusterStateLedgerIterator(d_records),
         d_allocator_p);
 }

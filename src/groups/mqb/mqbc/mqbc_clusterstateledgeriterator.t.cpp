@@ -71,11 +71,11 @@ struct ClusterStateLedgerIteratorTestImp
     }
 
     // ACCESSORS
-    bslma::ManagedPtr<ClusterStateLedgerIterator>
+    bmqu::UniquePtr<ClusterStateLedgerIterator>
     clone(bslma::Allocator* allocator) const override
     {
         markDone();
-        return bslma::ManagedPtr<ClusterStateLedgerIterator>();
+        return bmqu::UniquePtr<ClusterStateLedgerIterator>();
     }
 
     bool isValid() const override { return markDone(); }

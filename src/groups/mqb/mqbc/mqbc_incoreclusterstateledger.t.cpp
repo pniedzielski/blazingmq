@@ -952,7 +952,7 @@ static void test7_apply_ClusterStateRecord()
     BMQTST_ASSERT(tester.hasSentMessagesToLeader(1));
 
     // Verify that the underlying ledger contains the snapshot record
-    bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator> cslIter =
+    bmqu::UniquePtr<mqbc::ClusterStateLedgerIterator> cslIter =
         obj->getIterator();
     BMQTST_ASSERT_EQ(cslIter->next(), 0);
     BMQTST_ASSERT(cslIter->isValid());
@@ -1449,7 +1449,7 @@ static void test10_persistanceLeader()
     // 3. Open the CSL and instantiate ClusterStateLedgerIterator
     BSLS_ASSERT_OPT(obj->open() == 0);
 
-    bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator> cslIter =
+    bmqu::UniquePtr<mqbc::ClusterStateLedgerIterator> cslIter =
         obj->getIterator();
 
     // 4. Iterate through the records and verify that they are as expected
@@ -1757,7 +1757,7 @@ static void test11_persistanceFollower()
     // 3. Open the CSL and instantiate ClusterStateLedgerIterator
     BSLS_ASSERT_OPT(obj->open() == 0);
 
-    bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator> cslIter =
+    bmqu::UniquePtr<mqbc::ClusterStateLedgerIterator> cslIter =
         obj->getIterator();
 
     // 4. Iterate through the records and verify that they are as expected
@@ -2184,7 +2184,7 @@ static void test12_persistanceAcrossRolloverLeader()
     // 6. Open the CSL and instantiate ClusterStateLedgerIterator.
     BSLS_ASSERT_OPT(obj->open() == 0);
 
-    bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator> cslIter =
+    bmqu::UniquePtr<mqbc::ClusterStateLedgerIterator> cslIter =
         obj->getIterator();
 
     // 7. Verify the CSL now consists of the rollover snapshot, then the

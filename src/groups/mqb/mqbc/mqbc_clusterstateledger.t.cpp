@@ -111,11 +111,11 @@ struct ClusterStateLedgerTestImp
         markDone();
     }
 
-    bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator>
+    bmqu::UniquePtr<mqbc::ClusterStateLedgerIterator>
     getIterator() const override
     {
         markDone();
-        return bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator>();
+        return bmqu::UniquePtr<mqbc::ClusterStateLedgerIterator>();
     }
 };
 

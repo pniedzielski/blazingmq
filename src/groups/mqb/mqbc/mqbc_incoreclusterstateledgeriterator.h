@@ -42,6 +42,9 @@
 #include <mqbsi_ledger.h>
 #include <mqbsi_log.h>
 
+// BMQ
+#include <bmqu_uniqueptr.h>
+
 // BDE
 #include <bsl_ostream.h>
 
@@ -130,7 +133,7 @@ class IncoreClusterStateLedgerIterator final
 
     /// Return a new `ClusterStateLedgerIterator`, which is a clone of self,
     /// using the specified `allocator`.
-    bslma::ManagedPtr<ClusterStateLedgerIterator>
+    bmqu::UniquePtr<ClusterStateLedgerIterator>
     clone(bslma::Allocator* allocator) const override;
 
     /// Return true if this iterator is initialized and valid, and the
@@ -230,12 +233,13 @@ IncoreClusterStateLedgerIterator::copy(const ClusterStateLedgerIterator& other)
 
 // ACCESSORS
 //   (virtual mqbc::ClusterStateLedgerIterator)
-inline bslma::ManagedPtr<ClusterStateLedgerIterator>
+inline bmqu::UniquePtr<ClusterStateLedgerIterator>
 IncoreClusterStateLedgerIterator::clone(bslma::Allocator* allocator) const
 {
-    bslma::ManagedPtr<ClusterStateLedgerIterator> mp(
-        new (*allocator) IncoreClusterStateLedgerIterator(*this),
-        allocator);
+    bmqu::UniquePtr<ClusterStateLedgerIterator> mp =
+        bmqu::UniquePtrUtil::adopt<ClusterStateLedgerIterator>(
+            new (*allocator) IncoreClusterStateLedgerIterator(*this),
+            allocator);
 
     return mp;
 }

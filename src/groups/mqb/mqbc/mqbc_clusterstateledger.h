@@ -49,6 +49,7 @@
 
 // BMQ
 #include <bmqp_ctrlmsg_messages.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bdlbb_blob.h>
@@ -336,7 +337,7 @@ class ClusterStateLedger {
     ///
     /// THREAD: This method can be invoked only in the associated cluster's
     ///         dispatcher thread.
-    virtual bslma::ManagedPtr<ClusterStateLedgerIterator>
+    virtual bmqu::UniquePtr<ClusterStateLedgerIterator>
     getIterator() const = 0;
 };
 

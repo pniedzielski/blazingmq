@@ -41,6 +41,7 @@
 
 // BMQ
 #include <bmqp_ctrlmsg_messages.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bsl_list.h>
@@ -124,7 +125,7 @@ class ClusterStateLedgerIterator final
 
     /// Return a new `ClusterStateLedgerIterator`, which is a clone of self,
     /// using the specified `allocator`.
-    bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator>
+    bmqu::UniquePtr<mqbc::ClusterStateLedgerIterator>
     clone(bslma::Allocator* allocator) const override;
 
     /// Return true if this iterator is initialized and valid, and the
@@ -203,12 +204,13 @@ ClusterStateLedgerIterator::copy(const mqbc::ClusterStateLedgerIterator& other)
 }
 
 // ACCESSORS
-inline bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator>
+inline bmqu::UniquePtr<mqbc::ClusterStateLedgerIterator>
 ClusterStateLedgerIterator::clone(bslma::Allocator* allocator) const
 {
-    bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator> mp(
-        new (*allocator) ClusterStateLedgerIterator(*this),
-        allocator);
+    bmqu::UniquePtr<mqbc::ClusterStateLedgerIterator> mp =
+        bmqu::UniquePtrUtil::adopt<mqbc::ClusterStateLedgerIterator>(
+            new (*allocator) ClusterStateLedgerIterator(*this),
+            allocator);
 
     return mp;
 }

@@ -1584,7 +1584,7 @@ void IncoreClusterStateLedger::uncommittedAdvisories(
     }
 }
 
-bslma::ManagedPtr<ClusterStateLedgerIterator>
+bmqu::UniquePtr<ClusterStateLedgerIterator>
 IncoreClusterStateLedger::getIterator() const
 {
     // executed by the *CLUSTER DISPATCHER* thread
@@ -1592,10 +1592,11 @@ IncoreClusterStateLedger::getIterator() const
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_clusterData_p->cluster().inDispatcherThread());
 
-    bslma::ManagedPtr<ClusterStateLedgerIterator> mp(
-        new (*d_allocator_p)
-            IncoreClusterStateLedgerIterator(d_ledger_mp.get()),
-        d_allocator_p);
+    bmqu::UniquePtr<ClusterStateLedgerIterator> mp =
+        bmqu::UniquePtrUtil::adopt<ClusterStateLedgerIterator>(
+            new (*d_allocator_p)
+                IncoreClusterStateLedgerIterator(d_ledger_mp.get()),
+            d_allocator_p);
 
     return mp;
 }

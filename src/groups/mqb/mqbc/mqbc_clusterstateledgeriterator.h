@@ -38,6 +38,7 @@
 
 // BMQ
 #include <bmqp_ctrlmsg_messages.h>
+#include <bmqu_uniqueptr.h>
 
 // BDE
 #include <bsl_ostream.h>
@@ -83,7 +84,7 @@ class ClusterStateLedgerIterator {
 
     /// Return a new `ClusterStateLedgerIterator`, which is a clone of self,
     /// using the specified `allocator`.
-    virtual bslma::ManagedPtr<ClusterStateLedgerIterator>
+    virtual bmqu::UniquePtr<ClusterStateLedgerIterator>
     clone(bslma::Allocator* allocator) const = 0;
 
     /// Return true if this iterator is initialized and valid, and the

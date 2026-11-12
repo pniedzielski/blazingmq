@@ -1909,7 +1909,7 @@ int ClusterUtil::load(ClusterState*               state,
 
     // Point the CSL iterator to the latest snapshot record, since we only need
     // to start loading from there.
-    bslma::ManagedPtr<ClusterStateLedgerIterator> latestIter = iterator->clone(
+    bmqu::UniquePtr<ClusterStateLedgerIterator> latestIter = iterator->clone(
         allocator);
 
     int rc = latestIter->next();
@@ -2092,7 +2092,7 @@ int ClusterUtil::latestLedgerLSN(bmqp_ctrlmsg::LeaderMessageSequence* out,
         return rc_LEDGER_NOT_OPENED;  // RETURN
     }
 
-    bslma::ManagedPtr<mqbc::ClusterStateLedgerIterator> cslIter =
+    bmqu::UniquePtr<mqbc::ClusterStateLedgerIterator> cslIter =
         ledger.getIterator();
     const mqbc::ClusterStateRecordHeader* header = 0;
 
