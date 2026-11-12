@@ -562,8 +562,8 @@ struct Tester {
 
         bsl::vector<bsl::string> files(bmqtst::TestHelperUtil::allocator());
         bdls::FilesystemUtil::findMatchingPaths(&files, pattern.c_str());
-        for (size_t i = 0; i < files.size(); ++i) {
-            bsl::remove(files[i].c_str());
+        for (const bsl::string& file : files) {
+            bsl::remove(file.c_str());
         }
     }
 };
