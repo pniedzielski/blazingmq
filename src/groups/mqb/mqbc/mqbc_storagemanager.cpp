@@ -4921,12 +4921,12 @@ void StorageManager::processReplicaStatusAdvisory(
                  &partitionInfo = d_partitionInfoVec[partitionId],
                  source,
                  status]() {
-        StorageUtil::processReplicaStatusAdvisoryDispatched(clusterData,
-                                                            fs,
-                                                            partitionId,
-                                                            partitionInfo,
-                                                            source,
-                                                            status);
+        StorageUtil::processReplicaStatusAdvisory(clusterData,
+                                                  fs,
+                                                  partitionId,
+                                                  partitionInfo,
+                                                  source,
+                                                  status);
     });
 }
 

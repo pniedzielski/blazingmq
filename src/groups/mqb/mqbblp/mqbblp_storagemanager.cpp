@@ -1983,12 +1983,12 @@ void StorageManager::processReplicaStatusAdvisory(
                  &pinfo = d_partitionInfoVec[partitionId],
                  source,
                  status]() {
-        mqbc::StorageUtil::processReplicaStatusAdvisoryDispatched(clusterData,
-                                                                  fs,
-                                                                  partitionId,
-                                                                  pinfo,
-                                                                  source,
-                                                                  status);
+        mqbc::StorageUtil::processReplicaStatusAdvisory(clusterData,
+                                                        fs,
+                                                        partitionId,
+                                                        pinfo,
+                                                        source,
+                                                        status);
     });
 }
 

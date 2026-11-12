@@ -702,13 +702,13 @@ struct StorageUtil {
 
     /// THREAD: Executed by the queue dispatcher thread associated with
     ///         'partitionId'.
-    static void processReplicaStatusAdvisoryDispatched(
-        mqbc::ClusterData*              clusterData,
-        mqbs::FileStore*                fs,
-        int                             partitionId,
-        const PartitionInfo&            pinfo,
-        mqbnet::ClusterNode*            source,
-        bmqp_ctrlmsg::NodeStatus::Value status);
+    static void
+    processReplicaStatusAdvisory(mqbc::ClusterData*              clusterData,
+                                 mqbs::FileStore*                fs,
+                                 int                             partitionId,
+                                 const PartitionInfo&            pinfo,
+                                 mqbnet::ClusterNode*            source,
+                                 bmqp_ctrlmsg::NodeStatus::Value status);
 
     static void processShutdownEventDispatched(ClusterData*     clusterData,
                                                PartitionInfo*   pinfo,

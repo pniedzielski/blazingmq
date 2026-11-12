@@ -3154,7 +3154,7 @@ int StorageUtil::configureStorage(
     return rc_SUCCESS;
 }
 
-void StorageUtil::processReplicaStatusAdvisoryDispatched(
+void StorageUtil::processReplicaStatusAdvisory(
     mqbc::ClusterData*              clusterData,
     mqbs::FileStore*                fs,
     int                             partitionId,
