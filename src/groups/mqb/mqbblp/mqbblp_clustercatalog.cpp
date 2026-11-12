@@ -550,7 +550,7 @@ ClusterCatalog::getCluster(bsl::shared_ptr<mqbi::Cluster>* out,
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // d_mutex LOCK
 
     // Check if we already have created that cluster
-    ClustersMapIter it = d_clusters.find(name);
+    auto it = d_clusters.find(name);
     if (it != d_clusters.end()) {
         *out = it->second.d_cluster_sp;
         return status;  // RETURN
@@ -599,7 +599,7 @@ bool ClusterCatalog::findCluster(bsl::shared_ptr<mqbi::Cluster>* out,
 {
     bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // d_mutex LOCK
 
-    ClustersMapIter it = d_clusters.find(name);
+    auto it = d_clusters.find(name);
     if (it != d_clusters.end()) {
         *out = it->second.d_cluster_sp;
         return true;  // RETURN
@@ -625,7 +625,7 @@ mqbnet::ClusterNode* ClusterCatalog::onNegotiationForClusterSession(
     {
         bslmt::LockGuard<bslmt::Mutex> guard(&d_mutex);  // d_mutex LOCK
 
-        ClustersMapIter it = d_clusters.find(clusterName);
+        auto it = d_clusters.find(clusterName);
         if (it == d_clusters.end()) {
             errorDescription << "Cluster '" << clusterName << "' not found";
             return 0;  // RETURN
