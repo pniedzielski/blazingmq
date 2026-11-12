@@ -204,7 +204,7 @@ int QueueHandleCatalog::releaseHandleHelper(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queue_p->inDispatcherThread());
 
-    HandleMap::iterator handleIt = d_handles.findByKey1(handle);
+    auto handleIt = d_handles.findByKey1(handle);
     if (handleIt == d_handles.end()) {
         BALL_LOG_ERROR << "#QUEUE_IMPROPER_BEHAVIOR "
                        << d_queue_p->description()
@@ -283,7 +283,7 @@ mqbi::QueueHandle* QueueHandleCatalog::getHandleByRequester(
     // PRECONDITIONS
     BSLS_ASSERT_SAFE(d_queue_p->inDispatcherThread());
 
-    HandleMap::iterator it = d_handles.findByKey2(
+    auto it = d_handles.findByKey2(
         bsl::make_pair(context.requesterId(), queueId));
     return (it != d_handles.end()) ? it->value().get() : 0;
 }
