@@ -61,8 +61,8 @@ isValidPacketLength(int*                      packetLength,
                 bsls::AlignmentFromType<bdlb::BigEndianUint32>::VALUE) == 0)) {
         // All length bytes are in one contiguous buffer at a position that is
         // aligned, so we can directly read from it.
-        const bdlb::BigEndianUint32* lengthBE =
-            reinterpret_cast<const bdlb::BigEndianUint32*>(offsetByte);
+        const auto* lengthBE = reinterpret_cast<const bdlb::BigEndianUint32*>(
+            offsetByte);
         *packetLength = *lengthBE;
     }
     else {
