@@ -453,7 +453,7 @@ static void test3_reconfigureSkipsUnregisteredQueue()
     BMQTST_ASSERT_EQ(rc, 0);
 
     // A queue that will remain registered across the reconfigure.
-    bsl::shared_ptr<TestQueue> survivor = bsl::allocate_shared<TestQueue>(
+    auto survivor = bsl::allocate_shared<TestQueue>(
         alloc,
         "bmq://bmq.test.local/survivor");
 
